@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XC Analytics</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; }
+  h1 { font-size: 1.5rem; }
+  label { display: block; margin-top: 16px; font-weight: 600; font-size: 0.9rem; }
+  input[type=text] { width: 100%; padding: 8px; font-size: 0.95rem; box-sizing: border-box; margin-top: 4px; }
+  textarea { width: 100%; padding: 8px; font-size: 0.9rem; box-sizing: border-box; margin-top: 4px; height: 70px; }
+  button { margin-top: 16px; padding: 10px 20px; font-size: 1rem; background: #111; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  button:disabled { background: #999; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; font-size: 0.9rem; }
+  th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+  th { background: #f4f4f4; }
+  .error { color: #b00020; white-space: pre-wrap; margin-top: 12px; font-size: 0.85rem; }
+  .hint { color: #666; font-size: 0.85rem; margin-top: 4px; }
+  #status { margin-top: 12px; font-size: 0.9rem; color: #444; }
+</style>
+</head>
+<body>
+
+<h1>XC Analytics — AthleticLIVE meet scorer</h1>
+<p class="hint">
+  Enter one or more AthleticLIVE event ids or race URLs (e.g. from a URL like
+  <code>.../meets/76676/events/xc/2909435</code>, the id is <code>2909435</code>).
+  Multiple events (e.g. all grade races at one meet) get merged into one scored field.
+</p>
+
+<label>Event ids or URLs (comma-separated)</label>
+<input type="text" id="events" placeholder="2909525, 2909527, 2909529, 2909530">
+
+<label>Manually add missing runner(s) — optional, one per line, format: Name|Team|Time</label>
+<textarea id="addRunners" placeholder="Jayden Smith|Tualatin|9:02.0"></textarea>
+
+<button id="go">Score meet</button>
+<div id="status"></div>
+<div id="error" class="error"></div>
+
+<div id="output"></div>
+
+<script>
+const goBtn = document.getElementById('go');
+const statusEl = document.getElementById('status');
+const errorEl = document.getElementById('error');
+const outputEl = document.getElementById('output');
+
+goBtn.addEventListener('click', async () => {
+  errorEl.textContent = '';
+  outputEl.innerHTML = '';
+  const events = document.getElementById('events').value.trim();
+  if (!events) {
+    errorEl.textContent = 'Enter at least one event id or URL.';
+    return;
+  }
+  const addRunnersRaw = document.getElementById('addRunners').value
+    .split('\n').map(s => s.trim()).filter(Boolean);
+
+  const params = new URLSearchParams();
+  params.set('events', events);
+  for (const spec of addRunnersRaw) params.append('add_runner', spec);
+
+  goBtn.disabled = true;
+  statusEl.textContent = 'Fetching and scoring…';
+
+  try {
+    const resp = await fetch('/api/score?' + params.toString());
+    const data = await resp.json();
+    statusEl.textContent = '';
+    goBtn.disabled = false;
+
+    if (data.error) {
+      errorEl.textContent = 'Error: ' + data.error;
+      return;
+    }
+    if (data.errors && data.errors.length) {
+      errorEl.textContent = 'Warnings:\n' + data.errors.join('\n');
+    }
+
+    let html = '';
+    if (data.team_scores && data.team_scores.length) {
+      html += '<h2>Team scores</h2><table><tr><th>Rank</th><th>Team</th><th>Score</th><th>Scoring places</th><th>Displacers</th></tr>';
+      for (const ts of data.team_scores) {
+        html += `<tr><td>${ts.rank}</td><td>${ts.team}</td><td>${ts.score}</td>` +
+                `<td>${ts.scoring_places.join('-')}</td><td>${ts.displacer_places.join('-') || '-'}</td></tr>`;
+      }
+      html += '</table>';
+    } else {
+      html += '<p>No team scored — need at least one team with 5+ finishers.</p>';
+    }
+
+    if (data.results && data.results.length) {
+      html += '<h2>Individual results (' + data.results.length + ')</h2><table><tr><th>Place</th><th>Name</th><th>Team</th><th>Time (s)</th><th>Event</th></tr>';
+      const sorted = [...data.results].sort((a,b) => (a.time_seconds ?? Infinity) - (b.time_seconds ?? Infinity));
+      for (const r of sorted) {
+        html += `<tr><td>${r.place ?? ''}</td><td>${r.name}</td><td>${r.team ?? ''}</td>` +
+                `<td>${r.time_seconds ?? ''}</td><td>${r.event_name ?? r.event_id ?? ''}</td></tr>`;
+      }
+      html += '</table>';
+    }
+    outputEl.innerHTML = html;
+  } catch (ex) {
+    statusEl.textContent = '';
+    goBtn.disabled = false;
+    errorEl.textContent = 'Request failed: ' + ex;
+  }
+});
+</script>
+
+</body>
+</html>
