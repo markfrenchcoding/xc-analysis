@@ -235,23 +235,9 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .note{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--accent);
   padding:9px 11px;border-radius:0 9px 9px 0;font-size:12.5px;color:var(--muted);margin:11px 0;line-height:1.45}
 .note b{color:var(--text);font-weight:600}
-.note code,.steps code{background:var(--raised);padding:1px 4px;border-radius:3px;font-size:11.5px;
+.note code{background:var(--raised);padding:1px 4px;border-radius:3px;font-size:11.5px;
   color:var(--text);font-family:ui-monospace,Menlo,monospace;word-break:break-all}
 .empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:14px}
-.steps{counter-reset:s;list-style:none;padding:0;margin:10px 0}
-.steps li{counter-increment:s;position:relative;padding-left:26px;margin-bottom:9px;font-size:13px;
-  color:var(--muted);line-height:1.45}
-.steps li::before{content:counter(s);position:absolute;left:0;top:0;font-family:'Barlow Condensed',sans-serif;
-  font-weight:700;color:var(--accent);font-size:13px}
-.field{margin:12px 0}
-.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px}
-textarea{width:100%;min-height:110px;background:var(--surface);border:1px solid var(--line);border-radius:9px;
-  color:var(--text);font-family:ui-monospace,Menlo,monospace;font-size:11.5px;padding:9px;resize:vertical}
-textarea:focus{outline:2px solid var(--dim);outline-offset:-1px}
-.btn{background:var(--raised);color:var(--text);border:1px solid var(--line);font-family:inherit;font-size:13.5px;
-  padding:8px 13px;border-radius:9px;cursor:pointer;transition:transform .18s var(--ease)}
-.btn:active{transform:scale(.97)}
-.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 .toast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,12px);background:var(--raised);
   border:1px solid var(--line);padding:8px 14px;border-radius:9px;font-size:13px;opacity:0;
   pointer-events:none;transition:all .3s var(--ease);z-index:60;color:var(--text)}
@@ -259,6 +245,55 @@ textarea:focus{outline:2px solid var(--dim);outline-offset:-1px}
 .legend{display:flex;gap:11px;font-size:10.5px;color:var(--dim);margin:0 0 8px;flex-wrap:wrap}
 .legend span{display:flex;align-items:center;gap:4px}
 .legend i{width:8px;height:8px;border-radius:2px;display:block}
+.wisel{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);
+  border-radius:9px;padding:9px 10px;font-family:inherit;font-size:14px;margin-bottom:8px}
+.wirow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;
+  padding:6px 0;border-top:1px solid var(--line);font-size:13.5px}
+.wirow .who{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wirow .who em{font-style:normal;color:var(--dim);font-size:11px;margin-left:5px;
+  font-variant-numeric:tabular-nums}
+.step{display:flex;align-items:center;gap:4px}
+.step button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);
+  background:var(--raised);color:var(--text);font-family:inherit;font-size:15px;
+  line-height:1;cursor:pointer;padding:0}
+.step button:active{transform:scale(.9)}
+.step span{width:44px;text-align:center;font-family:'Barlow Condensed',sans-serif;
+  font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.step span.on{color:var(--accent)}
+.cmp{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 0;
+  border-top:1px solid var(--line);font-size:13.5px;align-items:baseline}
+.cmp b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+  width:52px;text-align:right;font-variant-numeric:tabular-nums;display:block}
+.cmp .d{width:56px;text-align:right;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
+.cmp .d.up{color:#3FB37F}.cmp .d.dn{color:var(--accent)}.cmp .d.flat{color:var(--dim)}
+.cmphead{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;font-size:9.5px;
+  color:var(--dim);padding-bottom:2px}
+.cmphead span:not(:first-child){width:52px;text-align:right}
+.cmphead span:last-child{width:56px}
+.solve{background:var(--accent);color:#fff;border:0;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:14px;padding:0 16px;border-radius:9px;cursor:pointer;
+  transition:transform .18s var(--ease)}
+.solve:active{transform:scale(.96)}
+.imp{display:grid;grid-template-columns:1fr 90px 46px;gap:8px;align-items:center;
+  padding:6px 0;border-top:1px solid var(--line);font-size:13.5px}
+.imp .who em{font-style:normal;color:var(--dim);font-size:11px;margin-left:5px}
+.ibar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.ibar i{display:block;height:100%;background:var(--accent);border-radius:3px;
+  transition:width .5s var(--ease)}
+.ival{text-align:right;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:14px;font-variant-numeric:tabular-nums;color:var(--accent)}
+.doc h3{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+  margin:16px 0 3px;color:var(--text)}
+.doc p{font-size:13px;color:var(--muted);margin:0 0 7px;line-height:1.5}
+.doc table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 10px}
+.doc th{text-align:left;color:var(--dim);font-weight:500;font-size:10.5px;padding:3px 0}
+.doc td{padding:4px 0;border-top:1px solid var(--line);color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.doc td:first-child{color:var(--text)}
+.doc td:not(:first-child),.doc th:not(:first-child){text-align:right}
+.doc code{background:var(--raised);padding:1px 5px;border-radius:3px;font-size:11.5px;
+  color:var(--text);font-family:ui-monospace,Menlo,monospace}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
@@ -1364,15 +1399,21 @@ F,Nefret Perez,20:04.3,9,Westview,3000
         <span class="dial-val" id="vVal">1.8%</span>
       </div>
       <div class="dial-note" id="vNote"></div>
-      <input type="range" id="vRange" min="4" max="50" value="18" step="1" aria-label="Race-day variance">
+      <input type="range" id="vRange" min="4" max="80" value="23" step="1" aria-label="Race-day variance">
       <div class="seg" role="group" aria-label="Variance presets">
-        <button data-v="8">Consistent</button>
-        <button data-v="18" aria-pressed="true">Typical</button>
-        <button data-v="32">Volatile</button>
+        <button data-v="14">Consistent</button>
+        <button data-v="23" aria-pressed="true">Typical</button>
+        <button data-v="40">Volatile</button>
       </div>
+      <div class="dial-top" style="margin-top:12px">
+        <span class="dial-lab">Races simulated</span>
+        <span class="dial-val" id="nVal">5,000</span>
+      </div>
+      <div class="dial-note" style="min-height:0;margin-bottom:8px">More races, steadier odds. One race is a single roll of the dice.</div>
+      <input type="range" id="nRange" min="0" max="20" value="20" step="1" aria-label="Races simulated">
       <div class="seg" role="group" aria-label="Race distance">
-        <button data-dist="5000" aria-pressed="true">5,000m board</button>
-        <button data-dist="3000">3,000m board</button>
+        <button data-dist="5000" aria-pressed="true">5,000m</button>
+        <button data-dist="3000">3,000m</button>
       </div>
     </div>
 
@@ -1396,45 +1437,79 @@ F,Nefret Perez,20:04.3,9,Westview,3000
     <div id="lgOut"></div>
   </section>
 
-  <section class="panel" id="p-3k">
+  <section class="panel" id="p-doc">
+    <h2 class="sec">How this works</h2>
+    <div class="doc">
+
+      <h3>What goes in</h3>
+      <p>Every 6A athlete's marks from athletic.net, grouped by school, seven fastest per team. A team needs five runners to score; teams short of five sit out and are named on the Leagues tab. The 5,000m and 3,000m boards are scored separately — nothing is converted between them, because team places come from finishing order and a 3,000m race produces order just as well as a 5,000m one.</p>
+
+      <h3>Sampling an athlete</h3>
+      <p>A runner is not reduced to their best day. Each race draws from their top three marks — <code>25%</code> best, <code>50%</code> second, <code>25%</code> third. With fewer than three marks the weights renormalise over what exists, so a single mark is used every time.</p>
+
+      <h3>Race-day noise</h3>
+      <p>The drawn mark is then scaled by <code>1 + team shock + individual noise</code>. Thirty percent of the variance is a shock shared by all seven of a squad — travel, tactics, a course that suits them. Variances add, so the two are <code>√0.30</code> and <code>√0.70</code> of the dial. Independent draws would cancel inside a five-runner sum and make every favourite look safer than they are.</p>
+      <p>Individual noise is right-skewed. A good day is capped by fitness; a bad one — illness, a fall, going out too hard — is not. The slow half is stretched ×1.45 and the fast half compressed ×0.75, then recentred and rescaled so the dial still means one standard deviation.</p>
+      <p>A meet-wide shock is deliberately absent: multiplying everyone in a race by the same number cannot change the order of finish.</p>
+
+      <h3>What last season told us</h3>
+      <p>The dial's default is not a guess. Athletes who ran both a fair-course meet in 2025 and the state meet at Lane were compared directly:</p>
+      <table>
+        <tr><th>Reference</th><th>n</th><th>state ÷ ref</th><th>spread</th></tr>
+        <tr><td>Rose City GC · Oct 10</td><td>208</td><td>1.009</td><td>2.16%</td></tr>
+        <tr><td>Blue Lake · Sep 26</td><td>85</td><td>1.007</td><td>2.44%</td></tr>
+        <tr><td>Ultimook · Sep 6</td><td>66</td><td>0.937</td><td>4.40%</td></tr>
+      </table>
+      <p>The two fair courses agree almost exactly: Lane runs about 1% slower, and race-to-race spread is roughly <code>2.25%</code>. That is where the default comes from. Ultimook was dropped — Hydrangea Ranch is effectively an obstacle course, and that 4.4% measured the terrain rather than the athletes.</p>
+      <p>The two fair references are six weeks apart and give the same ratio, which says something useful: across the back half of the season, fitness gains and Lane's extra difficulty roughly cancel. The ratio itself never enters the simulation — it is uniform, so it cannot change order. Only the spread does.</p>
+
+      <h3>Scoring a race</h3>
+      <p>NFHS rules. Runners are placed by time, a team's first five finishers sum to its score, and runners six and seven take places without scoring — they displace rivals. Ties break on the sixth runner, and a team without a sixth loses any tie it is in. Teams that cannot field five are removed before places are assigned, so their runners displace nobody.</p>
+
+      <h3>Getting to Lane</h3>
+      <p>Two teams from each of the seven leagues qualify automatically — fourteen berths. Third-place teams enter the at-large pool, ranked here by their scoring five's average time. A fourth-place team is only eligible once its own league's third has been taken, which is the OSAA rule and is why fourth place almost never gets in with only two spots. Two at-large teams are chosen, for a sixteen-team field.</p>
+      <p>The state meet is then run with a <b>fresh</b> set of draws. A team that got hot at districts starts again from its marks, which is the whole point of running the season thousands of times rather than once.</p>
+
+      <h3>What if</h3>
+      <p>Both worlds are scored against the same simulated races, so the difference you see is the improvement and not the luck. When several runners are adjusted, each is also run on its own to show what it is worth alone — and comparing the sum of those to the combined figure tells you whether the gains stack or overlap.</p>
+      <p>The solver adds five seconds at a time to whichever runner buys the most, re-probing after each step, and stops once the outcome is more likely than not. It gives up at 180 seconds across the squad.</p>
+
+      <h3>What it does not know</h3>
+      <p>Course difficulty is not modelled — a mark from a flat park and one from a hilly farm are treated alike, which is the largest source of error this early in the season. Nobody improves, gets injured, or changes the top seven between now and November. The at-large ranking is a stand-in for a committee that also weighs league strength and head-to-head. And a league with only two scoring teams will show both at 100%, which is arithmetic rather than a prediction.</p>
+
+    </div>
+  </section>
+
+  <section class="panel" id="p-wi">
     <div class="switch" role="group" aria-label="Race">
       <button data-g="M" aria-pressed="true">Boys</button>
       <button data-g="F" aria-pressed="false">Girls</button>
     </div>
-    <h2 class="sec">The 3,000m board</h2>
-    <p class="sub2">Several teams have only raced 3,000m so far. Pick the 3,000m board on the Odds tab to run the whole season at that distance.</p>
-    <div id="k3Out"></div>
+    <h2 class="sec">What if a runner improves?</h2>
+    <p class="sub2">Take time off one or more of your seven and see what it does to your league and state odds. Both worlds are run against the same simulated races, so the difference is the improvement, not luck.</p>
+    <select id="wiTeam" class="wisel"></select>
+    <div class="runbar" id="runbar2">
+      <span class="lane">
+        <span class="track"><i></i></span>
+        <span class="pack" id="pack2"><svg class="rn r3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16.2" cy="4.6" r="2.4" fill="currentColor" stroke="none"/><path d="M15 8.4 11.2 12.9"/><g class="lg1"><path d="M11.2 12.9 15.2 15.9 13.8 21"/><path d="M11.2 12.9 6.6 15.2 7.4 20.4"/></g><g class="lg2"><path d="M11.2 12.9 14.2 16.8 16.4 20.6"/><path d="M11.2 12.9 7.2 14.2 5.6 19"/></g><g class="ar1"><path d="M14.4 9.4 18.8 11.2"/><path d="M13.8 10 9.4 9.1"/></g><g class="ar2"><path d="M14.4 9.4 18.2 7.6"/><path d="M13.8 10 10.2 12.2"/></g></svg><svg class="rn r2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16.2" cy="4.6" r="2.4" fill="currentColor" stroke="none"/><path d="M15 8.4 11.2 12.9"/><g class="lg1"><path d="M11.2 12.9 15.2 15.9 13.8 21"/><path d="M11.2 12.9 6.6 15.2 7.4 20.4"/></g><g class="lg2"><path d="M11.2 12.9 14.2 16.8 16.4 20.6"/><path d="M11.2 12.9 7.2 14.2 5.6 19"/></g><g class="ar1"><path d="M14.4 9.4 18.8 11.2"/><path d="M13.8 10 9.4 9.1"/></g><g class="ar2"><path d="M14.4 9.4 18.2 7.6"/><path d="M13.8 10 10.2 12.2"/></g></svg><svg class="rn r1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16.2" cy="4.6" r="2.4" fill="currentColor" stroke="none"/><path d="M15 8.4 11.2 12.9"/><g class="lg1"><path d="M11.2 12.9 15.2 15.9 13.8 21"/><path d="M11.2 12.9 6.6 15.2 7.4 20.4"/></g><g class="lg2"><path d="M11.2 12.9 14.2 16.8 16.4 20.6"/><path d="M11.2 12.9 7.2 14.2 5.6 19"/></g><g class="ar1"><path d="M14.4 9.4 18.8 11.2"/><path d="M13.8 10 9.4 9.1"/></g><g class="ar2"><path d="M14.4 9.4 18.2 7.6"/><path d="M13.8 10 10.2 12.2"/></g></svg></span>
+      </span>
+      <span class="runlab" id="runlab2"></span>
+    </div>
+    <div id="wiRoster"></div>
+    <div id="wiOut"></div>
   </section>
 
-  <section class="panel" id="p-data">
-    <h2 class="sec">Update the database</h2>
-    <p class="sub2">The full 2026 6A division as of September 11 — both distances, top 7 per team. Athletic.net renders in JavaScript, so marks have to come out of a real browser.</p>
-    <ol class="steps">
-      <li>Open <code>athletic.net/CrossCountry/rankings/list/87405/m/5000?page=1</code>. Division 87405 is 2026 6A; 2025 is <code>81499</code>.</li>
-      <li>Walk the pages — 9 boys and 6 girls at 5,000m, 10 and 7 at 3,000m. Swap <code>/5000</code> for <code>/3000</code>.</li>
-      <li>Group by team, keep each athlete's fastest mark per distance, take the 7 fastest runners.</li>
-      <li>Paste below, or replace the <code>seed</code> block in this file and commit.</li>
-    </ol>
-    <div class="field">
-      <label for="csv">Paste CSV — header needs gender, athlete, team, mark. A <code>dist</code> column of 3000 puts a row on the 3,000m board.</label>
-      <textarea id="csv" placeholder="gender,athlete,mark,grade,team,dist&#10;M,George Lora,15:18.6,11,Ida B. Wells,5000"></textarea>
-    </div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap">
-      <button class="btn primary" id="loadCsv">Load this data</button>
-      <button class="btn" id="resetCsv">Restore seed</button>
-    </div>
-    <h2 class="sec">What's loaded</h2>
-    <div id="stats"></div>
-    <p class="sub2" style="margin-top:10px">School crests come from athletic.net. If one stops loading it falls back to initials.</p>
-  </section>
+  
+
+  
 </div>
 
 <div class="bar"><div class="bar-inner">
   <div class="tabs" role="group" aria-label="Sections">
     <button data-p="p-sim" aria-pressed="true">Odds</button>
     <button data-p="p-lg" aria-pressed="false">Leagues</button>
-    <button data-p="p-3k" aria-pressed="false">3k</button>
-    <button data-p="p-data" aria-pressed="false">Data</button>
+    <button data-p="p-wi" aria-pressed="false">What if</button>
+    <button data-p="p-doc" aria-pressed="false">How</button>
   </div>
   <button class="go" id="go">Run</button>
 </div></div>
@@ -1459,13 +1534,28 @@ const ABBR={"Portland Interscholastic":"PIL","Metro":"Metro","Pacific":"Pacific"
   "Three Rivers":"Three Rivers","Central Valley":"Central Valley","Special District 1":"SD1"};
 const AUTO_PER=2, AT_LARGE=2, LG=Object.keys(LEAGUES);
 const FIELD=LG.length*AUTO_PER+AT_LARGE;   // 16
-const N_SIMS=5000;
-const DURATION=10000;                      // paced so the odds visibly settle
+let nSims=5000;          // 1, then 250-step increments to 5,000
+/* Calibrated against 2025, using fair courses only. Two references were
+   compared to the state meet at Lane (Nov 8):
+       Rose City GC  Oct 10  n=208  ratio 1.009  sd 2.16%
+       Blue Lake     Sep 26  n= 85  ratio 1.007  sd 2.44%
+   They agree closely: athletes run about 1% slower at Lane, and their
+   race-to-race spread is ~2.25%. Ultimook at Hydrangea Ranch (sd 4.4%) was
+   dropped — it is effectively an obstacle course, and that figure measured
+   the terrain rather than the athletes.
+   The ratio is uniform so it cannot change finishing order; only the spread
+   enters the model. */
+const CAL={ratio:1.008,sd:2.3,n:293};
+/* Each athlete's season is sampled, not just their best: 25% best mark,
+   50% second, 25% third. Fewer than three marks renormalises over what exists. */
+const MARK_W=[0.25,0.50,0.25];
+const FULL_MS=10000;                       // pacing for a full 5,000-race run
+const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
 
 const TEAM_LEAGUE={};
 for(const [lg,ts] of Object.entries(LEAGUES)) ts.forEach(t=>TEAM_LEAGUE[t]=lg);
 
-let DATA=[], gender="M", sigmaPct=1.8, distMode=5000, running=false, skip=false,
+let DATA=[], gender="M", sigmaPct=CAL.sd, distMode=5000, running=false, skip=false,
     cards=[], stepH=100;
 
 function initials(n){
@@ -1509,6 +1599,7 @@ function parseCSV(text){
     if(raw===null||(g!=="M"&&g!=="F")){bad++;continue;}
     const dist=iD>-1&&String(c[iD]).indexOf("3")===0?3000:5000;
     rows.push({g,name:c[iA],team:c[iT],dist,sb:raw,grade:iGr>-1?c[iGr]:""});
+    // duplicate athlete rows are kept, not collapsed — they are the season
   }
   return {rows,bad};
 }
@@ -1519,9 +1610,19 @@ function buildModel(g,dist){
   for(const r of DATA){
     if(r.g!==g||r.dist!==dist)continue;
     if(!byTeam.has(r.team))byTeam.set(r.team,new Map());
-    const t=byTeam.get(r.team),cur=t.get(r.name);
-    if(!cur||r.sb<cur.sb) t.set(r.name,r);
+    const t=byTeam.get(r.team);
+    if(!t.has(r.name)) t.set(r.name,{name:r.name,grade:r.grade,marks:[]});
+    t.get(r.name).marks.push(r.sb);
   }
+  for(const t of byTeam.values())
+    for(const a of t.values()){
+      a.marks.sort((x,y)=>x-y);
+      a.marks=a.marks.slice(0,3);       // top three of the season
+      a.sb=a.marks[0];
+      a.w=MARK_W.slice(0,a.marks.length);
+      const s=a.w.reduce((p,q)=>p+q,0);
+      a.w=a.w.map(v=>v/s);              // renormalise when fewer than three
+    }
   const teams=[],runners=[],unassigned=[];
   for(const [name,m] of byTeam){
     const lg=TEAM_LEAGUE[name];
@@ -1529,7 +1630,7 @@ function buildModel(g,dist){
     const roster=[...m.values()].sort((a,b)=>a.sb-b.sb).slice(0,7);
     const idx=teams.length;
     if(roster.length<5){teams.push({name,league:lg,idx,rIdx:[],short:roster.length,avg5:Infinity});continue;}
-    const rIdx=roster.map(r=>{runners.push({sb:r.sb,t:idx});return runners.length-1;});
+    const rIdx=roster.map(r=>{runners.push({marks:r.marks,w:r.w,sb:r.sb,t:idx});return runners.length-1;});
     teams.push({name,league:lg,idx,rIdx,short:0,roster,
       avg5:roster.slice(0,5).reduce((s,r)=>s+r.sb,0)/5});
   }
@@ -1600,18 +1701,27 @@ function gauss(){
   spare=v*m;return u*m;
 }
 
+function pickMark(r){
+  if(r.marks.length===1)return r.marks[0];
+  let u=Math.random();
+  for(let i=0;i<r.w.length;i++){ if(u<r.w[i])return r.marks[i]; u-=r.w[i]; }
+  return r.marks[r.marks.length-1];
+}
+
 function draw(model,times,sigma,shock){
   const {runners,teams}=model;
   for(let k=0;k<teams.length;k++) shock[k]=gauss()*sigma*SIG_T;
   for(let i=0;i<runners.length;i++){
     const r=runners[i];
-    times[i]=r.sb*(1+shock[r.t]+skew()*sigma*SIG_I);
+    times[i]=pickMark(r)*(1+shock[r.t]+skew()*sigma*SIG_I);
   }
 }
 
-function oneSeason(model,byIdx,sigma,times,shock){
-  const {byLeague,teams}=model;
-  draw(model,times,sigma,shock);
+/* Districts + at-large, scored over a supplied set of times. Split out from the
+   drawing so the what-if can score two worlds off ONE set of draws: a paired
+   comparison, where the difference is the improvement and not the luck. */
+function playDistricts(model,byIdx,times){
+  const {byLeague}=model;
   const autos=[],pool=[];
   for(const lg of LG){
     const list=byLeague[lg];
@@ -1632,10 +1742,11 @@ function oneSeason(model,byIdx,sigma,times,shock){
   }
   for(const i of autos){byIdx[i].auto++;byIdx[i].qual++;}
   for(const i of wilds){byIdx[i].wild++;byIdx[i].qual++;}
+  return autos.concat(wilds);
+}
 
-  const fieldIdx=autos.concat(wilds);
-  if(fieldIdx.length<2)return;
-  draw(model,times,sigma,shock);          // state is a fresh race, not a replay
+function playState(model,byIdx,times,fieldIdx){
+  const {teams}=model;
   const res=scoreMeet(fieldIdx.map(i=>teams[i]),times);
   for(let p=0;p<res.length;p++){
     const t=byIdx[res[p].idx],place=p+1;
@@ -1644,6 +1755,29 @@ function oneSeason(model,byIdx,sigma,times,shock){
     if(place<=4)t.top4++;
     if(place===1)t.win++;
   }
+}
+
+/* A world is {adj, byIdx}: a set of second-offsets and its own tally. Every
+   world is scored against the SAME draws, so differences between them are the
+   adjustments and never the luck. One world = the ordinary simulation. */
+function oneSeason(model,worlds,sigma,times,shock,tmp){
+  draw(model,times,sigma,shock);
+  const fields=worlds.map(w=>playDistricts(model,w.byIdx,shift(times,w.adj,tmp)));
+  draw(model,times,sigma,shock);        // state is a fresh race, not a replay
+  worlds.forEach((w,i)=>{
+    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i]);
+  });
+}
+function shift(times,adj,tmp){
+  if(!adj)return times;
+  for(let i=0;i<times.length;i++) tmp[i]=times[i]-adj[i];
+  return tmp;
+}
+function blankTally(model){
+  const t=model.teams.filter(x=>!x.short).map(x=>({idx:x.idx,name:x.name,league:x.league,
+    avg5:x.avg5,auto:0,wild:0,qual:0,top10:0,top4:0,win:0,hist:new Array(FIELD+1).fill(0)}));
+  const by=[]; for(const x of t) by[x.idx]=x;
+  return {list:t,byIdx:by};
 }
 
 /* ---------- render ---------- */
@@ -1676,7 +1810,7 @@ function buildBoard(tally){
   const box=document.getElementById("simOut");
   box.innerHTML=`
     <h2 class="sec">Odds by team</h2>
-    <p class="sub2">Bars are where a team finishes at state across 5,000 simulated seasons.</p>
+    <p class="sub2">Bars are where a team finishes at state across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
     <div class="legend">
       <span><i style="background:var(--t1)"></i>1st</span>
       <span><i style="background:var(--t2)"></i>2nd</span>
@@ -1795,37 +1929,225 @@ function renderLeagues(tally,model,done){
   });
 }
 
-function render3k(){
-  const m5=buildModel(gender,5000), m3=buildModel(gender,3000);
-  const ok5=new Set(m5.teams.filter(t=>!t.short).map(t=>t.name));
-  const ok3=new Set(m3.teams.filter(t=>!t.short).map(t=>t.name));
-  const only3=[...ok3].filter(n=>!ok5.has(n)).sort();
-  const only5=[...ok5].filter(n=>!ok3.has(n)).sort();
-  const list=m3.teams.filter(t=>!t.short).sort((a,b)=>a.avg5-b.avg5);
+/* ---------- what if ---------- */
+let wiAdj={};                       // runner name -> seconds of improvement
+const GOALS=[["auto","Auto-qualify"],["wild","At-large berth"],
+             ["top10","Top 10 at state"],["top4","Top 4 at state"],["win","Win state"]];
+const GOAL_P=0.5;                   // "gets there" means more likely than not
+const STEP=5, MAX_TOTAL=180, MAX_STEPS=30;
 
-  let html=`<div class="note">Team places come out of 3,000m times exactly the way they come out of 5,000m times, so nothing here is converted. Two separate boards, not one adjusted board.</div>`;
-  if(only3.length) html+=`<div class="note"><b>Only on this board:</b> ${only3.join(", ")}. No 5,000m five yet.</div>`;
-  if(only5.length) html+=`<div class="note"><b>Absent from this board:</b> ${only5.join(", ")}. No 3,000m five.</div>`;
-  if(!list.length) html+=`<div class="empty">No team here has five 3,000m runners.</div>`;
+function wiTeamNow(){
+  const model=buildModel(gender,distMode);
+  const t=model.teams.find(x=>x.name===document.getElementById("wiTeam").value);
+  return {model,team:(t&&!t.short)?t:null};
+}
 
-  for(const t of list){
-    html+=`<div class="dgroup"><button class="dhead" aria-expanded="false">
-      <span class="ttl">${crest(t.name,"crest-sm")}<h3>${t.name}</h3></span>
-      <span>${ABBR[t.league]} · 1&ndash;5 avg ${fmt(t.avg5)}</span></button>
-      <div class="dbody" style="display:none">`;
-    t.roster.forEach((a,i)=>{
-      html+=`<div class="prow"><span class="nm">${i+1}. ${a.name}</span>
-        <span class="m">${a.grade?"gr "+a.grade:""}</span>
-        <span class="p">${fmt(a.sb)}</span></div>`;
-    });
-    html+=`</div></div>`;
+function renderWhatIf(){
+  const model=buildModel(gender,distMode);
+  const teams=model.teams.filter(t=>!t.short).sort((a,b)=>a.name.localeCompare(b.name));
+  const sel=document.getElementById("wiTeam");
+  if(!teams.length){
+    sel.innerHTML="";
+    document.getElementById("wiRoster").innerHTML=`<div class="empty">No team here can field five runners.</div>`;
+    document.getElementById("wiOut").innerHTML="";return;
   }
-  const box=document.getElementById("k3Out");
-  box.innerHTML=html;
-  box.querySelectorAll(".dhead").forEach(h=>h.onclick=()=>{
-    const b=h.nextElementSibling,open=h.getAttribute("aria-expanded")==="true";
-    h.setAttribute("aria-expanded",!open);b.style.display=open?"none":"";
+  const keep=sel.value;
+  sel.innerHTML=teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join("");
+  if(teams.some(t=>t.name===keep))sel.value=keep;
+  const team=teams.find(t=>t.name===sel.value)||teams[0];
+  const total=Object.values(wiAdj).reduce((s,v)=>s+v,0);
+
+  document.getElementById("wiRoster").innerHTML=
+    `<h2 class="sec">${team.name}</h2>
+     <p class="sub2">Seconds off each runner${total?` — ${total}s across ${Object.keys(wiAdj).length} of them`:""}.</p>`+
+    team.roster.map((r,i)=>`<div class="wirow">
+      <span class="who">${i+1}. ${r.name}<em>${fmt(r.sb)}</em></span>
+      <span class="step" data-n="${r.name}">
+        <button data-d="-${STEP}" aria-label="less">−</button>
+        <span class="${wiAdj[r.name]?"on":""}">${wiAdj[r.name]?"−"+wiAdj[r.name]+"s":"0s"}</span>
+        <button data-d="${STEP}" aria-label="more">+</button>
+      </span><span></span></div>`).join("")+
+    `<div style="display:flex;gap:6px;margin-top:10px">
+       <select id="wiGoal" class="wisel" style="margin:0;flex:1">
+         ${GOALS.map(([k,l])=>`<option value="${k}">${l}</option>`).join("")}
+       </select>
+       <button class="solve" id="wiSolve">Find it</button>
+     </div>
+     <p class="sub2" style="margin-top:6px">Picks the cheapest set of improvements that makes the chosen outcome more likely than not.</p>`;
+
+  document.querySelectorAll("#wiRoster .step button").forEach(b=>b.onclick=()=>{
+    const n=b.parentElement.dataset.n;
+    wiAdj[n]=Math.max(0,Math.min(120,(wiAdj[n]||0)+(+b.dataset.d)));
+    if(!wiAdj[n])delete wiAdj[n];
+    renderWhatIf();
   });
+  document.getElementById("wiSolve").onclick=solveGoal;
+  sel.onchange=()=>{wiAdj={};renderWhatIf();document.getElementById("wiOut").innerHTML="";};
+}
+
+function adjFor(model,team,map){
+  const a=new Float64Array(model.runners.length);
+  team.rIdx.forEach((ri,k)=>{a[ri]=map[team.roster[k].name]||0;});
+  return a;
+}
+
+/* Paced runner over a set of worlds. onEnd gets the tallies. */
+function runWorlds(model,worlds,seasons,label,onEnd){
+  running=true;
+  const go=document.getElementById("go");
+  go.textContent="…";go.classList.add("running");
+  const rb=document.getElementById("runbar2"),lab=document.getElementById("runlab2"),
+        pk=document.getElementById("pack2");
+  rb.classList.add("on");document.body.classList.add("simming");
+  const times=new Float64Array(model.runners.length);
+  const tmp=new Float64Array(model.runners.length);
+  const shock=new Float64Array(model.teams.length);
+  const sigma=sigmaPct/100;
+  const dur=Math.max(320,FULL_MS*seasons/5000);
+  let done=0,t0=0;
+  requestAnimationFrame(function step(ts){
+    if(!t0)t0=ts;
+    const target=Math.max(done+1,Math.min(seasons,Math.floor(seasons*(ts-t0)/dur)));
+    while(done<target){oneSeason(model,worlds,sigma,times,shock,tmp);done++;}
+    pk.style.left=(done/seasons*100)+"%";
+    rb.querySelector(".track i").style.width=(done/seasons*100)+"%";
+    lab.textContent=label+" "+done.toLocaleString()+"/"+seasons.toLocaleString();
+    if(done<seasons)requestAnimationFrame(step);
+    else{
+      rb.classList.remove("on");document.body.classList.remove("simming");
+      lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+      onEnd(done);
+    }
+  });
+}
+
+function runWhatIf(){
+  if(running)return;
+  const {model,team}=wiTeamNow();
+  if(!team)return;
+  const names=Object.keys(wiAdj);
+  if(!names.length){
+    document.getElementById("wiOut").innerHTML=`<div class="note">Take some time off at least one runner first, or pick an outcome and let it solve.</div>`;
+    return;
+  }
+  document.getElementById("wiOut").innerHTML="";
+  // worlds: baseline, combined, then one per runner on its own (only if several)
+  const worlds=[],meta=[];
+  const add=(map,tag)=>{const T=blankTally(model);
+    worlds.push({adj:map?adjFor(model,team,map):null,byIdx:T.byIdx});
+    meta.push({tag,by:T.byIdx});};
+  add(null,"base"); add(wiAdj,"all");
+  if(names.length>1) for(const n of names) add({[n]:wiAdj[n]},n);
+  const seasons=Math.max(250,Math.round(nSims*2/worlds.length));
+  runWorlds(model,worlds,seasons,"",n=>showWhatIf(meta,team,n,names));
+}
+
+function showWhatIf(meta,team,n,names){
+  const g=t=>meta.find(m=>m.tag===t).by[team.idx];
+  const base=g("base"),all=g("all");
+  const rows=[["auto","Auto-qualify"],["wild","At-large"],["qual","Makes state"],
+              ["top10","Top 10"],["top4","Top 4"],["win","Wins state"]];
+  let html=`<h2 class="sec">${team.name} — before and after</h2>
+    <p class="sub2">${names.map(k=>`${k} −${wiAdj[k]}s`).join(", ")} · ${n.toLocaleString()} paired ${n===1?"race":"races"}.</p>
+    <div class="cmphead"><span></span><span>now</span><span>after</span><span>change</span></div>`;
+  for(const [k,label] of rows){
+    const pa=base[k]/n*100,pb=all[k]/n*100,d=pb-pa;
+    const cls=Math.abs(d)<0.5?"flat":(d>0?"up":"dn");
+    html+=`<div class="cmp"><span>${label}</span><b>${pct(base[k],n)}</b><b>${pct(all[k],n)}</b>
+      <span class="d ${cls}">${cls==="flat"?"—":(d>0?"+":"")+d.toFixed(1)}</span></div>`;
+  }
+  if(names.length>1){
+    const key=document.getElementById("wiGoal").value;
+    const lab=GOALS.find(x=>x[0]===key)[1];
+    const solo=names.map(nm=>({nm,gain:(g(nm)[key]-base[key])/n*100,secs:wiAdj[nm]}));
+    const max=Math.max(...solo.map(s=>Math.abs(s.gain)),0.1);
+    solo.sort((a,b)=>b.gain-a.gain);
+    html+=`<h2 class="sec">Who is moving the needle</h2>
+      <p class="sub2">Each runner's effect on <b>${lab}</b> on their own, holding the rest at their current marks.</p>`;
+    for(const s of solo)
+      html+=`<div class="imp"><span class="who">${s.nm}<em>−${s.secs}s</em></span>
+        <span class="ibar"><i style="width:${Math.max(2,Math.abs(s.gain)/max*100)}%"></i></span>
+        <span class="ival">${s.gain>0?"+":""}${s.gain.toFixed(1)}</span></div>`;
+    const sum=solo.reduce((t,s)=>t+s.gain,0), combined=(all[key]-base[key])/n*100;
+    if(Math.abs(sum)>0.5)
+      html+=`<div class="note">Separately they add to ${sum>0?"+":""}${sum.toFixed(1)} points; together they are worth ${combined>0?"+":""}${combined.toFixed(1)}. ${
+        combined>sum+1?"Improving them together is worth more than the parts — they displace opponents as a pack.":
+        combined<sum-1?"The gains overlap: once one of them is past a rival, the next has less left to win.":
+        "The gains are close to additive."}</div>`;
+  }
+  document.getElementById("wiOut").innerHTML=html;
+}
+
+/* ---- greedy solver: cheapest improvements that reach the target ---- */
+function solveGoal(){
+  if(running)return;
+  const {model,team}=wiTeamNow();
+  if(!team)return;
+  const key=document.getElementById("wiGoal").value;
+  const label=GOALS.find(x=>x[0]===key)[1];
+  const out=document.getElementById("wiOut");
+  const rb=document.getElementById("runbar2"),lab=document.getElementById("runlab2"),
+        pk=document.getElementById("pack2");
+  running=true;
+  const go=document.getElementById("go");go.textContent="…";go.classList.add("running");
+  rb.classList.add("on");document.body.classList.add("simming");
+  out.innerHTML="";
+
+  const EV=300;                                   // quick probe per candidate
+  const times=new Float64Array(model.runners.length);
+  const tmp=new Float64Array(model.runners.length);
+  const shock=new Float64Array(model.teams.length);
+  const sigma=sigmaPct/100;
+  const probe=map=>{
+    const T=blankTally(model);
+    const w=[{adj:map?adjFor(model,team,map):null,byIdx:T.byIdx}];
+    for(let s=0;s<EV;s++) oneSeason(model,w,sigma,times,shock,tmp);
+    return T.byIdx[team.idx][key]/EV;
+  };
+
+  const cur={}; let step=0, p0=probe(null), best=p0;
+  const roster=team.roster.map(r=>r.name);
+
+  requestAnimationFrame(function tick(){
+    const total=Object.values(cur).reduce((s,v)=>s+v,0);
+    if(best>=GOAL_P||step>=MAX_STEPS||total>=MAX_TOTAL){
+      rb.classList.remove("on");document.body.classList.remove("simming");
+      lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+      finishSolve(cur,key,label,p0,best,total);
+      return;
+    }
+    let pick=null,pickP=best;
+    for(const nm of roster){
+      const trial={...cur};trial[nm]=(trial[nm]||0)+STEP;
+      const p=probe(trial);
+      if(p>pickP){pickP=p;pick=nm;}
+    }
+    if(!pick){                                    // nothing helped; nudge the best runner
+      const nm=roster[0];cur[nm]=(cur[nm]||0)+STEP;best=probe(cur);
+    }else{cur[pick]=(cur[pick]||0)+STEP;best=pickP;}
+    step++;
+    lab.textContent=`solving ${(best*100).toFixed(0)}%`;
+    pk.style.left=Math.min(100,best/GOAL_P*100)+"%";
+    rb.querySelector(".track i").style.width=Math.min(100,best/GOAL_P*100)+"%";
+    requestAnimationFrame(tick);
+  });
+}
+
+function finishSolve(cur,key,label,p0,best,total){
+  const names=Object.keys(cur).filter(k=>cur[k]>0);
+  const out=document.getElementById("wiOut");
+  if(!names.length||best<GOAL_P&&total>=MAX_TOTAL){
+    out.innerHTML=`<div class="note"><b>No route found.</b> Even ${MAX_TOTAL}s spread across the seven only gets
+      <b>${label}</b> to ${(best*100).toFixed(0)}%. It is out of reach this season on these marks.</div>`;
+    return;
+  }
+  wiAdj={...cur};
+  renderWhatIf();
+  document.getElementById("wiGoal").value=key;
+  out.innerHTML=`<div class="note"><b>${label}:</b> ${(p0*100).toFixed(0)}% → about ${(best*100).toFixed(0)}%
+    with ${total}s total — ${names.map(n=>`${n} −${cur[n]}s`).join(", ")}. Loaded into the steppers;
+    hit Run for the full read.</div>`;
+  out.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 
 /* ---------- run ---------- */
@@ -1841,11 +2163,8 @@ function run(){
   document.body.classList.add("simming");
   const go=document.getElementById("go");
   go.textContent="Finish";go.classList.add("running");
-  const tally=model.teams.filter(t=>!t.short).map(t=>({
-    idx:t.idx,name:t.name,league:t.league,avg5:t.avg5,
-    auto:0,wild:0,qual:0,top10:0,top4:0,win:0,hist:new Array(FIELD+1).fill(0)
-  }));
-  const byIdx=[];for(const t of tally)byIdx[t.idx]=t;
+  const T=blankTally(model), tally=T.list;
+  const worlds=[{adj:null,byIdx:T.byIdx}];
   buildBoard(tally);
   document.getElementById("board").classList.add("running");
   const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
@@ -1853,19 +2172,20 @@ function run(){
   rb.classList.add("on");
   const sigma=sigmaPct/100;
   const times=new Float64Array(model.runners.length);
+  const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
   let done=0,t0=0,frame=0;
 
   requestAnimationFrame(function step(ts){
     if(!t0)t0=ts;
-    const target=skip?N_SIMS:Math.max(done+1,Math.min(N_SIMS,Math.floor(N_SIMS*(ts-t0)/DURATION)));
-    while(done<target) oneSeason(model,byIdx,sigma,times,shock), done++;
-    const frac=done/N_SIMS;
+    const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/durMs())));
+    while(done<target) oneSeason(model,worlds,sigma,times,shock,tmp), done++;
+    const frac=done/nSims;
     rb.querySelector(".track i").style.width=(frac*100)+"%";
     pack.style.left=(frac*100)+"%";
-    lab.textContent=done.toLocaleString()+" / "+N_SIMS.toLocaleString();
+    lab.textContent=done.toLocaleString()+" / "+nSims.toLocaleString();
     paint(tally,done,(frame++%3)===0);
-    if(done<N_SIMS) requestAnimationFrame(step);
+    if(done<nSims) requestAnimationFrame(step);
     else{
       paint(tally,done,true);
       settle(tally);
@@ -1881,20 +2201,6 @@ function run(){
 }
 
 /* ---------- plumbing ---------- */
-function renderStats(){
-  let html=`<div class="dlab"><span></span><span>5,000m</span><span>3,000m</span></div>`,un=[];
-  for(const g of ["M","F"]){
-    const a=buildModel(g,5000),b=buildModel(g,3000);
-    un=un.concat(a.unassigned,b.unassigned);
-    html+=`<div class="drow"><span class="nm">${g==="M"?"Boys":"Girls"}</span>
-      <span class="v">${a.teams.filter(t=>!t.short).length}</span>
-      <span class="v">${b.teams.filter(t=>!t.short).length}</span></div>`;
-  }
-  const uniq=[...new Set(un)];
-  document.getElementById("stats").innerHTML=html+
-    `<div class="sub2" style="margin-top:8px">Teams able to field five runners on each board.</div>`+
-    (uniq.length?`<div class="thin">Not matched to a 6A league: ${uniq.join(", ")}</div>`:"");
-}
 function toast(m){
   const t=document.getElementById("toast");
   t.textContent=m;t.classList.add("show");
@@ -1911,10 +2217,15 @@ function syncVar(){
 }
 function clearOut(){
   document.getElementById("simOut").innerHTML="";
-  document.getElementById("runlab").textContent="";
-  document.getElementById("runbar").classList.remove("on");
-  document.querySelector("#runbar .track i").style.width="0";
-  document.getElementById("pack").style.left="0";
+  for(const id of ["","2"]){
+    const rb=document.getElementById("runbar"+id);
+    if(!rb)continue;
+    document.getElementById("runlab"+id).textContent="";
+    rb.classList.remove("on");
+    rb.querySelector(".track i").style.width="0";
+    document.getElementById("pack"+id).style.left="0";
+  }
+  const wo=document.getElementById("wiOut"); if(wo)wo.innerHTML="";
   cards=[];
   document.getElementById("lgOut").innerHTML=`<div class="empty">Run the simulation to fill this in.</div>`;
 }
@@ -1931,6 +2242,12 @@ if(matchMedia("(prefers-color-scheme: light)").matches){
 }
 
 document.getElementById("vRange").oninput=e=>{sigmaPct=+e.target.value/10;syncVar();};
+const nFromIdx=i=>i===0?1:i*250;     // 1, 250, 500 ... 5000
+document.getElementById("nRange").oninput=e=>{
+  nSims=nFromIdx(+e.target.value);
+  document.getElementById("nVal").textContent=nSims.toLocaleString();
+  clearOut();
+};
 document.querySelectorAll('.seg button[data-v]').forEach(b=>b.onclick=()=>{
   sigmaPct=+b.dataset.v/10;document.getElementById("vRange").value=b.dataset.v;syncVar();});
 document.querySelectorAll('.seg button[data-dist]').forEach(b=>b.onclick=()=>{
@@ -1940,31 +2257,25 @@ document.querySelectorAll('.seg button[data-dist]').forEach(b=>b.onclick=()=>{
 document.querySelectorAll(".switch button").forEach(b=>b.onclick=()=>{
   gender=b.dataset.g;
   document.querySelectorAll(".switch button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
-  clearOut();render3k();});
+  clearOut();wiAdj={};renderWhatIf();});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
-  document.getElementById("go").style.display=b.dataset.p==="p-sim"?"":"none";
+  document.getElementById("go").style.display=/p-sim|p-wi/.test(b.dataset.p)?"":"none";
+  if(b.dataset.p==="p-wi")renderWhatIf();
   scrollTo({top:0,behavior:"smooth"});});
-document.getElementById("go").onclick=run;
-document.getElementById("loadCsv").onclick=()=>{
-  const v=document.getElementById("csv").value;
-  if(!v.trim())return toast("Paste some CSV first.");
-  try{
-    const {rows,bad}=parseCSV(v);
-    if(!rows.length)return toast("No usable rows found.");
-    DATA=rows;renderStats();clearOut();render3k();
-    toast(`Loaded ${rows.length} marks${bad?`, skipped ${bad}`:""}.`);
-  }catch(e){toast(e.message);}
+document.getElementById("go").onclick=()=>{
+  const wi=document.getElementById("p-wi").classList.contains("on");
+  if(running){skip=true;return;}
+  wi?runWhatIf():run();
 };
-document.getElementById("resetCsv").onclick=()=>{loadSeed();clearOut();render3k();toast("Seed restored.");};
 addEventListener("resize",()=>{if(cards.length&&!running){measure();cards.forEach(c=>{c.pos=-1;});}});
 
 function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
-  DATA=rows;renderStats();
+  DATA=rows;
 }
-loadSeed();syncVar();clearOut();render3k();
+loadSeed();syncVar();clearOut();renderWhatIf();
 </script>
 </body>
 </html>
