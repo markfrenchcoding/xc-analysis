@@ -2131,19 +2131,39 @@ function solveGoal(){
       for(const k of allowed){const g=(p[k+1][met]-p[0][met])/EV;if(g>gain){gain=g;pick=k;}}
       if(pick>=0)return pick;
     }
-    let pick=-1,bestDrop=0.02;          // finally: lowest mean league place
+    let pick=-1,bestDrop=0.03;          // finally: lowest mean district score
     for(const k of allowed){
-      const d=p[0].placeSum/p[0].n-p[k+1].placeSum/p[k+1].n;
+      const d=p[0].scoreSum/p[0].n-p[k+1].scoreSum/p[k+1].n;
       if(d>bestDrop){bestDrop=d;pick=k;}
     }
     return pick;
   };
 
   const cur={}; let step=0;
-  const p0=(()=>{const T=blankTally(model);const w=[{adj:null,byIdx:T.byIdx}];
+  const base=(()=>{const T=blankTally(model);const w=[{adj:null,byIdx:T.byIdx}];
     for(let s=0;s<EV;s++) oneSeason(model,w,sigma,times,shock,tmp);
-    return T.byIdx[team.idx][key]/EV;})();
+    return T.byIdx[team.idx];})();
+  const p0=base[key]/EV, autoP=base.auto/EV;
   let best=p0;
+
+  const done=(msg)=>{
+    rb.classList.remove("on");document.body.classList.remove("simming");
+    lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+    document.getElementById("wiOut").innerHTML=`<div class="note">${msg}</div>`;
+  };
+  if(p0>=GOAL_P){
+    done(`<b>${team.name} is already there.</b> ${label} happens
+      ${(p0*100).toFixed(0)}% of the time as things stand — nothing to solve for.`);
+    return;
+  }
+  // at-large only exists for teams finishing third; an auto-qualifier never needs it
+  if(key==="wild"&&autoP>=GOAL_P){
+    done(`<b>${team.name} does not need an at-large berth.</b> They take one of the two
+      automatic spots in ${ABBR[team.league]} ${(autoP*100).toFixed(0)}% of the time.
+      At-large is the route for third-place teams, so this figure stays near zero no matter
+      how fast they run. Try Top 10, Top 4 or Win state instead.`);
+    return;
+  }
 
   const stop=(b,total,stalled)=>{
     rb.classList.remove("on");document.body.classList.remove("simming");
