@@ -1934,7 +1934,12 @@ let wiAdj={};                       // runner name -> seconds of improvement
 const GOALS=[["auto","Auto-qualify"],["wild","At-large berth"],
              ["top10","Top 10 at state"],["top4","Top 4 at state"],["win","Win state"]];
 const GOAL_P=0.5;                   // "gets there" means more likely than not
-const STEP=5, MAX_TOTAL=180, MAX_STEPS=30;
+const STEP=5, MAX_TOTAL=180, MAX_STEPS=30, PER_RUNNER_CAP=45;
+const MIN_GAIN=0.004;               // ignore a candidate that sits inside the noise
+/* requestAnimationFrame is throttled to a standstill in a background tab, which
+   strands a run mid-way. Fall back to a timer when the page is hidden. */
+const nextTick=fn=>document.hidden?setTimeout(()=>fn(performance.now()),16)
+                                  :requestAnimationFrame(fn);
 
 function wiTeamNow(){
   const model=buildModel(gender,distMode);
@@ -2005,14 +2010,14 @@ function runWorlds(model,worlds,seasons,label,onEnd){
   const sigma=sigmaPct/100;
   const dur=Math.max(320,FULL_MS*seasons/5000);
   let done=0,t0=0;
-  requestAnimationFrame(function step(ts){
+  nextTick(function step(ts){
     if(!t0)t0=ts;
     const target=Math.max(done+1,Math.min(seasons,Math.floor(seasons*(ts-t0)/dur)));
     while(done<target){oneSeason(model,worlds,sigma,times,shock,tmp);done++;}
     pk.style.left=(done/seasons*100)+"%";
     rb.querySelector(".track i").style.width=(done/seasons*100)+"%";
     lab.textContent=label+" "+done.toLocaleString()+"/"+seasons.toLocaleString();
-    if(done<seasons)requestAnimationFrame(step);
+    if(done<seasons)nextTick(step);
     else{
       rb.classList.remove("on");document.body.classList.remove("simming");
       lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
@@ -2093,59 +2098,73 @@ function solveGoal(){
   rb.classList.add("on");document.body.classList.add("simming");
   out.innerHTML="";
 
-  const EV=300;                                   // quick probe per candidate
+  const EV=420;                                   // paired, so this is plenty
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
   const sigma=sigmaPct/100;
-  const probe=map=>{
-    const T=blankTally(model);
-    const w=[{adj:map?adjFor(model,team,map):null,byIdx:T.byIdx}];
-    for(let s=0;s<EV;s++) oneSeason(model,w,sigma,times,shock,tmp);
-    return T.byIdx[team.idx][key]/EV;
-  };
-
-  const cur={}; let step=0, p0=probe(null), best=p0;
   const roster=team.roster.map(r=>r.name);
 
-  requestAnimationFrame(function tick(){
+  /* One pass scores the current plan and all seven +5s variants against
+     identical races. Comparing candidates across separate runs let sampling
+     noise choose the winner — which is how 80s got handed to the fastest
+     runner on the team. */
+  const sweep=cur=>{
+    const maps=[cur].concat(roster.map(nm=>{const m={...cur};m[nm]=(m[nm]||0)+STEP;return m;}));
+    const Ts=maps.map(()=>blankTally(model));
+    const worlds=maps.map((m,i)=>({adj:adjFor(model,team,m),byIdx:Ts[i].byIdx}));
+    for(let s=0;s<EV;s++) oneSeason(model,worlds,sigma,times,shock,tmp);
+    return Ts.map(T=>T.byIdx[team.idx][key]/EV);
+  };
+
+  const cur={}; let step=0;
+  const p0=(()=>{const T=blankTally(model);const w=[{adj:null,byIdx:T.byIdx}];
+    for(let s=0;s<EV;s++) oneSeason(model,w,sigma,times,shock,tmp);
+    return T.byIdx[team.idx][key]/EV;})();
+  let best=p0;
+
+  const stop=(b,total,stalled)=>{
+    rb.classList.remove("on");document.body.classList.remove("simming");
+    lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+    finishSolve(cur,key,label,p0,b,total,stalled);
+  };
+
+  nextTick(function tick(){
     const total=Object.values(cur).reduce((s,v)=>s+v,0);
-    if(best>=GOAL_P||step>=MAX_STEPS||total>=MAX_TOTAL){
-      rb.classList.remove("on");document.body.classList.remove("simming");
-      lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
-      finishSolve(cur,key,label,p0,best,total);
-      return;
+    if(best>=GOAL_P||step>=MAX_STEPS||total>=MAX_TOTAL){stop(best,total);return;}
+    const p=sweep(cur);
+    let pick=-1,gain=MIN_GAIN;
+    for(let k=0;k<roster.length;k++){
+      if((cur[roster[k]]||0)>=PER_RUNNER_CAP)continue;   // no fantasy leaps
+      const g=p[k+1]-p[0];
+      if(g>gain){gain=g;pick=k;}
     }
-    let pick=null,pickP=best;
-    for(const nm of roster){
-      const trial={...cur};trial[nm]=(trial[nm]||0)+STEP;
-      const p=probe(trial);
-      if(p>pickP){pickP=p;pick=nm;}
-    }
-    if(!pick){                                    // nothing helped; nudge the best runner
-      const nm=roster[0];cur[nm]=(cur[nm]||0)+STEP;best=probe(cur);
-    }else{cur[pick]=(cur[pick]||0)+STEP;best=pickP;}
-    step++;
+    if(pick<0){stop(p[0],total,true);return;}
+    cur[roster[pick]]=(cur[roster[pick]]||0)+STEP;
+    best=p[pick+1];step++;
     lab.textContent=`solving ${(best*100).toFixed(0)}%`;
-    pk.style.left=Math.min(100,best/GOAL_P*100)+"%";
-    rb.querySelector(".track i").style.width=Math.min(100,best/GOAL_P*100)+"%";
-    requestAnimationFrame(tick);
+    const frac=Math.min(1,best/GOAL_P);
+    pk.style.left=(frac*100)+"%";
+    rb.querySelector(".track i").style.width=(frac*100)+"%";
+    nextTick(tick);
   });
 }
 
-function finishSolve(cur,key,label,p0,best,total){
+function finishSolve(cur,key,label,p0,best,total,stalled){
   const names=Object.keys(cur).filter(k=>cur[k]>0);
   const out=document.getElementById("wiOut");
-  if(!names.length||best<GOAL_P&&total>=MAX_TOTAL){
-    out.innerHTML=`<div class="note"><b>No route found.</b> Even ${MAX_TOTAL}s spread across the seven only gets
-      <b>${label}</b> to ${(best*100).toFixed(0)}%. It is out of reach this season on these marks.</div>`;
+  if(best<GOAL_P){
+    out.innerHTML=`<div class="note"><b>${label} is out of reach.</b> The best route found only gets there
+      ${(best*100).toFixed(0)}% of the time — up from ${(p0*100).toFixed(0)}% — using ${total}s across
+      ${names.length} runner${names.length===1?"":"s"}${stalled?", and no further second helps":""}.
+      On these marks it is not happening this season.</div>`;
     return;
   }
   wiAdj={...cur};
   renderWhatIf();
   document.getElementById("wiGoal").value=key;
   out.innerHTML=`<div class="note"><b>${label}:</b> ${(p0*100).toFixed(0)}% → about ${(best*100).toFixed(0)}%
-    with ${total}s total — ${names.map(n=>`${n} −${cur[n]}s`).join(", ")}. Loaded into the steppers;
+    for ${total}s total — ${names.map(n=>`${n} −${cur[n]}s`).join(", ")}. Loaded into the steppers;
     hit Run for the full read.</div>`;
   out.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
@@ -2176,7 +2195,7 @@ function run(){
   const shock=new Float64Array(model.teams.length);
   let done=0,t0=0,frame=0;
 
-  requestAnimationFrame(function step(ts){
+  nextTick(function step(ts){
     if(!t0)t0=ts;
     const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/durMs())));
     while(done<target) oneSeason(model,worlds,sigma,times,shock,tmp), done++;
@@ -2185,7 +2204,7 @@ function run(){
     pack.style.left=(frac*100)+"%";
     lab.textContent=done.toLocaleString()+" / "+nSims.toLocaleString();
     paint(tally,done,(frame++%3)===0);
-    if(done<nSims) requestAnimationFrame(step);
+    if(done<nSims) nextTick(step);
     else{
       paint(tally,done,true);
       settle(tally);
