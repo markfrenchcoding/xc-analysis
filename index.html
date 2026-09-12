@@ -1728,6 +1728,8 @@ function playDistricts(model,byIdx,times){
     if(!list.length)continue;
     const r=scoreMeet(list,times);
     for(let p=0;p<r.length;p++){
+      const t=byIdx[r[p].idx];
+      if(t){t.scoreSum+=r[p].total;t.placeSum+=p+1;t.n++;}   // smooth surrogates
       if(p<AUTO_PER) autos.push(r[p].idx);
       else if(p<AUTO_PER+2) pool.push({idx:r[p].idx,third:p===AUTO_PER,lg,avg5:r[p].sum5/5});
     }
@@ -1775,7 +1777,8 @@ function shift(times,adj,tmp){
 }
 function blankTally(model){
   const t=model.teams.filter(x=>!x.short).map(x=>({idx:x.idx,name:x.name,league:x.league,
-    avg5:x.avg5,auto:0,wild:0,qual:0,top10:0,top4:0,win:0,hist:new Array(FIELD+1).fill(0)}));
+    avg5:x.avg5,auto:0,wild:0,qual:0,top10:0,top4:0,win:0,scoreSum:0,placeSum:0,n:0,
+    hist:new Array(FIELD+1).fill(0)}));
   const by=[]; for(const x of t) by[x.idx]=x;
   return {list:t,byIdx:by};
 }
@@ -2114,7 +2117,26 @@ function solveGoal(){
     const Ts=maps.map(()=>blankTally(model));
     const worlds=maps.map((m,i)=>({adj:adjFor(model,team,m),byIdx:Ts[i].byIdx}));
     for(let s=0;s<EV;s++) oneSeason(model,worlds,sigma,times,shock,tmp);
-    return Ts.map(T=>T.byIdx[team.idx][key]/EV);
+    return Ts.map(T=>T.byIdx[team.idx]);
+  };
+  /* At-large is rare enough that one 5s step often moves it less than the noise,
+     which strands a greedy search at zero. Steer by progressively softer signals
+     until the real target starts responding: the league place a team takes, and
+     ultimately its district score, always move. */
+  const CHAIN={win:["win","top4","top10","qual"],top4:["top4","top10","qual"],
+               top10:["top10","qual"],auto:["auto","qual"],wild:["wild","qual"]}[key];
+  const chooseBy=(p,allowed)=>{
+    for(const met of CHAIN){
+      let pick=-1,gain=MIN_GAIN;
+      for(const k of allowed){const g=(p[k+1][met]-p[0][met])/EV;if(g>gain){gain=g;pick=k;}}
+      if(pick>=0)return pick;
+    }
+    let pick=-1,bestDrop=0.02;          // finally: lowest mean league place
+    for(const k of allowed){
+      const d=p[0].placeSum/p[0].n-p[k+1].placeSum/p[k+1].n;
+      if(d>bestDrop){bestDrop=d;pick=k;}
+    }
+    return pick;
   };
 
   const cur={}; let step=0;
@@ -2133,15 +2155,12 @@ function solveGoal(){
     const total=Object.values(cur).reduce((s,v)=>s+v,0);
     if(best>=GOAL_P||step>=MAX_STEPS||total>=MAX_TOTAL){stop(best,total);return;}
     const p=sweep(cur);
-    let pick=-1,gain=MIN_GAIN;
-    for(let k=0;k<roster.length;k++){
-      if((cur[roster[k]]||0)>=PER_RUNNER_CAP)continue;   // no fantasy leaps
-      const g=p[k+1]-p[0];
-      if(g>gain){gain=g;pick=k;}
-    }
-    if(pick<0){stop(p[0],total,true);return;}
+    const allowed=roster.map((_,k)=>k).filter(k=>(cur[roster[k]]||0)<PER_RUNNER_CAP);
+    if(!allowed.length){stop(p[0][key]/EV,total,true);return;}
+    const pick=chooseBy(p,allowed);
+    if(pick<0){stop(p[0][key]/EV,total,true);return;}
     cur[roster[pick]]=(cur[roster[pick]]||0)+STEP;
-    best=p[pick+1];step++;
+    best=p[pick+1][key]/EV;step++;
     lab.textContent=`solving ${(best*100).toFixed(0)}%`;
     const frac=Math.min(1,best/GOAL_P);
     pk.style.left=(frac*100)+"%";
