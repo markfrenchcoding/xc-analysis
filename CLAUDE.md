@@ -40,47 +40,38 @@ the site. Nothing is ever converted between distances.
 Updating the database means replacing that block and committing. There is no
 admin UI and there should not be — the app is customer-facing.
 
-**Pulling marks.** Do not scrape the rendered page. athletic.net has a plain
-JSON API. It sits behind Cloudflare, so the calls must come from a real browser
-session — Node gets a challenge page. Drive it from the console on an
-athletic.net tab:
+**Updating the database is two edits, not one.** Replace the seed block *and*
+set `DATA_DATE` just above `FULL_MS` to the last day of results included. The
+header reports it to readers as "Results through Sep 12"; leave it stale and the
+site quietly lies about how fresh it is.
 
-```
-GET  /api/v1/TeamHome/GetTeamCore?teamId={id}&sport=xc&year=2026   -> jwtTeamHome
-GET  /api/v1/TeamHomeCal/GetCalendar?seasonId=2026                 -> that team's meets
-GET  /api/v1/Meet/GetMeetData?meetId={id}&sport=xc                 -> jwtMeet + xcDivisions
-POST /api/v1/Meet/GetResultsData3   {divId, meetId}                -> the results
-```
+## The site
 
-The calendar and results calls need the matching JWT in an `anettokens` header.
-**Pace them at 1.5s or slower** — faster returns 403, and a tight retry loop
-only digs in deeper. Results carry `AthleteID`, `FirstName`, `LastName`,
-`Grade`, `TeamID`, `SchoolName` and `Result`, so athletes and teams join on
-stable ids instead of name strings.
+Three things on the board beyond the odds themselves.
 
-Walking all 47 team calendars is what makes the pull complete — a meet only
-turns up if some team put it on its schedule. That found 26 meets for 2026.
-athletic.net spells some schools `Franklin (OR)`, `Roosevelt (OR)`,
-`Cleveland (OR)`, `Sheldon (OR)`; strip the suffix when matching.
+**Average points.** Each card carries the team's mean score at Lane underneath
+its chance of winning, averaged only over the seasons it actually qualified —
+teams that never get there show a dash rather than a fake zero. `blankTally`
+carries `ptsSum`/`ptsN` and `playState` fills them.
 
-Filter to the 47 6A `TeamID`s, grades 9-12, and divisions of exactly 3,000m or
-5,000m. Take each athlete's three fastest marks per distance, then the top
-seven per team per board — which is what `buildModel` does anyway.
+**Results-through date.** Driven by `DATA_DATE`, rendered into the header on
+load.
 
-The browser cannot write files, and an https page cannot reach a localhost
-server. A Blob plus a synthetic `<a download>` click does work and lands in
-Downloads. Do not call `window.open` — in an automated browser it navigates the
-tab rather than opening a popup, and the crawl state goes with it.
+**One November.** Tapping the checkered flag runs a single season end to end and
+shows that state meet: team result, first five across the line, and a note that
+the board behind it is the same thing several thousand times over. It is an
+easter egg, but it argues the site's whole case better than a paragraph does —
+any one November looks nothing like the odds. `oneRace()` reuses `draw`,
+`playDistricts` and `scoreMeet`; it draws twice, because Lane is a fresh race.
 
-**Rankings lists are no longer a source.** They publish only each athlete's
-season best, and everything past the top five is masked unless signed in. Meet
-results are open and carry every race.
-
-**Excluded meets.** `Ultimook Race` (meet 271535, Sep 5) is dropped. Hydrangea
-Ranch is an obstacle course: fitted against the rest of the season it runs
-1.23x at 3,000m and 1.15x at 5,000m, and its per-athlete spread is twice as
-wide as anywhere else — two McKay girls who race 16-18 minutes ran 35:36 there.
-Same course, same reason it is already excluded from calibration.
+**The How tab is written for readers, not for us.** It explains the ideas —
+seasons rather than one race, teammates having bad days together, bad days
+running deeper than good ones, comparisons held against identical races, and
+the fact that it has been scored against seasons we already know the answer to.
+It deliberately does not print the weights, the noise split, the calibration
+table or the solver's step size. What it does keep is an honest list of what the
+model does not know, including that early-season numbers are wider than they
+look. That section earns more trust than it costs — do not quietly drop it.
 
 ## How the simulation works
 

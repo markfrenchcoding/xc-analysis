@@ -159,6 +159,7 @@ function playState(model,byIdx,times,fieldIdx){
     if(place<=10)t.top10++;
     if(place<=4)t.top4++;
     if(place===1)t.win++;
+    t.ptsSum+=res[p].total;t.ptsN++;       // only counts seasons this team actually qualified
   }
 }
 
@@ -211,6 +212,7 @@ function oneSeason(model,worlds,sigma,times,shock,tmp){
 function blankTally(model){
   const t=model.teams.filter(x=>!x.short).map(x=>({idx:x.idx,name:x.name,league:x.league,
     avg5:x.avg5,auto:0,wild:0,qual:0,top10:0,top4:0,win:0,scoreSum:0,placeSum:0,n:0,
+    ptsSum:0,ptsN:0,                       // state points, averaged over the seasons they got there
     hist:new Array(FIELD+1).fill(0)}));
   const by=[]; for(const x of t) by[x.idx]=x;
   return {list:t,byIdx:by};
