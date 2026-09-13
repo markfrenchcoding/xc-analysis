@@ -78,14 +78,25 @@ seasons, and the legend above the board says the same thing in words. Do not
 
 **The How tab quotes live figures, and they will go stale.** Eight numbers are
 hardcoded into the markup: four describing the database (613 athletes, 868
-results, 47 schools, 5,000 seasons per run) and four from the backtest (82% of
-qualifiers inside the board's top group, 3 of 4 champions named, 96% of the
-above-90% band qualifying, 6% of the below-10% band qualifying). The backtest
-four come from `node backtest/backtest.js` at the September cutoff — the
-per-season "top 18 by odds held" lines and the pooled calibration table.
-**Regenerate them whenever the model changes.** They moved once already when
-`MARK_W` was fixed. Publishing an accuracy claim that the harness no longer
-supports would be the worst thing on the site.
+results, 47 schools, 5,000 seasons per run) and four from the backtest (81% of
+qualifiers inside the board's top group, 197 team-seasons scored, 96% of the
+above-90% band qualifying, 5% of the below-10% band qualifying). The champion
+record — two of four — is in the prose beneath them.
+
+Regenerate with `node backtest/headline.js`, **not** by reading a single
+`backtest.js` run. Every figure is a Monte Carlo estimate, so one run is not a
+fact: across five runs of 20,000 seasons the qualifier count moves between 58
+and 59 of 72, which is the difference between publishing "81%" and "82%".
+`headline.js` reports the spread so a number can be quoted at a precision that
+will actually reproduce. The calibration bands are rock steady (96.0-96.1% and
+4.7%); the qualifier count is not.
+
+**Do not read the favourite off a list sorted by P(qualify).** Half the field
+sits at 100% to qualify and those ties break arbitrarily, so the first row is
+not the team most likely to win. `backtest.js` made exactly this mistake and
+reported the champion record as three of four when it is two of four — the
+published claim was overstated until it was caught. Both `backtest.js` and
+`baseline.js` now take the maximum of `win`.
 
 **Diagrams in the How tab.** Three, inline SVG, themed off the existing custom
 properties and sized by viewBox so they scale on a phone: a hundred dots with

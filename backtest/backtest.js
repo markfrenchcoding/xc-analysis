@@ -43,8 +43,12 @@ for (const year of YEARS) {
     console.log('  Brier ' + bs.toFixed(4) + '  (base rate ' + bref.toFixed(4) + ')   skill '
       + (100 * (1 - bs / bref)).toFixed(0) + '%');
     console.log('  top ' + order.length + ' by odds held ' + hits + '/' + order.length + ' actual qualifiers');
-    console.log('  favourite ' + teams[0].name + ' ' + (100 * teams[0].win).toFixed(0)
-      + '% to win   →   champion ' + order[0]);
+    // the favourite is the team most likely to WIN, which is not the top of a
+    // list sorted by P(qualify) - those ties break arbitrarily among teams at 100%
+    const fav = teams.reduce((x, y) => (y.win > x.win ? y : x));
+    console.log('  favourite ' + fav.name + ' ' + (100 * fav.win).toFixed(0)
+      + '% to win   →   champion ' + order[0]
+      + (fav.name === order[0] ? '   HIT' : '   miss'));
     const wrong = teams.filter(t => (t.p >= 0.5) !== !!t.actual)
       .map(t => t.name + ' ' + (100 * t.p).toFixed(0) + '%' + (t.actual ? ' QUALIFIED' : ' missed'));
     if (wrong.length) console.log('  wrong side of 50%: ' + wrong.join(' · '));
