@@ -12,13 +12,17 @@ const truthFor = year => JSON.parse(fs.readFileSync(path.join(DIR, year + '-trut
 
 // Odds of qualifying for every team in a season-gender, from the database as it
 // stood on `cutoff`, simulated at `sigma` percent.
-function odds(year, gender, cutoff, sigma, seasons) {
+// `weights`, if given, is a function of how many marks an athlete has returning
+// the sampling weights to use instead of whatever buildModel derived. It exists
+// so alternative MARK_W schemes can be scored without editing index.html.
+function odds(year, gender, cutoff, sigma, seasons, weights) {
   const truth = truthFor(year);
   const csv = fs.readFileSync(path.join(DIR, year + '-seed-' + cutoff + '.csv'), 'utf8');
   M.setDATA(M.parseCSV(csv).rows.filter(r => r.g === gender));
   M.setLeagues(truth.leagues[gender]);
   M.setBerths(truth.berths[gender].auto, truth.berths[gender].atLarge);
   const model = M.buildModel(gender, 5000);
+  if (weights) for (const r of model.runners) r.w = weights(r.marks.length);
   const t = M.blankTally(model);
   const worlds = [{ adj: null, byIdx: t.byIdx }];
   const times = new Float64Array(model.runners.length);

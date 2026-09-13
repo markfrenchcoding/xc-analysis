@@ -252,11 +252,39 @@ compares the full database against one thinned to each athlete's best mark, each
 run at its own best sigma. Best-only wins at every cutoff, and the margin *grows*
 as marks accumulate — 0.0009 in mid-September at 1.26 marks per athlete, 0.0054
 in late October at 2.08. The more marks an athlete carries, the more they cost.
-That is the signature of the two known defects: `MARK_W` puts two thirds of the
-weight on the slower of two marks, and marks come from courses spanning a
-0.90-1.23 difficulty range. The meet-results pull was still the right move — it
-filled rosters out and retired the two-team-league artifact — but top-three
-sampling will not earn its keep until those two are fixed.
+The meet-results pull was still the right move — it filled rosters out and
+retired the two-team-league artifact — but top-three sampling is not yet earning
+its keep.
+
+**It is not `MARK_W`.** The obvious suspect was the two-mark case: truncating
+`[0.25, 0.50, 0.25]` renormalises to `[0.33, 0.67]`, putting two thirds of the
+weight on the *slower* mark, which shifts an athlete's expected time about 5.9%
+off their best. `backtest/markw.js` scores six weightings against actual
+outcomes and then runs a paired cluster bootstrap. The result does not support
+changing it:
+
+| scheme | pooled Brier | beats shipped |
+|---|---|---|
+| ignore extras `[1.00,0.00] [1.00,0.00,0.00]` | 0.0616 | 66% |
+| best-biased `[0.67,0.33] [0.50,0.30,0.20]` | 0.0622 | 65% |
+| even `[0.50,0.50] [0.33,0.33,0.33]` | 0.0634 | 55% |
+| SHIPPED `[0.33,0.67] [0.25,0.50,0.25]` | 0.0637 | — |
+| even two marks only `[0.50,0.50]` | 0.0641 | 43% |
+| slow-biased `[0.25,0.75] [0.20,0.30,0.50]` | 0.0654 | 37% |
+
+Changing only the two-mark split to `[0.50, 0.50]` — the neutral-looking fix —
+is *worse* than what ships. The arithmetic about the 5.9% shift is correct but it
+does not translate into worse predictions, because the shift lands on whichever
+athletes race most and the model reads relative standings inside a league, where
+much of it cancels.
+
+What the table does show is a clean gradient: the more weight on an athlete's
+best mark, the better the forecast, all the way to ignoring extra marks. That is
+what course contamination looks like — a slower mark currently carries terrain as
+much as form, so it adds bias rather than signal. Two thirds of draws is too thin
+to act on, and the mechanism is addressable, so leave `MARK_W` alone and fix
+courses. Re-run `markw.js` afterwards: if course was the cause, the gradient
+should reverse and the shipped weighting should start winning.
 
 Not yet pulled: 2023 and earlier. The direction of every finding above is settled
 — the bootstrap puts P(best September sigma >= 3.5%) at 99% — but the level is
@@ -286,31 +314,26 @@ Listed in the app's own "How" tab:
 
 ## Open items
 
-1. **Horizon-dependent variance.** The backtest measures the curve directly:
-   best sigma is 5.0% at eight weeks out, 3.0% at six, 2.6% from four weeks in.
+1. **Course-difficulty adjustment** via least squares over shared athletes. This
+   is now the top item, because it is the one mechanism that explains why extra
+   marks cost accuracy. Fitting `log(time) = athlete + course` over 2026 gives
+   factors from 0.90 to 1.23 against a 2.3% dial. A head-to-head test over 30,243
+   same-course pairs puts raw marks at 91.1% and adjusted at 91.6% — small
+   overall, but on the 660 pairs where the two disagree, adjusted is right 60% of
+   the time. `backtest/marks_value.js` and `backtest/markw.js` are the checks
+   that it worked: marks_value should flip to favouring the full database, and
+   markw's gradient toward the best mark should reverse.
+2. **Horizon-dependent variance.** The backtest measures the curve directly: best
+   sigma is 5.0% at eight weeks out, 3.0% at six, 2.6% from four weeks in.
    `confound.js` rules out thin data as the cause, so this is real horizon.
    Implement as `total² = raceDay² + drift²`, keeping `CAL.sd` at 2.3% for
    race-day and decaying drift from ~4.4% in September toward zero at Lane. Do
-   not just raise `CAL.sd` — the slider's own helper text describes race-day
+   not simply raise `CAL.sd` — the slider's own helper text describes race-day
    spread and would become false.
-2. **Fix the two defects that make extra marks cost accuracy**, in this order:
-   - `MARK_W` renormalisation at two marks. `[0.25, 0.50]` renormalises to
-     `[0.33, 0.67]`, so the *slower* of two marks carries twice the weight of the
-     faster. With three marks the 50% lands on the middle mark, which is the
-     intent; with two there is no middle. `[0.5, 0.5]` is the neutral
-     alternative.
-   - **Course-difficulty adjustment** via least squares over shared athletes.
-     Fitting `log(time) = athlete + course` over 2026 gives factors from 0.90 to
-     1.23 against a 2.3% dial. A head-to-head test over 30,243 same-course pairs
-     puts raw marks at 91.1% and adjusted at 91.6% — small overall, but on the
-     660 pairs where the two disagree, adjusted is right 60% of the time.
-   `marks_value.js` is the check for both: it should flip to favouring the full
-   database once they are done. Today best-only wins at every cutoff.
 3. **Model roster attrition directly** instead of hiding it in drift. About 6% of
    September top-five places are not on the line at the league championship. A
    per-runner probability of absence would be closer to the truth than widening
-   everyone's distribution, and would explain part of what drift is currently
-   absorbing.
+   everyone's distribution, and would explain part of what drift absorbs.
 4. **2023 as a holdout.** Not to narrow the sigma estimate — the bootstrap says a
    third season moves the 80% interval from about 2.0 points to 1.6, which
    changes nothing. Pull it *after* the drift term exists, as the only season it
@@ -320,3 +343,7 @@ Listed in the app's own "How" tab:
    later runners displace opponents where NFHS strikes them out. Unreachable
    while `buildModel` caps rosters at seven; `audit2.js` records it as the one
    deliberate failure.
+
+**Settled, do not revisit without new evidence:** `MARK_W`'s two-mark split. It
+looks wrong on paper and tests fine — see the backtest section. `markw.js` is the
+harness if a later change makes it worth asking again.
