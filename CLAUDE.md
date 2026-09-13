@@ -286,6 +286,30 @@ to act on, and the mechanism is addressable, so leave `MARK_W` alone and fix
 courses. Re-run `markw.js` afterwards: if course was the cause, the gradient
 should reverse and the shipped weighting should start winning.
 
+**Against season-best seeding.** athletic.net's "hypothetical meet" lines every
+athlete up at their season best and scores one race. That is this model with the
+dial at zero and all the weight on each athlete's best mark, so
+`backtest/baseline.js` compares them exactly — same leagues, same berths, same
+NFHS scoring, only the variance removed.
+
+| cutoff | season-best: in top N | Brier | simulation: in top N | Brier |
+|---|---|---|---|---|
+| mid-September | 59/72 | 0.1320 | 59/72 | **0.0849** |
+| late September | 63/72 | 0.0914 | 63/72 | **0.0574** |
+| mid-October | 63/72 | 0.0914 | 63/72 | **0.0587** |
+| late October | **64/72** | 0.0812 | 63/72 | **0.0550** |
+
+**At picking which teams qualify, the two are indistinguishable** — season-best
+seeding is even one better at the last cutoff, and they tie on naming the
+champion (10 of 16 season-genders each). The simulation's entire advantage is in
+knowing how sure to be: 35% better by Brier, because a deterministic ranking
+states every one of its calls at 100% and is flatly wrong about 10% of them.
+
+Worth being clear about what that does and does not establish. It says the
+simulation is better calibrated than the obvious alternative on two seasons of
+Oregon 6A. It says nothing about how it compares to other published forecasts,
+none of which have been tested here.
+
 Not yet pulled: 2023 and earlier. The direction of every finding above is settled
 — the bootstrap puts P(best September sigma >= 3.5%) at 99% — but the level is
 pinned only to about a point either way. 2023 is worth more held back as a clean
