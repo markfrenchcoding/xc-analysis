@@ -1,0 +1,856 @@
+{
+ "year": 2024,
+ "cutoff": "2024-09-14",
+ "leagues": {
+  "M": {
+   "Portland Interscholastic": [
+    "Benson Tech",
+    "Cleveland (OR)",
+    "Franklin (OR)",
+    "Grant",
+    "Ida B. Wells",
+    "Jefferson-Portland",
+    "Lincoln",
+    "McDaniel",
+    "Roosevelt (OR)"
+   ],
+   "Metro": [
+    "Aloha",
+    "Beaverton",
+    "Jesuit",
+    "Mountainside",
+    "Southridge",
+    "Sunset",
+    "Westview"
+   ],
+   "Pacific": [
+    "Century",
+    "Forest Grove",
+    "Glencoe",
+    "Liberty(OR)",
+    "McMinnville",
+    "Newberg",
+    "Sherwood"
+   ],
+   "Mt. Hood": [
+    "Adrienne Nelson",
+    "Barlow",
+    "Central Catholic",
+    "Clackamas",
+    "David Douglas",
+    "Gresham",
+    "Reynolds",
+    "Sandy"
+   ],
+   "Three Rivers": [
+    "Lake Oswego",
+    "Lakeridge",
+    "Oregon City",
+    "Tigard",
+    "Tualatin",
+    "West Linn"
+   ],
+   "Central Valley": [
+    "McNary",
+    "North Salem",
+    "South Salem",
+    "Sprague",
+    "West Salem"
+   ],
+   "Southwest": [
+    "Grants Pass",
+    "North Medford",
+    "Roseburg",
+    "Sheldon (OR)",
+    "South Eugene",
+    "South Medford",
+    "Willamette"
+   ]
+  },
+  "F": {
+   "Portland Interscholastic": [
+    "Benson Tech",
+    "Cleveland (OR)",
+    "Franklin (OR)",
+    "Grant",
+    "Ida B. Wells",
+    "Jefferson-Portland",
+    "Lincoln",
+    "McDaniel",
+    "Roosevelt (OR)"
+   ],
+   "Metro": [
+    "Aloha",
+    "Beaverton",
+    "Jesuit",
+    "Mountainside",
+    "Southridge",
+    "Sunset",
+    "Westview"
+   ],
+   "Pacific": [
+    "Century",
+    "Forest Grove",
+    "Glencoe",
+    "Liberty(OR)",
+    "McMinnville",
+    "Newberg",
+    "Sherwood"
+   ],
+   "Mt. Hood": [
+    "Adrienne Nelson",
+    "Barlow",
+    "Central Catholic",
+    "Clackamas",
+    "David Douglas",
+    "Gresham",
+    "Reynolds",
+    "Sandy"
+   ],
+   "Three Rivers": [
+    "Lake Oswego",
+    "Lakeridge",
+    "Oregon City",
+    "St Mary's Academy",
+    "Tigard",
+    "Tualatin",
+    "West Linn"
+   ],
+   "Central Valley": [
+    "McNary",
+    "North Salem",
+    "South Salem",
+    "Sprague",
+    "West Salem"
+   ],
+   "Southwest": [
+    "Grants Pass",
+    "North Medford",
+    "Roseburg",
+    "Sheldon (OR)",
+    "South Eugene",
+    "South Medford",
+    "Willamette"
+   ]
+  }
+ },
+ "districts": {
+  "M": {
+   "Portland Interscholastic": [
+    {
+     "team": "Franklin (OR)",
+     "score": 66,
+     "sixth": 34
+    },
+    {
+     "team": "Lincoln",
+     "score": 67,
+     "sixth": 22
+    },
+    {
+     "team": "Ida B. Wells",
+     "score": 71,
+     "sixth": 24
+    },
+    {
+     "team": "Grant",
+     "score": 78,
+     "sixth": 32
+    },
+    {
+     "team": "Cleveland (OR)",
+     "score": 149,
+     "sixth": 41
+    },
+    {
+     "team": "McDaniel",
+     "score": 168,
+     "sixth": 47
+    },
+    {
+     "team": "Jefferson-Portland",
+     "score": 177,
+     "sixth": 60
+    },
+    {
+     "team": "Roosevelt (OR)",
+     "score": 212,
+     "sixth": 56
+    },
+    {
+     "team": "Benson Tech",
+     "score": 259,
+     "sixth": 62
+    }
+   ],
+   "Metro": [
+    {
+     "team": "Jesuit",
+     "score": 17,
+     "sixth": 7
+    },
+    {
+     "team": "Sunset",
+     "score": 68,
+     "sixth": 17
+    },
+    {
+     "team": "Westview",
+     "score": 89,
+     "sixth": 28
+    },
+    {
+     "team": "Mountainside",
+     "score": 90,
+     "sixth": 31
+    },
+    {
+     "team": "Beaverton",
+     "score": 152,
+     "sixth": 39
+    },
+    {
+     "team": "Southridge",
+     "score": 166,
+     "sixth": 43
+    },
+    {
+     "team": "Aloha",
+     "score": 203,
+     "sixth": 47
+    }
+   ],
+   "Pacific": [
+    {
+     "team": "Glencoe",
+     "score": 40,
+     "sixth": 18
+    },
+    {
+     "team": "Sherwood",
+     "score": 52,
+     "sixth": 20
+    },
+    {
+     "team": "Forest Grove",
+     "score": 73,
+     "sixth": 36
+    },
+    {
+     "team": "McMinnville",
+     "score": 83,
+     "sixth": 28
+    },
+    {
+     "team": "Liberty(OR)",
+     "score": 148,
+     "sixth": 48
+    },
+    {
+     "team": "Newberg",
+     "score": 166,
+     "sixth": 44
+    },
+    {
+     "team": "Century",
+     "score": 167,
+     "sixth": 45
+    }
+   ],
+   "Mt. Hood": [
+    {
+     "team": "Central Catholic",
+     "score": 25,
+     "sixth": 9
+    },
+    {
+     "team": "Adrienne Nelson",
+     "score": 66,
+     "sixth": 21
+    },
+    {
+     "team": "Clackamas",
+     "score": 82,
+     "sixth": 30
+    },
+    {
+     "team": "David Douglas",
+     "score": 137,
+     "sixth": 53
+    },
+    {
+     "team": "Sandy",
+     "score": 140,
+     "sixth": 39
+    },
+    {
+     "team": "Barlow",
+     "score": 146,
+     "sixth": 48
+    },
+    {
+     "team": "Gresham",
+     "score": 156,
+     "sixth": 45
+    },
+    {
+     "team": "Reynolds",
+     "score": 218,
+     "sixth": 55
+    }
+   ],
+   "Three Rivers": [
+    {
+     "team": "Oregon City",
+     "score": 44,
+     "sixth": 25
+    },
+    {
+     "team": "West Linn",
+     "score": 55,
+     "sixth": 24
+    },
+    {
+     "team": "Lake Oswego",
+     "score": 65,
+     "sixth": 36
+    },
+    {
+     "team": "Tigard",
+     "score": 94,
+     "sixth": 33
+    },
+    {
+     "team": "Lakeridge",
+     "score": 102,
+     "sixth": 27
+    },
+    {
+     "team": "Tualatin",
+     "score": 137,
+     "sixth": 40
+    }
+   ],
+   "Central Valley": [
+    {
+     "team": "West Salem",
+     "score": 42,
+     "sixth": 25
+    },
+    {
+     "team": "McNary",
+     "score": 44,
+     "sixth": 23
+    },
+    {
+     "team": "Sprague",
+     "score": 48,
+     "sixth": 20
+    },
+    {
+     "team": "South Salem",
+     "score": 80,
+     "sixth": 28
+    },
+    {
+     "team": "North Salem",
+     "score": 144,
+     "sixth": 34
+    }
+   ],
+   "Southwest": [
+    {
+     "team": "South Eugene",
+     "score": 41,
+     "sixth": 23
+    },
+    {
+     "team": "Sheldon (OR)",
+     "score": 49,
+     "sixth": 28
+    },
+    {
+     "team": "South Medford",
+     "score": 67,
+     "sixth": 33
+    },
+    {
+     "team": "North Medford",
+     "score": 91,
+     "sixth": 29
+    },
+    {
+     "team": "Roseburg",
+     "score": 113,
+     "sixth": 36
+    },
+    {
+     "team": "Grants Pass",
+     "score": 158,
+     "sixth": 43
+    },
+    {
+     "team": "Willamette",
+     "score": 216,
+     "sixth": 48
+    }
+   ]
+  },
+  "F": {
+   "Portland Interscholastic": [
+    {
+     "team": "Lincoln",
+     "score": 37,
+     "sixth": 18
+    },
+    {
+     "team": "Franklin (OR)",
+     "score": 44,
+     "sixth": 29
+    },
+    {
+     "team": "Ida B. Wells",
+     "score": 72,
+     "sixth": 33
+    },
+    {
+     "team": "Grant",
+     "score": 92,
+     "sixth": 27
+    },
+    {
+     "team": "Cleveland (OR)",
+     "score": 148,
+     "sixth": 41
+    },
+    {
+     "team": "McDaniel",
+     "score": 153,
+     "sixth": 48
+    },
+    {
+     "team": "Jefferson-Portland",
+     "score": 212,
+     "sixth": 51
+    },
+    {
+     "team": "Roosevelt (OR)",
+     "score": 218,
+     "sixth": null
+    }
+   ],
+   "Metro": [
+    {
+     "team": "Jesuit",
+     "score": 38,
+     "sixth": 17
+    },
+    {
+     "team": "Sunset",
+     "score": 45,
+     "sixth": 22
+    },
+    {
+     "team": "Westview",
+     "score": 52,
+     "sixth": 26
+    },
+    {
+     "team": "Mountainside",
+     "score": 108,
+     "sixth": 36
+    },
+    {
+     "team": "Beaverton",
+     "score": 146,
+     "sixth": 41
+    },
+    {
+     "team": "Aloha",
+     "score": 171,
+     "sixth": 44
+    },
+    {
+     "team": "Southridge",
+     "score": 186,
+     "sixth": 48
+    }
+   ],
+   "Pacific": [
+    {
+     "team": "Sherwood",
+     "score": 17,
+     "sixth": 8
+    },
+    {
+     "team": "McMinnville",
+     "score": 68,
+     "sixth": 25
+    },
+    {
+     "team": "Forest Grove",
+     "score": 85,
+     "sixth": 21
+    },
+    {
+     "team": "Newberg",
+     "score": 108,
+     "sixth": 34
+    },
+    {
+     "team": "Liberty(OR)",
+     "score": 145,
+     "sixth": 44
+    },
+    {
+     "team": "Glencoe",
+     "score": 153,
+     "sixth": null
+    },
+    {
+     "team": "Century",
+     "score": 165,
+     "sixth": 40
+    }
+   ],
+   "Mt. Hood": [
+    {
+     "team": "Central Catholic",
+     "score": 30,
+     "sixth": 16
+    },
+    {
+     "team": "Adrienne Nelson",
+     "score": 61,
+     "sixth": 24
+    },
+    {
+     "team": "Sandy",
+     "score": 65,
+     "sixth": 23
+    },
+    {
+     "team": "Clackamas",
+     "score": 68,
+     "sixth": 29
+    },
+    {
+     "team": "Barlow",
+     "score": 153,
+     "sixth": 35
+    },
+    {
+     "team": "Gresham",
+     "score": 185,
+     "sixth": 45
+    },
+    {
+     "team": "David Douglas",
+     "score": 201,
+     "sixth": 48
+    }
+   ],
+   "Three Rivers": [
+    {
+     "team": "Lake Oswego",
+     "score": 38,
+     "sixth": 24
+    },
+    {
+     "team": "Lakeridge",
+     "score": 43,
+     "sixth": 23
+    },
+    {
+     "team": "Tigard",
+     "score": 78,
+     "sixth": 20
+    },
+    {
+     "team": "West Linn",
+     "score": 116,
+     "sixth": 35
+    },
+    {
+     "team": "St Mary's Academy",
+     "score": 133,
+     "sixth": 37
+    },
+    {
+     "team": "Tualatin",
+     "score": 159,
+     "sixth": 43
+    },
+    {
+     "team": "Oregon City",
+     "score": 166,
+     "sixth": 48
+    }
+   ],
+   "Central Valley": [
+    {
+     "team": "West Salem",
+     "score": 23,
+     "sixth": 11
+    },
+    {
+     "team": "Sprague",
+     "score": 62,
+     "sixth": 24
+    },
+    {
+     "team": "South Salem",
+     "score": 80,
+     "sixth": 23
+    },
+    {
+     "team": "McNary",
+     "score": 98,
+     "sixth": 29
+    },
+    {
+     "team": "North Salem",
+     "score": 116,
+     "sixth": null
+    }
+   ],
+   "Southwest": [
+    {
+     "team": "South Eugene",
+     "score": 38,
+     "sixth": 17
+    },
+    {
+     "team": "Grants Pass",
+     "score": 86,
+     "sixth": 28
+    },
+    {
+     "team": "South Medford",
+     "score": 90,
+     "sixth": 32
+    },
+    {
+     "team": "Roseburg",
+     "score": 94,
+     "sixth": 33
+    },
+    {
+     "team": "North Medford",
+     "score": 104,
+     "sixth": 38
+    },
+    {
+     "team": "Sheldon (OR)",
+     "score": 139,
+     "sixth": 43
+    },
+    {
+     "team": "Willamette",
+     "score": 165,
+     "sixth": 48
+    }
+   ]
+  }
+ },
+ "state": {
+  "M": [
+   {
+    "team": "Jesuit",
+    "score": 52,
+    "sixth": 27
+   },
+   {
+    "team": "Central Catholic",
+    "score": 100,
+    "sixth": 44
+   },
+   {
+    "team": "Ida B. Wells",
+    "score": 128,
+    "sixth": 43
+   },
+   {
+    "team": "Lincoln",
+    "score": 181,
+    "sixth": 53
+   },
+   {
+    "team": "Franklin (OR)",
+    "score": 209,
+    "sixth": 90
+   },
+   {
+    "team": "Grant",
+    "score": 224,
+    "sixth": 69
+   },
+   {
+    "team": "Sherwood",
+    "score": 230,
+    "sixth": 72
+   },
+   {
+    "team": "Glencoe",
+    "score": 265,
+    "sixth": 94
+   },
+   {
+    "team": "Sheldon (OR)",
+    "score": 272,
+    "sixth": 100
+   },
+   {
+    "team": "West Linn",
+    "score": 283,
+    "sixth": 97
+   },
+   {
+    "team": "Oregon City",
+    "score": 290,
+    "sixth": 104
+   },
+   {
+    "team": "South Eugene",
+    "score": 301,
+    "sixth": 92
+   },
+   {
+    "team": "Sunset",
+    "score": 311,
+    "sixth": 91
+   },
+   {
+    "team": "Forest Grove",
+    "score": 340,
+    "sixth": 124
+   },
+   {
+    "team": "West Salem",
+    "score": 354,
+    "sixth": 118
+   },
+   {
+    "team": "McNary",
+    "score": 366,
+    "sixth": 123
+   },
+   {
+    "team": "Lake Oswego",
+    "score": 370,
+    "sixth": 105
+   },
+   {
+    "team": "Adrienne Nelson",
+    "score": 434,
+    "sixth": 115
+   }
+  ],
+  "F": [
+   {
+    "team": "Lincoln",
+    "score": 90,
+    "sixth": 59
+   },
+   {
+    "team": "Lake Oswego",
+    "score": 102,
+    "sixth": 67
+   },
+   {
+    "team": "Lakeridge",
+    "score": 111,
+    "sixth": 73
+   },
+   {
+    "team": "Franklin (OR)",
+    "score": 164,
+    "sixth": 76
+   },
+   {
+    "team": "West Salem",
+    "score": 170,
+    "sixth": 63
+   },
+   {
+    "team": "Jesuit",
+    "score": 170,
+    "sixth": 101
+   },
+   {
+    "team": "Sherwood",
+    "score": 177,
+    "sixth": 61
+   },
+   {
+    "team": "Tigard",
+    "score": 198,
+    "sixth": 57
+   },
+   {
+    "team": "Sunset",
+    "score": 205,
+    "sixth": 68
+   },
+   {
+    "team": "South Eugene",
+    "score": 235,
+    "sixth": 94
+   },
+   {
+    "team": "Westview",
+    "score": 247,
+    "sixth": 103
+   },
+   {
+    "team": "Ida B. Wells",
+    "score": 270,
+    "sixth": 95
+   },
+   {
+    "team": "Central Catholic",
+    "score": 283,
+    "sixth": 105
+   },
+   {
+    "team": "Grant",
+    "score": 343,
+    "sixth": 112
+   },
+   {
+    "team": "Grants Pass",
+    "score": 384,
+    "sixth": 123
+   },
+   {
+    "team": "Sprague",
+    "score": 446,
+    "sixth": 121
+   },
+   {
+    "team": "Adrienne Nelson",
+    "score": 467,
+    "sixth": 110
+   },
+   {
+    "team": "McMinnville",
+    "score": 488,
+    "sixth": 119
+   }
+  ]
+ },
+ "berths": {
+  "M": {
+   "total": 18,
+   "leagues": 7,
+   "auto": 2,
+   "atLarge": 4
+  },
+  "F": {
+   "total": 18,
+   "leagues": 7,
+   "auto": 2,
+   "atLarge": 4
+  }
+ }
+}

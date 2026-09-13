@@ -126,6 +126,13 @@ Teams that cannot field five are removed before places are assigned.
 teams enter the at-large pool ranked by scoring-five average; a fourth-place
 team is only eligible once its own league's third is taken. Two at-large spots.
 
+**The at-large count is a season's rule, not a constant.** OSAA sets it each
+year and it has moved: 2024 and 2025 both ran 14 automatic + **4** at-large
+(18 teams at Lane), 2026 runs 14 + **2** (16). The 2026 figure is confirmed
+against OSAA's own qualification page, so `AT_LARGE=2` is right for this
+season - but check it each August, and never assume a past season used it.
+The backtest sets it per season from that year's results.
+
 ## Worlds
 
 `oneSeason(model, worlds, sigma, times, shock, tmp)` scores N parallel worlds
@@ -174,14 +181,58 @@ run finishes.
 
 ## Audit harness
 
-`model.js` extracts the pure functions; `audit2.js` runs them under Node. It
-covers NFHS scoring (perfect dual is **15-50**, not 15-40), displacement, the
-seven-runner cap, sixth-runner tiebreaks, and model-wiring invariants across
-both genders and both distances. Regenerate `model.js` if you change function
-signatures. Run: `node audit2.js`.
+`extract_model.js` regenerates `model.js` by lifting the pure functions out of
+`index.html`; `audit2.js` runs them under Node. Neither touches the DOM. Run:
 
-**Neither file is in the repo.** They are described here but absent, so none of
-these tests can currently be run. See open item 5.
+```
+node extract_model.js        # regenerate model.js after any signature change
+node audit2.js               # 47 checks
+```
+
+It covers NFHS scoring (a perfect dual is **15-50**, not 15-40), displacement,
+the seven-runner cap, sixth-runner tiebreaks, and model-wiring invariants across
+both genders and both distances, plus simulation invariants — exactly `FIELD`
+teams qualify per season, exactly one winner, `auto + wild == qual`.
+
+`extract_model.js` smoke-tests what it generates, because a constant left behind
+in `index.html` otherwise only surfaces when the function using it runs.
+
+**One check fails, by design.** `scoreMeet` increments `place` before the `n>7`
+check, so a team's eighth and later runners still push opponents down the field.
+NFHS strikes them out instead. This is unreachable today — `buildModel` caps
+every roster at seven — so it is recorded as a latent issue rather than fixed,
+but it would bite if that cap were ever raised.
+
+## Backtest
+
+`backtest/` rebuilds a past season's database as of mid-September, simulates it,
+and compares against Lane in November. See `backtest/README.md`. Two seasons are
+committed, 2024 and 2025, which is 197 team-seasons.
+
+**The headline: the variance dial is too narrow for a September projection.**
+
+| sigma | 2025 boys | 2025 girls | 2024 boys | 2024 girls | pooled Brier | logloss |
+|---|---|---|---|---|---|---|
+| 2.3% (shipped) | 0.0376 | 0.1435 | 0.1245 | 0.0794 | 0.0962 | 0.3054 |
+| 5.0% | 0.0493 | 0.1088 | 0.1057 | 0.0740 | **0.0844** | 0.2616 |
+
+Three of the four season-genders want 5-7%; only 2025 boys prefers 2.3%, and
+that season was unusually predictable. Calibration at 2.3% is badly
+overconfident — teams given 70-90% qualified only 50% of the time, and teams
+given under 10% qualified 5% of the time. At 5% those bands land at 79% and 1%.
+
+This does **not** say `CAL` is wrong about what it measures. 2.3% is race-to-race
+spread, measured between two meets in the same season. The backtest projects
+eight weeks ahead, across which squads also change: roughly 6% of September
+top-five places are not on the line at the league championship, near-identical
+for boys and girls. Raising sigma is a crude proxy for attrition the model does
+not represent. Treat 5% as the honest dial for a long projection and 2.3% as the
+honest dial for the next race.
+
+Not yet tested: whether the right sigma falls as the season advances and the
+database gets closer to November. That needs October cutoffs, which means
+pulling the mid-season meets for 2024 and 2025 — only the pre-cutoff, district
+and state meets were pulled.
 
 ## What the model does not know
 
@@ -207,21 +258,29 @@ Listed in the app's own "How" tab:
 ## Open items
 
 1. **Course-difficulty adjustment** via least squares over shared athletes.
-   The pull in the Data section already gives enough overlap to fit it — the
-   factors above came out of this season's data. This is now the top item: the
-   multi-mark database it needed exists, and multi-mark sampling actively
-   misleads without it.
-2. Revisit `MARK_W` renormalisation for the two-mark case. `[0.25, 0.50]`
-   renormalises to `[0.33, 0.67]`, so the *slower* of two marks carries twice
-   the weight of the faster. With three marks the 50% lands on the middle mark,
-   which is the intent; with two there is no middle, and the current split
-   pushes an athlete's expected time about 5.9% slower than their best. That
-   was invisible while every athlete had one mark. 348 athletes now have two or
-   three. Straight `[0.5, 0.5]` is the neutral alternative — but decide it
-   together with course adjustment, since most of the gap being corrected for
-   is course, not form.
-3. Backtest: rebuild the 2025 database as of mid-September, simulate, compare to
-   what actually happened at Lane — checking calibration, not just ranking
-4. Grade-dependent improvement curves (freshmen improve most)
-5. Rebuild the audit harness. `model.js` / `audit2.js` are referenced below but
-   are not in the repo, so none of the NFHS scoring tests can be run.
+   Fitting `log(time) = athlete + course` over 2026 gives factors from **0.90 to
+   1.23** against a 2.3% noise dial. A head-to-head test — 30,243 pairs who raced
+   the same course on the same day, predicted from their other marks — puts raw
+   marks at 91.1% and course-adjusted at 91.6%. Small, because most pairs are
+   blowouts; but on the 660 pairs where the two disagree, adjusted is right 60%
+   of the time. Most of the available gain was already banked by excluding
+   Ultimook. Worth doing, not urgent.
+2. **Horizon-dependent variance.** The backtest says a September projection wants
+   sigma near 5%, not 2.3%. Before changing `CAL.sd`, pull October meets for 2024
+   and 2025 and re-run at later cutoffs: if the best sigma falls as November
+   approaches, the dial should depend on how far out the projection is rather
+   than being one number.
+3. **Model roster attrition directly** instead of hiding it in sigma. About 6% of
+   September top-five places are not on the line at the league championship. A
+   per-runner probability of being absent by November would be closer to the
+   truth than widening everyone's distribution.
+4. Revisit `MARK_W` renormalisation for the two-mark case. `[0.25, 0.50]`
+   renormalises to `[0.33, 0.67]`, so the *slower* of two marks carries twice the
+   weight of the faster. With three marks the 50% lands on the middle mark, which
+   is the intent; with two there is no middle, and the current split pushes an
+   athlete's expected time about 5.9% slower than their best. 348 athletes now
+   have two or three marks. `[0.5, 0.5]` is the neutral alternative — but decide
+   it together with course adjustment, since most of that gap is course.
+5. More backtest seasons. 2023 and earlier would firm up the sigma estimate;
+   197 team-seasons is enough to see the direction, not to pin the number.
+6. Grade-dependent improvement curves (freshmen improve most).

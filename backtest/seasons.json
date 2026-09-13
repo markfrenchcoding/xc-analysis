@@ -1,0 +1,31 @@
+{
+  "_comment": "One entry per backtested season. districts/state are athletic.net meet ids; cutoff is the date the information set stops, chosen to sit at the same point in the season as the live database. Berth counts are derived from the state meet itself, not hardcoded - OSAA has changed them.",
+  "2025": {
+    "cutoff": "2025-09-13",
+    "state": "258447",
+    "exclude": ["253214"],
+    "districts": {
+      "Portland Interscholastic": "269786",
+      "Metro": "256358",
+      "Pacific": "257219",
+      "Mt. Hood": "265417",
+      "Three Rivers": "253251",
+      "Central Valley": "267687",
+      "Southwest": "257523"
+    }
+  },
+  "2024": {
+    "cutoff": "2024-09-14",
+    "state": "237896",
+    "exclude": ["236276"],
+    "districts": {
+      "Portland Interscholastic": "241625",
+      "Metro": "237971",
+      "Pacific": "238041",
+      "Mt. Hood": "241632",
+      "Three Rivers": "235847",
+      "Central Valley": "241032",
+      "Southwest": "237797"
+    }
+  }
+}
