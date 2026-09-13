@@ -6,6 +6,28 @@ const M = require('../model.js');
 const DIR = path.join(__dirname, 'data');
 const CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'seasons.json'), 'utf8'));
 
+// A seed carrying a `course` column holds raw times plus the fitted difficulty
+// of the race each came from. Divide them out here so the rest of the harness
+// sees course-neutral marks — the same thing index.html does in buildModel.
+// A seed without the column passes through untouched.
+function applyCourse(csv) {
+  const lines = csv.trim().split(/\r?\n/);
+  const head = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const iC = head.indexOf('course'), iM = head.indexOf('mark');
+  if (iC < 0) return csv;
+  const out = [head.filter((_, i) => i !== iC).join(',')];
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(',');
+    const x = /^(\d{1,2}):(\d{1,2})(?:\.(\d+))?$/.exec(c[iM]);
+    if (!x) continue;
+    const secs = ((+x[1]) * 60 + (+x[2]) + (x[3] ? +('0.' + x[3]) : 0)) / (+c[iC] || 1);
+    const m = Math.floor(secs / 60);
+    c[iM] = m + ':' + (secs - m * 60).toFixed(2).padStart(5, '0');
+    out.push(c.filter((_, j) => j !== iC).join(','));
+  }
+  return out.join('\n') + '\n';
+}
+
 const years = () => Object.keys(CFG).filter(k => /^\d{4}$/.test(k)).sort();
 const cutoffs = year => CFG[year].cutoffs;
 const truthFor = year => JSON.parse(fs.readFileSync(path.join(DIR, year + '-truth.json'), 'utf8'));
@@ -18,7 +40,7 @@ const truthFor = year => JSON.parse(fs.readFileSync(path.join(DIR, year + '-trut
 function odds(year, gender, cutoff, sigma, seasons, weights) {
   const truth = truthFor(year);
   const csv = fs.readFileSync(path.join(DIR, year + '-seed-' + cutoff + '.csv'), 'utf8');
-  M.setDATA(M.parseCSV(csv).rows.filter(r => r.g === gender));
+  M.setDATA(M.parseCSV(applyCourse(csv)).rows.filter(r => r.g === gender));
   M.setLeagues(truth.leagues[gender]);
   M.setBerths(truth.berths[gender].auto, truth.berths[gender].atLarge);
   const model = M.buildModel(gender, 5000);

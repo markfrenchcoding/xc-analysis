@@ -27,10 +27,15 @@ entrypoint that did not exist.
 Embedded as CSV in `<script id="seed" type="text/plain">` near the top of the
 file. Columns: `gender,athlete,mark,grade,team,dist`.
 
-- `gender` is `M`/`F`, `dist` is `5000` or `3000`
+- `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
-- 1,531 rows currently: 1,172 athletes, of whom 348 carry two or three marks.
+- 868 rows currently: 613 athletes, of whom 218 carry two or three marks.
   Pulled from meet results through Sep 12, 2026
+
+**5,000m only.** The state meet and every league championship are run at
+5,000m, so that is the only board. Short early-season races (the 3k meets in
+late August) are dropped at pull time and the distance toggle was removed from
+the site. Nothing is ever converted between distances.
 
 Updating the database means replacing that block and committing. There is no
 admin UI and there should not be — the app is customer-facing.
@@ -310,6 +315,39 @@ simulation is better calibrated than the obvious alternative on two seasons of
 Oregon 6A. It says nothing about how it compares to other published forecasts,
 none of which have been tested here.
 
+**Course adjustment was built, tested, and not shipped.** `fit_courses.js` fits
+`log(time) = athlete + course` by alternating least squares, with shrinkage for
+thin meets and a connectivity check so unconnected courses are left at 1.000
+rather than invented. `backtest/course_value.js` scores it against raw marks at
+every cutoff, with factors fitted only from marks available at that cutoff so no
+September forecast sees October.
+
+| cutoff | raw | course-adjusted | |
+|---|---|---|---|
+| mid-September | 0.0845 | **0.0830** | better |
+| late September | 0.0575 | 0.0616 | worse |
+| mid-October | 0.0582 | 0.0599 | worse |
+| late October | 0.0551 | 0.0588 | worse |
+
+Pooled it is 3.1% *worse*, and it beats raw marks in only 38% of bootstrap
+draws. It helps in September and hurts steadily more as the season goes on.
+
+**Why: course and date are confounded.** Each meet happens on exactly one day,
+so nothing in the data distinguishes "this course is hard" from "this race was
+early". The fitted factors correlate with the calendar at **r = -0.70 (2024)**
+and **-0.66 (2025)**, sliding about **1% per week** — which is athletes getting
+fitter, not courses getting flatter. Dividing by such a factor inflates early
+marks and erases genuine improvement, and the later the cutoff the more real
+progression there is to erase. That is exactly the observed pattern.
+
+So the 0.90-1.23 spread quoted elsewhere is course **plus** eight weeks of
+fitness, and the honest course-only component is smaller and unmeasured.
+
+Separating them needs an identifying assumption the current data cannot supply.
+The realistic route is venues that host more than one meet on different dates:
+the venue effect is shared while the dates differ, which pins the time trend.
+A handful of Oregon venues qualify. Until then, leave marks raw.
+
 Not yet pulled: 2023 and earlier. The direction of every finding above is settled
 — the bootstrap puts P(best September sigma >= 3.5%) at 99% — but the level is
 pinned only to about a point either way. 2023 is worth more held back as a clean
@@ -319,15 +357,13 @@ holdout for whatever drift term gets built than folded in now.
 
 Listed in the app's own "How" tab:
 
-- **Course difficulty is not modelled, and this is now the binding problem.**
-  A mark from flat Lents Park and one from hilly Alderbrook are treated alike.
-  Now that athletes carry marks from different meets, that assumption is doing
-  real damage rather than sitting idle. Fitting `log(time) = athlete + course`
-  by alternating least squares over the 2026 season gives course factors from
-  **0.90 to 1.23** — Oregon City 5,000m at 0.903, Ash Creek at 0.976, the
-  Mountainside quad at 1.053, Ultimook at 1.15-1.23. That is a 33% spread
-  against a noise dial of 2.3%. Until it is corrected, an athlete's second mark
-  says more about where they raced than how they ran. See open item 1.
+- **Course difficulty is not modelled, and correcting it is harder than it
+  looks.** A mark from flat Lents Park and one from hilly Alderbrook are treated
+  alike. Fitting `log(time) = athlete + course` does produce a spread of roughly
+  0.90 to 1.23 — but see the backtest section: most of the late-season end of
+  that range is athletes getting fitter, not courses getting easier, and
+  dividing it out makes forecasts worse. Treat the number as an upper bound on
+  the course effect, not a measurement of it.
 - No seasonal progression, injury, or roster change between now and November.
 - The at-large ranking is a stand-in for a committee that also weighs league
   strength and head-to-head.
@@ -338,31 +374,30 @@ Listed in the app's own "How" tab:
 
 ## Open items
 
-1. **Course-difficulty adjustment** via least squares over shared athletes. This
-   is now the top item, because it is the one mechanism that explains why extra
-   marks cost accuracy. Fitting `log(time) = athlete + course` over 2026 gives
-   factors from 0.90 to 1.23 against a 2.3% dial. A head-to-head test over 30,243
-   same-course pairs puts raw marks at 91.1% and adjusted at 91.6% — small
-   overall, but on the 660 pairs where the two disagree, adjusted is right 60% of
-   the time. `backtest/marks_value.js` and `backtest/markw.js` are the checks
-   that it worked: marks_value should flip to favouring the full database, and
-   markw's gradient toward the best mark should reverse.
-2. **Horizon-dependent variance.** The backtest measures the curve directly: best
-   sigma is 5.0% at eight weeks out, 3.0% at six, 2.6% from four weeks in.
-   `confound.js` rules out thin data as the cause, so this is real horizon.
-   Implement as `total² = raceDay² + drift²`, keeping `CAL.sd` at 2.3% for
-   race-day and decaying drift from ~4.4% in September toward zero at Lane. Do
-   not simply raise `CAL.sd` — the slider's own helper text describes race-day
-   spread and would become false.
-3. **Model roster attrition directly** instead of hiding it in drift. About 6% of
-   September top-five places are not on the line at the league championship. A
-   per-runner probability of absence would be closer to the truth than widening
-   everyone's distribution, and would explain part of what drift absorbs.
-4. **2023 as a holdout.** Not to narrow the sigma estimate — the bootstrap says a
-   third season moves the 80% interval from about 2.0 points to 1.6, which
-   changes nothing. Pull it *after* the drift term exists, as the only season it
-   was never fitted on.
-5. Grade-dependent improvement curves (freshmen improve most).
+1. **Break the course/date confound.** Course adjustment is built and fails
+   because a course factor currently absorbs about 1% per week of seasonal
+   fitness — see the backtest section. The identifying trick is venues that host
+   more than one meet on different dates: the venue effect is shared while the
+   dates differ, which pins the time trend and lets the two be separated. Find
+   the repeat venues, add a shared week term, re-run `course_value.js`. If it
+   then beats raw marks, ship it and re-run `marks_value.js` and `markw.js` —
+   both should flip.
+2. **Horizon-dependent variance.** The backtest measures the curve: best sigma
+   is 5.0% at eight weeks out, 3.0% at six, 2.6% from four weeks in.
+   `confound.js` rules out thin data as the cause. Implement as
+   `total² = raceDay² + drift²`, keeping `CAL.sd` at 2.3% for race-day and
+   decaying drift from ~4.4% in September toward zero at Lane. Do not simply
+   raise `CAL.sd` — the slider's own helper text describes race-day spread and
+   would become false. Note this is the same confound as item 1 seen from the
+   other side: drift and course-date are both "the season moves".
+3. **Model roster attrition directly** instead of hiding it in drift. About 6%
+   of September top-five places are not on the line at the league championship.
+4. **2023 as a holdout.** Not to narrow the sigma estimate — a third season moves
+   the 80% interval from about 2.0 points to 1.6, which changes nothing. Pull it
+   *after* the drift term exists, as the only season it was never fitted on.
+5. Grade-dependent improvement curves (freshmen improve most). This is item 1's
+   problem wearing a different hat: a per-grade progression term would also help
+   separate fitness from terrain.
 6. `scoreMeet` increments `place` before its `n>7` check, so a team's eighth and
    later runners displace opponents where NFHS strikes them out. Unreachable
    while `buildModel` caps rosters at seven; `audit2.js` records it as the one

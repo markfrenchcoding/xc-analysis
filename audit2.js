@@ -85,10 +85,13 @@ console.log('\nmodel wiring (live seed)');
   const seed = /<script id="seed"[^>]*>([\s\S]*?)<\/script>/.exec(html)[1];
   const { rows, bad } = M.parseCSV(seed);
   eq('seed parses with no bad rows', bad, 0);
-  ok('seed has rows', rows.length > 1000, 'rows=' + rows.length);
+  ok('seed has rows', rows.length > 500, 'rows=' + rows.length);
+  ok('seed is 5,000m only', rows.every(r => r.dist === 5000),
+    (new Set(rows.map(r => r.dist))).size + ' distinct distances');
   M.setDATA(rows);
 
-  for (const g of ['M', 'F']) for (const dist of [5000, 3000]) {
+  // 3,000m was removed from the model; only the state-meet distance is built
+  for (const g of ['M', 'F']) for (const dist of [5000]) {
     const tag = g + dist;
     const m = M.buildModel(g, dist);
     ok(tag + ': every team maps to a league', m.unassigned.length === 0, m.unassigned.join(','));

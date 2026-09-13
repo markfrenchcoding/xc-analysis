@@ -6,6 +6,7 @@
 // re-pull a season. Usage:  node build_season.js 2025 [rawDir]
 const fs = require('fs');
 const path = require('path');
+const { fitCourses } = require('../fit_courses.js');
 
 const YEAR = process.argv[2];
 const RAW = process.argv[3] || path.join(__dirname, 'raw');
@@ -25,7 +26,9 @@ const meta = JSON.parse(fs.readFileSync(path.join(RAW, 'y' + YEAR + '_meta.json'
 const rows = fs.readFileSync(path.join(RAW, 'y' + YEAR + '_raw.csv'), 'utf8').trim()
   .split(/\r?\n/).slice(1).map(split)
   .map(c => ({ aid: c[0], name: c[1] + ' ' + c[2], grade: c[3], school: c[5],
-               g: c[6], dist: +c[7], s: +c[8], mid: c[9], divName: c[11] }));
+               g: c[6], dist: +c[7], s: +c[8], mid: c[9], divName: c[11] }))
+  // 3,000m is not modelled: the state meet and every league championship are 5,000m
+  .filter(r => r.dist === 5000);
 
 // NFHS scoring over a raw result list, mirroring scoreMeet: top five score,
 // six and seven displace, a team that cannot field five is removed first.
@@ -91,21 +94,43 @@ for (const g of ['M', 'F']) {
                       auto: 2, atLarge: truth.state[g].length - 2 * nLeagues };
 }
 
+// Course factors are fitted from the marks available AT THE CUTOFF and no
+// later. Fitting them over the whole season would leak November into a
+// September forecast and quietly flatter the backtest.
+const courseCache = new Map();
+function coursesAt(CUTOFF) {
+  if (!courseCache.has(CUTOFF)) {
+    const upto = rows.filter(r => !(cfg.exclude || []).includes(r.mid)
+      && (meta.meets[r.mid] || {}).date <= CUTOFF);
+    courseCache.set(CUTOFF, fitCourses(upto.map(r => ({ aid: r.aid, dist: r.dist, secs: r.s, mid: r.mid }))));
+  }
+  return courseCache.get(CUTOFF);
+}
+
 // the marks database as of the cutoff, built exactly the way index.html builds its seed
-function seedFor(g, CUTOFF) {
+function seedFor(g, CUTOFF, useCourse) {
   const members = new Set();
   for (const l in truth.leagues[g]) truth.leagues[g][l].forEach(t => members.add(t));
   const info = rows.filter(r => r.g === g && members.has(r.school)
     && !(cfg.exclude || []).includes(r.mid)
     && (meta.meets[r.mid] || {}).date <= CUTOFF);
+  // with adjustment off every factor is 1, so ranking falls back to raw time
+  // and the seed is byte-identical to the one built before this existed
+  const cf = useCourse ? coursesAt(CUTOFF) : { factorFor: () => 1 };
   const ath = new Map(), seen = new Set();
   for (const r of info) {
     const pk = `${r.aid}|${r.mid}|${r.dist}|${r.s}`; if (seen.has(pk)) continue; seen.add(pk);
     const k = `${r.aid}|${r.dist}`;
     if (!ath.has(k)) ath.set(k, { name: r.name, grade: r.grade, school: r.school, dist: r.dist, marks: [] });
-    ath.get(k).marks.push(r.s);
+    const f = cf.factorFor(r.mid, r.dist);
+    ath.get(k).marks.push({ raw: r.s, f, adj: r.s / f });
   }
-  for (const a of ath.values()) { a.marks.sort((x, y) => x - y); a.marks = a.marks.slice(0, 3); a.sb = a.marks[0]; }
+  // rank and cut on the course-neutral value, which is what the model will use
+  for (const a of ath.values()) {
+    a.marks.sort((x, y) => x.adj - y.adj);
+    a.marks = a.marks.slice(0, 3);
+    a.sb = a.marks[0].adj;
+  }
   const board = new Map();
   for (const a of ath.values()) { const b = `${a.school}|${a.dist}`; if (!board.has(b)) board.set(b, []); board.get(b).push(a); }
   const kept = [];
@@ -124,16 +149,26 @@ for (const g of ["M", "F"]) {
     + " leagues, " + b.total + " at state = " + (b.auto * b.leagues) + " auto + " + b.atLarge + " at-large");
 }
 for (const CUTOFF of cfg.cutoffs) {
-  const lines = ["gender,athlete,mark,grade,team,dist"];
+  // `course` carries the fitted difficulty of the race each mark came from.
+  // Raw times stay in the file; the model divides. A seed without the column
+  // still parses — every factor defaults to 1.
+  const lines = ["gender,athlete,mark,grade,team,dist,course"];
+  const plain = ["gender,athlete,mark,grade,team,dist"];
   let athletes = 0, multi = 0;
   for (const g of ["M", "F"]) {
-    const kept = seedFor(g, CUTOFF);
-    athletes += kept.length;
-    multi += kept.filter(a => a.marks.length > 1).length;
-    for (const a of kept) for (const m of a.marks)
-      lines.push([g, a.name, fmt(m), a.grade, a.school, a.dist].map(esc).join(","));
+    for (const a of seedFor(g, CUTOFF, true)) for (const m of a.marks)
+      lines.push([g, a.name, fmt(m.raw), a.grade, a.school, a.dist, m.f.toFixed(3)].map(esc).join(","));
+    const raw = seedFor(g, CUTOFF, false);
+    athletes += raw.length;
+    multi += raw.filter(a => a.marks.length > 1).length;
+    for (const a of raw) for (const m of a.marks)
+      plain.push([g, a.name, fmt(m.raw), a.grade, a.school, a.dist].map(esc).join(","));
   }
-  fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + ".csv"), lines.join("\n") + "\n");
+  fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + "-course.csv"), lines.join("\n") + "\n");
+  fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + ".csv"), plain.join("\n") + "\n");
+  const cf = coursesAt(CUTOFF);
   console.log("  " + CUTOFF + ": " + athletes + " athletes, " + (lines.length - 1) + " marks, "
-    + (100 * multi / athletes).toFixed(0) + "% with more than one");
+    + (100 * multi / athletes).toFixed(0) + "% with more than one"
+    + "   courses " + cf.stats.placed + "/" + cf.stats.courses
+    + ", spread " + cf.stats.spread.toFixed(3));
 }
