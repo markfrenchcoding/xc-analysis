@@ -348,6 +348,12 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   font-variant-numeric:tabular-nums}
 .doc td:first-child{color:var(--text)}
 .doc td:not(:first-child),.doc th:not(:first-child){text-align:right}
+.doc .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:7px;margin:11px 0 13px}
+.doc .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.doc .stat b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:21px;line-height:1.05;color:var(--text);font-variant-numeric:tabular-nums}
+.doc .stat i{font-style:normal;display:block;font-size:9.5px;color:var(--dim);
+  line-height:1.3;margin-top:2px}
 .doc figure{margin:11px 0 13px;padding:11px 11px 9px;background:var(--bg);
   border:1px solid var(--line);border-radius:11px}
 .doc figure svg{width:100%;height:auto;display:block;overflow:visible}
@@ -1305,6 +1311,14 @@ M,Samuel Rhoads,19:03.02,12,Westview,5000
         <figcaption><b>Every number on the board is a count, not a score.</b> One hundred Novembers, played out end to end. A team shown at 53% won fifty-three of them &mdash; and lost forty-seven.</figcaption>
       </figure>
 
+
+      <div class="stats">
+        <div class="stat"><b>613</b><i>athletes in the database</i></div>
+        <div class="stat"><b>868</b><i>individual race results</i></div>
+        <div class="stat"><b>47</b><i>schools, every 6A team</i></div>
+        <div class="stat"><b>5,000</b><i>seasons per run</i></div>
+      </div>
+
       <h3>A season is not one race</h3>
       <p>Line every runner up at their season best and you learn who is fastest on paper. You do not learn how likely anything is — and paper does not run in November.</p>
 
@@ -1361,8 +1375,15 @@ M,Samuel Rhoads,19:03.02,12,Westview,5000
 
       <h3>Checked against seasons we already know</h3>
       <p>This is the part we would want to see if we were you.</p>
-      <p>We rebuilt the database exactly as it stood in mid-September of past seasons — nothing after that date, no hindsight — ran the simulation forward, and compared it to what actually happened at Lane in November. Not just whether the right teams were picked, but whether the percentages meant what they said: of all the teams given a one-in-four chance, did about one in four make it?</p>
-      <p>That is where the settings come from, and it is how we know which parts of this are sharp and which are still guesswork. A model nobody has scored is just an opinion with decimals.</p>
+      <p>We rebuilt the 2024 and 2025 seasons exactly as they stood in mid-September — <b>96,265 race results</b>, nothing after that date, no hindsight — then ran the season forward and compared it to what actually happened at Lane in November. Both genders, four points in each season, <b>197 team-seasons</b> scored.</p>
+      <div class="stats">
+        <div class="stat"><b>82%</b><i>of teams that qualified were in the board's top group</i></div>
+        <div class="stat"><b>3 of 4</b><i>state champions named as favourite</i></div>
+        <div class="stat"><b>96%</b><i>of teams shown above 90% did qualify</i></div>
+        <div class="stat"><b>6%</b><i>of teams shown below 10% did anyway</i></div>
+      </div>
+      <p>That second pair is the one that matters. It is easy to sort teams; it is hard to be right about <em>how sure</em> you are. Those two numbers say that when this model claims near-certainty it is nearly always correct, and when it writes a team off it is usually correct too.</p>
+      <p>Where it is still loose is the middle, this early. Teams we put between 70% and 90% in mid-September made it about half the time — honest odds there are wider than they look, and they tighten every week as results come in. We know that because we measured it, which is the whole point. A model nobody has scored is just an opinion with decimals.</p>
 
       <h3>What-ifs you can trust</h3>
       <p>Drop five seconds off a runner and the board moves. The trick is making sure it moved because of the five seconds and not because the dice rolled differently — so every comparison is run against identical races. What you see is the improvement, with the luck held still.</p>
@@ -1725,7 +1746,7 @@ function buildBoard(tally){
   const box=document.getElementById("simOut");
   box.innerHTML=`
     <h2 class="sec">Odds by team</h2>
-    <p class="sub2">Bars are where a team finishes at state across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
+    <p class="sub2">Points are what a team averages in the seasons it gets to Lane, so a team that rarely qualifies can still show a good number. Bars are where a team finishes at state across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
     <div class="legend">
       <span><i style="background:var(--t1)"></i>1st</span>
       <span><i style="background:var(--t2)"></i>2nd</span>
@@ -1743,7 +1764,7 @@ function buildBoard(tally){
         <span class="rank"><u>#—</u></span>
         ${crest(t.name,"crest")}
         <span class="tc-name"><b>${t.name}</b><i>${ABBR[t.league]}</i></span>
-        <span class="title"><span class="tnum"><svg class="tro" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10v6a5 5 0 0 1-10 0V2Z"/><path d="M7 3.5H4v2.2A3.8 3.8 0 0 0 7.2 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M17 3.5h3v2.2A3.8 3.8 0 0 1 16.8 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.6 13h2.8v4.2h-2.8z"/><path d="M7.6 19.6h8.8V22H7.6z"/></svg><b>—</b></span><i>wins state</i><span class="tnum pnum"><b>&mdash;</b></span><i>avg pts</i></span>
+        <span class="title"><span class="tnum"><svg class="tro" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10v6a5 5 0 0 1-10 0V2Z"/><path d="M7 3.5H4v2.2A3.8 3.8 0 0 0 7.2 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M17 3.5h3v2.2A3.8 3.8 0 0 1 16.8 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.6 13h2.8v4.2h-2.8z"/><path d="M7.6 19.6h8.8V22H7.6z"/></svg><b>—</b></span><i>wins state</i><span class="tnum pnum"><b>&mdash;</b></span><i>pts when there</i></span>
       </div>
       <div class="strip">${Array.from({length:FIELD},(_,k)=>`<s data-p="${k+1}" style="--i:${k}"></s>`).join("")}</div>
       <div class="odds">
@@ -1786,11 +1807,21 @@ function paint(tally,done,full){
       prev.win=ws;
       el.querySelector(".title b").textContent=ws;
     }
-    // a team that never reaches Lane has no points to average
+    /* Points are averaged over the seasons a team actually reached Lane, which
+       is the number a coach wants \u2014 but it means the column does not fall
+       neatly down the board. A team that qualifies once in ten tries only gets
+       there when everything went right, and scores well on those days. The
+       figure is faded when the team rarely makes it, to show the average rests
+       on a thin slice of seasons. */
     const ps=t.ptsN?String(Math.round(t.ptsSum/t.ptsN)):"\u2014";
     if(prev.pts!==ps){
       prev.pts=ps;
       el.querySelector(".pnum b").textContent=ps;
+    }
+    const thin=done?(t.qual/done<0.25):false;
+    if(prev.thin!==thin){
+      prev.thin=thin;
+      el.querySelector(".pnum").style.opacity=thin?".45":"1";
     }
     if(full){
       let maxH=1;

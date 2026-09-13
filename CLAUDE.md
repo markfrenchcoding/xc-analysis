@@ -66,6 +66,27 @@ single simulated state meet; it looked good and was redundant, because it was
 the tool again with less of it. `chuteSeven()` reads `DATA` directly rather than
 the model, so athletes on teams too short to score still appear.
 
+**Points are conditional, and the card says so.** Each card shows the mean score
+at Lane averaged over the seasons that team actually qualified — "pts when
+there". That is the number a coach wants, but it does not fall neatly down the
+board: a team reaching state one year in ten only gets there when everything
+went right, and scores well on those days. Girls' Ida B. Wells at 9.6% averages
+222; McMinnville at 99.8% averages 306. Both are correct. The figure is faded
+below a 25% qualifying rate to show the average rests on a thin slice of
+seasons, and the legend above the board says the same thing in words. Do not
+"fix" the ordering — the inversions are real information.
+
+**The How tab quotes live figures, and they will go stale.** Eight numbers are
+hardcoded into the markup: four describing the database (613 athletes, 868
+results, 47 schools, 5,000 seasons per run) and four from the backtest (82% of
+qualifiers inside the board's top group, 3 of 4 champions named, 96% of the
+above-90% band qualifying, 6% of the below-10% band qualifying). The backtest
+four come from `node backtest/backtest.js` at the September cutoff — the
+per-season "top 18 by odds held" lines and the pooled calibration table.
+**Regenerate them whenever the model changes.** They moved once already when
+`MARK_W` was fixed. Publishing an accuracy claim that the harness no longer
+supports would be the worst thing on the site.
+
 **Diagrams in the How tab.** Three, inline SVG, themed off the existing custom
 properties and sized by viewBox so they scale on a phone: a hundred dots with
 fifty-three filled for what a percentage means, the seven-leagues-to-sixteen-
