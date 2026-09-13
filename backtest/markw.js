@@ -18,6 +18,7 @@ const L = require('./lib.js');
 const SEASONS = +(process.argv[2] || 6000);
 const DRAWS = +(process.argv[3] || 2000);
 const YEARS = L.years();
+const ONLY = process.argv.includes("--cut") ? +process.argv[process.argv.indexOf("--cut")+1] : null;
 const SIGMA_BY_CUT = [5.0, 3.0, 2.6, 2.6];   // from horizon.js
 
 const SCHEMES = [
@@ -34,12 +35,13 @@ console.log('MARK_W weighting — ' + YEARS.join(', ') + ', all cutoffs, '
   + SEASONS.toLocaleString() + ' seasons per point\n');
 
 const nCuts = Math.min(...YEARS.map(y => L.cutoffs(y).length));
+const CUTS = ONLY===null ? [...Array(nCuts).keys()] : [ONLY];
 const preds = [];      // preds[schemeIndex] = [{cluster, p, o}, ...] in a stable order
 const rows = [];
 for (const [label, two, three] of SCHEMES) {
   const fn = mk(two, three);
   const flat = [], perCut = [];
-  for (let ci = 0; ci < nCuts; ci++) {
+  for (const ci of CUTS) {
     const cut = [];
     for (const y of YEARS) for (const g of ['M', 'F']) {
       const { teams } = L.odds(y, g, L.cutoffs(y)[ci], SIGMA_BY_CUT[ci], SEASONS, fn);

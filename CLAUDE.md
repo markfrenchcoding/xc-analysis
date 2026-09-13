@@ -57,12 +57,20 @@ carries `ptsSum`/`ptsN` and `playState` fills them.
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
 
-**One November.** Tapping the checkered flag runs a single season end to end and
-shows that state meet: team result, first five across the line, and a note that
-the board behind it is the same thing several thousand times over. It is an
-easter egg, but it argues the site's whole case better than a paragraph does —
-any one November looks nothing like the odds. `oneRace()` reuses `draw`,
-`playDistricts` and `scoreMeet`; it draws twice, because Lane is a fresh race.
+**The Chute Seven.** Tapping the checkered flag counts down the seven fastest
+individuals in the division, seventh to first, across every school — with a
+kicker on how many schools are represented and the fact that those seven as one
+squad would score a perfect 15. The board is entirely about teams, so this is
+the one question the site never otherwise answers. An earlier version replayed a
+single simulated state meet; it looked good and was redundant, because it was
+the tool again with less of it. `chuteSeven()` reads `DATA` directly rather than
+the model, so athletes on teams too short to score still appear.
+
+**Diagrams in the How tab.** Three, inline SVG, themed off the existing custom
+properties and sized by viewBox so they scale on a phone: a hundred dots with
+fifty-three filled for what a percentage means, the seven-leagues-to-sixteen-
+teams qualification path, and the lopsided race-day curve. Prose alone was
+losing people at exactly the points that matter.
 
 **The How tab is written for readers, not for us.** It explains the ideas —
 seasons rather than one race, teammates having bad days together, bad days
@@ -252,59 +260,47 @@ The meet-results pull was still the right move — it filled rosters out and
 retired the two-team-league artifact — but top-three sampling is not yet earning
 its keep.
 
-**It is not `MARK_W`.** The obvious suspect was the two-mark case: truncating
-`[0.25, 0.50, 0.25]` renormalises to `[0.33, 0.67]`, putting two thirds of the
-weight on the *slower* mark, which shifts an athlete's expected time about 5.9%
-off their best. `backtest/markw.js` scores six weightings against actual
-outcomes and then runs a paired cluster bootstrap. The result does not support
-changing it:
+**It was `MARK_W` after all — the aggregate test hid it.** The old scheme
+truncated `[0.25, 0.50, 0.25]` and renormalised, handing a two-mark athlete
+`[0.33, 0.67]`: two thirds of the weight on their *slower* race. Against a
+one-mark team-mate, who is simply taken at their best, that is not a judgement
+about speed. It is a penalty for racing more often.
 
-| scheme | pooled Brier | beats shipped |
-|---|---|---|
-| ignore extras `[1.00,0.00] [1.00,0.00,0.00]` | 0.0616 | 66% |
-| best-biased `[0.67,0.33] [0.50,0.30,0.20]` | 0.0622 | 65% |
-| even `[0.50,0.50] [0.33,0.33,0.33]` | 0.0634 | 55% |
-| SHIPPED `[0.33,0.67] [0.25,0.50,0.25]` | 0.0637 | — |
-| even two marks only `[0.50,0.50]` | 0.0641 | 43% |
-| slow-biased `[0.25,0.75] [0.20,0.30,0.50]` | 0.0654 | 37% |
+The damage in September 2026, before the fix:
 
-Changing only the two-mark split to `[0.50, 0.50]` — the neutral-looking fix —
-is *worse* than what ships. The arithmetic about the 5.9% shift is correct but it
-does not translate into worse predictions, because the shift lands on whichever
-athletes race most and the model reads relative standings inside a league, where
-much of it cancels.
+| | marks each | top five, bests | as the model ran them |
+|---|---|---|---|
+| Grant (boys) | 2.0 | 76:28 | 78:20 — **112s slower** |
+| Lincoln (boys) | 1.0 | 77:58 | 77:58 — no penalty |
+| Sherwood (girls) | 2.0 | 94:38 | 97:57 — **199s slower** |
+| Jesuit (girls) | 1.0 | 97:06 | 97:06 — no penalty |
 
-What the table does show is a clean gradient: the more weight on an athlete's
-best mark, the better the forecast, all the way to ignoring extra marks. That is
-what course contamination looks like — a slower mark currently carries terrain as
-much as form, so it adds bias rather than signal. Two thirds of draws is too thin
-to act on, and the mechanism is addressable, so leave `MARK_W` alone and fix
-courses. Re-run `markw.js` afterwards: if course was the cause, the gradient
-should reverse and the shipped weighting should start winning.
+Grant was 90 seconds faster than Lincoln across five and ranked behind them.
+Sherwood was two and a half minutes faster than Jesuit and ranked behind them.
+Both flipped the moment the weights changed, and both now agree with
+athletic.net's own season-best ordering.
 
-**Against season-best seeding.** athletic.net's "hypothetical meet" lines every
-athlete up at their season best and scores one race. That is this model with the
-dial at zero and all the weight on each athlete's best mark, so
-`backtest/baseline.js` compares them exactly — same leagues, same berths, same
-NFHS scoring, only the variance removed.
+`markw.js` had said the shipped split was fine, and that was a real methodological
+error on my part rather than bad luck: it pooled every cutoff. By late October
+almost every athlete has two or more marks, so the penalty is near-universal and
+cancels out of the relative standings. It only bites when *some* teams have raced
+twice and others have not — which is exactly mid-September, exactly where the live
+site sits. Run `markw.js --cut 0` and the shipped scheme ranks fifth of six.
 
-| cutoff | season-best: in top N | Brier | simulation: in top N | Brier |
-|---|---|---|---|---|
-| mid-September | 59/72 | 0.1320 | 59/72 | **0.0849** |
-| late September | 63/72 | 0.0914 | 63/72 | **0.0574** |
-| mid-October | 63/72 | 0.0914 | 63/72 | **0.0587** |
-| late October | **64/72** | 0.0812 | 63/72 | **0.0550** |
+The weights are now an explicit table, `[[1], [0.67, 0.33], [0.50, 0.30, 0.20]]` —
+best mark leads, later marks temper it. Pooled backtest Brier improved 0.0965 to
+0.0921 in September and 0.0550 to 0.0522 in late October, so it is better
+everywhere, not a September-only patch.
 
-**At picking which teams qualify, the two are indistinguishable** — season-best
-seeding is even one better at the last cutoff, and they tie on naming the
-champion (10 of 16 season-genders each). The simulation's entire advantage is in
-knowing how sure to be: 35% better by Brier, because a deterministic ranking
-states every one of its calls at 100% and is flatly wrong about 10% of them.
+**It is still not fair, only less unfair.** A second mark can only ever slow an
+athlete down, because there is nothing to compare it against — that needs course
+and date adjustment, which is open item 1. When that lands, re-run `markw.js`:
+the gradient toward the best mark should flatten.
 
-Worth being clear about what that does and does not establish. It says the
-simulation is better calibrated than the obvious alternative on two seasons of
-Oregon 6A. It says nothing about how it compares to other published forecasts,
-none of which have been tested here.
+**The lesson worth keeping:** pooling across regimes can hide a bias that is
+severe in one of them. When a result says "no effect", check whether the effect
+is supposed to be uniform. Here it was not, and a reader spotting Grant on the
+board caught what the aggregate missed.
 
 **Course adjustment was built, tested, and not shipped.** `fit_courses.js` fits
 `log(time) = athlete + course` by alternating least squares, with shrinkage for
@@ -394,6 +390,7 @@ Listed in the app's own "How" tab:
    while `buildModel` caps rosters at seven; `audit2.js` records it as the one
    deliberate failure.
 
-**Settled, do not revisit without new evidence:** `MARK_W`'s two-mark split. It
-looks wrong on paper and tests fine — see the backtest section. `markw.js` is the
-harness if a later change makes it worth asking again.
+**Previously marked settled, and it was not:** the `MARK_W` two-mark split.
+See the backtest section. The mistake was trusting a pooled result for a bias
+that only shows up in one regime — check whether an effect is supposed to be
+uniform before believing a null.

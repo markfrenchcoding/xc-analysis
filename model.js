@@ -17,7 +17,7 @@ let FIELD=LG.length*AUTO_PER+AT_LARGE;   // 16
 
 const CAL={ratio:1.008,sd:2.3,n:293};
 
-const MARK_W=[0.25,0.50,0.25];
+const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
 
 const TEAM_SHARE=0.30;
 
@@ -72,9 +72,7 @@ function buildModel(g,dist){
       a.marks.sort((x,y)=>x-y);
       a.marks=a.marks.slice(0,3);       // top three of the season
       a.sb=a.marks[0];
-      a.w=MARK_W.slice(0,a.marks.length);
-      const s=a.w.reduce((p,q)=>p+q,0);
-      a.w=a.w.map(v=>v/s);              // renormalise when fewer than three
+      a.w=MARK_W[a.marks.length-1].slice();
     }
   const teams=[],runners=[],unassigned=[];
   for(const [name,m] of byTeam){
