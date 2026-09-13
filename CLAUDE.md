@@ -29,8 +29,9 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
-- 868 rows currently: 613 athletes, of whom 218 carry two or three marks.
-  Pulled from meet results through Sep 12, 2026
+- a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
+- 2,974 rows currently across all five classifications: 2,221 athlete-boards,
+  214 schools. Pulled from meet results through Sep 12, 2026
 
 **5,000m only.** The state meet and every league championship are run at
 5,000m, so that is the only board. Short early-season races (the 3k meets in
@@ -115,39 +116,64 @@ look. That section earns more trust than it costs — do not quietly drop it.
 
 ## Classifications
 
-The site ships 6A today. The model has been generalised to the other four, but
-their data is not in yet. OSAA does **not** use one rule, so none of this can be
-a constant — `AUTO` is a per-league map, `AT_LARGE`, `SC` (scorers) and `PL`
-(runners before the rest are struck out) are set per classification and gender.
+All five ship. The switcher above the Boys/Girls toggle changes `CLS`, and
+`setClass(cls, gender)` repoints `LEAGUES`, `ABBR`, `LG`, `AUTO`, `AT_LARGE`,
+`SC`, `PL`, `FIELD` and `TEAM_LEAGUE` before anything rebuilds. League
+membership and berths live in the `CLASSES` block at the top of the script;
+the seed carries a `class` column and `buildModel` filters on it.
 
-| class | leagues | automatic per league | at-large | field | scorers |
+OSAA does not use one rule, and the numbers are not symmetric across genders:
+
+| board | leagues | automatic per league | at-large | field | scorers |
 |---|---|---|---|---|---|
-| 6A boys/girls | 7 | 2 each | 2 | 16 | 5 |
-| 5A boys/girls | 5 | 2 each | 2 | 12 | 5 |
-| 4A boys/girls | 6 | **1 each** | **6** | 12 | 5 |
-| 3A boys | 4 | **3, 3, 3, 2** | 1 | 12 | 5 |
-| 3A girls | 4 | **2, 2, 2, 1** | 1 | 8 | **4** |
-| 2A/1A boys | 4 | **3, 4, 3, 3** | 2 | 15 | 5 |
-| 2A/1A girls | 4 | **1, 2, 1, 1** | 3 | 8 | **4** |
+| 6A boys / girls | 7 | 2 each | 2 | 16 | 5 |
+| 5A boys / girls | 5 | 2 each | 2 | 12 | 5 |
+| 4A boys / girls | 6 | **1 each** | **6** | 12 | 5 |
+| 3A boys | 4 | 3, 3, 3, 2 | 1 | 12 | 5 |
+| 3A girls | 4 | 2, 2, 2, 1 | 1 | **8** | **4** |
+| 2A/1A boys | 4 | 3, 4, 3, 3 | 2 | 15 | 5 |
+| 2A/1A girls | 4 | 1, 2, 1, 1 | 3 | **8** | **4** |
 
-Three things to notice before adding a classification.
+`audit2.js` asserts every one of those ten boards: field size, scoring depth,
+that no team is stranded outside a league, that short teams really are below the
+scoring depth, and that exactly `FIELD` teams qualify and one wins per season.
+93 checks pass; the only failure is the deliberate `scoreMeet` one.
 
-**Boys and girls differ below 4A.** The allocation follows how many teams each
-district actually fields, so it is not symmetric and must be read per gender.
+**Verify against OSAA each August.** `osaa.org/activities/bxc/qualifications` and
+the `gxc` equivalent, one page per classification. The allocation tracks how many
+teams each district fields, so it moves.
 
-**3A and 2A/1A girls score four, not five.** Seven may run, the top four count,
-the fifth breaks ties, and a team needs four rather than five to score at all.
-`scoreMeet(list, times, SC, PL)` takes the depths; `buildModel` uses `SC` as the
-minimum roster and averages over `SC`.
+**3A and 2A/1A girls score four, not five**, new for 2026. Seven may run, four
+count, the fifth breaks ties, four are enough to field a team. `scoreMeet` takes
+the depths; `buildModel` uses `SC` as both the minimum roster and the averaging
+window.
 
-**That top-four rule is new for 2026 and cannot be backtested.** In 2025
-athletic.net reports `ScoreDepth: 5` for every division, and the girls' 3A and
-2A/1A ran as a single combined race. So for those two boards there is no history
-to check the model against — everything else in `backtest/` is 6A. Say so on the
-site rather than implying the same validation covers them.
+**Those two boards have no history to check.** In 2025 athletic.net reports
+`ScoreDepth: 5` for every division and the small-school girls raced 3A/2A/1A
+combined, so the backtest cannot score them. Everything in `backtest/` is 6A. The
+How tab says this outright — do not let the site imply otherwise.
 
-Verify against OSAA each August: `osaa.org/activities/bxc/qualifications?div=5A`
-and the `gxc` equivalent. The counts move with team numbers.
+### Rebuilding the database
+
+`scratchpad` tooling, in order: scrape `osaa.org/activities/bxc/teams-leagues`
+and the `gxc` page for 2026 membership (all five panels are in the DOM at once,
+one table per league); resolve those names to athletic.net team ids from meets
+already pulled; crawl every team calendar for meets with results; pull every
+5,000m division; then build the seed with top three marks per athlete and top
+seven per team.
+
+Two things that cost time. OSAA and athletic.net spell schools differently
+(`Benson` / `Benson Tech`, `Nelson` / `Adrienne Nelson`, `Jefferson, Portland` /
+`Jefferson-Portland`) and several entries are co-ops filed under the lead school
+(`The Dalles / Dufur`, `Heppner / Ione`, `Union / Cove`), so an alias table is
+unavoidable. And athletic.net suffixes ambiguous names — strip a trailing
+`(OR)` or the board will show `Cleveland (OR)` where it has always said
+`Cleveland`.
+
+Current coverage: 2,974 marks, 2,221 athlete-boards, 214 schools. Ten schools
+have no athletic.net id and 43 more have an id but no 5,000m result yet; they
+simply do not appear, the same as any team short of the scoring depth. Nearly
+all are 1A schools that have only raced 3k so far.
 
 ## How the simulation works
 

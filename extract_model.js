@@ -14,7 +14,8 @@ const lines = src.split(/\r?\n/);
 
 // Names to lift. Order matters only for readability; JS hoists functions.
 const WANT = [
-  'LEAGUES', 'AUTO', 'LG', 'autoFor', 'autoTotal', 'FIELD', 'CAL', 'MARK_W', 'TEAM_SHARE', 'SIG_T',
+  'CLASSES', 'CLS', 'LEAGUES', 'AUTO', 'autoFor', 'autoTotal', 'TEAM_LEAGUE', 'setClass',
+  'CAL', 'MARK_W', 'TEAM_SHARE', 'SIG_T',
   'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'buildModel', 'scoreMeet',
   'SK_HI', 'SK_MEAN', 'SK_SD',
   'playDistricts', 'playState', 'skew', 'spare', 'gauss', 'pickMark', 'draw', 'shift',
@@ -65,18 +66,14 @@ for (let i = 0; i < parts.length; i++) {
   parts[i] = parts[i].replace(/^const FIELD=/m, 'let FIELD=');
 }
 
-parts.push(`const TEAM_LEAGUE={};
-function reindexLeagues(){
-  for(const k in TEAM_LEAGUE) delete TEAM_LEAGUE[k];
-  for(const [lg,ts] of Object.entries(LEAGUES)) ts.forEach(t=>TEAM_LEAGUE[t]=lg);
-}
-reindexLeagues();`);
-
 parts.push('let DATA=[];');
+// a freshly required module should be usable without ceremony
+parts.push('try{ setClass("6A","M"); }catch(e){}');
 
 parts.push(`module.exports = {
   get LEAGUES(){return LEAGUES;}, get LG(){return LG;}, get TEAM_LEAGUE(){return TEAM_LEAGUE;},
-  get AUTO(){return AUTO;}, get AT_LARGE(){return AT_LARGE;}, get FIELD(){return FIELD;},
+  get AUTO(){return AUTO;}, get CLS(){return CLS;}, setCLS(c){ CLS=c; },
+  setClass, get AT_LARGE(){return AT_LARGE;}, get FIELD(){return FIELD;},
   get SC(){return SC;}, get PL(){return PL;},
   CAL, MARK_W, TEAM_SHARE, SIG_T, SIG_I,
   parseCSV, toSeconds, fmt, buildModel, scoreMeet, playDistricts, playState,
@@ -84,10 +81,10 @@ parts.push(`module.exports = {
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
   setLeagues(L){
-    for(const k in LEAGUES) delete LEAGUES[k];
-    Object.assign(LEAGUES, L);
-    LG.length = 0; LG.push(...Object.keys(LEAGUES));
-    reindexLeagues();
+    LEAGUES = L;
+    LG = Object.keys(LEAGUES);
+    for(const k in TEAM_LEAGUE) delete TEAM_LEAGUE[k];
+    for(const [lg,ts] of Object.entries(LEAGUES)) ts.forEach(x=>TEAM_LEAGUE[x]=lg);
     FIELD = autoTotal() + AT_LARGE;
   },
   setBerths(auto, atLarge){

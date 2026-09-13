@@ -93,6 +93,7 @@ console.log('\nmodel wiring (live seed)');
   // 3,000m was removed from the model; only the state-meet distance is built
   for (const g of ['M', 'F']) for (const dist of [5000]) {
     const tag = g + dist;
+    M.setClass('6A', g);            // league membership differs by gender
     const m = M.buildModel(g, dist);
     ok(tag + ': every team maps to a league', m.unassigned.length === 0, m.unassigned.join(','));
     ok(tag + ': no roster exceeds seven', m.teams.every(t => !t.roster || t.roster.length <= 7));
@@ -108,8 +109,42 @@ console.log('\nmodel wiring (live seed)');
   }
 }
 
+console.log('\nclassifications');
+{
+  // every board OSAA runs, with the field size and scoring depth it actually uses
+  const want = {
+    '6A':    { M: [16, 5], F: [16, 5] },
+    '5A':    { M: [12, 5], F: [12, 5] },
+    '4A':    { M: [12, 5], F: [12, 5] },
+    '3A':    { M: [12, 5], F: [8, 4] },
+    '2A/1A': { M: [15, 5], F: [8, 4] },
+  };
+  for (const cls in want) for (const g of ['M', 'F']) {
+    const [field, score] = want[cls][g];
+    M.setClass(cls, g);
+    const tag = cls + ' ' + g;
+    eq(tag + ': state field', M.FIELD, field);
+    eq(tag + ': scoring depth', M.SC, score);
+    const m = M.buildModel(g, 5000);
+    ok(tag + ': every team maps to a league', m.unassigned.length === 0, m.unassigned.join(','));
+    ok(tag + ': short teams sit below the scoring depth',
+      m.teams.filter(x => x.short).every(x => x.short < score));
+    const t = M.blankTally(m);
+    const worlds = [{ adj: null, byIdx: t.byIdx }];
+    const times = new Float64Array(m.runners.length);
+    const tmp = new Float64Array(m.runners.length);
+    const shock = new Float64Array(m.teams.length);
+    const N = 60;
+    for (let i = 0; i < N; i++) M.oneSeason(m, worlds, M.CAL.sd / 100, times, shock, tmp);
+    eq(tag + ': exactly FIELD qualify per season', t.list.reduce((s, x) => s + x.qual, 0), N * field);
+    eq(tag + ': exactly one winner per season', t.list.reduce((s, x) => s + x.win, 0), N);
+  }
+  M.setClass('6A', 'M');
+}
+
 console.log('\nsimulation invariants');
 {
+  M.setClass('6A', 'M');
   const m = M.buildModel('M', 5000);
   const t = M.blankTally(m);
   const worlds = [{ adj: null, byIdx: t.byIdx }];
