@@ -1,23 +1,9 @@
 {
-  "_comment": "One entry per backtested season. districts/state are athletic.net meet ids; cutoff is the date the information set stops, chosen to sit at the same point in the season as the live database. Berth counts are derived from the state meet itself, not hardcoded - OSAA has changed them.",
-  "2025": {
-    "cutoff": "2025-09-13",
-    "state": "258447",
-    "exclude": ["253214"],
-    "districts": {
-      "Portland Interscholastic": "269786",
-      "Metro": "256358",
-      "Pacific": "257219",
-      "Mt. Hood": "265417",
-      "Three Rivers": "253251",
-      "Central Valley": "267687",
-      "Southwest": "257523"
-    }
-  },
   "2024": {
-    "cutoff": "2024-09-14",
     "state": "237896",
-    "exclude": ["236276"],
+    "exclude": [
+      "236276"
+    ],
     "districts": {
       "Portland Interscholastic": "241625",
       "Metro": "237971",
@@ -26,6 +12,34 @@
       "Three Rivers": "235847",
       "Central Valley": "241032",
       "Southwest": "237797"
-    }
-  }
+    },
+    "cutoffs": [
+      "2024-09-14",
+      "2024-09-28",
+      "2024-10-12",
+      "2024-10-26"
+    ]
+  },
+  "2025": {
+    "state": "258447",
+    "exclude": [
+      "253214"
+    ],
+    "districts": {
+      "Portland Interscholastic": "269786",
+      "Metro": "256358",
+      "Pacific": "257219",
+      "Mt. Hood": "265417",
+      "Three Rivers": "253251",
+      "Central Valley": "267687",
+      "Southwest": "257523"
+    },
+    "cutoffs": [
+      "2025-09-13",
+      "2025-09-27",
+      "2025-10-11",
+      "2025-10-25"
+    ]
+  },
+  "_comment": "One entry per backtested season. districts/state are athletic.net meet ids. cutoffs are the dates an information set stops - the first is the mid-September point that matches the live database, the rest walk toward the state meet so the horizon can be measured. Berth counts are derived from the state meet itself, not hardcoded - OSAA has changed them."
 }

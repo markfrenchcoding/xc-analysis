@@ -48,7 +48,7 @@ function score(list) {
     .sort((a, b) => a.score - b.score || ((a.sixth ?? 1e9) - (b.sixth ?? 1e9)));
 }
 
-const truth = { year: +YEAR, cutoff: cfg.cutoff, leagues: { M: {}, F: {} },
+const truth = { year: +YEAR, cutoffs: cfg.cutoffs, leagues: { M: {}, F: {} },
                 districts: { M: {}, F: {} }, state: { M: [], F: [] }, berths: {} };
 
 for (const [league, mid] of Object.entries(cfg.districts)) {
@@ -92,12 +92,12 @@ for (const g of ['M', 'F']) {
 }
 
 // the marks database as of the cutoff, built exactly the way index.html builds its seed
-function seedFor(g) {
+function seedFor(g, CUTOFF) {
   const members = new Set();
   for (const l in truth.leagues[g]) truth.leagues[g][l].forEach(t => members.add(t));
   const info = rows.filter(r => r.g === g && members.has(r.school)
     && !(cfg.exclude || []).includes(r.mid)
-    && (meta.meets[r.mid] || {}).date <= cfg.cutoff);
+    && (meta.meets[r.mid] || {}).date <= CUTOFF);
   const ath = new Map(), seen = new Set();
   for (const r of info) {
     const pk = `${r.aid}|${r.mid}|${r.dist}|${r.s}`; if (seen.has(pk)) continue; seen.add(pk);
@@ -113,23 +113,27 @@ function seedFor(g) {
   return kept;
 }
 
-const lines = ['gender,athlete,mark,grade,team,dist'];
-let athletes = 0;
-for (const g of ['M', 'F']) {
-  const kept = seedFor(g); athletes += kept.length;
-  for (const a of kept) for (const m of a.marks)
-    lines.push([g, a.name, fmt(m), a.grade, a.school, a.dist].map(esc).join(','));
-}
-
-const outDir = path.join(__dirname, 'data');
+const outDir = path.join(__dirname, "data");
 fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(path.join(outDir, YEAR + '-truth.json'), JSON.stringify(truth, null, 1));
-fs.writeFileSync(path.join(outDir, YEAR + '-seed.csv'), lines.join('\n') + '\n');
+fs.writeFileSync(path.join(outDir, YEAR + "-truth.json"), JSON.stringify(truth, null, 1));
 
-console.log(YEAR + ': cutoff ' + cfg.cutoff);
-for (const g of ['M', 'F']) {
+console.log(YEAR + ":");
+for (const g of ["M", "F"]) {
   const b = truth.berths[g];
-  console.log('  ' + (g === 'M' ? 'boys ' : 'girls') + ': ' + Object.keys(truth.leagues[g]).length + ' leagues, '
-    + b.total + ' teams at state = ' + (b.auto * b.leagues) + ' automatic + ' + b.atLarge + ' at-large');
+  console.log("  " + (g === "M" ? "boys " : "girls") + ": " + Object.keys(truth.leagues[g]).length
+    + " leagues, " + b.total + " at state = " + (b.auto * b.leagues) + " auto + " + b.atLarge + " at-large");
 }
-console.log('  seed: ' + athletes + ' athletes, ' + (lines.length - 1) + ' marks');
+for (const CUTOFF of cfg.cutoffs) {
+  const lines = ["gender,athlete,mark,grade,team,dist"];
+  let athletes = 0, multi = 0;
+  for (const g of ["M", "F"]) {
+    const kept = seedFor(g, CUTOFF);
+    athletes += kept.length;
+    multi += kept.filter(a => a.marks.length > 1).length;
+    for (const a of kept) for (const m of a.marks)
+      lines.push([g, a.name, fmt(m), a.grade, a.school, a.dist].map(esc).join(","));
+  }
+  fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + ".csv"), lines.join("\n") + "\n");
+  console.log("  " + CUTOFF + ": " + athletes + " athletes, " + (lines.length - 1) + " marks, "
+    + (100 * multi / athletes).toFixed(0) + "% with more than one");
+}

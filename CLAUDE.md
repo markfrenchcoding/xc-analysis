@@ -205,34 +205,63 @@ but it would bite if that cap were ever raised.
 
 ## Backtest
 
-`backtest/` rebuilds a past season's database as of mid-September, simulates it,
+`backtest/` rebuilds a past season's database as of a chosen date, simulates it,
 and compares against Lane in November. See `backtest/README.md`. Two seasons are
-committed, 2024 and 2025, which is 197 team-seasons.
+committed, 2024 and 2025, at four cutoffs each — mid-September through late
+October — which is 197 team-seasons per cutoff.
 
-**The headline: the variance dial is too narrow for a September projection.**
+**The variance dial depends on how far out you are.** Sweeping sigma against
+actual outcomes at each cutoff:
 
-| sigma | 2025 boys | 2025 girls | 2024 boys | 2024 girls | pooled Brier | logloss |
-|---|---|---|---|---|---|---|
-| 2.3% (shipped) | 0.0376 | 0.1435 | 0.1245 | 0.0794 | 0.0962 | 0.3054 |
-| 5.0% | 0.0493 | 0.1088 | 0.1057 | 0.0740 | **0.0844** | 0.2616 |
+| information set | weeks to state | best sigma | implied drift |
+|---|---|---|---|
+| mid-September | 8 | **5.0%** | 4.4% |
+| late September | 6 | 3.0% | 1.9% |
+| mid-October | 4 | 2.6% | 1.2% |
+| late October | 2 | 2.6% | 1.2% |
 
-Three of the four season-genders want 5-7%; only 2025 boys prefers 2.3%, and
-that season was unusually predictable. Calibration at 2.3% is badly
-overconfident — teams given 70-90% qualified only 50% of the time, and teams
-given under 10% qualified 5% of the time. At 5% those bands land at 79% and 1%.
+`CAL.sd` is 2.3%, which is about right from four weeks out and much too narrow in
+September. At the September cutoff, teams given 70-90% qualified only 50% of the
+time and teams given under 10% qualified 5% of the time; at 5% those land at 79%
+and 1%. Pooled Brier improves 0.0962 -> 0.0844. Skill against the base rate runs
+58% in September and 76% in late October — the model gets sharper as the season
+fills in, which is what it should do.
 
-This does **not** say `CAL` is wrong about what it measures. 2.3% is race-to-race
-spread, measured between two meets in the same season. The backtest projects
-eight weeks ahead, across which squads also change: roughly 6% of September
-top-five places are not on the line at the league championship, near-identical
-for boys and girls. Raising sigma is a crude proxy for attrition the model does
-not represent. Treat 5% as the honest dial for a long projection and 2.3% as the
-honest dial for the next race.
+**It is the horizon, not thin data.** In mid-September only about a quarter of
+athletes have raced twice, against nearly two thirds by late October, so the
+September set is both further out and poorer — either could push sigma up.
+`backtest/confound.js` separates them by thinning the *late* database to one mark
+per athlete: the same poverty, none of the distance. The best sigma barely moves
+(2.6% -> 2.3%). Poverty is not the cause; eight weeks of unmodelled change is.
 
-Not yet tested: whether the right sigma falls as the season advances and the
-database gets closer to November. That needs October cutoffs, which means
-pulling the mid-season meets for 2024 and 2025 — only the pre-cutoff, district
-and state meets were pulled.
+That points at a shape of fix rather than a new constant. Variances add, exactly
+as `TEAM_SHARE` already assumes, so
+
+```
+total² = raceDay² + drift²      5.0² = 2.3² + 4.4²
+```
+
+Keep `CAL.sd` as race-day spread, with its "two thirds of races land within ±X s"
+explanation intact and honest, and add a drift term decaying from roughly 4.4% in
+September to near zero by the state meet. The table above is the decay curve.
+Most of it is gone within a fortnight of the September cutoff, which is far
+steeper than a straight line.
+
+**Extra marks are not currently paying their way.** `backtest/marks_value.js`
+compares the full database against one thinned to each athlete's best mark, each
+run at its own best sigma. Best-only wins at every cutoff, and the margin *grows*
+as marks accumulate — 0.0009 in mid-September at 1.26 marks per athlete, 0.0054
+in late October at 2.08. The more marks an athlete carries, the more they cost.
+That is the signature of the two known defects: `MARK_W` puts two thirds of the
+weight on the slower of two marks, and marks come from courses spanning a
+0.90-1.23 difficulty range. The meet-results pull was still the right move — it
+filled rosters out and retired the two-team-league artifact — but top-three
+sampling will not earn its keep until those two are fixed.
+
+Not yet pulled: 2023 and earlier. The direction of every finding above is settled
+— the bootstrap puts P(best September sigma >= 3.5%) at 99% — but the level is
+pinned only to about a point either way. 2023 is worth more held back as a clean
+holdout for whatever drift term gets built than folded in now.
 
 ## What the model does not know
 
@@ -257,30 +286,37 @@ Listed in the app's own "How" tab:
 
 ## Open items
 
-1. **Course-difficulty adjustment** via least squares over shared athletes.
-   Fitting `log(time) = athlete + course` over 2026 gives factors from **0.90 to
-   1.23** against a 2.3% noise dial. A head-to-head test — 30,243 pairs who raced
-   the same course on the same day, predicted from their other marks — puts raw
-   marks at 91.1% and course-adjusted at 91.6%. Small, because most pairs are
-   blowouts; but on the 660 pairs where the two disagree, adjusted is right 60%
-   of the time. Most of the available gain was already banked by excluding
-   Ultimook. Worth doing, not urgent.
-2. **Horizon-dependent variance.** The backtest says a September projection wants
-   sigma near 5%, not 2.3%. Before changing `CAL.sd`, pull October meets for 2024
-   and 2025 and re-run at later cutoffs: if the best sigma falls as November
-   approaches, the dial should depend on how far out the projection is rather
-   than being one number.
-3. **Model roster attrition directly** instead of hiding it in sigma. About 6% of
+1. **Horizon-dependent variance.** The backtest measures the curve directly:
+   best sigma is 5.0% at eight weeks out, 3.0% at six, 2.6% from four weeks in.
+   `confound.js` rules out thin data as the cause, so this is real horizon.
+   Implement as `total² = raceDay² + drift²`, keeping `CAL.sd` at 2.3% for
+   race-day and decaying drift from ~4.4% in September toward zero at Lane. Do
+   not just raise `CAL.sd` — the slider's own helper text describes race-day
+   spread and would become false.
+2. **Fix the two defects that make extra marks cost accuracy**, in this order:
+   - `MARK_W` renormalisation at two marks. `[0.25, 0.50]` renormalises to
+     `[0.33, 0.67]`, so the *slower* of two marks carries twice the weight of the
+     faster. With three marks the 50% lands on the middle mark, which is the
+     intent; with two there is no middle. `[0.5, 0.5]` is the neutral
+     alternative.
+   - **Course-difficulty adjustment** via least squares over shared athletes.
+     Fitting `log(time) = athlete + course` over 2026 gives factors from 0.90 to
+     1.23 against a 2.3% dial. A head-to-head test over 30,243 same-course pairs
+     puts raw marks at 91.1% and adjusted at 91.6% — small overall, but on the
+     660 pairs where the two disagree, adjusted is right 60% of the time.
+   `marks_value.js` is the check for both: it should flip to favouring the full
+   database once they are done. Today best-only wins at every cutoff.
+3. **Model roster attrition directly** instead of hiding it in drift. About 6% of
    September top-five places are not on the line at the league championship. A
-   per-runner probability of being absent by November would be closer to the
-   truth than widening everyone's distribution.
-4. Revisit `MARK_W` renormalisation for the two-mark case. `[0.25, 0.50]`
-   renormalises to `[0.33, 0.67]`, so the *slower* of two marks carries twice the
-   weight of the faster. With three marks the 50% lands on the middle mark, which
-   is the intent; with two there is no middle, and the current split pushes an
-   athlete's expected time about 5.9% slower than their best. 348 athletes now
-   have two or three marks. `[0.5, 0.5]` is the neutral alternative — but decide
-   it together with course adjustment, since most of that gap is course.
-5. More backtest seasons. 2023 and earlier would firm up the sigma estimate;
-   197 team-seasons is enough to see the direction, not to pin the number.
-6. Grade-dependent improvement curves (freshmen improve most).
+   per-runner probability of absence would be closer to the truth than widening
+   everyone's distribution, and would explain part of what drift is currently
+   absorbing.
+4. **2023 as a holdout.** Not to narrow the sigma estimate — the bootstrap says a
+   third season moves the 80% interval from about 2.0 points to 1.6, which
+   changes nothing. Pull it *after* the drift term exists, as the only season it
+   was never fitted on.
+5. Grade-dependent improvement curves (freshmen improve most).
+6. `scoreMeet` increments `place` before its `n>7` check, so a team's eighth and
+   later runners displace opponents where NFHS strikes them out. Unreachable
+   while `buildModel` caps rosters at seven; `audit2.js` records it as the one
+   deliberate failure.
