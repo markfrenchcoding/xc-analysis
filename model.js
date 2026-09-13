@@ -10,10 +10,15 @@ const LEAGUES={
  "Special District 1":["Grants Pass","North Medford","Roseburg","Sheldon","South Eugene","South Medford"]
 };
 
-let AUTO_PER=2, AT_LARGE=2;
-const LG=Object.keys(LEAGUES);
+let AUTO = {}, AT_LARGE = 2, SC = 5, PL = 7;
 
-let FIELD=LG.length*AUTO_PER+AT_LARGE;   // 16
+const LG = Object.keys(LEAGUES);
+
+const autoFor = lg => (lg in AUTO ? AUTO[lg] : 2);
+
+const autoTotal = () => LG.reduce((s, lg) => s + autoFor(lg), 0);
+
+let FIELD=LG.length*2+AT_LARGE;            // recomputed whenever the class changes
 
 const CAL={ratio:1.008,sd:2.3,n:293};
 
@@ -80,30 +85,31 @@ function buildModel(g,dist){
     if(!lg){unassigned.push(name);continue;}
     const roster=[...m.values()].sort((a,b)=>a.sb-b.sb).slice(0,7);
     const idx=teams.length;
-    if(roster.length<5){teams.push({name,league:lg,idx,rIdx:[],short:roster.length,avg5:Infinity});continue;}
+    if(roster.length<SC){teams.push({name,league:lg,idx,rIdx:[],short:roster.length,avg5:Infinity});continue;}
     const rIdx=roster.map(r=>{runners.push({marks:r.marks,w:r.w,sb:r.sb,t:idx});return runners.length-1;});
     teams.push({name,league:lg,idx,rIdx,short:0,roster,
-      avg5:roster.slice(0,5).reduce((s,r)=>s+r.sb,0)/5});
+      avg5:roster.slice(0,SC).reduce((s,r)=>s+r.sb,0)/SC});
   }
   const byLeague={};
   for(const lg of LG) byLeague[lg]=teams.filter(t=>t.league===lg&&!t.short);
   return {teams,runners,byLeague,unassigned};
 }
 
-function scoreMeet(list,times){
+function scoreMeet(list,times,SC,PL){
+  SC=SC||5;PL=PL||7;                  // scorers, then how many run before the rest are struck out
   const field=[];
   for(const t of list) for(const i of t.rIdx) field.push({t:times[i],team:t.idx});
   field.sort((a,b)=>a.t-b.t);
   const seen=new Map(),res=new Map();
-  for(const t of list) res.set(t.idx,{idx:t.idx,total:0,sixth:null,sum5:0});
+  for(const t of list) res.set(t.idx,{idx:t.idx,total:0,sixth:null,sumN:0});
   let place=0;
   for(const f of field){
     place++;
     const n=(seen.get(f.team)||0)+1;seen.set(f.team,n);
-    if(n>7)continue;
+    if(n>PL)continue;
     const r=res.get(f.team);
-    if(n<=5){r.total+=place;r.sum5+=f.t;}
-    else if(n===6)r.sixth=place;
+    if(n<=SC){r.total+=place;r.sumN+=f.t;}
+    else if(n===SC+1)r.sixth=place;   // the first non-scorer breaks a tie
   }
   const out=[...res.values()];
   out.sort((a,b)=>{
@@ -127,16 +133,17 @@ function playDistricts(model,byIdx,times){
   for(const lg of LG){
     const list=byLeague[lg];
     if(!list.length)continue;
-    const r=scoreMeet(list,times);
+    const r=scoreMeet(list,times,SC,PL);
     for(let p=0;p<r.length;p++){
       const t=byIdx[r[p].idx];
       if(t){t.scoreSum+=r[p].total;t.placeSum+=p+1;t.n++;}   // smooth surrogates
-      if(p<AUTO_PER) autos.push(r[p].idx);
-      else if(p<AUTO_PER+2) pool.push({idx:r[p].idx,third:p===AUTO_PER,lg,avg5:r[p].sum5/5});
+      const A=autoFor(lg);
+      if(p<A) autos.push(r[p].idx);
+      else if(p<A+2) pool.push({idx:r[p].idx,third:p===A,lg,avg5:r[p].sumN/SC});
     }
   }
   pool.sort((a,b)=>a.avg5-b.avg5);
-  const slots=Math.min(AT_LARGE+(LG.length*AUTO_PER-autos.length),pool.length);
+  const slots=Math.min(AT_LARGE+(autoTotal()-autos.length),pool.length);
   const taken3=new Set(),wilds=[];
   for(const c of pool){
     if(wilds.length>=slots)break;
@@ -150,7 +157,7 @@ function playDistricts(model,byIdx,times){
 
 function playState(model,byIdx,times,fieldIdx){
   const {teams}=model;
-  const res=scoreMeet(fieldIdx.map(i=>teams[i]),times);
+  const res=scoreMeet(fieldIdx.map(i=>teams[i]),times,SC,PL);
   for(let p=0;p<res.length;p++){
     const t=byIdx[res[p].idx],place=p+1;
     if(place<=FIELD)t.hist[place]++;
@@ -227,7 +234,8 @@ let DATA=[];
 
 module.exports = {
   get LEAGUES(){return LEAGUES;}, get LG(){return LG;}, get TEAM_LEAGUE(){return TEAM_LEAGUE;},
-  get AUTO_PER(){return AUTO_PER;}, get AT_LARGE(){return AT_LARGE;}, get FIELD(){return FIELD;},
+  get AUTO(){return AUTO;}, get AT_LARGE(){return AT_LARGE;}, get FIELD(){return FIELD;},
+  get SC(){return SC;}, get PL(){return PL;},
   CAL, MARK_W, TEAM_SHARE, SIG_T, SIG_I,
   parseCSV, toSeconds, fmt, buildModel, scoreMeet, playDistricts, playState,
   gauss, skew, pickMark, draw, shift, oneSeason, blankTally,
@@ -238,7 +246,12 @@ module.exports = {
     Object.assign(LEAGUES, L);
     LG.length = 0; LG.push(...Object.keys(LEAGUES));
     reindexLeagues();
-    FIELD = LG.length*AUTO_PER + AT_LARGE;
+    FIELD = autoTotal() + AT_LARGE;
   },
-  setBerths(auto, atLarge){ AUTO_PER = auto; AT_LARGE = atLarge; FIELD = LG.length*AUTO_PER + AT_LARGE; },
+  setBerths(auto, atLarge){
+    AUTO = {};
+    if (typeof auto === 'number') LG.forEach(l => AUTO[l] = auto); else Object.assign(AUTO, auto);
+    AT_LARGE = atLarge; FIELD = autoTotal() + AT_LARGE;
+  },
+  setDepths(score, place){ SC = score; PL = place || 7; },
 };

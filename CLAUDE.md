@@ -113,6 +113,42 @@ table or the solver's step size. What it does keep is an honest list of what the
 model does not know, including that early-season numbers are wider than they
 look. That section earns more trust than it costs — do not quietly drop it.
 
+## Classifications
+
+The site ships 6A today. The model has been generalised to the other four, but
+their data is not in yet. OSAA does **not** use one rule, so none of this can be
+a constant — `AUTO` is a per-league map, `AT_LARGE`, `SC` (scorers) and `PL`
+(runners before the rest are struck out) are set per classification and gender.
+
+| class | leagues | automatic per league | at-large | field | scorers |
+|---|---|---|---|---|---|
+| 6A boys/girls | 7 | 2 each | 2 | 16 | 5 |
+| 5A boys/girls | 5 | 2 each | 2 | 12 | 5 |
+| 4A boys/girls | 6 | **1 each** | **6** | 12 | 5 |
+| 3A boys | 4 | **3, 3, 3, 2** | 1 | 12 | 5 |
+| 3A girls | 4 | **2, 2, 2, 1** | 1 | 8 | **4** |
+| 2A/1A boys | 4 | **3, 4, 3, 3** | 2 | 15 | 5 |
+| 2A/1A girls | 4 | **1, 2, 1, 1** | 3 | 8 | **4** |
+
+Three things to notice before adding a classification.
+
+**Boys and girls differ below 4A.** The allocation follows how many teams each
+district actually fields, so it is not symmetric and must be read per gender.
+
+**3A and 2A/1A girls score four, not five.** Seven may run, the top four count,
+the fifth breaks ties, and a team needs four rather than five to score at all.
+`scoreMeet(list, times, SC, PL)` takes the depths; `buildModel` uses `SC` as the
+minimum roster and averages over `SC`.
+
+**That top-four rule is new for 2026 and cannot be backtested.** In 2025
+athletic.net reports `ScoreDepth: 5` for every division, and the girls' 3A and
+2A/1A ran as a single combined race. So for those two boards there is no history
+to check the model against — everything else in `backtest/` is 6A. Say so on the
+site rather than implying the same validation covers them.
+
+Verify against OSAA each August: `osaa.org/activities/bxc/qualifications?div=5A`
+and the `gxc` equivalent. The counts move with team numbers.
+
 ## How the simulation works
 
 One "season" is: draw times → score seven league meets → allocate 14 automatic
