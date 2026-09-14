@@ -55,6 +55,19 @@ its chance of winning, averaged only over the seasons it actually qualified —
 teams that never get there show a dash rather than a fake zero. `blankTally`
 carries `ptsSum`/`ptsN` and `playState` fills them.
 
+**Crests.** `LOGO` maps display name to a school's mascot image, and `crest()`
+falls back to initials when a name is missing. It covers all 214 schools in the
+seed; before the other classifications shipped it held only the 6A 47, so every
+5A-and-below card fell back to initials.
+
+Refresh with `GetTeamCore?teamId={id}&sport=xc&year=2026` — the response carries
+`team.MascotUrl`. Two gotchas: the url comes back protocol-relative
+(`//lh3.googleusercontent.com/...`) and without a size suffix, so prefix
+`https:` and append `=s96` to match the existing entries. And **pace it** — at
+320ms a request 105 of 167 came back empty; at 900ms with three retries all 167
+resolved. Key the map by the seed's display name, not athletic.net's own
+spelling, or `Cleveland (OR)` will miss `Cleveland`.
+
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
 
