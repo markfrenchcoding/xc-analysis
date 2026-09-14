@@ -140,26 +140,55 @@ the top N across the line at a district meet whose team did not qualify — 14 i
 in `CLASSES[cls][g].ind`. `playDistricts` picks them after the at-large places
 are settled, because those teams count as qualified for this purpose. They race
 and are ranked, but they are struck from team scoring, which is why `scoreMeet`
-is untouched. Without them every athlete's place would be a handful of spots
-too good.
+is untouched. The simulated field comes out at 148-152 against an actual 147-157,
+so the shape of the race is right.
 
 Ranked by average finish rather than by chance of winning: a runner who is
-reliably twelfth is a better bet than one who is fourth or fortieth, and the
-mean says so where a win probability does not.
+reliably twelfth is a better bet than one who is fourth or fortieth.
 
-**Known distortion, disclosed on the board.** A runner with one race is taken at
-that time; a runner with two is judged on both. Measured on the live 6A boys
-field, two-mark athletes rank **11.4 places worse** than their season best
-implies and one-mark athletes **5.3 better** — a gap of about seventeen places
-driven by nothing but how often someone raced.
+**Expect about twenty places of error.** `backtest/runners.js` scores predicted
+finishing places against what athletes actually did at Lane: mean absolute error
+is 19.7 places. Individual forecasting eight weeks out is genuinely hard, and the
+board should not be read as if it were tight.
 
-This is open item 1 wearing its most visible face. On a team board it partly
-cancels; on a list of named athletes it does not. The honest reading is that the
-*single-mark* runners are flattered, not that the others are punished — one
-race is a best-of-one with no regression applied. The fix is either course/date
-adjustment or regressing a lone mark the way a second mark effectively regresses
-the first. Until then the row shows each athlete's best time and race count so a
-reader can see the input, and the footnote says it plainly.
+Every group also finishes about five places worse than predicted. That is not a
+bias in the model but the shape of the problem: roughly two dozen runners in each
+real state field were not in the September database at all — call-ups, late
+starters, athletes who had only raced 3k — and they take places from everyone the
+model does know about. Open item 3 again.
+
+### Regressing a lone mark
+
+A single race used to be taken at face value while an athlete with two was judged
+on both, so the less evidence there was the more generous the estimate. That is
+backwards.
+
+Measured properly — predicted place against real state results, split by race
+count at the cutoff — the one-race athlete finished **2.8 places worse** than
+predicted relative to the two-race athlete. `LONE=0.006` closes it:
+
+| | before | after |
+|---|---|---|
+| one race, mean residual | +6.54 | +5.13 |
+| two or more | +3.79 | +5.27 |
+| gap | **2.75** | **-0.14** |
+| team Brier, pooled | 0.0925 | **0.0919** |
+
+The team board improves too, beating no-penalty in **99% of bootstrap draws** —
+much stronger evidence than the ~66% that was rightly not acted on for `MARK_W`.
+Re-fit with `backtest/runners.js` and `backtest/lone_mark.js`; both now measure a
+penalty *on top of* what ships, so a healthy re-run should prefer 0%.
+
+`buildModel` keeps `sbRaw` alongside `sb` — the time the athlete actually ran,
+which is what the Runners board and the what-if roster display. Never show `sb`
+to a reader; it carries the regression.
+
+**A correction worth recording.** The first measurement of this effect compared
+simulated rank against *season-best* rank and reported a seventeen-place gap.
+That baseline is itself biased: a season best is a minimum, and a minimum of two
+races is faster than a minimum of one, so ranking on best flatters whoever raced
+more. Scored against real results the true gap was 2.8 places. When measuring a
+bias, check that the yardstick is not bent the same way.
 
 ## Classifications
 
@@ -519,7 +548,10 @@ Listed in the app's own "How" tab:
    would become false. Note this is the same confound as item 1 seen from the
    other side: drift and course-date are both "the season moves".
 3. **Model roster attrition directly** instead of hiding it in drift. About 6%
-   of September top-five places are not on the line at the league championship.
+   of September top-five places are not on the line at the league championship,
+   and about two dozen runners in each state field were never in the September
+   database at all — which is most of why every athlete finishes about five
+   places worse than the Runners board predicts.
 4. **2023 as a holdout.** Not to narrow the sigma estimate — a third season moves
    the 80% interval from about 2.0 points to 1.6, which changes nothing. Pull it
    *after* the drift term exists, as the only season it was never fitted on.

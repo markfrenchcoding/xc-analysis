@@ -3714,6 +3714,14 @@ const CAL={ratio:1.008,sd:2.3,n:293};
    - that a second mark can only ever slow you down - needs course and date
    adjustment to fix properly. See CLAUDE.md. */
 const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
+/* A single race carries no regression: one time, taken at face value, while an
+   athlete who has raced twice is judged on both and so is rated more
+   conservatively. That is backwards — less evidence should mean more caution,
+   not less. Scored against real state results, the one-race athlete finished
+   2.8 places worse than predicted relative to the two-race athlete; this closes
+   the gap to 0.2 and, separately, improves team odds in 99% of bootstrap draws.
+   Re-fit with backtest/runners.js and backtest/lone_mark.js. */
+const LONE=0.006;
 /* The day the marks database was last refreshed. Update this whenever the seed
    block is replaced — it is what the header reports to readers. */
 const DATA_DATE="2026-09-12";
@@ -3794,6 +3802,8 @@ function buildModel(g,dist){
     for(const a of t.values()){
       a.marks.sort((x,y)=>x-y);
       a.marks=a.marks.slice(0,3);       // top three of the season
+      a.sbRaw=a.marks[0];               // what they actually ran, for display
+      if(a.marks.length===1) a.marks=[a.marks[0]*(1+LONE)];
       a.sb=a.marks[0];
       a.w=MARK_W[a.marks.length-1].slice();
     }
@@ -4007,7 +4017,7 @@ function runnerTally(model){
     if(!tm.roster)continue;
     tm.rIdx.forEach((ri,k)=>{
       by[ri]={ri,name:tm.roster[k].name,team:tm.name,league:tm.league,grade:tm.roster[k].grade,
-        sb:tm.roster[k].sb,marks:tm.roster[k].marks.length,
+        sb:tm.roster[k].sbRaw,marks:tm.roster[k].marks.length,
         n:0,placeSum:0,win:0,top5:0,top10:0,top20:0,best:1e9};
     });
   }
@@ -4216,7 +4226,7 @@ function renderWhatIf(){
     `<h2 class="sec">${team.name}</h2>
      <p class="sub2">Seconds off each runner${total?` — ${total}s across ${Object.keys(wiAdj).length} of them`:""}.</p>`+
     team.roster.map((r,i)=>`<div class="wirow">
-      <span class="who">${i+1}. ${r.name}<em>${fmt(r.sb)}</em></span>
+      <span class="who">${i+1}. ${r.name}<em>${fmt(r.sbRaw)}</em></span>
       <span class="step" data-n="${r.name}">
         <button data-d="-${STEP}" aria-label="less">−</button>
         <span class="${wiAdj[r.name]?"on":""}">${wiAdj[r.name]?"−"+wiAdj[r.name]+"s":"0s"}</span>
@@ -4515,8 +4525,8 @@ function renderRunners(rt,seasons){
     +'<span>top 10</span><span>avg place</span><span>gets there</span></div>'+body
     +'<p class="sub2" style="margin-top:9px">Ranked by average finish across the seasons the runner actually made it &mdash; a runner who is reliably twelfth outranks one who is fourth or fortieth. '
     +'&ldquo;Gets there&rdquo; is how often they reached Lane at all, on a qualifying team or as an individual. '
-    +'One caveat worth knowing: a runner with only one race is taken at that time, while a runner with two is judged on both, '
-    +'so the more often someone has raced the more conservatively this board rates them. We are working on it.</p>';
+    +'A runner with a single race is rated slightly more cautiously than that one time suggests, because one race is thinner '
+    +'evidence than two — without that, the athletes who have raced least would look the best.</p>';
 }
 
 function run(){

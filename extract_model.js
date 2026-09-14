@@ -15,11 +15,11 @@ const lines = src.split(/\r?\n/);
 // Names to lift. Order matters only for readability; JS hoists functions.
 const WANT = [
   'CLASSES', 'CLS', 'LEAGUES', 'AUTO', 'autoFor', 'autoTotal', 'TEAM_LEAGUE', 'setClass',
-  'CAL', 'MARK_W', 'TEAM_SHARE', 'SIG_T',
+  'CAL', 'MARK_W', 'LONE', 'TEAM_SHARE', 'SIG_T',
   'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'buildModel', 'scoreMeet',
   'SK_HI', 'SK_MEAN', 'SK_SD',
   'playDistricts', 'playState', 'skew', 'spare', 'gauss', 'pickMark', 'draw', 'shift',
-  'oneSeason', 'blankTally',
+  'oneSeason', 'blankTally', 'runnerTally',
 ];
 
 // Find a top-level declaration by name and return its full text, brace-balanced.
@@ -77,7 +77,8 @@ parts.push(`module.exports = {
   get SC(){return SC;}, get PL(){return PL;},
   CAL, MARK_W, TEAM_SHARE, SIG_T, SIG_I,
   parseCSV, toSeconds, fmt, buildModel, scoreMeet, playDistricts, playState,
-  gauss, skew, pickMark, draw, shift, oneSeason, blankTally,
+  gauss, skew, pickMark, draw, shift, oneSeason, blankTally, runnerTally,
+  get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
   setLeagues(L){
@@ -109,6 +110,10 @@ try {
   m.gauss(); m.skew();
   m.pickMark({ marks: [100, 110], w: [0.4, 0.6] });
   m.scoreMeet([{ idx: 0, rIdx: [0, 1, 2, 3, 4] }], [1, 2, 3, 4, 5]);
+  m.setDATA(Array.from({ length: 6 }, (_, i) =>
+    ({ g: 'M', name: 'R' + i, team: 'T', dist: 5000, sb: 900 + i * 10, grade: '12', cls: '6A' })));
+  m.setLeagues({ L1: ['T'] });
+  m.buildModel('M', 5000);
   console.log('smoke test ok');
 } catch (e) {
   console.log('SMOKE TEST FAILED: ' + e.message);

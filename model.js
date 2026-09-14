@@ -111,6 +111,8 @@ const CAL={ratio:1.008,sd:2.3,n:293};
 
 const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
 
+const LONE=0.006;
+
 const TEAM_SHARE=0.30;
 
 const SIG_T=Math.sqrt(TEAM_SHARE), SIG_I=Math.sqrt(1-TEAM_SHARE);
@@ -163,6 +165,8 @@ function buildModel(g,dist){
     for(const a of t.values()){
       a.marks.sort((x,y)=>x-y);
       a.marks=a.marks.slice(0,3);       // top three of the season
+      a.sbRaw=a.marks[0];               // what they actually ran, for display
+      if(a.marks.length===1) a.marks=[a.marks[0]*(1+LONE)];
       a.sb=a.marks[0];
       a.w=MARK_W[a.marks.length-1].slice();
     }
@@ -347,6 +351,19 @@ function blankTally(model){
   return {list:t,byIdx:by};
 }
 
+function runnerTally(model){
+  const by=[];
+  for(const tm of model.teams){
+    if(!tm.roster)continue;
+    tm.rIdx.forEach((ri,k)=>{
+      by[ri]={ri,name:tm.roster[k].name,team:tm.name,league:tm.league,grade:tm.roster[k].grade,
+        sb:tm.roster[k].sbRaw,marks:tm.roster[k].marks.length,
+        n:0,placeSum:0,win:0,top5:0,top10:0,top20:0,best:1e9};
+    });
+  }
+  return by;
+}
+
 let DATA=[];
 
 try{ setClass("6A","M"); }catch(e){}
@@ -358,7 +375,8 @@ module.exports = {
   get SC(){return SC;}, get PL(){return PL;},
   CAL, MARK_W, TEAM_SHARE, SIG_T, SIG_I,
   parseCSV, toSeconds, fmt, buildModel, scoreMeet, playDistricts, playState,
-  gauss, skew, pickMark, draw, shift, oneSeason, blankTally,
+  gauss, skew, pickMark, draw, shift, oneSeason, blankTally, runnerTally,
+  get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
   setLeagues(L){
