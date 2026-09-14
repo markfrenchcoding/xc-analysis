@@ -231,6 +231,28 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .title b{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;line-height:1;
   font-variant-numeric:tabular-nums}
 .title i{font-style:normal;font-size:8.5px;color:var(--dim);display:block;line-height:1.25}
+.rrow{display:flex;align-items:center;gap:8px;padding:7px 2px;border-top:1px solid var(--line)}
+.rrow:first-child{border-top:0}
+.rpl{width:26px;flex:none;text-align:right;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:15px;color:var(--dim);font-variant-numeric:tabular-nums}
+.rrow.p1 .rpl{color:var(--t1e)}
+.rnm{flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rnm em{font-style:normal;color:var(--dim);font-size:10.5px}
+.rfig{flex:none;width:44px;text-align:right;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.rfig i{display:block;font-style:normal;font-size:8px;color:var(--dim);font-weight:400;
+  font-family:'Barlow',sans-serif}
+.rhead{display:flex;gap:8px;padding:0 2px 5px;font-size:8.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--dim)}
+.rhead span:first-child{width:26px;flex:none}
+.rhead span:nth-child(2){flex:1}
+.rhead span:not(:first-child):not(:nth-child(2)){width:44px;flex:none;text-align:right}
+/* four figure columns squeeze the name to an ellipsis on a phone; "gets there"
+   is the one that is almost always 100%, so it is the one that goes */
+@media (max-width:430px){
+  .rrow .rfig:last-child,.rhead span:last-child{display:none}
+  .rnm em{display:block;line-height:1.3}
+}
 .title .pnum{margin-top:3px}
 .title .pnum b{font-size:13px;color:var(--muted)}
 .strip{display:flex;align-items:flex-end;gap:1.5px;height:15px;margin-bottom:6px}
@@ -3402,6 +3424,12 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
     <div id="simOut"></div>
   </section>
 
+  <section class="panel" id="p-run">
+    <h2 class="sec">Runners</h2>
+    <p class="sub2">Where each athlete finishes at Lane, across every simulated season &mdash; run against the same field the teams face, individual qualifiers included.</p>
+    <div id="runOut"><div class="empty">Run the simulation to fill this in.</div></div>
+  </section>
+
   <section class="panel" id="p-lg">
     <div class="switch" role="group" aria-label="Race">
       <button data-g="M" aria-pressed="true">Boys</button>
@@ -3540,6 +3568,7 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
 <div class="bar"><div class="bar-inner">
   <div class="tabs" role="group" aria-label="Sections">
     <button data-p="p-sim" aria-pressed="true">Odds</button>
+    <button data-p="p-run" aria-pressed="false">Runners</button>
     <button data-p="p-lg" aria-pressed="false">Leagues</button>
     <button data-p="p-wi" aria-pressed="false">What if</button>
     <button data-p="p-doc" aria-pressed="false">How</button>
@@ -3561,7 +3590,7 @@ const LOGO={"Adrienne Nelson": "https://lh3.googleusercontent.com/0GoKkm46K_APEZ
 const CLASSES={
  "6A":{
   ab:{"Portland Interscholastic League":"PIL","Metro League":"Metro","Pacific Conference":"Pacific","Mt. Hood Conference":"Mt. Hood","Three Rivers League":"Three Rivers","Central Valley Conference":"Central Valley","Special District 1":"SD1"},
-  M:{atLarge:2,score:5,
+  M:{atLarge:2,score:5,ind:14,
     auto:{"Portland Interscholastic League":2,"Metro League":2,"Pacific Conference":2,"Mt. Hood Conference":2,"Three Rivers League":2,"Central Valley Conference":2,"Special District 1":2},
     lg:{"Portland Interscholastic League":["Benson Tech","Cleveland","Franklin","Grant","Ida B. Wells","Jefferson-Portland","Lincoln","McDaniel","Roosevelt"],
       "Metro League":["Beaverton","Jesuit","Mountainside","Southridge","Sunset","Westview"],
@@ -3570,7 +3599,7 @@ const CLASSES={
       "Three Rivers League":["Lake Oswego","Lakeridge","Oregon City","Tigard","Tualatin","West Linn"],
       "Central Valley Conference":["McKay","McNary","North Salem","South Salem","Sprague","West Salem"],
       "Special District 1":["Grants Pass","North Medford","Roseburg","Sheldon","South Eugene","South Medford"]}},
-  F:{atLarge:2,score:5,
+  F:{atLarge:2,score:5,ind:14,
     auto:{"Portland Interscholastic League":2,"Metro League":2,"Pacific Conference":2,"Mt. Hood Conference":2,"Three Rivers League":2,"Central Valley Conference":2,"Special District 1":2},
     lg:{"Portland Interscholastic League":["Benson Tech","Cleveland","Franklin","Grant","Ida B. Wells","Jefferson-Portland","Lincoln","McDaniel","Roosevelt"],
       "Metro League":["Beaverton","Jesuit","Mountainside","Southridge","Sunset","Westview"],
@@ -3581,14 +3610,14 @@ const CLASSES={
       "Special District 1":["Grants Pass","North Medford","Roseburg","Sheldon","South Eugene","South Medford"]}}},
  "5A":{
   ab:{"Northwest Oregon Conference":"NWOC","Greater Metro Conference":"Greater Metro","Mid-Willamette Conference":"Mid-Will","Intermountain Conference":"IMC","Special District 1":"SD1"},
-  M:{atLarge:2,score:5,
+  M:{atLarge:2,score:5,ind:7,
     auto:{"Northwest Oregon Conference":2,"Greater Metro Conference":2,"Mid-Willamette Conference":2,"Intermountain Conference":2,"Special District 1":2},
     lg:{"Northwest Oregon Conference":["Centennial","Hood River Valley","Milwaukie","Parkrose","Putnam","Sandy","St Helens"],
       "Greater Metro Conference":["Aloha","Canby","Hillsboro","La Salle Prep","Liberty","Wilsonville","Woodburn"],
       "Mid-Willamette Conference":["Corvallis","Crescent Valley","Dallas","Lebanon","Silverton","South Albany","West Albany"],
       "Intermountain Conference":["Bend","Caldera","Crook County","Mountain View","Redmond","Ridgeview","Summit"],
       "Special District 1":["Ashland","Churchill","Crater","Eagle Point","North Eugene","Springfield","Thurston","Willamette"]}},
-  F:{atLarge:2,score:5,
+  F:{atLarge:2,score:5,ind:7,
     auto:{"Northwest Oregon Conference":2,"Greater Metro Conference":2,"Mid-Willamette Conference":2,"Intermountain Conference":2,"Special District 1":2},
     lg:{"Northwest Oregon Conference":["Centennial","Hood River Valley","Milwaukie","Parkrose","Putnam","Sandy","St Helens"],
       "Greater Metro Conference":["Aloha","Canby","Hillsboro","La Salle Prep","Liberty","Wilsonville","Woodburn"],
@@ -3597,7 +3626,7 @@ const CLASSES={
       "Special District 1":["Ashland","Churchill","Crater","Eagle Point","North Eugene","Springfield","Thurston","Willamette"]}}},
  "4A":{
   ab:{"Cowapa League":"Cowapa","Tri-Valley Conference":"Tri-Valley","Oregon West Conference":"Oregon West","Sky-Em League":"Sky-Em","Skyline Conference":"Skyline","Greater Oregon League":"Greater Oregon"},
-  M:{atLarge:6,score:5,
+  M:{atLarge:6,score:5,ind:7,
     auto:{"Cowapa League":1,"Tri-Valley Conference":1,"Oregon West Conference":1,"Sky-Em League":1,"Skyline Conference":1,"Greater Oregon League":1},
     lg:{"Cowapa League":["Astoria","Banks","Scappoose","Seaside","Tillamook","Valley Catholic"],
       "Tri-Valley Conference":["Estacada","Gladstone","Madras","Molalla","The Dalles"],
@@ -3605,7 +3634,7 @@ const CLASSES={
       "Sky-Em League":["Cottage Grove","Elmira","Junction City","Marist","Marshfield","North Bend","South Umpqua"],
       "Skyline Conference":["Cascade Christian","Henley","Hidden Valley","Klamath Union","Mazama","North Valley","Phoenix"],
       "Greater Oregon League":["Baker","La Grande","Ontario","Pendleton"]}},
-  F:{atLarge:6,score:5,
+  F:{atLarge:6,score:5,ind:7,
     auto:{"Cowapa League":1,"Tri-Valley Conference":1,"Oregon West Conference":1,"Sky-Em League":1,"Skyline Conference":1,"Greater Oregon League":1},
     lg:{"Cowapa League":["Astoria","Banks","Scappoose","Seaside","Tillamook","Valley Catholic"],
       "Tri-Valley Conference":["Estacada","Gladstone","Madras","Molalla","The Dalles"],
@@ -3615,13 +3644,13 @@ const CLASSES={
       "Greater Oregon League":["Baker","La Grande","Ontario","Pendleton"]}}},
  "3A":{
   ab:{"Special District 1":"SD1","Special District 2":"SD2","Special District 3":"SD3","Special District 4":"SD4"},
-  M:{atLarge:1,score:5,
+  M:{atLarge:1,score:5,ind:7,
     auto:{"Special District 1":3,"Special District 2":3,"Special District 3":3,"Special District 4":2},
     lg:{"Special District 1":["Catlin Gabel","Corbett","Horizon Christian","Neah-Kah-Nie","Oregon Episcopal","Portland Adventist","Rainier","Riverdale","Warrenton","Westside Christian"],
       "Special District 2":["Amity","Blanchet Catholic","Dayton","Gervais","Harrisburg","Jefferson","Salem Academy","Santiam Christian","Scio","Willamina","Yamhill-Carlton"],
       "Special District 3":["Brookings-Harbor","Coquille","Creswell","Douglas","Glide","Illinois Valley","La Pine","Pleasant Hill","Sisters","Siuslaw","St Mary's","Sutherlin","Sweet Home","Trinity Lutheran"],
       "Special District 4":["Burns","Enterprise","McLoughlin","Nyssa","Riverside","Umatilla","Vale"]}},
-  F:{atLarge:1,score:4,
+  F:{atLarge:1,score:4,ind:4,
     auto:{"Special District 1":2,"Special District 2":2,"Special District 3":2,"Special District 4":1},
     lg:{"Special District 1":["Catlin Gabel","Corbett","Horizon Christian","Neah-Kah-Nie","Oregon Episcopal","Portland Adventist","Rainier","Riverdale","Warrenton","Westside Christian"],
       "Special District 2":["Amity","Blanchet Catholic","Dayton","Gervais","Harrisburg","Jefferson","Salem Academy","Santiam Christian","Scio","Willamina","Yamhill-Carlton"],
@@ -3629,13 +3658,13 @@ const CLASSES={
       "Special District 4":["Burns","Enterprise","McLoughlin","Nyssa","Riverside","Umatilla","Vale"]}}},
  "2A/1A":{
   ab:{"Special District 1":"SD1","Special District 2":"SD2","Special District 3":"SD3","Special District 4":"SD4"},
-  M:{atLarge:2,score:5,
+  M:{atLarge:2,score:5,ind:7,
     auto:{"Special District 1":3,"Special District 2":4,"Special District 3":3,"Special District 4":3},
     lg:{"Special District 1":["Clatskanie","Columbia Christian","Country Christian","Faith Bible Christian","Knappa","Nestucca","North Clackamas Christian","Paideia Classical Christian","Portland Christian","Riverside-WLWV","Southwest Christian","St. Stephen's Academy","Trinity Academy","Valor Christian","Vernonia"],
       "Special District 2":["C.S. Lewis Academy","Central Linn","Crosshill Christian","Crow","Delphian","East Linn Christian","Eugene Christian","Jewell","Kennedy","Livingstone Adventist Acad.","Lowell","Mapleton","McKenzie","Northwest Christian","Oakridge","Oregon School for the Deaf","Perrydale","Regis","Santiam","St Paul","Toledo","Triangle Lake","Veritas","Western Christian"],
       "Special District 3":["Bandon","Camas Valley","Culver","Days Creek","Glendale","Gold Beach","Harvest Christian","Lakeview","Myrtle Point","New Hope Christian","North Douglas","North Lake","Oakland","Paisley","Reedsport","Trout Lake","Yoncalla"],
       "Special District 4":["Echo","Elgin","Four Rivers","Grant Union","Griswold","Heppner","Imbler","Nixyaawii Community","Pilot Rock","Pine Eagle","Sherman","Stanfield","Union","Weston-McEwen"]}},
-  F:{atLarge:3,score:4,
+  F:{atLarge:3,score:4,ind:4,
     auto:{"Special District 1":1,"Special District 2":2,"Special District 3":1,"Special District 4":1},
     lg:{"Special District 1":["Clatskanie","Columbia Christian","Faith Bible Christian","Gaston","Knappa","Nestucca","North Clackamas Christian","Paideia Classical Christian","Portland Christian","Riverside-WLWV","Southwest Christian","St. Stephen's Academy","Trinity Academy","Valor Christian","Vernonia"],
       "Special District 2":["C.S. Lewis Academy","Central Linn","Crosshill Christian","Crow","Delphian","East Linn Christian","Eugene Christian","Kennedy","Livingstone Adventist Acad.","Lowell","Mapleton","McKenzie","Oakridge","Oregon School for the Deaf","Regis","Santiam","St Paul","Toledo","Triangle Lake","Veritas","Western Christian"],
@@ -3644,7 +3673,7 @@ const CLASSES={
 };
 let CLS="6A";
 let LEAGUES={}, ABBR={}, LG=[];
-let AUTO={}, AT_LARGE=2, SC=5, PL=7, FIELD=16;
+let AUTO={}, AT_LARGE=2, SC=5, PL=7, FIELD=16, IND=14;
 const autoFor = lg => (lg in AUTO ? AUTO[lg] : 2);
 const autoTotal = () => LG.reduce((s, lg) => s + autoFor(lg), 0);
 const TEAM_LEAGUE={};
@@ -3654,7 +3683,7 @@ function setClass(c,g){
   CLS=c;
   const K=CLASSES[c], cfg=K[g];
   LEAGUES=cfg.lg; ABBR=K.ab; LG=Object.keys(LEAGUES);
-  AUTO=cfg.auto; AT_LARGE=cfg.atLarge; SC=cfg.score; PL=7;
+  AUTO=cfg.auto; AT_LARGE=cfg.atLarge; SC=cfg.score; PL=7; IND=cfg.ind;
   FIELD=autoTotal()+AT_LARGE;
   for(const k in TEAM_LEAGUE) delete TEAM_LEAGUE[k];
   for(const [lg,ts] of Object.entries(LEAGUES)) ts.forEach(t=>TEAM_LEAGUE[t]=lg);
@@ -3866,13 +3895,14 @@ function draw(model,times,sigma,shock){
 /* Districts + at-large, scored over a supplied set of times. Split out from the
    drawing so the what-if can score two worlds off ONE set of draws: a paired
    comparison, where the difference is the improvement and not the luck. */
-function playDistricts(model,byIdx,times){
+function playDistricts(model,byIdx,times,indOut){
   const {byLeague}=model;
-  const autos=[],pool=[];
+  const autos=[],pool=[],perLeague=[];
   for(const lg of LG){
     const list=byLeague[lg];
     if(!list.length)continue;
     const r=scoreMeet(list,times,SC,PL);
+    if(indOut) perLeague.push({list,r});
     for(let p=0;p<r.length;p++){
       const t=byIdx[r[p].idx];
       if(t){t.scoreSum+=r[p].total;t.placeSum+=p+1;t.n++;}   // smooth surrogates
@@ -3891,12 +3921,47 @@ function playDistricts(model,byIdx,times){
   }
   for(const i of autos){byIdx[i].auto++;byIdx[i].qual++;}
   for(const i of wilds){byIdx[i].wild++;byIdx[i].qual++;}
-  return autos.concat(wilds);
+  const field=autos.concat(wilds);
+  /* Individual qualifiers: walk the first IND finishers of each district race
+     and advance anyone whose team did not make it. Fewer than IND is normal —
+     in a strong league the top of the race is all qualifying teams. This runs
+     after the at-large places are settled, because those teams count as
+     qualified for this purpose. */
+  if(indOut){
+    const through=new Set(field);
+    for(const {list} of perLeague){
+      const order=[];
+      for(const tm of list) for(const ri of tm.rIdx) order.push({ri,t:times[ri],team:tm.idx});
+      order.sort((a,b)=>a.t-b.t);
+      const n=Math.min(IND,order.length);
+      for(let k=0;k<n;k++) if(!through.has(order[k].team)) indOut.push(order[k].ri);
+    }
+  }
+  return field;
 }
 
-function playState(model,byIdx,times,fieldIdx){
+function playState(model,byIdx,times,fieldIdx,indIdx,rTally){
   const {teams}=model;
   const res=scoreMeet(fieldIdx.map(i=>teams[i]),times,SC,PL);
+  /* Individual places are scored over everyone on the line — qualifying teams
+     plus the individual qualifiers, who run but are struck from team scoring. */
+  if(rTally){
+    const line=[];
+    for(const i of fieldIdx) for(const ri of teams[i].rIdx) line.push(ri);
+    if(indIdx) for(const ri of indIdx) line.push(ri);
+    line.sort((a,b)=>times[a]-times[b]);
+    for(let k=0;k<line.length;k++){
+      const r=rTally[line[k]];
+      if(!r)continue;
+      const place=k+1;
+      r.n++; r.placeSum+=place;
+      if(place===1)r.win++;
+      if(place<=5)r.top5++;
+      if(place<=10)r.top10++;
+      if(place<=20)r.top20++;
+      if(place<r.best)r.best=place;
+    }
+  }
   for(let p=0;p<res.length;p++){
     const t=byIdx[res[p].idx],place=p+1;
     if(place<=FIELD)t.hist[place]++;
@@ -3912,10 +3977,11 @@ function playState(model,byIdx,times,fieldIdx){
    adjustments and never the luck. One world = the ordinary simulation. */
 function oneSeason(model,worlds,sigma,times,shock,tmp){
   draw(model,times,sigma,shock);
-  const fields=worlds.map(w=>playDistricts(model,w.byIdx,shift(times,w.adj,tmp)));
+  const inds=worlds.map(w=>w.rt?[]:null);
+  const fields=worlds.map((w,i)=>playDistricts(model,w.byIdx,shift(times,w.adj,tmp),inds[i]));
   draw(model,times,sigma,shock);        // state is a fresh race, not a replay
   worlds.forEach((w,i)=>{
-    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i]);
+    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i],inds[i],w.rt);
   });
 }
 function shift(times,adj,tmp){
@@ -3930,6 +3996,22 @@ function blankTally(model){
     hist:new Array(FIELD+1).fill(0)}));
   const by=[]; for(const x of t) by[x.idx]=x;
   return {list:t,byIdx:by};
+}
+
+/* One row per runner on a scoring team, indexed the way model.runners is, so a
+   place can be recorded without a lookup. Built only when the runners board is
+   being filled — the odds board does not pay for it. */
+function runnerTally(model){
+  const by=[];
+  for(const tm of model.teams){
+    if(!tm.roster)continue;
+    tm.rIdx.forEach((ri,k)=>{
+      by[ri]={ri,name:tm.roster[k].name,team:tm.name,league:tm.league,grade:tm.roster[k].grade,
+        sb:tm.roster[k].sb,marks:tm.roster[k].marks.length,
+        n:0,placeSum:0,win:0,top5:0,top10:0,top20:0,best:1e9};
+    });
+  }
+  return by;
 }
 
 /* ---------- render ---------- */
@@ -4374,6 +4456,69 @@ function finishSolve(cur,key,label,p0,best,total,stalled){
 }
 
 /* ---------- run ---------- */
+/* Individual odds. Same engine, same draws, one extra tally — the runners board
+   is simply the finishing order the team board was already computing and
+   discarding. Sorted by mean place, which is the honest ranking: a runner who is
+   reliably 12th outranks one who is 4th or 40th. */
+function runRunners(){
+  if(running){skip=true;return;}
+  const model=buildModel(gender,DIST);
+  const out=document.getElementById("runOut");
+  if(!model.runners.length){
+    out.innerHTML='<div class="empty">No team here can field '+SC+' runners.</div>';
+    return;
+  }
+  running=true;skip=false;
+  document.body.classList.add("simming");
+  const go=document.getElementById("go");
+  go.textContent="Finish";go.classList.add("running");
+  const T=blankTally(model), rt=runnerTally(model);
+  const worlds=[{adj:null,byIdx:T.byIdx,rt}];
+  const sigma=sigmaPct/100;
+  const times=new Float64Array(model.runners.length);
+  const tmp=new Float64Array(model.runners.length);
+  const shock=new Float64Array(model.teams.length);
+  const rb=document.getElementById("runbar"),lab=document.getElementById("runlab");
+  rb.classList.add("on");
+  let done=0,t0=0;
+  const dur=durMs();
+  nextTick(function step(ts){
+    if(!t0)t0=ts;
+    const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/dur)));
+    while(done<target){oneSeason(model,worlds,sigma,times,shock,tmp);done++;}
+    rb.querySelector(".track i").style.width=(done/nSims*100)+"%";
+    lab.textContent="runners "+done.toLocaleString()+"/"+nSims.toLocaleString();
+    if(done<nSims)nextTick(step);
+    else{
+      rb.classList.remove("on");lab.textContent="";
+      document.body.classList.remove("simming");
+      go.textContent="Run again";go.classList.remove("running");running=false;
+      renderRunners(rt,done);
+    }
+  });
+}
+function renderRunners(rt,seasons){
+  const rows=rt.filter(r=>r&&r.n).map(r=>({...r,mean:r.placeSum/r.n,rate:r.n/seasons}));
+  const out=document.getElementById("runOut");
+  if(!rows.length){ out.innerHTML='<div class="empty">Nobody here reached Lane.</div>'; return; }
+  rows.sort((a,b)=>a.mean-b.mean);
+  const body=rows.slice(0,60).map((r,i)=>
+    '<div class="rrow'+(i===0?" p1":"")+'">'
+    +'<span class="rpl">'+(i+1)+'</span>'
+    +'<span class="rnm">'+crest(r.team,"crest")+' '+r.name+' <em>'+r.team+' &middot; '+fmt(r.sb)+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span>'
+    +'<span class="rfig">'+pct(r.win,seasons)+'<i>wins</i></span>'
+    +'<span class="rfig">'+pct(r.top10,seasons)+'<i>top 10</i></span>'
+    +'<span class="rfig">'+r.mean.toFixed(1)+'<i>avg place</i></span>'
+    +'<span class="rfig">'+pct(r.n,seasons)+'<i>gets there</i></span>'
+    +'</div>').join("");
+  out.innerHTML='<div class="rhead"><span></span><span>athlete</span><span>wins</span>'
+    +'<span>top 10</span><span>avg place</span><span>gets there</span></div>'+body
+    +'<p class="sub2" style="margin-top:9px">Ranked by average finish across the seasons the runner actually made it &mdash; a runner who is reliably twelfth outranks one who is fourth or fortieth. '
+    +'&ldquo;Gets there&rdquo; is how often they reached Lane at all, on a qualifying team or as an individual. '
+    +'One caveat worth knowing: a runner with only one race is taken at that time, while a runner with two is judged on both, '
+    +'so the more often someone has raced the more conservatively this board rates them. We are working on it.</p>';
+}
+
 function run(){
   if(running){skip=true;return;}
   const model=buildModel(gender,DIST);
@@ -4555,13 +4700,14 @@ document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
-  document.getElementById("go").style.display=/p-sim|p-wi/.test(b.dataset.p)?"":"none";
+  document.getElementById("go").style.display=/p-sim|p-wi|p-run/.test(b.dataset.p)?"":"none";
   if(b.dataset.p==="p-wi")renderWhatIf();
   scrollTo({top:0,behavior:"smooth"});});
 document.getElementById("go").onclick=()=>{
-  const wi=document.getElementById("p-wi").classList.contains("on");
   if(running){skip=true;return;}
-  wi?runWhatIf():run();
+  if(document.getElementById("p-run").classList.contains("on"))return runRunners();
+  if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();
+  run();
 };
 addEventListener("resize",()=>{if(cards.length&&!running){measure();cards.forEach(c=>{c.pos=-1;});}});
 

@@ -127,6 +127,40 @@ table or the solver's step size. What it does keep is an honest list of what the
 model does not know, including that early-season numbers are wider than they
 look. That section earns more trust than it costs — do not quietly drop it.
 
+## Runners
+
+Individual odds at Lane, on its own tab. The engine already drew a time for
+every athlete in every simulated season and threw the finishing order away;
+`runnerTally` keeps it. A world carrying `rt` gets individual places recorded,
+so the odds board and the backtest pay nothing for the feature.
+
+**The individual qualifiers are on the line.** OSAA advances any runner inside
+the top N across the line at a district meet whose team did not qualify — 14 in
+6A, 7 in 5A/4A and in the 3A and 2A/1A boys, 4 in the 3A and 2A/1A girls, held
+in `CLASSES[cls][g].ind`. `playDistricts` picks them after the at-large places
+are settled, because those teams count as qualified for this purpose. They race
+and are ranked, but they are struck from team scoring, which is why `scoreMeet`
+is untouched. Without them every athlete's place would be a handful of spots
+too good.
+
+Ranked by average finish rather than by chance of winning: a runner who is
+reliably twelfth is a better bet than one who is fourth or fortieth, and the
+mean says so where a win probability does not.
+
+**Known distortion, disclosed on the board.** A runner with one race is taken at
+that time; a runner with two is judged on both. Measured on the live 6A boys
+field, two-mark athletes rank **11.4 places worse** than their season best
+implies and one-mark athletes **5.3 better** — a gap of about seventeen places
+driven by nothing but how often someone raced.
+
+This is open item 1 wearing its most visible face. On a team board it partly
+cancels; on a list of named athletes it does not. The honest reading is that the
+*single-mark* runners are flattered, not that the others are punished — one
+race is a best-of-one with no regression applied. The fix is either course/date
+adjustment or regressing a lone mark the way a second mark effectively regresses
+the first. Until then the row shows each athlete's best time and race count so a
+reader can see the input, and the footnote says it plainly.
+
 ## Classifications
 
 All five ship. The switcher above the Boys/Girls toggle changes `CLS`, and
