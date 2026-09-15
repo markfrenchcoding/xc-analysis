@@ -50,6 +50,40 @@ site quietly lies about how fresh it is.
 
 ## The site
 
+**Three tabs, and one of them has three views.** Odds · What if · How. Inside
+Odds a segmented switch chooses Teams, Runners or Leagues. That is the shape
+because all three of those *are* odds — they were three sibling tabs for a
+while, each with its own copy of the switchers and its own Run button, and it
+read as three tools rather than three readings of one.
+
+**One control block, `#ctl`, above everything.** Classification, Boys/Girls,
+both dials and the single progress strip live there once. They used to be pasted
+onto each panel, which is how What if ended up with a gender switch and no
+classification switch, and how the Runners board ended up with no dials at all.
+The block hides only on How, which is the one page with nothing to set.
+
+**The dials fold.** Open until the first run finishes, then collapsed to a line
+reading `±2.3% · 5,000 seasons`; touch the header once and that choice sticks
+for the session (`dialsTouched`). A hundred and fifty pixels of settings above a
+fifty-row board every time was the alternative.
+
+**One run fills all three views.** `RUN` holds the model, both tallies and the
+season count, and is written every frame. Only the view on screen is painted —
+`paintActive` — and `refreshView` catches the other two up the moment they are
+switched to, which is why every paint reads from `RUN` rather than from a
+closure inside the loop. A hidden panel measures zero, so `refreshView` also
+re-measures; that is what stops a board built while the reader was elsewhere
+from laying out against a stale step.
+
+Leagues is the exception to per-frame painting: it is a full `innerHTML` rebuild
+rather than cards that move, so it refreshes twice a second. Enough to watch the
+numbers firm up, cheap enough not to fight the run.
+
+**The leagues heading is generated, not written.** It used to say "The seven
+leagues" on every board, including the five-league and four-league ones.
+`syncViewText` builds it from `LG.length`, `autoTotal()`, `AT_LARGE` and
+`FIELD`, and must be called anywhere `setClass` is.
+
 Three things on the board beyond the odds themselves.
 
 **Average points.** Each card carries the team's mean score at Lane underneath

@@ -179,6 +179,26 @@ header .asof{color:var(--muted);font-size:10.5px}
 .switch{display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);
   border-radius:9px;padding:2px;margin:10px 0 8px}
 .clsw{margin-bottom:7px}
+/* One set of controls above every view. How is the only page with nothing to
+   set, so it is the only one that hides them. */
+.ctl.off{display:none}
+.vsw{margin:10px 0 11px}
+.view{display:none}
+.view.on{display:block}
+/* Open until the first run finishes, then folded to a line. max-height rather
+   than a grid trick, because the heights here are small and known and this
+   works everywhere. */
+.dsum{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  margin-top:8px;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface);color:var(--muted);font:inherit;font-size:11.5px;
+  font-variant-numeric:tabular-nums;cursor:pointer;transition:border-color .3s,color .3s}
+.dsum:hover{border-color:var(--t1e);color:var(--text)}
+.dsum i{flex:none;width:8px;height:8px;border-right:1.6px solid currentColor;
+  border-bottom:1.6px solid currentColor;transform:rotate(-135deg) translate(-2px,-2px);
+  transition:transform .3s var(--ease)}
+.dsum[aria-expanded="false"] i{transform:rotate(45deg) translate(-1px,-1px)}
+.dials{overflow:hidden;max-height:420px;transition:max-height .34s var(--ease),opacity .26s}
+.dials.fold{max-height:0;opacity:0}
 .clsw button{font-size:12.5px;padding:7px 4px}
 .switch button{flex:1;background:none;border:0;color:var(--muted);font-family:inherit;font-size:13.5px;
   font-weight:500;padding:6px 0;border-radius:7px;cursor:pointer;transition:color .2s,background .2s}
@@ -3488,7 +3508,7 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
     <button class="themeBtn" id="theme" aria-label="Switch between dark and light"><svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor"/></svg></button>
   </header>
 
-  <section class="panel on" id="p-sim">
+  <div class="ctl" id="ctl">
     <div class="switch clsw" role="group" aria-label="Classification">
       <button data-c="6A" aria-pressed="true">6A</button>
       <button data-c="5A">5A</button>
@@ -3500,7 +3520,10 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
       <button data-g="M" aria-pressed="true">Boys</button>
       <button data-g="F" aria-pressed="false">Girls</button>
     </div>
-
+    <button class="dsum" id="dsum" aria-expanded="true" aria-controls="dials">
+      <span id="dsumT">Hide settings</span><i></i>
+    </button>
+    <div class="dials" id="dials">
     <div class="dial">
       <div class="dial-top">
         <span class="dial-lab">Race-day variance</span>
@@ -3520,7 +3543,7 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
       <div class="dial-note" style="min-height:0;margin-bottom:8px">More races, steadier odds. One race is a single roll of the dice.</div>
       <input type="range" id="nRange" min="0" max="20" value="20" step="1" aria-label="Races simulated">
     </div>
-
+    </div>
     <div class="runbar" id="runbar">
       <span class="lane">
         <span class="track"><i></i></span>
@@ -3528,44 +3551,28 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
       </span>
       <span class="runlab" id="runlab"></span>
     </div>
-    <div id="simOut"></div>
+  </div>
+
+  <section class="panel on" id="p-sim">
+    <div class="switch vsw" role="group" aria-label="View">
+      <button data-view="v-teams" aria-pressed="true">Teams</button>
+      <button data-view="v-runners" aria-pressed="false">Runners</button>
+      <button data-view="v-leagues" aria-pressed="false">Leagues</button>
+    </div>
+    <div class="view on" id="v-teams"><div id="simOut"></div></div>
+    <div class="view" id="v-runners">
+      <h2 class="sec">Runners</h2>
+      <p class="sub2">Where each athlete finishes at Lane, across every simulated season &mdash; run against the same field the teams face, individual qualifiers included.</p>
+      <div id="runOut"><div class="empty">Press Run to fill this in.</div></div>
+    </div>
+    <div class="view" id="v-leagues">
+      <h2 class="sec" id="lgTitle">Leagues</h2>
+      <p class="sub2" id="lgSub"></p>
+      <div id="lgOut"><div class="empty">Press Run to fill this in.</div></div>
+    </div>
   </section>
 
-  <section class="panel" id="p-run">
-    <div class="switch clsw" role="group" aria-label="Classification">
-      <button data-c="6A" aria-pressed="true">6A</button>
-      <button data-c="5A">5A</button>
-      <button data-c="4A">4A</button>
-      <button data-c="3A">3A</button>
-      <button data-c="2A/1A">2A/1A</button>
-    </div>
-    <div class="switch" role="group" aria-label="Race">
-      <button data-g="M" aria-pressed="true">Boys</button>
-      <button data-g="F" aria-pressed="false">Girls</button>
-    </div>
-    <h2 class="sec">Runners</h2>
-    <p class="sub2">Where each athlete finishes at Lane, across every simulated season &mdash; run against the same field the teams face, individual qualifiers included.</p>
-    <div id="rbhost3"></div>
-    <div id="runOut"><div class="empty">Press Run to fill this in.</div></div>
-  </section>
 
-  <section class="panel" id="p-lg">
-    <div class="switch clsw" role="group" aria-label="Classification">
-      <button data-c="6A" aria-pressed="true">6A</button>
-      <button data-c="5A">5A</button>
-      <button data-c="4A">4A</button>
-      <button data-c="3A">3A</button>
-      <button data-c="2A/1A">2A/1A</button>
-    </div>
-    <div class="switch" role="group" aria-label="Race">
-      <button data-g="M" aria-pressed="true">Boys</button>
-      <button data-g="F" aria-pressed="false">Girls</button>
-    </div>
-    <h2 class="sec">The seven leagues</h2>
-    <p class="sub2">Two teams out of each league go straight to Lane. Everyone else is chasing two at-large spots.</p>
-    <div id="rbhost4"></div>
-    <div id="lgOut"></div>
-  </section>
 
   <section class="panel" id="p-doc">
     <h2 class="sec">How this works</h2>
@@ -3669,20 +3676,9 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
   </section>
 
   <section class="panel" id="p-wi">
-    <div class="switch" role="group" aria-label="Race">
-      <button data-g="M" aria-pressed="true">Boys</button>
-      <button data-g="F" aria-pressed="false">Girls</button>
-    </div>
     <h2 class="sec">What if a runner improves?</h2>
     <p class="sub2">Take time off one or more of your seven and see what it does to your league and state odds. Both worlds are run against the same simulated races, so the difference is the improvement, not luck.</p>
     <select id="wiTeam" class="wisel"></select>
-    <div class="runbar" id="runbar2">
-      <span class="lane">
-        <span class="track"><i></i></span>
-        <span class="pack" id="pack2"><svg class="rn r3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16.2" cy="4.6" r="2.4" fill="currentColor" stroke="none"/><path d="M15 8.4 11.2 12.9"/><g class="lg1"><path d="M11.2 12.9 15.2 15.9 13.8 21"/><path d="M11.2 12.9 6.6 15.2 7.4 20.4"/></g><g class="lg2"><path d="M11.2 12.9 14.2 16.8 16.4 20.6"/><path d="M11.2 12.9 7.2 14.2 5.6 19"/></g><g class="ar1"><path d="M14.4 9.4 18.8 11.2"/><path d="M13.8 10 9.4 9.1"/></g><g class="ar2"><path d="M14.4 9.4 18.2 7.6"/><path d="M13.8 10 10.2 12.2"/></g></svg><svg class="rn r2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16.2" cy="4.6" r="2.4" fill="currentColor" stroke="none"/><path d="M15 8.4 11.2 12.9"/><g class="lg1"><path d="M11.2 12.9 15.2 15.9 13.8 21"/><path d="M11.2 12.9 6.6 15.2 7.4 20.4"/></g><g class="lg2"><path d="M11.2 12.9 14.2 16.8 16.4 20.6"/><path d="M11.2 12.9 7.2 14.2 5.6 19"/></g><g class="ar1"><path d="M14.4 9.4 18.8 11.2"/><path d="M13.8 10 9.4 9.1"/></g><g class="ar2"><path d="M14.4 9.4 18.2 7.6"/><path d="M13.8 10 10.2 12.2"/></g></svg><svg class="rn r1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16.2" cy="4.6" r="2.4" fill="currentColor" stroke="none"/><path d="M15 8.4 11.2 12.9"/><g class="lg1"><path d="M11.2 12.9 15.2 15.9 13.8 21"/><path d="M11.2 12.9 6.6 15.2 7.4 20.4"/></g><g class="lg2"><path d="M11.2 12.9 14.2 16.8 16.4 20.6"/><path d="M11.2 12.9 7.2 14.2 5.6 19"/></g><g class="ar1"><path d="M14.4 9.4 18.8 11.2"/><path d="M13.8 10 9.4 9.1"/></g><g class="ar2"><path d="M14.4 9.4 18.2 7.6"/><path d="M13.8 10 10.2 12.2"/></g></svg></span>
-      </span>
-      <span class="runlab" id="runlab2"></span>
-    </div>
     <div id="wiRoster"></div>
     <div id="wiOut"></div>
   </section>
@@ -3695,8 +3691,6 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
 <div class="bar"><div class="bar-inner">
   <div class="tabs" role="group" aria-label="Sections">
     <button data-p="p-sim" aria-pressed="true">Odds</button>
-    <button data-p="p-run" aria-pressed="false">Runners</button>
-    <button data-p="p-lg" aria-pressed="false">Leagues</button>
     <button data-p="p-wi" aria-pressed="false">What if</button>
     <button data-p="p-doc" aria-pressed="false">How</button>
   </div>
@@ -4404,8 +4398,8 @@ function runWorlds(model,worlds,seasons,label,onEnd){
   running=true;
   const go=document.getElementById("go");
   go.textContent="…";go.classList.add("running");
-  const rb=document.getElementById("runbar2"),lab=document.getElementById("runlab2"),
-        pk=document.getElementById("pack2");
+  const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
+        pk=document.getElementById("pack");
   rb.classList.add("on");document.body.classList.add("simming");
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
@@ -4494,8 +4488,8 @@ function solveGoal(){
   const key=document.getElementById("wiGoal").value;
   const label=GOALS.find(x=>x[0]===key)[1];
   const out=document.getElementById("wiOut");
-  const rb=document.getElementById("runbar2"),lab=document.getElementById("runlab2"),
-        pk=document.getElementById("pack2");
+  const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
+        pk=document.getElementById("pack");
   running=true;
   const go=document.getElementById("go");go.textContent="…";go.classList.add("running");
   rb.classList.add("on");document.body.classList.add("simming");
@@ -4613,53 +4607,6 @@ function finishSolve(cur,key,label,p0,best,total,stalled){
    is simply the finishing order the team board was already computing and
    discarding. Sorted by mean place, which is the honest ranking: a runner who is
    reliably 12th outranks one who is 4th or 40th. */
-function runRunners(){
-  if(running){skip=true;return;}
-  const model=buildModel(gender,DIST);
-  const out=document.getElementById("runOut");
-  if(!model.runners.length){
-    out.innerHTML='<div class="empty">No team here can field '+SC+' runners.</div>';
-    return;
-  }
-  running=true;skip=false;
-  document.body.classList.add("simming");
-  const go=document.getElementById("go");
-  go.textContent="Finish";go.classList.add("running");
-  const T=blankTally(model), rt=runnerTally(model);
-  const worlds=[{adj:null,byIdx:T.byIdx,rt}];
-  const pool=rt.filter(Boolean).sort((a,b)=>a.sb-b.sb).slice(0,RPOOL);
-  buildRunBoard(pool);
-  const sigma=sigmaPct/100;
-  const times=new Float64Array(model.runners.length);
-  const tmp=new Float64Array(model.runners.length);
-  const shock=new Float64Array(model.teams.length);
-  const rb=document.getElementById("runbar3"),lab=document.getElementById("runlab3"),
-        pack=document.getElementById("pack3");
-  rb.classList.add("on");
-  let done=0,t0=0;
-  const dur=durMs();
-  nextTick(function step(ts){
-    if(!t0)t0=ts;
-    const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/dur)));
-    while(done<target){oneSeason(model,worlds,sigma,times,shock,tmp);done++;}
-    const frac=done/nSims;
-    rb.querySelector(".track i").style.width=(frac*100)+"%";
-    pack.style.left=(frac*100)+"%";
-    lab.textContent=done.toLocaleString()+" / "+nSims.toLocaleString();
-    paintRunners(pool,done,frac*frac);
-    if(done<nSims)nextTick(step);
-    else{
-      rb.classList.remove("on");
-      lab.textContent="±"+sigmaPct.toFixed(1)+"%";
-      document.body.classList.remove("simming");
-      go.textContent="Run again";go.classList.remove("running");running=false;
-      settleRunners(pool,done);
-      // rows were laid out against a measured step; re-measure now the footnote
-      // has text in it and the board has stopped moving
-      nextTick(()=>{measureRun();rcards.forEach(c=>c.pos=-1);settleRunners(pool,done);});
-    }
-  });
-}
 /* Fifty rows are shown and ninety are in play. The board ranks on mean finishing
    place, which is not knowable in advance, so the cards have to be built before
    the run from something correlated with it — season best — and then allowed to
@@ -4766,12 +4713,37 @@ function settleRunners(pool,done){
     +'A runner with a single race is rated slightly more cautiously than that one time suggests, because one race is thinner '
     +'evidence than two \u2014 without that, the athletes who have raced least would look the best.';
 }
-/* The last completed odds run, kept so a card can be opened afterwards and so
-   the board can be re-laid-out when the Odds tab comes back into view. */
-let lastRun=null;
+/* Teams, Runners and Leagues are three readings of one simulation, so there is
+   one run and one place its results live. RUN is written every frame while a run
+   is going and read by whichever view happens to be showing. */
+let RUN=null, VIEW="v-teams";
 
-function run(bid){
-  bid=bid||"";
+/* Only the view on screen is painted. The other two are caught up the moment
+   they are switched to, which is why every paint takes its numbers from RUN
+   rather than from a closure inside the loop. */
+function paintActive(full){
+  if(!RUN)return;
+  if(VIEW==="v-teams") paint(RUN.tally,RUN.done,full);
+  else if(VIEW==="v-runners") paintRunners(RUN.pool,RUN.done,RUN.lock);
+  else if(VIEW==="v-leagues"){
+    /* The leagues board is a full innerHTML rebuild rather than a set of cards
+       that move, so it is refreshed twice a second rather than every frame -
+       enough to watch the numbers firm up, cheap enough not to fight the run. */
+    const now=performance.now();
+    if(now-RUN.lgAt>500){RUN.lgAt=now;renderLeagues(RUN.tally,RUN.model,RUN.done);}
+  }
+}
+function refreshView(){
+  if(!RUN)return;
+  if(VIEW==="v-teams"&&cards.length)
+    nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(RUN.tally,RUN.done,true);});
+  else if(VIEW==="v-runners"&&rcards.length)
+    nextTick(()=>{measureRun();rcards.forEach(c=>c.pos=-1);paintRunners(RUN.pool,RUN.done,RUN.lock);});
+  else if(VIEW==="v-leagues")
+    renderLeagues(RUN.tally,RUN.model,RUN.done);
+}
+
+function run(){
   if(running){skip=true;return;}
   const model=buildModel(gender,DIST);
   if(!model.runners.length){
@@ -4784,12 +4756,18 @@ function run(bid){
   const go=document.getElementById("go");
   go.textContent="Finish";go.classList.add("running");
   const T=blankTally(model), tally=T.list;
+  const rt=runnerTally(model);
   const rtm=new Float64Array(model.runners.length);
-  const worlds=[{adj:null,byIdx:T.byIdx,rtm}];
+  const worlds=[{adj:null,byIdx:T.byIdx,rt,rtm}];
+  const pool=rt.filter(Boolean).sort((a,b)=>a.sb-b.sb).slice(0,RPOOL);
   buildBoard(tally);
+  buildRunBoard(pool);
+  document.getElementById("lgOut").innerHTML=
+    '<div class="empty">Filling in as the seasons run&hellip;</div>';
+  RUN={model,tally,byIdx:T.byIdx,rtm,pool,done:0,lock:0,lgAt:0};
   document.getElementById("board").classList.add("running");
-  const rb=document.getElementById("runbar"+bid),lab=document.getElementById("runlab"+bid),
-        pack=document.getElementById("pack"+bid);
+  const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
+        pack=document.getElementById("pack");
   rb.classList.add("on");
   const sigma=sigmaPct/100;
   const times=new Float64Array(model.runners.length);
@@ -4805,20 +4783,23 @@ function run(bid){
     rb.querySelector(".track i").style.width=(frac*100)+"%";
     pack.style.left=(frac*100)+"%";
     lab.textContent=done.toLocaleString()+" / "+nSims.toLocaleString();
-    paint(tally,done,(frame++%3)===0);
+    RUN.done=done;RUN.lock=frac*frac;
+    paintActive((frame++%3)===0);
     if(done<nSims) nextTick(step);
     else{
+      RUN.done=done;RUN.lock=1;
       paint(tally,done,true);
       settle(tally);
+      settleRunners(pool,done);
       renderLeagues(tally,model,done);
-      lastRun={model,tally,byIdx:T.byIdx,rtm,done};
+      foldDials();
       cards.forEach(c=>{c.el.classList.add("tappable");c.el.tabIndex=0;});
       rb.classList.remove("on");
       lab.textContent=`±${sigmaPct.toFixed(1)}%`;
       go.textContent="Run again";go.classList.remove("running");
       running=false;
       document.body.classList.remove("simming");
-      nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(tally,done,true);});
+      nextTick(refreshView);
     }
   });
 }
@@ -4829,6 +4810,38 @@ function toast(m){
   t.textContent=m;t.classList.add("show");
   clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2400);
 }
+/* The dials are open until the first run finishes and then fold away, because
+   nobody wants a hundred and fifty pixels of settings above a fifty-row board
+   every time. Touch the header once and that choice sticks for the session. */
+let dialsOpen=true, dialsTouched=false;
+function setDials(open){
+  dialsOpen=open;
+  document.getElementById("dials").classList.toggle("fold",!open);
+  document.getElementById("dsum").setAttribute("aria-expanded",open);
+  syncDialSummary();
+}
+function foldDials(){ if(!dialsTouched) setDials(false); }
+function syncDialSummary(){
+  document.getElementById("dsumT").textContent=dialsOpen?"Hide settings"
+    :"\u00b1"+sigmaPct.toFixed(1)+"% \u00b7 "+nSims.toLocaleString()+" seasons";
+}
+document.getElementById("dsum").onclick=()=>{dialsTouched=true;setDials(!dialsOpen);};
+
+// The leagues view is the only heading that has to move with the board.
+function syncViewText(){
+  document.getElementById("lgSub").textContent=
+    LG.length+" leagues send "+autoTotal()+" teams straight to Lane. "
+    +AT_LARGE+" more get in at large, and "+FIELD+" line up in November.";
+}
+
+document.querySelectorAll(".vsw button").forEach(b=>b.onclick=()=>{
+  VIEW=b.dataset.view;
+  document.querySelectorAll(".vsw button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  document.querySelectorAll("#p-sim .view").forEach(v=>v.classList.toggle("on",v.id===VIEW));
+  refreshView();
+  scrollTo({top:0,behavior:"smooth"});
+});
+
 function syncVar(){
   document.getElementById("vVal").textContent=sigmaPct.toFixed(1)+"%";
   const [ra,rb]=[17*60,20*60];
@@ -4837,41 +4850,20 @@ function syncVar(){
     `Two thirds of races land within ±${(ra*sigmaPct/100).toFixed(0)}s of a ${lbl(ra)} best, ±${(rb*sigmaPct/100).toFixed(0)}s of a ${lbl(rb)}.`;
   document.querySelectorAll('.seg button[data-v]').forEach(x=>
     x.setAttribute("aria-pressed",Math.abs(+x.dataset.v/10-sigmaPct)<.05));
+  syncDialSummary();
 }
-/* The progress strip is one lump of markup with three inline runner SVGs in it.
-   Cloning the original onto the other panels at load keeps it from being pasted
-   four times into a file that is edited by hand. */
-function mountRunbars(){
-  const src=document.getElementById("runbar");
-  for(const id of ["3","4"]){
-    const host=document.getElementById("rbhost"+id);
-    if(!host)continue;
-    const el=src.cloneNode(true);
-    el.id="runbar"+id;
-    el.classList.remove("on");
-    el.querySelector(".pack").id="pack"+id;
-    el.querySelector(".runlab").id="runlab"+id;
-    el.querySelector(".track i").style.width="0";
-    host.replaceWith(el);
-  }
-}
-
 function clearOut(){
   document.getElementById("simOut").innerHTML="";
   const ro=document.getElementById("runOut");
   if(ro)ro.innerHTML='<div class="empty">Press Run to fill this in.</div>';
   rcards=[];rlabs=[];
   closeRace();
-  lastRun=null;
-  for(const id of ["","2","3","4"]){
-    const rb=document.getElementById("runbar"+id);
-    if(!rb)continue;
-    document.getElementById("runlab"+id).textContent="";
-    rb.classList.remove("on");
-    rb.querySelector(".track i").style.width="0";
-    const pk=document.getElementById("pack"+id);
-    if(pk)pk.style.left="0";
-  }
+  RUN=null;
+  const rb=document.getElementById("runbar");
+  document.getElementById("runlab").textContent="";
+  rb.classList.remove("on");
+  rb.querySelector(".track i").style.width="0";
+  document.getElementById("pack").style.left="0";
   const wo=document.getElementById("wiOut"); if(wo)wo.innerHTML="";
   cards=[];
   document.getElementById("lgOut").innerHTML=`<div class="empty">Run the simulation to fill this in.</div>`;
@@ -4921,8 +4913,8 @@ function overlay(){
    the caution — sampling a slower race, plus a skew that stretches bad days
    further than good ones, so the average lands behind the best. */
 function showTeam(idx){
-  if(!lastRun)return;
-  const {model,byIdx,rtm,done}=lastRun;
+  if(!RUN)return;
+  const {model,byIdx,rtm,done}=RUN;
   const tm=model.teams[idx];
   if(!tm||!tm.roster)return;
   const row=byIdx[idx];
@@ -5326,33 +5318,28 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeRace(); });
 document.querySelectorAll(".switch button[data-g]").forEach(b=>b.onclick=()=>{
   gender=b.dataset.g;
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
-  setClass(CLS,gender);syncHead();
+  setClass(CLS,gender);syncHead();syncViewText();
   clearOut();wiAdj={};renderWhatIf();});
 document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
   setClass(b.dataset.c,gender);
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
-  syncHead();clearOut();wiAdj={};renderWhatIf();});
+  syncHead();syncViewText();clearOut();wiAdj={};renderWhatIf();});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
-  document.getElementById("go").style.display=/p-sim|p-wi|p-run|p-lg/.test(b.dataset.p)?"":"none";
+  document.getElementById("go").style.display=/p-sim|p-wi/.test(b.dataset.p)?"":"none";
+  // The controls belong to everything that runs; How is the one page with nothing to set.
+  document.getElementById("ctl").classList.toggle("off",b.dataset.p==="p-doc");
   if(b.dataset.p==="p-wi")renderWhatIf();
-  /* Cards are absolutely positioned off a measured step height, and a hidden
-     panel measures zero — so a board built while the Odds tab was away has to
-     be re-laid-out the moment it comes back. */
-  if(b.dataset.p==="p-sim"&&cards.length&&!running&&lastRun)
-    nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(lastRun.tally,lastRun.done,true);});
-  if(b.dataset.p==="p-run"&&rcards.length&&!running)
-    nextTick(()=>{measureRun();rcards.forEach(c=>c.pos=-1);});
+  /* Rows and cards are absolutely positioned off a measured step height, and a
+     hidden panel measures zero — so a board built while the reader was on
+     another tab has to be re-laid-out the moment it comes back. */
+  if(b.dataset.p==="p-sim")refreshView();
   scrollTo({top:0,behavior:"smooth"});});
 document.getElementById("go").onclick=()=>{
   if(running){skip=true;return;}
-  const on=id=>document.getElementById(id).classList.contains("on");
-  if(on("p-run"))return runRunners();
-  if(on("p-wi"))return runWhatIf();
-  /* The Leagues board is a by-product of the odds run, so running from that tab
-     runs the same simulation — only the progress strip moves. */
-  run(on("p-lg")?"4":"");
+  if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();
+  run();
 };
 addEventListener("resize",()=>{
   if(running)return;
@@ -5369,7 +5356,7 @@ function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
 }
-loadSeed();mountRunbars();syncVar();clearOut();renderWhatIf();
+loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();
 </script>
 </body>
 </html>
