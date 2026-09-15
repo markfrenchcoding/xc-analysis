@@ -1,0 +1,142 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Chute — type directions</title>
+<!-- Scratch file. Not linked from the app, not loaded by it. It exists so the
+     five directions can be compared as real rendered cards rather than as
+     adjectives in a message. Delete once a direction is chosen. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Archivo+Black&family=Archivo:wght@500;600;700&family=Bebas+Neue&family=Roboto+Slab:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@700&family=Oswald:wght@500;700&family=Saira+Condensed:wght@600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0D0D0F;color:#F3F3F4;font-family:'Barlow',system-ui,sans-serif;padding:24px}
+.opt{max-width:760px;margin:0 auto 34px}
+.hdr{display:flex;align-items:baseline;gap:12px;margin:0 0 4px;
+  border-bottom:1px solid #2E2E35;padding-bottom:8px}
+.hdr h2{font:700 15px/1 'Barlow',sans-serif;letter-spacing:.14em;text-transform:uppercase;margin:0;color:#F0455C}
+.hdr span{font-size:12px;color:#6C6C77}
+.note{font-size:12.5px;color:#A2A2AB;margin:8px 0 14px;line-height:1.5}
+
+/* ---- shared card skeleton; only the tokens change between options ---- */
+.board{--bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;
+  --text:#F3F3F4;--muted:#A2A2AB;--dim:#6C6C77;--accent:#F0455C;
+  --disp:'Anton',sans-serif;--dispw:400;--dispsz:19.5px;--dispsp:.004em;--dispcase:uppercase;
+  --num:'Barlow Condensed',sans-serif;--numw:700;--numsp:-.025em;
+  --lab:'Barlow',sans-serif;--labsp:.11em;
+  background:var(--bg);padding:14px;border-radius:12px;border:1px solid var(--line)}
+.sec{font-family:var(--disp);font-weight:var(--dispw);font-size:19px;text-transform:uppercase;
+  letter-spacing:.015em;margin:0 0 10px;color:var(--text)}
+.tcard{position:relative;background:var(--surface);border:1px solid var(--line);border-left:0;
+  border-radius:9px;padding:9px 11px 10px 14px;margin-bottom:9px;overflow:hidden}
+.tcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(to top,var(--accent) calc(var(--q) * 100%),var(--line) 0)}
+.head{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.rank{flex:none;width:40px;height:30px;display:grid;place-items:center}
+.rank svg{width:100%;height:100%;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55))}
+.rank text{font-family:var(--num);font-weight:700;font-size:38px;text-anchor:middle}
+.crest{width:26px;height:26px;border-radius:5px;flex:none;background:var(--raised);
+  display:grid;place-items:center;font:700 11px var(--num);color:var(--muted);border:1px solid var(--line)}
+.nm{flex:1;min-width:0;font-family:var(--disp);font-weight:var(--dispw);font-size:var(--dispsz);
+  letter-spacing:var(--dispsp);text-transform:var(--dispcase);line-height:1.08;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lg{font:normal 9.5px var(--lab);color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex:none}
+.poll{flex:none;width:62px;display:inline-flex;align-items:baseline;justify-content:flex-end;gap:3px;
+  font-family:var(--num);font-weight:700;font-size:13px;line-height:1;padding:3px 6px 4px;
+  border-radius:5px;border:1px solid #9CBEFF;color:#9CBEFF}
+.poll u{text-decoration:none;font-size:7px;letter-spacing:.09em;opacity:.75;align-self:center}
+.big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:9px;align-items:end}
+.big b{display:block;font-family:var(--num);font-weight:var(--numw);font-size:32px;line-height:.9;
+  letter-spacing:var(--numsp);font-variant-numeric:tabular-nums}
+.big i{display:block;font-style:normal;font-family:var(--lab);font-size:8px;letter-spacing:var(--labsp);
+  text-transform:uppercase;color:var(--dim);margin-top:4px;white-space:nowrap}
+.big .w b{color:var(--accent)}
+.big .q b{color:var(--text)}
+.big .p b{color:var(--muted);font-size:26px}
+.strip{display:flex;align-items:flex-end;gap:2px;height:16px;margin-bottom:8px}
+.strip s{flex:1;border-radius:1px;text-decoration:none;background:var(--line)}
+.odds{display:flex;gap:4px;border-top:1px solid var(--line);padding-top:7px}
+.odd{flex:1;text-align:center}
+.odd b{display:block;font-family:var(--num);font-weight:600;font-size:14px;line-height:1.05;
+  font-variant-numeric:tabular-nums;color:#9CBEFF}
+.odd i{display:block;font-style:normal;font-family:var(--lab);font-size:8px;color:var(--dim);
+  letter-spacing:.07em;text-transform:uppercase}
+
+/* ================= the five directions ================= */
+/* A — what ships today */
+#a .board{}
+
+/* B — Archivo Black / Saira Condensed. Heavier, tighter, NFL-broadcast. */
+#b .board{--disp:'Archivo Black',sans-serif;--dispw:400;--dispsz:17px;--dispsp:-.01em;
+  --num:'Saira Condensed',sans-serif;--numw:700;--numsp:-.01em;
+  --lab:'Archivo',sans-serif;--labsp:.13em;
+  --accent:#FF3B41;--surface:#141418;--line:#33333C}
+
+/* C — Bebas Neue / Roboto Slab. Track programme, warmer, gold. */
+#c .board{--disp:'Bebas Neue',sans-serif;--dispw:400;--dispsz:23px;--dispsp:.02em;
+  --num:'Roboto Slab',serif;--numw:700;--numsp:-.02em;
+  --lab:'Roboto Slab',serif;--labsp:.1em;
+  --accent:#E8A33D;--bg:#0E0D0B;--surface:#1A1814;--raised:#241F19;--line:#38312A}
+
+/* D — Space Grotesk / JetBrains Mono. Precision instrument. */
+#d .board{--disp:'Space Grotesk',sans-serif;--dispw:700;--dispsz:18px;--dispsp:-.02em;--dispcase:none;
+  --num:'JetBrains Mono',monospace;--numw:700;--numsp:-.05em;
+  --lab:'Space Grotesk',sans-serif;--labsp:.14em;
+  --accent:#4ADE80;--bg:#08090C;--surface:#111318;--raised:#191C23;--line:#262B34}
+
+/* E — Oswald / Rajdhani. Clean modern athletics, electric blue. */
+#e .board{--disp:'Oswald',sans-serif;--dispw:700;--dispsz:19px;--dispsp:.01em;
+  --num:'Rajdhani',sans-serif;--numw:700;--numsp:-.01em;
+  --lab:'Rajdhani',sans-serif;--labsp:.13em;
+  --accent:#2F9BFF;--bg:#0A0C10;--surface:#14181F;--raised:#1C222B;--line:#2A323E}
+</style>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7BA6FF"/><stop offset="1" stop-color="#12379E"/></linearGradient>
+<linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDFEFF"/><stop offset="1" stop-color="#969DA8"/></linearGradient>
+<linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8A5C33"/><stop offset="1" stop-color="#4E3018"/></linearGradient>
+</defs></svg>
+
+<div id="host"></div>
+
+<script>
+const OR='M2.5 9L8 12L14 15L20 17L26 18L32 17.5L38 18.5L44 17L50 16L56 15'
+ +'L62 13.5L68 12L74 10.5L80 9L86 7.5L90 6L92 11L90 16L92 22L90 27L91 32'
+ +'L89.5 36L89 40L89 72L2 72L1.6 65L2.8 58L1.4 51L2.6 44L1.2 37L2.6 30L1.4 23L2.8 16Z';
+const tro=n=>'<svg viewBox="0 0 100 76"><path fill="url(#gw)" d="'+OR+'"/>'
+ +'<path fill="url(#g'+n+')" d="'+OR+'" transform="translate(50 39) scale(.8) translate(-50 -39)"/>'
+ +'<text x="50" y="53" fill="'+(n===1?'#0B2A6B':'#4A4F58')+'" stroke="'+(n===1?'#9CBEFF':'#fff')
+ +'" stroke-width=".6" paint-order="stroke">'+n+'</text></svg>';
+
+const bars=[['#7BA6FF',15],['#E8ECF2',11],['#F0B784',9],['#9AA0AA',7],['#8B909A',6],
+            ['#8B909A',5],['#8B909A',4],['#2E2E35',3],['#2E2E35',3],['#2E2E35',2],
+            ['#2E2E35',2],['#2E2E35',2],['#2E2E35',2],['#2E2E35',2],['#2E2E35',2],['#2E2E35',2]];
+
+const card=(n,name,lg,poll,q,win,qual,pts,odds)=>
+ '<div class="tcard" style="--q:'+q+'">'
+ +'<div class="head"><span class="rank">'+tro(n)+'</span>'
+ +'<span class="crest">'+name.slice(0,2).toUpperCase()+'</span>'
+ +'<span class="nm">'+name+'</span><i class="lg">'+lg+'</i>'
+ +'<span class="poll"><u>OSAA</u>'+poll+'</span></div>'
+ +'<div class="big">'
+ +'<span class="w"><b>'+win+'</b><i>wins state</i></span>'
+ +'<span class="q"><b>'+qual+'</b><i>reaches Lane</i></span>'
+ +'<span class="p"><b>'+pts+'</b><i>pts when there</i></span></div>'
+ +'<div class="strip">'+bars.map(b=>'<s style="background:'+b[0]+';height:'+b[1]+'px"></s>').join('')+'</div>'
+ +'<div class="odds">'+odds.map(o=>'<span class="odd"><b>'+o[0]+'</b><i>'+o[1]+'</i></span>').join('')+'</div>'
+ +'</div>';
+
+const O=[['a','A &middot; Anton + Barlow Condensed','what ships today'],
+         ['b','B &middot; Archivo Black + Saira Condensed','heavier, tighter, hotter red'],
+         ['c','C &middot; Bebas Neue + Roboto Slab','track programme, warm ground, gold'],
+         ['d','D &middot; Space Grotesk + JetBrains Mono','precision instrument, mono figures'],
+         ['e','E &middot; Oswald + Rajdhani','clean modern athletics, electric blue']];
+
+document.getElementById('host').innerHTML=O.map(([id,t,s])=>
+ '<div class="opt" id="'+id+'"><div class="hdr"><h2>'+t+'</h2><span>'+s+'</span></div>'
+ +'<div class="board"><h3 class="sec">Odds by team</h3>'
+ + card(1,'Grant','PIL','#10',0.97,'43%','97%','78',
+     [['88%','auto'],['9.2%','at-large'],['97%','top 10'],['90%','top 4']])
+ + card(2,'Central Catholic','MHC','#4',0.92,'12%','92%','121',
+     [['71%','auto'],['21%','at-large'],['84%','top 10'],['58%','top 4']])
+ +'</div></div>').join('');
+</script>
