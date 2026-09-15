@@ -1900,7 +1900,7 @@ Listed in the app's own "How" tab:
    then beats raw marks, ship it and re-run `marks_value.js` and `markw.js` —
    both should flip.
 2. ~~Horizon-dependent variance.~~ **Shipped** - see The horizon allowance.
-   The next step is to re-run  once a season has been scored against
+   The next step is to re-run `publish.js` once a season has been scored against
    the drift term in place, so the horizon table measures what now ships rather
    than what used to.
 3. **Model roster attrition directly** instead of hiding it in drift. About 6%
