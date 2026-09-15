@@ -1008,6 +1008,35 @@ is hidden below 430px - it is the one thing on that row with a whole view of its
 own, so it is the one that goes. Zero names truncate at 375px or at 1280px now.
 **Re-check this after any type change.**
 
+## Fitting a name that does not fit
+
+A few schools are longer than the card's name column: "Oregon School for the
+Deaf" wants 310px of a 245px slot. `fitNames()` shrinks **only** the names
+that overflow, then gives up the league abbreviation if that is still not
+enough. Three of 231 schools ever reach the first step and two reach the second.
+
+**Overflow is `scrollWidth > clientWidth` and nothing else.** When the text
+fits, the two are *equal*, so writing the test as `scrollWidth > clientWidth - 6`
+to "leave some slack" is true for every card on the board. That version sent all
+forty-five names into the shrink loop, 360 forced reflows, and took
+`buildBoard` from 25ms to **372ms**. Slack is taken *after* a name fits, by
+stepping down twice more. Never by loosening the test.
+
+**Write everything, then read everything, then fit.** Interleaving a style write
+with a geometry read makes the browser lay out on the spot, once per card.
+
+**It runs more than once on purpose.** `measure()` calls it at build time,
+when every rank still reads `#-`; `settle()` calls it again, plus once more
+on the next tick, because `paint` swaps four ranks for wider trophy marks and
+a rank grows from `#5` to `#32`. The column a name was fitted against is
+not the column it ends up in.
+
+**Card heights must stay identical**, because the step is measured from them.
+They were not: `.rank.tr` was 5px taller than `.rank`, so the four trophy
+cards ran into their gap. Both are the same height now, and `measure()` takes
+the **tallest** card rather than the first, so the next thing that breaks this
+costs a little dead space instead of an overlap.
+
 ## Performance
 
 Measured, on the live board: **135µs a season**, so 89 fit in the 12ms visible
@@ -1019,6 +1048,29 @@ close to a problem.
 innerHTML parsing for forty-five cards, not insertion - batching them into a
 DocumentFragment first barely moved it. Left alone rather than optimised into
 something harder to read.
+
+**Measured on the live board**, desktop, after the fixes above:
+
+| | |
+|---|---|
+| `domInteractive` | ~70ms |
+| seed parse, 4,923 rows | 6ms |
+| `buildModel` | 0.3ms |
+| `buildBoard`, 45 cards | 25ms, once per press of Run |
+| `fitNames` | 0.3ms typical, 9ms on the one board with long names |
+| one simulated season | ~150µs, so 80 fit in a 12ms frame |
+| `paint` full | 0.8ms |
+| page, gzipped | 158KB of a 526KB file |
+
+Nothing here is close to a problem. `buildBoard` is the only hitch and it is
+one frame at the moment of a button press, before a ten-second animation.
+
+**Two font faults worth knowing about, both invisible until measured.** Oswald
+500 was being downloaded and never used. Barlow 700 was being *rendered* and
+never downloaded, so every bold word in the prose was synthesised by the browser
+rather than drawn, which is a smear rather than a weight. Body bold is 600 now.
+**Check what the page actually renders against what the link actually asks for**
+after any type change.
 
 **The rule that matters: anything animating continuously on N elements must
 animate `transform` or `opacity`.** Everything else is a repaint per
@@ -1162,6 +1214,17 @@ accent and leaves 47 as hollow rings, which is a clearer read than a hundred
 dots at graded opacity. Labels inside a box have to fit that box: two of them
 overflowed at the first attempt and were shortened, with the long version moved
 to the caption where it has the full column width.
+
+## Deferred work must re-check its state
+
+`refreshView` guarded `RUN` at the top and then did the work inside
+`nextTick`, which is a frame later. Switch classification in that window and
+`clearOut` sets `RUN=null` before the callback runs, which threw
+`Cannot read properties of null` in ordinary use. Checking once on the way in
+only proves the state existed when the frame was **scheduled**.
+
+Anything deferred re-checks what it captured. The same reasoning as the run
+generation below, one level down.
 
 ## Cancelling a run
 

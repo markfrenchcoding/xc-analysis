@@ -29,7 +29,7 @@
 <meta name="twitter:image" content="https://chutexc.vercel.app/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;--glow:rgba(232,163,61,.18);
@@ -59,6 +59,10 @@
   color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Body bold is 600, not 700. Barlow 700 is not loaded, so a plain <b> in prose
+   was being synthesised by the browser - smeared rather than drawn. Components
+   that set their own weight beat this on specificity and are unaffected. */
+b,strong{font-weight:600}
 /* without color-scheme some mobile webviews force-dark the root canvas
    and the page background never follows the theme */
 html{margin:0;padding:0;background:var(--bg);color-scheme:dark;transition:background .3s}
@@ -484,7 +488,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   100%{transform:skewX(-9deg) scale(1)}}
 .rank.bump{animation:rankPop .42s var(--ease)}
 .tc-head{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-.rank{flex:none;min-width:37px;height:27px;padding:0 7px;border-radius:5px;display:grid;place-items:center;
+.rank{flex:none;min-width:37px;height:31px;padding:0 7px;border-radius:5px;display:grid;place-items:center;
   background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
   transition:background .4s,border-color .4s}
 .rank u{display:block;transform:skewX(9deg);text-decoration:none;
@@ -908,7 +912,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   .tcard .tc-big b{font-size:38px}
   .tcard .tc-big .pnum b{font-size:30px}
   .tc-name b{font-size:24px}
-  .rank{min-width:42px;height:30px}
+  .rank{min-width:42px;height:35px}
   .rank u{font-size:19px}
   .rank.tr{width:46px;height:35px}
   .crest{width:30px;height:30px}
@@ -6725,12 +6729,84 @@ function buildBoard(tally){
 }
 
 // Measure a rendered card rather than assuming a height — this is what prevents overlap.
+/* A handful of schools are simply longer than the column: "Oregon School for
+   the Deaf" wants 310px of a 245px slot at the desktop size. Cutting the size
+   for every card to suit three of 231 would be the wrong trade, so only the
+   names that overflow step down, and only as far as they need to.
+   This is safe for the measured step because the head row is governed by the
+   rank mark (35px) and not by the name line box (26px at full size), so
+   shrinking a name cannot change a card height. If the rank ever gets
+   shorter than the name, this starts causing overlap - check both. */
+function fitNames(){
+  if(!cards.length)return;
+  /* A handful of schools are longer than the column. "Oregon School for the
+     Deaf" wants 310px of a 245px slot at the desktop size, and cutting every
+     card to suit three of 231 would be the wrong trade, so only the names that
+     overflow step down, and only as far as they need to.
+
+     TWO THINGS HERE ARE EASY TO GET WRONG, and I got both wrong first.
+
+     One: overflow is scrollWidth > clientWidth, and nothing else. When the text
+     FITS the two are equal, so a "leave some slack" test written as
+     scrollWidth > clientWidth - 6 is true for every card on the board. That
+     version sent all forty-five into the shrink loop for 360 forced reflows and
+     took buildBoard from 25ms to 372ms. Slack is taken AFTER a name fits, by
+     stepping down twice more, never by loosening the test.
+
+     Two: writing a style and then reading a geometry makes the browser lay out
+     on the spot. Write everything, then read everything, then do the real work
+     on the one or two that need it.
+
+     The slack matters because the column moves under us: a rank reads "#-" at
+     build, "#5" mid-run and "#32" at rest, and the trophy marks are wider
+     again. A name fitted to the exact pixel re-clips the moment any of that
+     changes. This is also safe for the measured step, because the head row is
+     governed by the rank mark and not by the name's line box. */
+  const all=[];
+  for(const {el} of cards){
+    const b=el.querySelector(".tc-name b");
+    if(!b)continue;
+    if(b.style.fontSize)b.style.fontSize="";
+    const lg=el.querySelector(".tc-lg");
+    if(lg&&lg.style.display)lg.style.display="";
+    all.push({b,lg});
+  }
+  const over=[];
+  for(const x of all) if(x.b.scrollWidth>x.b.clientWidth+1) over.push(x);
+  if(!over.length)return;
+
+  for(const {b,lg} of over){
+    let px=parseFloat(getComputedStyle(b).fontSize);
+    const floor=px*0.78, STEP=0.75;
+    const fits=()=>b.scrollWidth<=b.clientWidth+1;
+    while(px>floor&&!fits()){px-=STEP;b.style.fontSize=px.toFixed(2)+"px";}
+    /* Still short at 78%? Give it the league abbreviation. That is already the
+       first thing dropped on a phone and it has a whole view of its own, so one
+       card without a three-letter tag beats one name set six points smaller
+       than every name around it. */
+    if(lg&&!fits()){
+      lg.style.display="none";
+      while(px>floor&&!fits()){px-=STEP;b.style.fontSize=px.toFixed(2)+"px";}
+    }
+    // two steps of margin, so the next shift of the column does not re-clip
+    for(let k=0;k<2&&px-STEP>floor;k++){px-=STEP;b.style.fontSize=px.toFixed(2)+"px";}
+  }
+}
+
 function measure(){
   if(!cards.length)return;
-  const h=cards[0].el.getBoundingClientRect().height;
+  /* The TALLEST card, not the first. Card heights are meant to be identical
+     and were not: the four trophy marks were 5px taller than the plain rank
+     chips, so the step came off whichever card happened to sit first in the
+     DOM and the top four ran 5px into their gap. The heights are equal again,
+     and taking the max means the next thing that makes one card taller costs
+     a little dead space instead of an overlap. */
+  let h=0;
+  for(const c of cards){const y=c.el.getBoundingClientRect().height;if(y>h)h=y;}
   if(h>0) stepH=Math.round(h)+7;
   const board=document.getElementById("board");
   if(board) board.style.height=(cards.length*stepH)+"px";
+  fitNames();
 }
 
 function paint(tally,done,full){
@@ -6809,6 +6885,13 @@ function paint(tally,done,full){
 // once the pack finishes, drain the spectrum out and settle into the real colours
 function settle(tally){
   document.getElementById("board").classList.remove("running");
+  /* Re-fit the names here as well as in measure(). measure() runs inside
+     buildBoard, when every rank still reads "#-"; paint then swaps four of
+     them for trophy marks, which are wider, so the name column a card was
+     fitted against is not the column it ends up with. Fit once more when the
+     board has stopped moving. */
+  fitNames();
+  nextTick(fitNames);
   for(const {el,t} of cards){
     let maxH=1;
     for(let p=1;p<=FIELD;p++) if(t.hist[p]>maxH)maxH=t.hist[p];
@@ -7322,12 +7405,17 @@ function paintActive(full){
     }
   }
 }
+/* The guard at the top is not enough, and this threw in the wild. The work
+   happens inside nextTick, which is a frame later; switch classification in
+   that window and clearOut sets RUN=null before the callback runs. Checking
+   once on the way in only proves RUN existed when the frame was SCHEDULED.
+   Anything deferred has to re-check the state it captured. */
 function refreshView(){
   if(!RUN)return;
   if(VIEW==="v-teams"&&cards.length)
-    nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(RUN.tally,RUN.done,true);});
+    nextTick(()=>{if(!RUN)return;measure();cards.forEach(c=>c.pos=-1);paint(RUN.tally,RUN.done,true);});
   else if(VIEW==="v-runners"&&rcards.length)
-    nextTick(()=>{measureRun();rcards.forEach(c=>c.pos=-1);paintRunners(RUN.pool,RUN.done,RUN.lock);});
+    nextTick(()=>{if(!RUN)return;measureRun();rcards.forEach(c=>c.pos=-1);paintRunners(RUN.pool,RUN.done,RUN.lock);});
   else if(VIEW==="v-leagues")
     renderLeagues(RUN.tally,RUN.model,RUN.done);
 }
