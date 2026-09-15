@@ -201,7 +201,18 @@
          name, silently. athletic.net carries nicknames that way, so this is not
          hypothetical: Benjamin "Finley" Crowell and Abigail "Abbie" Hamilton
          both arrived with the deeper roster cap. */
-      keep.push({ g: r.g, name: String(r.name || '').replace(/[",]/g, ' ')
+      /* The one untrusted input in the whole system. Athlete names come from
+         athletic.net and end up interpolated into innerHTML on five different
+         boards, so anything that could be read as markup is removed here, at
+         ingest, rather than trusted to be escaped correctly at twenty render
+         sites. Quotes and commas would break the CSV; angle brackets and
+         ampersands would break the page. Apostrophes stay - O'Brien and St
+         Mary's are real, and an apostrophe cannot escape a double-quoted
+         attribute or a text node. */
+      keep.push({ g: r.g, name: String(r.name || '').replace(/[",<>&]/g, ' ')
+                    /* tab, newline and return are whitespace and are left for the
+                       collapse below; only the unprintable rest is dropped. */
+                    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
                     .replace(/\s+/g, ' ').trim(),
                   sec, date: r.date || '', grade: String(r.grade || '').replace(/\D/g, ''),
                   team: b.name, cls: b.cls });

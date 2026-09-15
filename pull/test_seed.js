@@ -82,6 +82,22 @@ eq(nick[0], 'Benjamin Finley Crowell', 'a nickname loses its quotes');
 eq(nick[1], 'Stray Quote', 'an unmatched quote is removed too');
 eq(nick[2], "Sean O'Brien", 'an apostrophe is left alone');
 
+/* A name is the one piece of untrusted input in the whole system: it comes from
+   athletic.net and ends up interpolated into innerHTML on five different
+   boards. Nothing that can be read as markup may survive the pull. These are
+   real payloads rather than a regex restated - the point is that the STRING
+   coming out cannot open a tag or an entity, however it got in. */
+const eviL = S.buildSeed([
+  { g:'M', name:'<img src=x onerror=alert(1)>', school:'Jesuit', grade:'10', seconds:'16:00.00', dist:5000, date:'2026-09-05' },
+  { g:'M', name:'</script><script>alert(1)</script>', school:'Jesuit', grade:'10', seconds:'16:01.00', dist:5000, date:'2026-09-05' },
+  { g:'M', name:'Amp &amp; Entity &#60;', school:'Jesuit', grade:'11', seconds:'16:02.00', dist:5000, date:'2026-09-05' },
+  { g:'M', name:'Tab\tand\u0000null', school:'Jesuit', grade:'11', seconds:'16:03.00', dist:5000, date:'2026-09-05' },
+], board).csv.split('\n').slice(1).map(l => l.split(',')[1]);
+ok(eviL.every(n => !/[<>&"]/.test(n)), 'no name can carry a markup character');
+ok(eviL.every(n => !/[\u0000-\u001F\u007F]/.test(n)), 'and no control characters either');
+eq(eviL[0], 'img src=x onerror=alert(1)', 'a tag is defanged, not deleted');
+eq(eviL[3], 'Tab andnull', 'a tab collapses to a space and a null simply goes');
+
 /* ---------- trimming actually happens ----------
    An eighth athlete and a fourth mark have to be discarded, or the round trip
    above is passing because nothing was ever over the cap. */

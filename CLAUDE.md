@@ -210,6 +210,11 @@ optical middle of the glyphs on the middle of the shape. Checked by measuring
 both bounding boxes rather than by eye: the text centre lands at 49.5, 36.9
 against the plate's 50, 36.9.
 
+**Nothing about a place should read as black.** `--t4` was
+`#868C96 -> #24272D`, which on the 4th-place distribution bar and its legend
+swatch read as no colour at all rather than as a finish. It is pewter now, the
+same metal as the fourth trophy plate, in both themes.
+
 **The number is solid black, which is why the plates were lightened.** The four
 plate gradients are the same four finishes as `--t1`..`--t4` but a good
 deal lighter, because black has to read across the whole plate and not only
@@ -1055,7 +1060,83 @@ hardcoded here for the same reason it is in the favicon.
 
 The app still works without the file; only the shortcut changes.
 
+## Security
+
+**The site cannot be stopped from being duplicated, and nothing here pretends
+otherwise.** It is a static page; every visitor is handed the complete source,
+including the seed. Minifying or obfuscating would cost readability and buy
+nothing against anybody who can press View Source. What is actually protected is
+the *domain* and the *record* - the archive's commit dates live in a public
+repository, which is a claim a copy cannot make.
+
+**The one untrusted input is an athlete's name.** It comes from athletic.net and
+ends up interpolated into `innerHTML` on five boards. `pull/seed.js` strips
+`< > & "` and unprintable control characters at ingest, so nothing that could
+be read as markup ever enters the data. Tab, newline and return are left for the
+whitespace collapse. **Apostrophes stay** - O'Brien and St Mary's are real, and
+an apostrophe cannot escape a double-quoted attribute or a text node.
+
+Sanitising at ingest rather than escaping at twenty render sites is deliberate:
+one choke point that the tests can aim at, instead of a rule every future
+`innerHTML` has to remember. `pull/test_seed.js` fires real payloads at it -
+an `<img onerror>`, a `</script>` break-out, entities, a null byte - and
+asserts on the string that comes out, not on the regex restated.
+
+`initials()` was already safe and worth knowing why: it strips everything but
+`[A-Za-z ]` and returns at most two letters, which is what makes the inline
+`onerror` in `crest()` unexploitable.
+
+**`vercel.json` carries the headers.** `nosniff`, `frame-ancestors none`
+and `X-Frame-Options: DENY` (the site is never framed), HSTS with preload, a
+locked-down Permissions-Policy, and a CSP whose `default-src` is `none` with
+each source opened only where it is used: fonts from gstatic, crests from
+googleusercontent, and `connect-src none` on the app because the page makes no
+requests of its own. `/pull/` gets its own looser policy, because the refresh
+harness genuinely does call athletic.net.
+
+**The CSP has to keep `unsafe-inline` for scripts, and that is a real
+limitation rather than an oversight.** The app is one inline `<script>`, so the
+alternatives are a nonce or a hash. A nonce needs a server rendering the page
+per request, which there isn't. A hash would work - and would also block
+injected inline handlers, which is the whole prize - but **the weekly refresh
+rewrites `index.html`**, so the hash would go stale on every data pull and
+take the site down until somebody noticed. Adding hash recomputation to an
+unattended job that already refuses more readily than it writes is a worse trade
+than sanitising at ingest. If `crawl.js` ever learns to write the hash into
+`vercel.json`, revisit this.
+
+Adding `vercel.json` does **not** change the framework preset. It must stay
+**Other**.
+
+## Presentability
+
+**The Teams board is the default view of the default tab**, and it was an empty
+div until somebody pressed Run - Runners and Leagues both said "press Run",
+Teams said nothing at all. It now carries a real empty state that names what the
+board is rather than only that it is not filled in yet.
+
+**Shared links carried no title, description or image.** There is a description,
+an Open Graph set and a Twitter card now, and `og.png` comes out of the same
+generator as the home-screen icon. That card has no wordmark on purpose: the
+encoder has no font, and drawing letters would mean shipping a rasteriser to
+repeat what the preview's own title already says.
+
 ## The How tab diagrams
+
+**The qualification diagram animates the process rather than labelling a picture
+of it.** Two teams light up in each of the seven leagues, wires carry them
+across, and sixteen seats fill at Lane - fourteen in order, then two more a beat
+later with a dashed ring, because those two were chosen rather than earned. It
+replays on tap or Enter, and plays itself once when it first scrolls into view.
+
+**The rule that makes that safe: at rest the drawing is COMPLETE.** `.run`
+parks the parts at `scale(0)` so they can pop in, which means that while it is
+set the figure is *incomplete*. So `play()` takes the class off again on a
+timer longer than the longest animation in any of the three. The entrance plays,
+and either way the figure ends up back at its resting state. **A timer fires
+when a frame callback might not** - a throttled tab, a frozen clock, an engine
+that skips the animation - and without that fallback the figure would sit empty
+for good. Never leave content depending on an animation to become visible.
 
 **All three are drawn on a 200-unit-wide viewBox, and that is the whole mobile
 fix.** A figure is always the column width, so a label written at 8 units on a

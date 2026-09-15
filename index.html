@@ -14,6 +14,19 @@
      need it. The app still works without the file; only the shortcut changes. -->
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Chute">
+<meta name="description" content="Monte Carlo odds for Oregon high school cross country. Chute plays the rest of the season out thousands of times and reports every team's chance of reaching the state meet at Lane.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Chute">
+<meta property="og:title" content="Chute — Oregon cross country odds">
+<meta property="og:description" content="Every team's chance of reaching Lane, from thousands of simulated seasons. All five classifications, boys and girls, scored against seasons we already know the answer to.">
+<meta property="og:url" content="https://chutexc.vercel.app/">
+<meta property="og:image" content="https://chutexc.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chute — Oregon cross country odds">
+<meta name="twitter:description" content="Every team's chance of reaching Lane, from thousands of simulated seasons.">
+<meta name="twitter:image" content="https://chutexc.vercel.app/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,7 +38,7 @@
   --t1:linear-gradient(180deg,#7BA6FF,#12379E);--t1e:#9CBEFF;
   --t2:linear-gradient(180deg,#FDFEFF,#969DA8);--t2e:#E8ECF2;
   --t3:linear-gradient(180deg,#F0B784,#834C1D);--t3e:#F2C79D;
-  --t4:linear-gradient(180deg,#868C96,#24272D);--t4e:#9AA0AA;
+  --t4:linear-gradient(180deg,#C6CBD2,#7E848D);--t4e:#B0B6BE;
   --tmid:#8B909A;--rain:rgba(204,228,248,.7);
   --shadow:0 1px 2px rgba(0,0,0,.4);
   --ease:cubic-bezier(.22,1,.36,1);
@@ -40,7 +53,7 @@
   --t1:linear-gradient(180deg,#4C7BEB,#0B2F8F);--t1e:#2C55BE;
   --t2:linear-gradient(180deg,#FFFFFF,#8D949F);--t2e:#B9C0CA;
   --t3:linear-gradient(180deg,#E3A96E,#7A4519);--t3e:#C08A55;
-  --t4:linear-gradient(180deg,#5C626C,#15171B);--t4e:#3C4149;
+  --t4:linear-gradient(180deg,#9BA1AA,#5A606A);--t4e:#767C86;
   --tmid:#767C86;
   --shadow:0 1px 2px rgba(20,20,25,.07);
   color-scheme:light;
@@ -714,6 +727,16 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .note code{background:var(--raised);padding:1px 4px;border-radius:3px;font-size:11.5px;
   color:var(--text);font-family:ui-monospace,Menlo,monospace;word-break:break-all}
 .empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:14px}
+/* The first thing a visitor sees, so it says what the board is rather than
+   only that it is not filled in yet. */
+.empty.start{padding:30px 18px 34px}
+.empty.start svg{width:104px;height:auto;display:block;margin:0 auto 14px;overflow:visible}
+.empty.start .es-dots circle{fill:var(--accent);opacity:.9}
+.empty.start .es-line{stroke:var(--line);stroke-width:1.6;fill:none}
+.empty.start b{display:block;font-family:var(--disp);font-weight:700;font-size:17px;
+  text-transform:uppercase;letter-spacing:.03em;color:var(--text);margin-bottom:7px}
+.empty.start i{display:block;font-style:normal;font-size:13px;color:var(--dim);
+  line-height:1.5;max-width:44ch;margin:0 auto}
 .toast{position:fixed;left:50%;bottom:78px;transform:translate(-50%,12px);background:var(--raised);
   border:1px solid var(--line);padding:8px 14px;border-radius:9px;font-size:13px;opacity:0;
   pointer-events:none;transition:all .3s var(--ease);z-index:60;color:var(--text)}
@@ -785,6 +808,48 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   text-transform:uppercase;letter-spacing:.06em}
 .dg-num{font-size:11px;fill:var(--text);font-family:var(--num);font-weight:700}
 .dg-big{font-size:17px;fill:var(--accent);font-family:var(--num);font-weight:700}
+
+/* ---------- the road to Lane ----------
+   The diagram animates the process rather than labelling a picture of it: two
+   runners light up in each league, a wire carries them across, and sixteen
+   seats fill at Lane - fourteen in order, then two more a beat later with a
+   ring around them, because those two were chosen rather than earned.
+   Everything here animates transform, opacity or stroke-dashoffset, and only
+   while .run is set - at rest the drawing is complete, so a reader who never
+   triggers it still sees the whole thing. */
+.ql{cursor:pointer}
+.ql-lane{fill:var(--raised);stroke:var(--line)}
+.ql-node{fill:var(--surface);stroke:var(--line)}
+.ql-node.wild{stroke-dasharray:3 2.5}
+.ql-lane-box{fill:var(--surface);stroke:var(--accent);stroke-width:1.2}
+.ql-in{fill:var(--accent)}
+.ql-out{fill:var(--line)}
+.ql-wire{fill:none;stroke:var(--accent);stroke-width:1.1;opacity:.55}
+.ql-seat{fill:var(--accent)}
+.ql-seat.wild{fill:var(--surface);stroke:var(--accent);stroke-width:1.4;stroke-dasharray:2.4 1.8}
+.ql-n{font-family:var(--num);font-weight:700;font-size:13px;fill:var(--text)}
+.ql-t{font-size:5.4px;fill:var(--dim);letter-spacing:.02em}
+.ql-hd{font-family:var(--disp);font-weight:600;font-size:7px;fill:var(--accent);
+  letter-spacing:.12em}
+.ql-again{display:block;margin-top:5px;font-size:10px;color:var(--dim);
+  letter-spacing:.06em;text-transform:uppercase}
+
+.ql.run .ql-in,.ql.run .ql-seat{transform-box:fill-box;transform-origin:center;
+  animation:qlPop .42s var(--ease) both;animation-delay:var(--d,0ms)}
+@keyframes qlPop{from{transform:scale(0);opacity:0}60%{transform:scale(1.35)}to{transform:scale(1);opacity:1}}
+.ql.run .ql-wire{stroke-dasharray:60;stroke-dashoffset:60;
+  animation:qlDraw .5s var(--ease) both;animation-delay:var(--d,0ms)}
+@keyframes qlDraw{to{stroke-dashoffset:0}}
+.ql.run .ql-lane-box{animation:qlGlow 1.1s var(--ease) 1.5s both}
+@keyframes qlGlow{0%,100%{stroke-width:1.2}45%{stroke-width:2.6}}
+
+/* ---------- the other two, same rule: complete at rest ---------- */
+.pcd.run circle{transform-box:fill-box;transform-origin:center;
+  animation:qlPop .3s var(--ease) both;animation-delay:var(--d,0ms)}
+.curve.run .cv-path{stroke-dasharray:420;stroke-dashoffset:420;
+  animation:qlDraw 1.5s var(--ease) both}
+.curve.run .cv-fill{animation:qlFade .8s ease-out .7s both}
+@keyframes qlFade{from{opacity:0}to{opacity:1}}
 .dg-box{fill:var(--surface);stroke:var(--line)}
 .dg-line{stroke:var(--line);fill:none}
 .doc code{background:var(--raised);padding:1px 5px;border-radius:3px;font-size:11.5px;
@@ -5915,9 +5980,9 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
       <h3>The short version</h3>
       <p>Chute plays the rest of the season out, from here to the finish at Lane, and then does it again. Thousands of times. Every league meet, every selection decision, every state race. The numbers on the board are simply how often each thing happened.</p>
 
-      <figure>
-        <svg viewBox="0 0 200 86" role="img" aria-label="One hundred dots, fifty-three of them filled in">
-          <circle cx="10.0" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="19.5" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="28.9" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="38.4" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="47.9" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="57.4" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="66.8" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="76.3" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="85.8" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="95.2" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="104.7" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="114.2" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="123.6" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="133.1" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="142.6" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="152.1" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="161.5" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="171.0" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="180.5" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="189.9" cy="10.0" r="3.5" fill="var(--accent)"/><circle cx="10.0" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="19.5" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="28.9" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="38.4" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="47.9" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="57.4" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="66.8" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="76.3" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="85.8" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="95.2" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="104.7" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="114.2" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="123.6" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="133.1" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="142.6" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="152.1" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="161.5" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="171.0" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="180.5" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="189.9" cy="21.4" r="3.5" fill="var(--accent)"/><circle cx="10.0" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="19.5" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="28.9" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="38.4" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="47.9" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="57.4" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="66.8" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="76.3" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="85.8" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="95.2" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="104.7" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="114.2" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="123.6" cy="32.8" r="3.5" fill="var(--accent)"/><circle cx="133.1" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="142.6" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="152.1" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="161.5" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="171.0" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="180.5" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="189.9" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="10.0" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="19.5" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="28.9" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="38.4" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="47.9" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="57.4" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="66.8" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="76.3" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="85.8" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="95.2" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="104.7" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="114.2" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="123.6" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="133.1" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="142.6" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="152.1" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="161.5" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="171.0" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="180.5" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="189.9" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="10.0" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="19.5" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="28.9" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="38.4" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="47.9" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="57.4" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="66.8" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="76.3" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="85.8" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="95.2" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="104.7" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="114.2" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="123.6" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="133.1" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="142.6" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="152.1" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="161.5" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="171.0" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="180.5" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="189.9" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/>
+      <figure class="pcd" tabindex="0">
+        <svg class="pcd-svg" viewBox="0 0 200 86" role="img" aria-label="One hundred dots, fifty-three of them filled in">
+          <circle cx="10.0" cy="10.0" r="3.5" fill="var(--accent)" style="--d:60ms"/><circle cx="19.5" cy="10.0" r="3.5" fill="var(--accent)" style="--d:89ms"/><circle cx="28.9" cy="10.0" r="3.5" fill="var(--accent)" style="--d:117ms"/><circle cx="38.4" cy="10.0" r="3.5" fill="var(--accent)" style="--d:145ms"/><circle cx="47.9" cy="10.0" r="3.5" fill="var(--accent)" style="--d:174ms"/><circle cx="57.4" cy="10.0" r="3.5" fill="var(--accent)" style="--d:202ms"/><circle cx="66.8" cy="10.0" r="3.5" fill="var(--accent)" style="--d:230ms"/><circle cx="76.3" cy="10.0" r="3.5" fill="var(--accent)" style="--d:259ms"/><circle cx="85.8" cy="10.0" r="3.5" fill="var(--accent)" style="--d:287ms"/><circle cx="95.2" cy="10.0" r="3.5" fill="var(--accent)" style="--d:316ms"/><circle cx="104.7" cy="10.0" r="3.5" fill="var(--accent)" style="--d:344ms"/><circle cx="114.2" cy="10.0" r="3.5" fill="var(--accent)" style="--d:373ms"/><circle cx="123.6" cy="10.0" r="3.5" fill="var(--accent)" style="--d:401ms"/><circle cx="133.1" cy="10.0" r="3.5" fill="var(--accent)" style="--d:429ms"/><circle cx="142.6" cy="10.0" r="3.5" fill="var(--accent)" style="--d:458ms"/><circle cx="152.1" cy="10.0" r="3.5" fill="var(--accent)" style="--d:486ms"/><circle cx="161.5" cy="10.0" r="3.5" fill="var(--accent)" style="--d:515ms"/><circle cx="171.0" cy="10.0" r="3.5" fill="var(--accent)" style="--d:543ms"/><circle cx="180.5" cy="10.0" r="3.5" fill="var(--accent)" style="--d:572ms"/><circle cx="189.9" cy="10.0" r="3.5" fill="var(--accent)" style="--d:600ms"/><circle cx="10.0" cy="21.4" r="3.5" fill="var(--accent)" style="--d:94ms"/><circle cx="19.5" cy="21.4" r="3.5" fill="var(--accent)" style="--d:123ms"/><circle cx="28.9" cy="21.4" r="3.5" fill="var(--accent)" style="--d:151ms"/><circle cx="38.4" cy="21.4" r="3.5" fill="var(--accent)" style="--d:179ms"/><circle cx="47.9" cy="21.4" r="3.5" fill="var(--accent)" style="--d:208ms"/><circle cx="57.4" cy="21.4" r="3.5" fill="var(--accent)" style="--d:236ms"/><circle cx="66.8" cy="21.4" r="3.5" fill="var(--accent)" style="--d:265ms"/><circle cx="76.3" cy="21.4" r="3.5" fill="var(--accent)" style="--d:293ms"/><circle cx="85.8" cy="21.4" r="3.5" fill="var(--accent)" style="--d:322ms"/><circle cx="95.2" cy="21.4" r="3.5" fill="var(--accent)" style="--d:350ms"/><circle cx="104.7" cy="21.4" r="3.5" fill="var(--accent)" style="--d:378ms"/><circle cx="114.2" cy="21.4" r="3.5" fill="var(--accent)" style="--d:407ms"/><circle cx="123.6" cy="21.4" r="3.5" fill="var(--accent)" style="--d:435ms"/><circle cx="133.1" cy="21.4" r="3.5" fill="var(--accent)" style="--d:464ms"/><circle cx="142.6" cy="21.4" r="3.5" fill="var(--accent)" style="--d:492ms"/><circle cx="152.1" cy="21.4" r="3.5" fill="var(--accent)" style="--d:521ms"/><circle cx="161.5" cy="21.4" r="3.5" fill="var(--accent)" style="--d:549ms"/><circle cx="171.0" cy="21.4" r="3.5" fill="var(--accent)" style="--d:577ms"/><circle cx="180.5" cy="21.4" r="3.5" fill="var(--accent)" style="--d:606ms"/><circle cx="189.9" cy="21.4" r="3.5" fill="var(--accent)" style="--d:634ms"/><circle cx="10.0" cy="32.8" r="3.5" fill="var(--accent)" style="--d:128ms"/><circle cx="19.5" cy="32.8" r="3.5" fill="var(--accent)" style="--d:157ms"/><circle cx="28.9" cy="32.8" r="3.5" fill="var(--accent)" style="--d:185ms"/><circle cx="38.4" cy="32.8" r="3.5" fill="var(--accent)" style="--d:214ms"/><circle cx="47.9" cy="32.8" r="3.5" fill="var(--accent)" style="--d:242ms"/><circle cx="57.4" cy="32.8" r="3.5" fill="var(--accent)" style="--d:271ms"/><circle cx="66.8" cy="32.8" r="3.5" fill="var(--accent)" style="--d:299ms"/><circle cx="76.3" cy="32.8" r="3.5" fill="var(--accent)" style="--d:327ms"/><circle cx="85.8" cy="32.8" r="3.5" fill="var(--accent)" style="--d:356ms"/><circle cx="95.2" cy="32.8" r="3.5" fill="var(--accent)" style="--d:384ms"/><circle cx="104.7" cy="32.8" r="3.5" fill="var(--accent)" style="--d:413ms"/><circle cx="114.2" cy="32.8" r="3.5" fill="var(--accent)" style="--d:441ms"/><circle cx="123.6" cy="32.8" r="3.5" fill="var(--accent)" style="--d:469ms"/><circle cx="133.1" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="142.6" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="152.1" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="161.5" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="171.0" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="180.5" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="189.9" cy="32.8" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="10.0" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="19.5" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="28.9" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="38.4" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="47.9" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="57.4" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="66.8" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="76.3" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="85.8" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="95.2" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="104.7" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="114.2" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="123.6" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="133.1" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="142.6" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="152.1" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="161.5" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="171.0" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="180.5" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="189.9" cy="44.2" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="10.0" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="19.5" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="28.9" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="38.4" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="47.9" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="57.4" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="66.8" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="76.3" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="85.8" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="95.2" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="104.7" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="114.2" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="123.6" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="133.1" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="142.6" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="152.1" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="161.5" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="171.0" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="180.5" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/><circle cx="189.9" cy="55.6" r="3.1" fill="none" stroke="var(--line)" stroke-width="1.4"/>
           <text class="dg-big" x="10" y="80">53</text>
           <text class="dg-key" x="30" y="80">won</text>
           <text class="dg-lbl" x="52" y="80">&middot;  47 lost</text>
@@ -5937,45 +6002,48 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
       <h3>A season is not one race</h3>
       <p>Line every runner up at their season best and you learn who is fastest on paper. You do not learn how likely anything is — and paper does not run in November.</p>
 
-      <figure>
-        <svg viewBox="0 0 200 104" role="img" aria-label="Seven leagues send fourteen teams automatically and two more on at-large places, making a field of sixteen at Lane">
-          <rect class="dg-box" x="2" y="8" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="11.75" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="11.75" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 11.75 H 62"/><rect class="dg-box" x="2" y="18.5" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="22.25" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="22.25" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 22.25 H 62"/><rect class="dg-box" x="2" y="29" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="32.75" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="32.75" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 32.75 H 62"/><rect class="dg-box" x="2" y="39.5" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="43.25" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="43.25" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 43.25 H 62"/><rect class="dg-box" x="2" y="50" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="53.75" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="53.75" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 53.75 H 62"/><rect class="dg-box" x="2" y="60.5" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="64.25" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="64.25" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 64.25 H 62"/><rect class="dg-box" x="2" y="71" width="46" height="7.5" rx="2.5"/><circle cx="8" cy="74.75" r="1.9" fill="var(--accent)"/><circle cx="13.5" cy="74.75" r="1.9" fill="var(--accent)"/><path class="dg-line" d="M48 74.75 H 62"/>
-          <text class="dg-lbl" x="25" y="93" text-anchor="middle">7 leagues</text>
-          <text class="dg-lbl" x="25" y="100" text-anchor="middle">race their own meet</text>
+      <figure class="ql" tabindex="0" role="img"
+        aria-label="Seven leagues send their top two teams straight to Lane, fourteen in all. A committee adds two more from the teams that finished third. Sixteen race at Lane in November.">
+        <svg viewBox="0 0 200 92">
+          <rect class="ql-lane" x="2" y="5" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:0ms" cx="8.5" cy="9" r="2.3"/><circle class="ql-in" style="--d:45ms" cx="15" cy="9" r="2.3"/><circle class="ql-out" cx="21.5" cy="9" r="1.9"/><circle class="ql-out" cx="28" cy="9" r="1.9"/><circle class="ql-out" cx="34.5" cy="9" r="1.9"/><circle class="ql-out" cx="41" cy="9" r="1.9"/><path class="ql-wire" style="--d:0ms" d="M46 9 H 54 V 29"/><rect class="ql-lane" x="2" y="16" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:90ms" cx="8.5" cy="20" r="2.3"/><circle class="ql-in" style="--d:135ms" cx="15" cy="20" r="2.3"/><circle class="ql-out" cx="21.5" cy="20" r="1.9"/><circle class="ql-out" cx="28" cy="20" r="1.9"/><circle class="ql-out" cx="34.5" cy="20" r="1.9"/><circle class="ql-out" cx="41" cy="20" r="1.9"/><path class="ql-wire" style="--d:90ms" d="M46 20 H 54 V 29"/><rect class="ql-lane" x="2" y="27" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:180ms" cx="8.5" cy="31" r="2.3"/><circle class="ql-in" style="--d:225ms" cx="15" cy="31" r="2.3"/><circle class="ql-out" cx="21.5" cy="31" r="1.9"/><circle class="ql-out" cx="28" cy="31" r="1.9"/><circle class="ql-out" cx="34.5" cy="31" r="1.9"/><circle class="ql-out" cx="41" cy="31" r="1.9"/><path class="ql-wire" style="--d:180ms" d="M46 31 H 54 V 29"/><rect class="ql-lane" x="2" y="38" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:270ms" cx="8.5" cy="42" r="2.3"/><circle class="ql-in" style="--d:315ms" cx="15" cy="42" r="2.3"/><circle class="ql-out" cx="21.5" cy="42" r="1.9"/><circle class="ql-out" cx="28" cy="42" r="1.9"/><circle class="ql-out" cx="34.5" cy="42" r="1.9"/><circle class="ql-out" cx="41" cy="42" r="1.9"/><path class="ql-wire" style="--d:270ms" d="M46 42 H 54 V 29"/><rect class="ql-lane" x="2" y="49" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:360ms" cx="8.5" cy="53" r="2.3"/><circle class="ql-in" style="--d:405ms" cx="15" cy="53" r="2.3"/><circle class="ql-out" cx="21.5" cy="53" r="1.9"/><circle class="ql-out" cx="28" cy="53" r="1.9"/><circle class="ql-out" cx="34.5" cy="53" r="1.9"/><circle class="ql-out" cx="41" cy="53" r="1.9"/><path class="ql-wire" style="--d:360ms" d="M46 53 H 54 V 29"/><rect class="ql-lane" x="2" y="60" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:450ms" cx="8.5" cy="64" r="2.3"/><circle class="ql-in" style="--d:495ms" cx="15" cy="64" r="2.3"/><circle class="ql-out" cx="21.5" cy="64" r="1.9"/><circle class="ql-out" cx="28" cy="64" r="1.9"/><circle class="ql-out" cx="34.5" cy="64" r="1.9"/><circle class="ql-out" cx="41" cy="64" r="1.9"/><path class="ql-wire" style="--d:450ms" d="M46 64 H 54 V 29"/><rect class="ql-lane" x="2" y="71" width="44" height="8" rx="4"/><circle class="ql-in" style="--d:540ms" cx="8.5" cy="75" r="2.3"/><circle class="ql-in" style="--d:585ms" cx="15" cy="75" r="2.3"/><circle class="ql-out" cx="21.5" cy="75" r="1.9"/><circle class="ql-out" cx="28" cy="75" r="1.9"/><circle class="ql-out" cx="34.5" cy="75" r="1.9"/><circle class="ql-out" cx="41" cy="75" r="1.9"/><path class="ql-wire" style="--d:540ms" d="M46 75 H 54 V 29"/>
+          <path class="ql-wire" style="--d:660ms" d="M54 62 V 70 H 62"/>
 
-          <rect class="dg-box" x="64" y="14" width="58" height="22" rx="5"/>
-          <text class="dg-num" x="93" y="26" text-anchor="middle">14</text>
-          <text class="dg-lbl" x="93" y="33" text-anchor="middle">top two advance</text>
+          <rect class="ql-node" x="54" y="20" width="56" height="18" rx="5"/>
+          <text class="ql-n" x="63" y="32">14</text>
+          <text class="ql-t" x="76" y="28">straight</text>
+          <text class="ql-t" x="76" y="35">through</text>
 
-          <rect class="dg-box" x="64" y="48" width="58" height="22" rx="5" stroke-dasharray="3 2.5"/>
-          <text class="dg-num" x="93" y="60" text-anchor="middle">2</text>
-          <text class="dg-lbl" x="93" y="67" text-anchor="middle">best of the rest</text>
+          <rect class="ql-node wild" x="62" y="62" width="48" height="16" rx="5"/>
+          <text class="ql-n" x="70" y="73">2</text>
+          <text class="ql-t" x="80" y="72">picked</text>
 
-          <path class="dg-line" d="M122 25 H 134 V 52"/>
-          <path class="dg-line" d="M122 59 H 134 V 56"/>
-          <path class="dg-line" d="M134 54 H 144"/>
+          <path class="ql-wire" style="--d:560ms" d="M110 29 H 118 V 46 H 126"/>
+          <path class="ql-wire" style="--d:620ms" d="M110 70 H 118 V 54"/>
 
-          <rect x="146" y="30" width="52" height="48" rx="7" fill="var(--surface)" stroke="var(--accent)"/>
-          <text class="dg-big" x="172" y="56" text-anchor="middle">16</text>
-          <text class="dg-key" x="172" y="66" text-anchor="middle">at Lane</text>
-          <text class="dg-lbl" x="172" y="73" text-anchor="middle">in November</text>
+          <rect class="ql-lane-box" x="126" y="12" width="72" height="72" rx="7"/>
+          <text class="ql-hd" x="162" y="24" text-anchor="middle">AT LANE</text>
+          <circle class="ql-seat" style="--d:700ms" cx="140" cy="32" r="3.6"/><circle class="ql-seat" style="--d:762ms" cx="156" cy="32" r="3.6"/><circle class="ql-seat" style="--d:824ms" cx="172" cy="32" r="3.6"/><circle class="ql-seat" style="--d:886ms" cx="188" cy="32" r="3.6"/><circle class="ql-seat" style="--d:948ms" cx="140" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1010ms" cx="156" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1072ms" cx="172" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1134ms" cx="188" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1196ms" cx="140" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1258ms" cx="156" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1320ms" cx="172" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1382ms" cx="188" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1444ms" cx="140" cy="68" r="3.6"/><circle class="ql-seat" style="--d:1506ms" cx="156" cy="68" r="3.6"/><circle class="ql-seat wild" style="--d:1568ms" cx="172" cy="68" r="3.6"/><circle class="ql-seat wild" style="--d:1630ms" cx="188" cy="68" r="3.6"/>
+          <text class="ql-t" x="162" y="80" text-anchor="middle">16 teams, one race</text>
         </svg>
-        <figcaption><b>Getting there is a path, not a time.</b> Two teams a league go straight through. A committee picks two more from everyone who finished third. Then one race, on a day nobody has run yet.</figcaption>
+        <figcaption><b>Getting there is a path, not a time.</b> Every league runs its own
+          championship and the top two go straight through. A committee then picks two
+          more from the teams that finished third. That is the whole field.
+          <span class="ql-again">tap to watch it again</span></figcaption>
       </figure>
 
       <h3>Runners have days</h3>
       <p>Nobody races the same twice. Some days the legs are there, some days they are not, and the model treats that as the main event rather than an afterthought.</p>
       <p>Two things about those days matter more than people expect. The first is that teammates tend to have them together — the same bus, the same week of training, the same course that suits them or does not. The second is the shape of the days themselves.</p>
 
-      <figure>
+      <figure class="curve" tabindex="0">
         <svg viewBox="0 0 200 104" role="img" aria-label="A lopsided curve: a short steep side for good days and a long tail for bad ones">
           <defs><linearGradient id="skg" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0" stop-color="var(--accent)" stop-opacity=".45"/>
             <stop offset="1" stop-color="var(--accent)" stop-opacity=".04"/>
           </linearGradient></defs>
-          <path d="M14 74 C 34 74 44 16 62 14 C 84 12 112 44 146 58 C 172 69 186 73 196 74 Z"
+          <path class="cv-fill" d="M14 74 C 34 74 44 16 62 14 C 84 12 112 44 146 58 C 172 69 186 73 196 74 Z"
                 fill="url(#skg)" stroke="none"/>
-          <path d="M14 74 C 34 74 44 16 62 14 C 84 12 112 44 146 58 C 172 69 186 73 196 74"
+          <path class="cv-path" d="M14 74 C 34 74 44 16 62 14 C 84 12 112 44 146 58 C 172 69 186 73 196 74"
                 fill="none" stroke="var(--accent)" stroke-width="1.8"/>
           <path class="dg-line" d="M8 74 H 196" stroke="var(--line)" stroke-width="1.2"/>
           <path d="M62 18 V 74" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3 3" opacity=".8" fill="none"/>
@@ -7362,6 +7430,41 @@ function fwdTeam(b,name,k){
   return k==="qual"?row[0]:k==="win"?row[1]:null;
 }
 
+/* The How tab diagrams play themselves when they first come into view, and
+   again on a tap. At rest they are COMPLETE - the class only ever replays an
+   entrance - so a reader who never scrolls them into view, or who has reduced
+   motion on, sees the finished drawing rather than an empty box waiting for an
+   observer that may never fire. */
+function armFigures(){
+  const figs=document.querySelectorAll(".ql, .pcd, .curve");
+  if(!figs.length)return;
+  /* .run parks the parts at scale(0) so they can pop in, which means that
+     while it is set the drawing is INCOMPLETE. If the animation never runs -
+     a throttled tab, a frozen clock, an engine that skips it - the figure
+     would sit empty for good. So the class comes off on a timer that is
+     longer than the longest animation in any of the three: the entrance
+     plays, and either way the figure ends up back at its resting state, which
+     is the complete one. A timer fires when a frame callback might not.
+     Never leave content depending on an animation to become visible. */
+  const SPAN=2900;
+  const play=el=>{
+    clearTimeout(el._figT);
+    el.classList.remove("run");void el.offsetWidth;el.classList.add("run");
+    el._figT=setTimeout(()=>el.classList.remove("run"),SPAN);
+  };
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  figs.forEach(f=>{
+    f.addEventListener("click",()=>play(f));
+    f.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();play(f);}});
+  });
+  if(reduce||typeof IntersectionObserver!=="function")return;
+  const io=new IntersectionObserver(es=>{
+    for(const e of es) if(e.isIntersecting){play(e.target);io.unobserve(e.target);}
+  },{threshold:.35});
+  figs.forEach(f=>io.observe(f));
+}
+
 function renderForward(){
   const box=document.getElementById("fwdOut");
   if(!box)return;
@@ -7668,7 +7771,17 @@ function cancelRun(){
 
 function clearOut(){
   cancelRun();
-  document.getElementById("simOut").innerHTML="";
+  document.getElementById("simOut").innerHTML=
+    '<div class="empty start">'
+    +'<svg viewBox="0 0 64 36" aria-hidden="true"><g class="es-dots">'
+    +'<circle cx="8" cy="26" r="3.1"/><circle cx="19" cy="20" r="3.1"/>'
+    +'<circle cx="30" cy="24" r="3.1"/><circle cx="41" cy="14" r="3.1"/>'
+    +'<circle cx="52" cy="18" r="3.1"/></g>'
+    +'<path class="es-line" d="M2 33 H 62"/></svg>'
+    +'<b>Every team\u2019s odds at Lane</b>'
+    +'<i>Press Run and Chute plays the rest of the season out '
+    +'thousands of times \u2014 every league meet, every selection, every state race.</i>'
+    +'</div>';
   const ro=document.getElementById("runOut");
   if(ro)ro.innerHTML='<div class="empty">Press Run to fill this in.</div>';
   rcards=[];rlabs=[];
@@ -8338,7 +8451,7 @@ function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
 }
-loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();renderForward();
+loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();renderForward();armFigures();
 </script>
 </body>
 </html>
