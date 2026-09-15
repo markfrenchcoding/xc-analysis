@@ -959,8 +959,9 @@ it moved. Anything added below that point must stay below it.
 ```
 node extract_model.js        # regenerate model.js after any signature change
 node audit2.js               # 93 checks, 1 deliberate failure
-node pull/test_seed.js       # 61 checks on the seed builder, no network
+node pull/test_seed.js       # 64 checks on the seed builder, no network
 node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
+node backtest/test_snapshot.js   # 38 checks that the archive REFUSES, both line endings
 ```
 
 The two `pull` suites are quick and touch no network, so there is no reason not
@@ -981,6 +982,74 @@ check, so a team's eighth and later runners still push opponents down the field.
 NFHS strikes them out instead. This is unreachable today — `buildModel` caps
 every roster at seven — so it is recorded as a latent issue rather than fixed,
 but it would bite if that cap were ever raised.
+
+## The forward archive
+
+`backtest/snapshot.js` freezes what the board says today, before the races it is
+predicting, and `refresh.cmd` runs it on every successful crawl so the entry is
+committed and pushed the same morning. Git carries an external timestamp on each
+one. The **Called it** view in the How tab renders it.
+
+**It is a different artifact from the Track record, and that is the point.** The
+Track record is retrodictive: it rebuilds 2022-2025 and scores the model against
+a November everyone already knows, and every choice in it was made by someone who
+could see the answer. Honest work, and the kind nobody has to believe. A forward
+archive cannot be argued with the same way.
+
+**Five numbers, not the whole tally.** A team is `[qualify, auto, win, points]`
+and a runner is `[mean place x10, all-state, win]`, top thirty a board, all in
+tenths of a percent as integers. At-large is deliberately *not* stored, because
+`auto + wild == qual` is an invariant `audit2` asserts - the Leagues reading
+derives from the two rather than taking a column of its own. Points is the same
+conditional mean the card shows.
+
+**It costs about 20KB a snapshot**, so a weekly season adds roughly 250KB to a
+380KB file. That is the one thing to watch. If it gets uncomfortable the answer
+is a shared name table, not fewer columns - the names are most of the bytes.
+
+**The Called it grid shows one figure at a time**, chosen by a switch, because
+five numbers times N dates times 45 teams is a wall. Qualify ties break on win:
+half the field sits at 100% and those ties break on nothing otherwise, which is
+the same trap that once made `backtest.js` publish the champion record a team
+too high.
+
+**Early entries are narrower, and are not rewritten to match.** `fwdTeam` reads
+both the wide shape and the original `[qual, win]` one, and a column that did not
+exist yet prints as a dash. Widening the archive must never mean going back over
+what it already said.
+
+### The guard was inert for a day, and how
+
+Everything below was silent. It is the most useful thing in this section.
+
+`index.html` is CRLF on this machine. The regex looked for `];\n` and the file
+has `];\r\n`, so it **never matched**. Three things followed, none of which
+announced themselves:
+
+- `found` was null, so the replace branch was never taken and the else branch
+  *inserted* a fresh `const SNAPSHOTS` above `DATA_DATE`. Three declarations
+  accumulated. That does not show up as a wrong number - the browser refuses the
+  whole script with "Identifier 'SNAPSHOTS' has already been declared" and the
+  **page goes blank**.
+- `list` was therefore always `[]`, so the clash check compared today against
+  nothing. **The append-only guard - the entire reason the file exists - could
+  never fire.** It reported success every time.
+- Separately, `RUNS` was `+process.argv[2]`, so `snapshot.js --force` parsed the
+  flag as the season count, ran `for(i=0;i<NaN;i++)`, and wrote an entry of nulls
+  that was structurally perfect and completely empty.
+
+**A guard that cannot fail looks exactly like a guard that works.**
+`backtest/test_snapshot.js` now provokes real refusals against a real file in
+both line endings, and asserts that a permitted write leaves *exactly one*
+declaration. Verified non-vacuous the way `test_crawl.js` is: put the LF-only
+regex back and the suite fails.
+
+**`--force` now requires `--why` and staples the reason to the entry**, which the
+site renders beside the date with a dagger. The rule was never "never rewrite" -
+it is "never rewrite *quietly*". An archive that records its own amendments is
+still an archive; one that can be silently edited is a slower way of tuning after
+the fact. The Sep 15 entry carries such a stamp: it was rewritten the same day,
+from the same database, with no race in between, only to add the columns above.
 
 ## Backtest
 
