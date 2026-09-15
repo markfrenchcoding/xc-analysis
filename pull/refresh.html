@@ -152,7 +152,8 @@ function progress(done, total, what) {
 const KEY = 'chute.refresh.v1';
 let S = null, stopping = false, running = false;
 const blank = () => ({ stage: 'teams', teams: [], logos: {}, ti: 0,
-                       meets: [], mi: 0, rows: [], failed: [], started: new Date().toISOString() });
+                       meets: [], mi: 0, rows: [], failed: [],
+                       divsRead: 0, divsEmpty: 0, started: new Date().toISOString() });
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {
   log('could not save progress (' + e.name + ') — do not close the tab', 'w'); } }
 function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
@@ -237,15 +238,17 @@ function divMetres(name) {
    not trusted is the aggregate. Asked too fast this API has a documented habit
    of answering with blanks rather than 429s, and the signature of that is most
    of the day's races coming back empty at once, which the report checks for. */
-let divsRead = 0, divsEmpty = 0;
+/* These live in the saved state, not in a module variable. The report's
+   rate-limit check is built on them, and a reader who closes the tab and comes
+   back to press Start would otherwise be shown a confident "0 of 0". */
 async function divRows(meetId, divId, jwt) {
-  divsRead++;
+  S.divsRead++;
   let rows = (await post('Meet/GetResultsData3', { divId, meetId }, jwt)).resultsXC || [];
   if (!rows.length) {
     await sleep(GAP_POST);
     rows = (await post('Meet/GetResultsData3', { divId, meetId }, jwt)).resultsXC || [];
   }
-  if (!rows.length) divsEmpty++;
+  if (!rows.length) S.divsEmpty++;
   return rows;
 }
 
@@ -280,6 +283,7 @@ async function run() {
     const { board } = Seed.parseClasses(html);
 
     if (!S.failed) S.failed = [];
+    if (S.divsRead == null) { S.divsRead = 0; S.divsEmpty = 0; }
 
     if (S.stage === 'teams') {
       const f = await findTeams(board);
@@ -386,7 +390,7 @@ function finish(html, board) {
     ['Dropped — no usable time', b.dropped.unparsed],
     ['Dropped — not a possible 5k', b.dropped.implausible],
     ['Dropped — school not on a board', b.dropped.offBoard],
-    ['Races with no results posted', divsEmpty + ' of ' + divsRead],
+    ['Races with no results posted', S.divsEmpty + ' of ' + S.divsRead],
     ['Meets that never answered', S.failed.length],
   ];
   $('#sum').innerHTML = cells.map(c => '<tr><td>' + c[0] + '</td><td>' + c[1] + '</td></tr>').join('');
@@ -402,8 +406,8 @@ function finish(html, board) {
   if (S.failed.length)
     log(S.failed.length + ' meets never answered, so results from them are missing. Wait an '
       + 'hour and press Start again — it retries only what it still needs.', 'e');
-  if (divsRead > 20 && divsEmpty > divsRead * 0.4)
-    log(divsEmpty + ' of ' + divsRead + ' races came back empty. That is the shape of being '
+  if (S.divsRead > 20 && S.divsEmpty > S.divsRead * 0.4)
+    log(S.divsEmpty + ' of ' + S.divsRead + ' races came back empty. That is the shape of being '
       + 'rate-limited, not of a quiet season — wait an hour and run it again before '
       + 'uploading this.', 'e');
   if (b.rows < was * 0.9)
