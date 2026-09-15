@@ -21,6 +21,15 @@ node pull/crawl.js --dry                          crawl and report, write nothin
 node pull/crawl.js --resume                       pick up an interrupted run
 ```
 
+Run the `schtasks` lines from Command Prompt or PowerShell, not Git Bash — Git
+Bash rewrites `/run` into a Windows path and the command fails with a confusing
+complaint about `C:/Program Files/Git/run`. The `node` lines are fine anywhere.
+
+`--resume` is for a crawl that stopped minutes ago. Anything older than twelve
+hours is discarded rather than resumed: it would hold results from before the
+weekend's meets, and half-stale results give a `DATA_DATE` belonging to neither
+half.
+
 `crawl.js` exits **0** when it wrote a new database, **2** when it refused to
 because something looked wrong, and **3** when nothing had changed. Only 0 is
 committed. The refusals matter more than the successes: it will not write a seed
@@ -33,12 +42,14 @@ than no job at all.
 again the following week, and the site keeps serving the seed it already has.
 
 **The push needs credentials that work without anyone there.** The scheduled
-task runs as you but with no console to prompt at, so a git push that would ask
-for a password simply fails and the log says so. If it does, open the repo once
-in GitHub Desktop or run a manual `git push` so Windows Credential Manager holds
-the token, and the scheduled run will use the same one. Everything up to the
-push still happened, so the rebuilt `index.html` is sitting in the working tree
-ready to commit by hand.
+task runs as you but with no console to prompt at, so a git push that would stop
+to ask for a password just fails, and the log says so. This machine has
+`credential.helper=manager`, so Windows Credential Manager already holds a token
+and it should go through — but that is the thing most likely to break one day,
+typically when the token expires. Nothing is lost when it does: everything up to
+the push still happened, so the rebuilt `index.html` is sitting in the working
+tree ready to commit by hand, and a single manual `git push` refreshes the
+stored token for next time.
 
 ## By hand, from any browser
 
