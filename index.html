@@ -5656,6 +5656,7 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
     <div class="switch vsw" role="group" aria-label="View">
       <button data-view="v-how" aria-pressed="true">How it works</button>
       <button data-view="v-record" aria-pressed="false">Track record</button>
+      <button data-view="v-called" aria-pressed="false">Called it</button>
     </div>
     <div class="view on" id="v-how">
     <h2 class="sec">How this works</h2>
@@ -5753,6 +5754,13 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
       <h2 class="sec">Track record</h2>
       <p class="sub2">Every figure on this page is written by the harness that produced it, not typed in. Re-run with <code>node backtest/publish.js</code>.</p>
       <div class="doc" id="recOut"></div>
+    </div>
+    <div class="view" id="v-called">
+      <h2 class="sec">Called it</h2>
+      <p class="sub2">What the board said, on the day it said it, before the races it was
+        talking about. Written by <code>node backtest/snapshot.js</code> and pushed the same
+        morning &mdash; the commit dates are in public.</p>
+      <div class="doc" id="fwdOut"></div>
     </div>
   </section>
 
@@ -5927,6 +5935,7 @@ const LONE=0.006;
 /* The day the marks database was last refreshed. Update this whenever the seed
    block is replaced — it is what the header reports to readers. */
 const RECORD={"seasons":[2022,2023,2024,2025],"cutoff":"early September","cutoffDates":["2022-09-10","2023-09-09","2024-09-14","2025-09-13"],"teamSeasons":375,"qualified":144,"found":107,"ofField":144,"champHit":2,"champOf":8,"brier":0.1538,"base":0.2365,"skill":35,"logloss":0.777,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":192,"said":1,"was":11},{"lo":10,"hi":30,"n":21,"said":17,"was":33},{"lo":30,"hi":50,"n":16,"said":39,"was":44},{"lo":50,"hi":70,"n":19,"said":60,"was":42},{"lo":70,"hi":90,"n":22,"said":81,"was":50},{"lo":90,"hi":100,"n":105,"said":98,"was":85}],"horizon":[{"weeks":8,"best":6,"brier":0.1391,"shipped":0.1536},{"weeks":6,"best":2.6,"brier":0.0649,"shipped":0.0654},{"weeks":4,"best":2,"brier":0.0574,"shipped":0.058},{"weeks":2,"best":2,"brier":0.0529,"shipped":0.0538}],"perSeason":[{"year":2022,"g":"M","cutoff":"2022-09-10","field":18,"found":11,"skill":-3,"skillLate":80,"foundLate":16,"marks":610,"fav":"Lincoln","favP":45,"champ":"Jesuit","hit":false},{"year":2022,"g":"F","cutoff":"2022-09-10","field":18,"found":12,"skill":0,"skillLate":66,"foundLate":16,"marks":610,"fav":"Jesuit","favP":71,"champ":"Jesuit","hit":true},{"year":2023,"g":"M","cutoff":"2023-09-09","field":18,"found":11,"skill":0,"skillLate":65,"foundLate":16,"marks":580,"fav":"Jesuit","favP":78,"champ":"Franklin (OR)","hit":false},{"year":2023,"g":"F","cutoff":"2023-09-09","field":18,"found":14,"skill":43,"skillLate":88,"foundLate":18,"marks":580,"fav":"Lincoln","favP":54,"champ":"Jesuit","hit":false},{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":48,"skillLate":73,"foundLate":16,"marks":973,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":60,"skillLate":77,"foundLate":16,"marks":973,"fav":"Lakeridge","favP":40,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":84,"skillLate":74,"foundLate":16,"marks":867,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":46,"skillLate":83,"foundLate":17,"marks":867,"fav":"Sunset","favP":70,"champ":"Lincoln","hit":false}],"cutoffLate":"early October","weeksOut":8,"weeksOutLate":4,"built":"2026-09-15"};
+const SNAPSHOTS=[{"taken":"2026-09-15","through":"2026-09-12","marks":4923,"sigma":2.3,"runs":20000,"boards":{"6A|M":{"Adrienne Nelson":[18,0],"Barlow":[0,0],"Beaverton":[0,0],"Benson Tech":[0,0],"Central Catholic":[997,0],"Century":[167,0],"Clackamas":[969,1],"Cleveland":[0,0],"David Douglas":[16,0],"Forest Grove":[0,0],"Franklin":[898,41],"Glencoe":[0,0],"Grant":[970,428],"Grants Pass":[0,0],"Gresham":[0,0],"Ida B. Wells":[73,0],"Jesuit":[386,0],"Lake Oswego":[193,0],"Lakeridge":[541,0],"Lincoln":[999,359],"McDaniel":[3,0],"McKay":[0,0],"McMinnville":[854,0],"McNary":[100,0],"Mountainside":[611,0],"Newberg":[14,0],"North Medford":[13,0],"North Salem":[16,0],"Oregon City":[403,0],"Reynolds":[0,0],"Roosevelt":[0,0],"Roseburg":[53,0],"Sheldon":[19,0],"Sherwood":[994,8],"South Eugene":[977,1],"South Medford":[939,0],"South Salem":[861,0],"Southridge":[0,0],"Sprague":[1000,0],"Sunset":[329,0],"Tigard":[87,0],"Tualatin":[818,6],"West Linn":[970,156],"West Salem":[23,0],"Westview":[689,0]},"6A|F":{"Adrienne Nelson":[503,0],"Barlow":[0,0],"Beaverton":[0,0],"Central Catholic":[581,0],"Century":[30,0],"Clackamas":[916,0],"Cleveland":[0,0],"David Douglas":[0,0],"Forest Grove":[0,0],"Franklin":[991,202],"Glencoe":[1,0],"Grant":[437,1],"Grants Pass":[0,0],"Gresham":[0,0],"Ida B. Wells":[140,0],"Jesuit":[1000,153],"Lake Oswego":[0,0],"Lakeridge":[567,1],"Lincoln":[903,12],"McDaniel":[50,0],"McKay":[0,0],"McMinnville":[969,0],"McNary":[0,0],"Mountainside":[928,0],"Newberg":[0,0],"North Medford":[963,0],"North Salem":[515,0],"Oregon City":[0,0],"Roosevelt":[0,0],"Sheldon":[0,0],"Sherwood":[1000,556],"South Eugene":[1000,32],"South Medford":[37,0],"South Salem":[0,0],"Southridge":[4,0],"Sprague":[528,0],"St Mary's Academy":[893,20],"Sunset":[69,0],"Tigard":[538,1],"Tualatin":[799,8],"West Linn":[681,14],"West Salem":[957,0],"Westview":[0,0]},"5A|M":{"Aloha":[3,0],"Ashland":[1,0],"Bend":[998,0],"Caldera":[91,0],"Canby":[965,0],"Centennial":[970,0],"Churchill":[0,0],"Corvallis":[1000,0],"Crater":[1000,2],"Crescent Valley":[1000,0],"Crook County":[8,0],"Dallas":[0,0],"Eagle Point":[0,0],"Hillsboro":[0,0],"Hood River Valley":[987,2],"La Salle Prep":[76,0],"Lebanon":[0,0],"Liberty":[130,0],"Milwaukie":[0,0],"Mountain View":[943,0],"North Eugene":[518,0],"Putnam":[246,0],"Ridgeview":[0,0],"Sandy":[0,0],"Silverton":[0,0],"South Albany":[0,0],"Springfield":[983,0],"St Helens":[0,0],"Summit":[1000,984],"Thurston":[0,0],"West Albany":[0,0],"Willamette":[81,0],"Wilsonville":[1000,13],"Woodburn":[0,0]},"5A|F":{"Aloha":[0,0],"Ashland":[892,0],"Bend":[1000,1],"Caldera":[527,0],"Canby":[640,0],"Centennial":[1000,805],"Churchill":[0,0],"Corvallis":[402,0],"Crater":[1000,193],"Crescent Valley":[969,0],"Crook County":[0,0],"Dallas":[1000,0],"Eagle Point":[0,0],"Hood River Valley":[943,0],"La Salle Prep":[0,0],"Lebanon":[0,0],"Liberty":[371,0],"Mountain View":[252,0],"North Eugene":[12,0],"Putnam":[0,0],"Ridgeview":[0,0],"Sandy":[60,0],"Silverton":[0,0],"Springfield":[940,0],"Summit":[1000,1],"Thurston":[0,0],"West Albany":[3,0],"Willamette":[0,0],"Wilsonville":[990,0],"Woodburn":[0,0]},"4A|M":{"Astoria":[420,0],"Baker":[154,0],"Banks":[222,0],"Cascade":[0,0],"Cascade Christian":[0,0],"Central":[997,1],"Cottage Grove":[993,20],"Elmira":[2,0],"Estacada":[184,0],"Gladstone":[352,0],"Henley":[0,0],"Hidden Valley":[0,0],"Junction City":[0,0],"Klamath Union":[1000,3],"La Grande":[1000,1],"Madras":[9,0],"Marist":[1000,394],"Marshfield":[2,0],"Mazama":[0,0],"Molalla":[998,10],"Newport":[0,0],"North Bend":[22,0],"Ontario":[0,0],"Philomath":[627,0],"Phoenix":[0,0],"Scappoose":[988,155],"Seaside":[0,0],"Stayton":[996,0],"The Dalles":[1000,348],"Tillamook":[41,0],"Valley Catholic":[993,68]},"4A|F":{"Astoria":[435,0],"Baker":[734,0],"Banks":[1000,571],"Cascade":[357,0],"Cascade Christian":[0,0],"Central":[54,0],"Cottage Grove":[1000,0],"Estacada":[76,0],"Gladstone":[477,0],"Henley":[4,0],"Junction City":[8,0],"Klamath Union":[1000,0],"La Grande":[1000,0],"Madras":[55,0],"Marist":[999,0],"Marshfield":[132,0],"Mazama":[2,0],"Molalla":[2,0],"Newport":[22,0],"North Bend":[630,0],"Philomath":[1000,428],"Phoenix":[2,0],"Scappoose":[1000,1],"Seaside":[0,0],"Stayton":[998,0],"The Dalles":[1000,0],"Tillamook":[9,0],"Valley Catholic":[4,0]},"3A|M":{"Blanchet Catholic":[17,0],"Burns":[983,0],"Catlin Gabel":[0,0],"Corbett":[999,0],"Douglas":[0,0],"Enterprise":[29,0],"Gervais":[0,0],"Glide":[138,0],"Harrisburg":[983,0],"Horizon Christian":[72,0],"Illinois Valley":[0,0],"McLoughlin":[0,0],"Neah-Kah-Nie":[1000,141],"Nyssa":[993,1],"Oregon Episcopal":[128,0],"Pleasant Hill":[497,0],"Portland Adventist":[0,0],"Rainier":[0,0],"Riverdale":[809,0],"Santiam Christian":[999,0],"Scio":[65,0],"Sisters":[623,0],"Siuslaw":[1000,591],"St Mary's":[10,0],"Sutherlin":[0,0],"Sweet Home":[1000,267],"Trinity Lutheran":[720,0],"Vale":[0,0],"Warrenton":[0,0],"Westside Christian":[0,0],"Willamina":[103,0],"Yamhill-Carlton":[832,0]},"3A|F":{"Blanchet Catholic":[260,0],"Burns":[0,0],"Catlin Gabel":[360,0],"Coquille":[0,0],"Corbett":[1000,73],"Enterprise":[997,0],"Gervais":[0,0],"Glide":[941,0],"Harrisburg":[740,0],"Horizon Christian":[0,0],"La Pine":[0,0],"Nyssa":[3,0],"Oregon Episcopal":[1000,923],"Pleasant Hill":[0,0],"Rainier":[0,0],"Santiam Christian":[1000,0],"Scio":[1,0],"Sisters":[11,0],"Siuslaw":[576,0],"St Mary's":[141,0],"Sweet Home":[970,3],"Trinity Lutheran":[0,0],"Vale":[0,0],"Willamina":[0,0]},"2A/1A|M":{"Bandon":[1000,3],"C.S. Lewis Academy":[758,0],"Clatskanie":[0,0],"Columbia Christian":[8,0],"Crosshill Christian":[970,0],"Culver":[845,0],"Four Rivers":[959,0],"Glendale":[0,0],"Grant Union":[230,0],"Heppner":[103,0],"Knappa":[1000,924],"Lakeview":[891,0],"Nestucca":[0,0],"New Hope Christian":[0,0],"Nixyaawii Community":[0,0],"Oakland":[266,0],"Oregon School for the Deaf":[0,0],"Paideia Classical Christian":[970,0],"Perrydale":[0,0],"Portland Christian":[132,0],"Regis":[1000,0],"Riverside-WLWV":[0,0],"Southwest Christian":[377,0],"St Paul":[253,0],"St. Stephen's Academy":[714,0],"Stanfield":[682,0],"Toledo":[222,0],"Trinity Academy":[1000,72],"Union":[1000,0],"Vernonia":[706,0],"Western Christian":[865,0],"Weston-McEwen":[49,0]},"2A/1A|F":{"Bandon":[929,103],"Crosshill Christian":[259,0],"East Linn Christian":[998,74],"Four Rivers":[0,0],"Heppner":[596,3],"Imbler":[0,0],"Knappa":[881,393],"Lakeview":[902,49],"Nixyaawii Community":[0,0],"Paideia Classical Christian":[981,236],"Portland Christian":[0,0],"Southwest Christian":[177,0],"St. Stephen's Academy":[0,0],"Trinity Academy":[547,1],"Union":[967,140],"Vernonia":[11,0],"Western Christian":[752,1],"Weston-McEwen":[0,0]}}}];
 const DATA_DATE="2026-09-12";
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
@@ -6953,6 +6962,65 @@ document.getElementById("dsum").onclick=()=>{dialsTouched=true;setDials(!dialsOp
 
 /* The scorecard, drawn from RECORD. Nothing here is a literal: if the model
    changes, backtest/publish.js rewrites the constant and this page follows. */
+/* The forward archive.
+   Track record argues from seasons whose answers were already known when every
+   choice in the harness was made. This one cannot: each entry is what the model
+   said on a Monday about races that had not happened, committed and pushed that
+   morning. Until November there is nothing to score it against, and that is
+   fine - the archive IS the artifact, and it is worth more the earlier it
+   starts. Scoring arrives when Lane does. */
+function renderForward(){
+  const box=document.getElementById("fwdOut");
+  if(!box)return;
+  const S=(typeof SNAPSHOTS!=="undefined"&&SNAPSHOTS)||[];
+  if(!S.length){
+    box.innerHTML='<p>No snapshots yet. The weekly refresh writes one each time the '
+      +'database moves.</p>';
+    return;
+  }
+  const d=s=>new Date(s+"T00:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  const pc=v=>(v>=995?100:v/10<1?"<1":(v/10).toFixed(v<100?1:0))+"%";
+  const key=CLS+"|"+gender;
+
+  /* Only the board being looked at. Ten boards of every team would be a wall,
+     and the switchers above already say which one the reader chose. */
+  const rows=S.filter(s=>s.boards&&s.boards[key]);
+  if(!rows.length){
+    box.innerHTML='<p>Nothing archived for '+CLS+' '+(gender==="M"?"boys":"girls")+' yet.</p>';
+    return;
+  }
+
+  // every team that has ever appeared, ordered by the most recent call
+  const last=rows[rows.length-1].boards[key];
+  const names=[...new Set(rows.flatMap(s=>Object.keys(s.boards[key])))]
+    .sort((a,b)=>((last[b]||[0])[0]-(last[a]||[0])[0])||(a<b?-1:1));
+
+  const head='<tr><th>team</th>'+rows.map(s=>'<th>'+d(s.taken)+'</th>').join("")+'</tr>';
+  const body=names.slice(0,24).map(n=>{
+    const cells=rows.map(s=>{
+      const v=s.boards[key][n];
+      return '<td>'+(v?pc(v[0]):"\u2014")+'</td>';
+    }).join("");
+    return '<tr><td>'+n+'</td>'+cells+'</tr>';
+  }).join("");
+
+  const first=rows[0], latest=rows[rows.length-1];
+  box.innerHTML=
+    '<p>Chance of reaching Lane, as called on each date. '
+    +'<b>'+rows.length+' snapshot'+(rows.length===1?'':'s')+'</b> for '
+    +CLS+' '+(gender==="M"?"boys":"girls")+', the first from '+d(first.taken)
+    +' on '+first.marks.toLocaleString()+' marks'
+    +(rows.length>1?', the latest from '+d(latest.taken)+' on '+latest.marks.toLocaleString()
+      +' marks':'')+'.</p>'
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead>'+head+'</thead><tbody>'
+    +body+'</tbody></table></div>'
+    +(names.length>24?'<p class="rec-note">Top 24 by the most recent call.</p>':'')
+    +'<p>Each column was written before the Saturday that followed it and pushed that '
+    +'morning, so the dates are checkable against the repository rather than against us. '
+    +'When Lane is run these become a scored forward record; until then they are simply '
+    +'the claims, on the record, in order.</p>';
+}
+
 function renderRecord(){
   const box=document.getElementById("recOut");
   if(!box||typeof RECORD==="undefined")return;
@@ -7700,7 +7768,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeRace(); });
 document.querySelectorAll(".switch button[data-g]").forEach(b=>b.onclick=()=>{
   gender=b.dataset.g;
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
-  setClass(CLS,gender);syncHead();syncViewText();
+  setClass(CLS,gender);syncHead();syncViewText();renderForward();
   if(NEXT_SEASON) syncNextNote();
   clearOut();wiAdj={};renderWhatIf();});
 document.querySelectorAll(".switch button[data-ns]").forEach(b=>b.onclick=()=>{
@@ -7738,7 +7806,7 @@ function syncNextNote(){
 document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
   setClass(b.dataset.c,gender);
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
-  syncHead();syncViewText();
+  syncHead();syncViewText();renderForward();
   if(NEXT_SEASON) syncNextNote();
   clearOut();wiAdj={};renderWhatIf();});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
@@ -7773,7 +7841,7 @@ function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
 }
-loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();
+loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();renderForward();
 </script>
 </body>
 </html>

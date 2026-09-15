@@ -25,6 +25,12 @@ if %CODE%==3 goto :nothing
 if %CODE%==2 goto :refused
 if not %CODE%==0 goto :failed
 
+rem Freeze what the board now says, before the coming Saturday. Only on exit 0:
+rem an unchanged database would predict exactly what last week predicted, and an
+rem archive of identical rows proves nothing it did not already prove.
+node backtest\snapshot.js >> "%LOG%" 2>&1
+if not %ERRORLEVEL%==0 echo snapshot refused or failed - see above >> "%LOG%"
+
 rem Only index.html is ever committed. If anything else is dirty the run leaves
 rem it alone rather than sweeping a half-finished edit into an unattended commit.
 git diff --quiet -- index.html
