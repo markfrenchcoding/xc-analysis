@@ -32,6 +32,8 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
 - 2,974 rows currently across all five classifications: 2,221 athlete-boards,
   214 schools. Pulled from meet results through Sep 12, 2026
+- the flag's draft reads `DATA` across every classification at once, so a name
+  that only appears on one board is still draftable onto any other
 
 **5,000m only.** The state meet and every league championship are run at
 5,000m, so that is the only board. Short early-season races (the 3k meets in
@@ -77,53 +79,49 @@ individual qualifiers included. Fifty, not everyone — the tail is hundreds of
 runners who reached Lane in a handful of seasons and the ranking there is noise.
 The footnote says how many athletes made it at all.
 
-**The Chute Seven.** Tapping the checkered flag counts down the seven fastest
-individuals in the division, seventh to first, across every school — with a
-kicker on how many schools are represented and the fact that those seven as one
-squad would score a perfect 15. The board is entirely about teams, so this is
-the one question the site never otherwise answers. An earlier version replayed a
-single simulated state meet; it looked good and was redundant, because it was
-the tool again with less of it. `chuteSeven()` reads `DATA` directly rather than
-the model, so athletes on teams too short to score still appear.
+**The flag: the Impossible Team.** Tapping the checkered flag opens a draft.
+Pick any seven athletes in Oregon — any school, any classification, both ends of
+the state — and they are entered at Lane as an extra team: raced once in front
+of you as a pace line, then two thousand more times for the odds.
 
-**Every board carries the same two switches.** Classification and Boys/Girls
-appear on Odds, Runners and Leagues. They are not three sets of state — the
-handlers select `.clsw button` and `.switch button[data-g]` across the whole
-document, so all three groups light together and one `setClass` runs. Anything
-that flips gender in code must do the same; the easter egg's "switch to the
-girls" once used a bare `.switch button` selector and quietly unlit the
-classification row, because those buttons have no `data-g`.
+It answers the one question the board structurally cannot. Every other view is
+locked to real rosters; this is the only place the tool can be asked about a
+squad that does not exist. An earlier egg replayed a simulated state meet and
+was redundant — it was the tool again with less of it. A second one counted down
+the seven fastest individuals in the division, which the Runners board now
+covers properly; that idea survives as the draft's "Fastest" button.
 
-**One progress strip, cloned.** `mountRunbars()` copies `#runbar` onto the
-Runners and Leagues panels at load and renumbers the ids (`runbar3`,
-`runbar4`). The strip carries three inline runner SVGs; pasting it four times
-into a hand-edited file is how it drifts out of sync. `run(bid)` takes the
-suffix so the Leagues tab drives its own bar, and `clearOut()` resets all four.
+**No engine change, deliberately.** `addGuest` appends the squad to the model as
+a team with no league, so `playDistricts` never sees it, and `drRace` pushes it
+into the state field by hand. `draw`, `scoreMeet` and `playState` treat it like
+any other team. That is the point — these are the same numbers the board runs
+on, not a toy beside them. `draftPool` rebuilds marks exactly as `buildModel`
+does, top three with a lone mark regressed, minus the classification filter.
 
-**Every tab with results has a Run button.** Leagues runs the ordinary
-simulation — that board is a by-product of it — so pressing Run there fills the
-Odds board too. The button's visibility is one regex in the tab handler.
+**Drafted runners are ghosts.** Their own school still lines up with them, so a
+star drafted away is on the course twice and the results feed will show the same
+name at 3rd and at 43rd. Taking them out of their school would drop it below the
+scoring depth and quietly change the field they are being measured against, so
+the duplicate is the lesser distortion. The draft says so in a clause.
 
-**Cards are tappable after a run, and open a team sheet.** `lastRun` holds the
-model, tally and per-runner time sums from the last completed odds run;
-clicking a card opens that team's seven in the same blurred overlay the flag
-uses, showing each runner's season best beside the average time the model drew
-for them at Lane. The gap is the model's caution made visible — sampling a
-slower race, plus a skew that stretches bad days further than good ones. Both
-columns average only the seasons the team qualified, the same slice as the
-points figure.
+**The pace line is CSS, not a render loop.** Each dot gets one transition whose
+duration is that runner's own time, so the browser does the animation and the
+finishing order is exact by construction. Constant pace also means the field
+starts bunched and strings out as the gaps compound, which is what a race looks
+like from above. Only the clock is on `nextTick`. The winner crosses in eight
+seconds unless the tail is long — `SPEED` takes the max against a twelve-second
+whole-race cap, because a drafted seven can easily include a 28-minute runner
+and nobody wants to watch them jog in alone.
 
-Collecting those times costs almost nothing: `playState` sums `times[ri]` for
-every runner on a qualifying team, no sort and no allocation, and the divisor is
-that team's `ptsN` — the same set of seasons by construction. It is left
-switched on for the ordinary run.
+**The two thousand seasons finish before the race does**, by a factor of fifty.
+So `ghostOdds` holds its answer in `DR.oddsHTML` and whichever finishes second
+renders it. It is also paced on `setTimeout` rather than `nextTick`: it paints
+nothing until it is done, and a frame callback on a page that has stopped
+animating is at the browser's discretion.
 
-**Re-measure when the Odds tab comes back.** Cards are absolutely positioned off
-a step height measured from a rendered card, and a hidden panel measures zero.
-A board built while the user was on Leagues therefore has a stale step and
-overlaps. The tab handler re-measures and repaints on return. Use `nextTick`,
-never `requestAnimationFrame`, for that callback: a throttled or background tab
-never delivers the frame and the board is left broken.
+**Two timer lists, and they are not the same.** `DR.timers` holds the finish-line
+reveals, which tapping to skip cancels. `DR.odds` holds the season loop, which it
+must not — sharing one list meant skipping the race silently threw the odds away.
 
 **Points are conditional, and the card says so.** Each card shows the mean score
 at Lane averaged over the seasons that team actually qualified — "pts when

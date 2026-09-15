@@ -73,36 +73,78 @@ body.gunlap-fire .glyph .cl{animation-duration:.32s}
   font-size:22px;letter-spacing:.01em;line-height:1.05}
 .gl-hd p{margin:3px 0 0;font-size:11px;color:var(--dim)}
 .gl-sec{margin:14px 17px 0;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
-.gl-row{animation:glRow .42s cubic-bezier(.2,.9,.25,1) backwards;animation-delay:calc(var(--d)*.085s)}
 @keyframes glRow{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
-  .gl-row,.gl,.gl-card{animation:none}
+  .gl,.gl-card,.pl-fr{animation:none}
   .gl-tape{animation:none}
 }
-.gl-gr{width:34px;flex:none;font-size:9.5px;color:var(--dim);text-align:left}
-.gl-gap{flex:none;width:44px;text-align:right;font-size:10px;color:var(--dim);
-  font-variant-numeric:tabular-nums}
-.gl-row.p1 .gl-nm{font-weight:600}
-.gl-row.p1 .gl-vl{color:var(--t1e)}
 .gl-kick{margin:13px 17px 0;padding:11px 12px;border-radius:11px;background:var(--bg);
   border:1px solid var(--line);font-size:11.5px;line-height:1.5;color:var(--muted)}
 .gl-kick b{color:var(--fg)}
-.gl-row{display:flex;align-items:center;gap:8px;padding:6px 17px}
-.gl-row+.gl-row{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
-.gl-pl{width:19px;flex:none;text-align:right;font-family:'Barlow Condensed',sans-serif;
-  font-weight:700;font-size:15px;color:var(--dim);font-variant-numeric:tabular-nums}
-.gl-row.p1 .gl-pl{color:var(--t1e)}
-.gl-nm{flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gl-nm em{font-style:normal;color:var(--dim);font-size:10.5px}
-.gl-vl{flex:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
-  font-variant-numeric:tabular-nums}
-.gl-ft{margin:14px 17px 0;font-size:11px;color:var(--muted);line-height:1.45}
-.gl-ft b{color:var(--fg)}
 .gl-again{display:block;margin:11px 17px 0;width:calc(100% - 34px);padding:9px;border-radius:10px;
   border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:12px;
   cursor:pointer}
 .gl-again:hover{border-color:var(--t1e)}
 .gl-esc{margin:8px 17px 0;font-size:10px;color:var(--dim);text-align:center}
+/* ---- the draft: seven runners from anywhere in the state ---- */
+.gl-wide{max-width:452px}
+.dr-slots{display:flex;flex-wrap:wrap;gap:5px;margin:12px 17px 0}
+.dr-slot{flex:1 1 calc(25% - 4px);min-width:88px;display:flex;align-items:center;gap:5px;
+  min-height:32px;padding:4px 6px;border-radius:9px;background:var(--bg);
+  border:1px dashed var(--line);font-size:10.5px;color:var(--dim)}
+.dr-slot.full{border-style:solid;cursor:pointer}
+.dr-slot.full:hover{border-color:var(--t1e)}
+.dr-txt{min-width:0;line-height:1.2}
+.dr-txt b{display:block;font-weight:600;font-size:10.5px;color:var(--fg);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-txt i{display:block;font-style:normal;font-size:9px;color:var(--dim);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-meta{margin:9px 17px 0;font-size:11px;color:var(--muted);line-height:1.45}
+.dr-meta b{color:var(--fg)}
+.dr-tools{display:flex;gap:6px;margin:10px 17px 0}
+.dr-q{flex:1;min-width:0;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg);color:var(--text);font-family:inherit;font-size:12px}
+.dr-q:focus{outline:none;border-color:var(--t1e)}
+.dr-btn{flex:none;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface);color:var(--muted);font-family:inherit;font-size:11px;cursor:pointer}
+.dr-btn:hover{border-color:var(--t1e);color:var(--text)}
+.dr-list{margin:9px 0 0;max-height:224px;overflow:auto;border-top:1px solid var(--line)}
+.dr-row{display:flex;align-items:center;gap:8px;padding:6px 17px;font-size:12px;cursor:pointer}
+.dr-row+.dr-row{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+.dr-row:hover{background:var(--bg)}
+.dr-row.on{opacity:.38;cursor:default}
+.dr-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-nm em{font-style:normal;color:var(--dim);font-size:10px}
+.dr-cls{flex:none;width:34px;text-align:right;font-size:9px;color:var(--dim);letter-spacing:.04em}
+.dr-t{flex:none;width:54px;text-align:right;font-variant-numeric:tabular-nums;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+.gl-again[disabled]{opacity:.4;cursor:default}
+.gl-again[disabled]:hover{border-color:var(--line)}
+/* ---- the pace line: one race, run in front of you ---- */
+.pl-wrap{position:relative;margin:12px 17px 0;height:176px;border-radius:12px;overflow:hidden;
+  background:var(--bg);border:1px solid var(--line);cursor:pointer;
+  transition:height .45s ease,margin .45s ease,opacity .35s ease}
+.pl-wrap.over{height:0;margin-top:0;opacity:0;border-width:0;cursor:default}
+.pl-fin{position:absolute;right:15px;top:0;bottom:0;width:3px;background-size:3px 8px;
+  background-image:linear-gradient(var(--flagK) 50%,var(--flagM) 50%)}
+.pl-dot{position:absolute;left:0;top:0;width:4px;height:4px;border-radius:50%;
+  background:color-mix(in srgb,var(--dim) 65%,transparent)}
+.pl-dot.me{width:7px;height:7px;margin:-1.5px 0 0 -1.5px;background:var(--t1e);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--t1e) 20%,transparent)}
+.pl-clock{position:absolute;left:11px;top:8px;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums}
+.pl-skip{position:absolute;right:11px;top:8px;font-size:9.5px;color:var(--dim)}
+.pl-feed{margin:9px 17px 0}
+.pl-fr{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;
+  animation:glRow .3s ease-out backwards}
+.pl-fr+.pl-fr{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+.pl-fr.me .pl-nm{color:var(--t1e);font-weight:600}
+.pl-pl{width:22px;flex:none;text-align:right;color:var(--dim);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+.pl-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-nm em{font-style:normal;color:var(--dim);font-size:10px}
+.pl-t{flex:none;font-variant-numeric:tabular-nums;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
 /* the cloth is six vertical strips rising and falling out of phase — pure
    transforms, so it animates on every engine, unlike an SVG path morph */
 @keyframes c0{0%{transform:translateY(0.00px)}25%{transform:translateY(0.50px)}50%{transform:translateY(0.00px)}75%{transform:translateY(-0.50px)}100%{transform:translateY(-0.00px)}}
@@ -4722,15 +4764,6 @@ document.querySelectorAll('.seg button[data-v]').forEach(b=>b.onclick=()=>{
    is who the fastest kids in 6A actually are. Tapping the flag counts them down,
    seventh to first, across every school in the division. */
 const YR={12:"Sr",11:"Jr",10:"So",9:"Fr"};
-function chuteSeven(){
-  const best=new Map();
-  for(const r of DATA){
-    if(r.g!==gender||r.dist!==DIST)continue;
-    const k=r.name+"|"+r.team;
-    if(!best.has(k)||r.sb<best.get(k).sb) best.set(k,{name:r.name,team:r.team,grade:r.grade,sb:r.sb});
-  }
-  return [...best.values()].sort((a,b)=>a.sb-b.sb).slice(0,7);
-}
 /* The blurred sheet is shared: the flag opens the Chute Seven into it, a card
    on the odds board opens that team's seven. One element, one dismiss path. */
 function overlay(){
@@ -4784,55 +4817,318 @@ function showTeam(idx){
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
 }
 
-function showSeven(){
-  const seven=chuteSeven();
-  if(seven.length<7)return;
+
+/* ---------- the flag: a team that cannot exist ---------- */
+/* The board is locked to real rosters, which leaves one question it can never
+   answer - what if these seven ran together? Draft any seven athletes in the
+   state, from any school and any classification, and they are entered at Lane
+   as an extra team: raced once in front of you, then two thousand more times
+   for the odds.
+
+   No engine change. The squad is appended to the model as a team with no
+   league, so playDistricts never sees it, and it is pushed into the state field
+   by hand. Everything downstream - draw, scoreMeet, playState - treats it like
+   any other team, which is the point: these are the same numbers the board runs
+   on, not a toy beside them.
+
+   Drafted runners are ghosts. Their own school still lines up with them, so a
+   star drafted away is on the course twice. That is deliberate: taking them out
+   would drop their school below the scoring depth and quietly change the field
+   they are being measured against. */
+const GHOST="The Impossible Team";
+/* timers are the finish-line reveals, which skipping cancels; odds is the
+   background season loop, which it must not. */
+let DR={pool:[],pick:[],g:null,q:"",timers:[],odds:0,oddsHTML:"",live:false};
+
+/* The seasons finish in a fifth of a second and the race they run behind takes
+   ten, so the answer is usually ready before anywhere exists to put it.
+   Whichever finishes second renders. */
+function drShowOdds(){
+  const box=document.getElementById("plOdds");
+  if(box&&DR.oddsHTML) box.innerHTML=DR.oddsHTML;
+}
+
+function ord(n){
+  const s=["th","st","nd","rd"],v=n%100;
+  return n+(s[(v-20)%10]||s[v]||s[0]);
+}
+
+/* Every athlete in the state for one gender, marks handled exactly as
+   buildModel does - top three, a lone mark regressed - but with no
+   classification filter, which is what makes the draft impossible. */
+function draftPool(g){
+  const by=new Map();
+  for(const r of DATA){
+    if(r.g!==g||r.dist!==DIST)continue;
+    const k=r.name+"|"+r.team;
+    if(!by.has(k))by.set(k,{name:r.name,team:r.team,grade:r.grade,cls:r.cls,marks:[]});
+    by.get(k).marks.push(r.sb);
+  }
+  const out=[];
+  for(const a of by.values()){
+    a.marks.sort((x,y)=>x-y);
+    a.marks=a.marks.slice(0,3);
+    a.sbRaw=a.marks[0];
+    if(a.marks.length===1)a.marks=[a.marks[0]*(1+LONE)];
+    a.sb=a.marks[0];
+    a.w=MARK_W[a.marks.length-1].slice();
+    out.push(a);
+  }
+  return out.sort((x,y)=>x.sbRaw-y.sbRaw);
+}
+
+function addGuest(model,squad){
+  const idx=model.teams.length;
+  const rIdx=squad.map(a=>{
+    model.runners.push({marks:a.marks,w:a.w,sb:a.sb,t:idx});
+    return model.runners.length-1;
+  });
+  model.teams.push({name:GHOST,league:"\u2014",idx,rIdx,short:0,roster:squad,
+    avg5:squad.slice(0,SC).reduce((s,a)=>s+a.sb,0)/SC});
+  return idx;
+}
+
+function drFeedStop(){ DR.timers.forEach(clearTimeout); DR.timers=[]; }
+function drCancel(){ drFeedStop(); clearTimeout(DR.odds); DR.live=false; }
+
+function showDraft(){
+  drCancel();
   document.body.classList.add("gunlap-fire");
   setTimeout(()=>document.body.classList.remove("gunlap-fire"),1500);
+  if(DR.g!==gender){DR.g=gender;DR.pool=draftPool(gender);DR.pick=[];DR.q="";}
   const el=overlay();
-  const lead=seven[0].sb;
-  const schools=new Set(seven.map(x=>x.team));
-  const tally={}; seven.forEach(x=>tally[x.team]=(tally[x.team]||0)+1);
-  const most=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
-  const rows=seven.map((x,k)=>{
-    const place=k+1, delay=7-place;   // revealed seventh first
-    return `<div class="gl-row ${place===1?"p1":""}" style="--d:${delay}">
-      <span class="gl-pl">${place}</span>
-      <span class="gl-nm">${crest(x.team,"crest")} ${x.name} <em>${x.team}</em></span>
-      <span class="gl-gr">${YR[x.grade]||""}</span>
-      <span class="gl-gap">${place===1?"":"+"+(x.sb-lead).toFixed(1)+"s"}</span>
-      <span class="gl-vl">${fmt(x.sb)}</span>
-    </div>`;
-  }).join("");
-  const pack=(seven[6].sb-lead);
-  el.innerHTML=`<div class="gl-card" role="dialog" aria-label="The seven fastest runners in the division">
-    <div class="gl-tape"></div>
-    <div class="gl-hd">
-      <h3>The Chute Seven</h3>
-      <p>The fastest seven in ${CLS} right now &mdash; whatever singlet they are wearing</p>
-    </div>
-    <div class="gl-sec">${gender==="M"?"Boys":"Girls"} ${CLS} &middot; 5,000m &middot; season bests</div>
-    ${rows}
-    <div class="gl-kick">
-      <b>${schools.size} schools</b> in seven places, and ${most[1]>1?`<b>${most[0]}</b> owns ${most[1]} of them`:`no school owns more than one`}.
-      First to seventh is <b>${pack.toFixed(1)} seconds</b>.
-      Line these seven up as one school and they go 1&ndash;2&ndash;3&ndash;4${SC>4?"&ndash;5":""} for <b>${SC===4?10:15} points</b> &mdash; a perfect score, and a team that does not exist.
-    </div>
-    <button class="gl-again" id="glAgain">Switch to ${gender==="M"?"the girls":"the boys"}</button>
-    <p class="gl-esc">tap outside or press Esc to close</p>
-  </div>`;
-  document.getElementById("glAgain").onclick=()=>{
-    gender=gender==="M"?"F":"M";
-    document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
-    setClass(CLS,gender);syncHead();
-    clearOut();wiAdj={};renderWhatIf();
-    showSeven();
+  el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="The Impossible Team">'
+    +'<div class="gl-tape"></div>'
+    +'<div class="gl-hd"><h3>The Impossible Team</h3>'
+    +'<p>Seven runners who will never be on the same team. Put them on the line at Lane.</p></div>'
+    +'<div class="dr-slots" id="drSlots"></div>'
+    +'<div class="dr-meta" id="drMeta"></div>'
+    +'<div class="dr-tools">'
+    +'<input id="drQ" class="dr-q" placeholder="Search any runner in Oregon" autocomplete="off" spellcheck="false">'
+    +'<button class="dr-btn" id="drFast">Fastest</button>'
+    +'<button class="dr-btn" id="drRand">Surprise me</button></div>'
+    +'<div class="dr-list" id="drList"></div>'
+    +'<button class="gl-again" id="drGo">Race them</button>'
+    +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  const q=document.getElementById("drQ");
+  q.value=DR.q;
+  q.oninput=()=>{DR.q=q.value;drList();};
+  document.getElementById("drFast").onclick=()=>{DR.pick=DR.pool.slice(0,7);drPaint();};
+  document.getElementById("drRand").onclick=()=>{
+    /* From the fastest 120 in the state, not from all eleven hundred. Seven
+       runners drawn from the whole pool are hopeless every single time, which
+       is neither surprising nor worth watching; drawn from the front they are
+       genuinely in the race and different every time. */
+    const p=DR.pool.slice(0,120),out=[];
+    while(out.length<7&&p.length) out.push(p.splice(Math.floor(Math.random()*p.length),1)[0]);
+    DR.pick=out.sort((a,b)=>a.sbRaw-b.sbRaw);drPaint();
   };
+  document.getElementById("drGo").onclick=()=>{ if(DR.pick.length===7) drRace(); };
+  drPaint();
 }
-function closeRace(){ const el=document.getElementById("gl"); if(el) el.remove(); }
-document.getElementById("brand").addEventListener("click",showSeven);
+
+function drPaint(){
+  const s=document.getElementById("drSlots");
+  if(!s)return;
+  s.innerHTML=Array.from({length:7},(_,k)=>{
+    const a=DR.pick[k];
+    if(!a)return '<div class="dr-slot">'+(k+1)+'</div>';
+    return '<div class="dr-slot full" data-k="'+k+'" title="Tap to drop">'+crest(a.team,"crest-sm")
+      +'<span class="dr-txt"><b>'+a.name.split(" ").slice(-1)[0]+'</b><i>'+a.cls+' \u00b7 '
+      +fmt(a.sbRaw)+'</i></span></div>';
+  }).join("");
+  s.querySelectorAll(".dr-slot.full").forEach(d=>d.onclick=()=>{
+    DR.pick.splice(+d.dataset.k,1);drPaint();});
+  const m=document.getElementById("drMeta");
+  if(DR.pick.length<7){
+    m.innerHTML='<b>'+DR.pick.length+' of seven.</b> Anyone in the state, any classification. '
+      +'They line up against the '+CLS+' field at Lane &mdash; as ghosts, so their own schools still race too.';
+  }else{
+    const five=DR.pick.slice(0,SC).reduce((x,a)=>x+a.sbRaw,0);
+    const schools=new Set(DR.pick.map(a=>a.team)).size;
+    const classes=new Set(DR.pick.map(a=>a.cls)).size;
+    m.innerHTML='Scoring '+SC+' average <b>'+fmt(five/SC)+'</b> \u00b7 <b>'+schools+'</b> school'
+      +(schools===1?"":"s")+' \u00b7 <b>'+classes+'</b> classification'+(classes===1?"":"s")
+      +'. They line up against the '+CLS+' field at Lane.';
+  }
+  const go=document.getElementById("drGo");
+  go.disabled=DR.pick.length!==7;
+  go.textContent=DR.pick.length===7?"Race them":"Pick "+(7-DR.pick.length)+" more";
+  drList();
+}
+
+function drList(){
+  const box=document.getElementById("drList");
+  if(!box)return;
+  const q=DR.q.trim().toLowerCase();
+  const has=new Set(DR.pick.map(a=>a.name+"|"+a.team));
+  const hit=q?DR.pool.filter(a=>(a.name+" "+a.team).toLowerCase().indexOf(q)>=0):DR.pool;
+  box.innerHTML=hit.slice(0,60).map(a=>{
+    const on=has.has(a.name+"|"+a.team);
+    return '<div class="dr-row'+(on?" on":"")+'" data-i="'+DR.pool.indexOf(a)+'">'
+      +crest(a.team,"crest-sm")
+      +'<span class="dr-nm">'+a.name+' <em>'+a.team+'</em></span>'
+      +'<span class="dr-cls">'+a.cls+'</span>'
+      +'<span class="dr-t">'+fmt(a.sbRaw)+'</span></div>';
+  }).join("")||'<div class="dr-row on"><span class="dr-nm">Nobody by that name.</span></div>';
+  box.querySelectorAll(".dr-row[data-i]").forEach(r=>r.onclick=()=>{
+    if(r.classList.contains("on")||DR.pick.length>=7)return;
+    const a=DR.pool[+r.dataset.i];
+    if(a){DR.pick.push(a);DR.pick.sort((x,y)=>x.sbRaw-y.sbRaw);drPaint();}
+  });
+}
+
+/* One race, drawn the way every race on this site is drawn: a full season to
+   settle who qualifies, then a fresh draw at Lane with the ghosts added. */
+function drRace(){
+  drCancel();
+  DR.live=true;DR.oddsHTML="";
+  const model=buildModel(gender,DIST);
+  const gi=addGuest(model,DR.pick);
+  const sigma=sigmaPct/100;
+  const times=new Float64Array(model.runners.length);
+  const shock=new Float64Array(model.teams.length);
+  const T=blankTally(model);
+  draw(model,times,sigma,shock);
+  const field=playDistricts(model,T.byIdx,times,null);
+  if(field.length<2){drCancel();return;}
+  draw(model,times,sigma,shock);
+  field.push(gi);
+  const res=scoreMeet(field.map(i=>model.teams[i]),times,SC,PL);
+  const line=[];
+  for(const i of field) for(const ri of model.teams[i].rIdx) line.push({ri,t:times[ri],team:i});
+  line.sort((a,b)=>a.t-b.t);
+  paceLine(model,gi,line,res);
+  ghostOdds(model,gi,sigma);
+}
+
+/* The pace line. Position is a CSS transition per runner, duration set from
+   that runner's own time, so the browser does the animation and the finishing
+   order is exact by construction. Constant pace also means the field starts
+   bunched and strings out as the gaps compound - which is what a race does. */
+function paceLine(model,gi,line,res){
+  const who=[];
+  for(const tm of model.teams)
+    if(tm.roster) tm.rIdx.forEach((ri,k)=>who[ri]={name:tm.roster[k].name,team:tm.name});
+  const el=overlay();
+  el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="One race at Lane">'
+    +'<div class="gl-tape"></div>'
+    +'<div class="gl-hd"><h3>Lane, 5,000m</h3><p>'+line.length+' on the line &mdash; the '+CLS
+    +' state field, plus seven who do not exist</p></div>'
+    +'<div class="pl-wrap" id="plWrap"><span class="pl-fin"></span>'
+    +'<span class="pl-clock" id="plClock">0:00</span>'
+    +'<span class="pl-skip">tap to skip</span></div>'
+    +'<div class="pl-feed" id="plFeed"></div><div id="plOut"></div>'
+    +'<button class="gl-again" id="plAgain">Pick a different seven</button>'
+    +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  document.getElementById("plAgain").onclick=showDraft;
+  const wrap=document.getElementById("plWrap"),feed=document.getElementById("plFeed");
+  const W=wrap.clientWidth,H=wrap.clientHeight,x0=6,x1=W-24,ROWS=24,gy=(H-20)/(ROWS-1);
+  const frag=document.createDocumentFragment();
+  const dots=line.map((r,i)=>{
+    const d=document.createElement("i");
+    d.className="pl-dot"+(r.team===gi?" me":"");
+    const y=10+((i*7)%ROWS)*gy;
+    d.style.transform="translate("+x0+"px,"+y+"px)";
+    frag.appendChild(d);
+    return {el:d,y,t:r.t};
+  });
+  wrap.appendChild(frag);
+  const total=line[line.length-1].t;
+  /* The winner crosses in eight seconds - unless the field has a long tail, and
+     a drafted seven can easily include a twenty-eight minute runner. Then the
+     whole race is compressed into twelve rather than leaving someone jogging
+     alone for another ten. */
+  const SPEED=Math.max(line[0].t/8,total/12);
+  // the rows worth watching: the first three across, and all seven ghosts
+  const show=[];
+  line.forEach((r,i)=>{ if(i<3||r.team===gi) show.push({p:i+1,r}); });
+  let shown=0,over=false;
+  const addRow=s=>{
+    const row=document.createElement("div");
+    row.className="pl-fr"+(s.r.team===gi?" me":"");
+    row.innerHTML='<span class="pl-pl">'+s.p+'</span><span class="pl-nm">'+who[s.r.ri].name
+      +' <em>'+who[s.r.ri].team+'</em></span><span class="pl-t">'+fmt(s.r.t)+'</span>';
+    feed.appendChild(row);
+  };
+  const finish=()=>{
+    if(over)return; over=true;
+    drFeedStop();
+    DR.timers.push(setTimeout(()=>wrap.classList.add("over"),800));
+    for(const d of dots){d.el.style.transition="none";d.el.style.transform="translate("+x1+"px,"+d.y+"px)";}
+    while(shown<show.length) addRow(show[shown++]);
+    document.getElementById("plClock").textContent=
+      Math.floor(total/60)+":"+String(Math.floor(total%60)).padStart(2,"0");
+    const p=res.findIndex(r=>r.idx===gi)+1, mine=res[p-1];
+    document.getElementById("plOut").innerHTML='<div class="gl-kick">In this one race they finished <b>'
+      +ord(p)+'</b> on <b>'+mine.total+' points</b>, '
+      +(p===1?'ahead of <b>'+model.teams[res[1].idx].name+'</b>'
+             :'behind <b>'+model.teams[res[0].idx].name+'</b>')
+      +'. <span id="plOdds">Running two thousand more&hellip;</span></div>';
+    drShowOdds();
+  };
+  wrap.onclick=finish;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)
+    return finish();                    // the result, rather than a frozen track
+  void wrap.offsetWidth;                // commit the start line before animating
+  for(const d of dots){
+    d.el.style.transition="transform "+(d.t/SPEED)+"s linear";
+    d.el.style.transform="translate("+x1+"px,"+d.y+"px)";
+  }
+  for(const s of show)
+    DR.timers.push(setTimeout(()=>{ if(!over) addRow(show[shown++]); },s.r.t/SPEED*1000));
+  const clock=document.getElementById("plClock"),t0=performance.now();
+  nextTick(function tick(ts){
+    if(!DR.live||over)return;
+    const e=Math.min((ts-t0)/1000*SPEED,total);
+    clock.textContent=Math.floor(e/60)+":"+String(Math.floor(e%60)).padStart(2,"0");
+    if(e<total)nextTick(tick); else finish();
+  });
+}
+
+/* Two thousand more seasons, chunked so the race keeps animating while they
+   run. The guest never goes through districts, so it qualifies every season -
+   which makes ptsN the season count and the points figure unconditional. */
+function ghostOdds(model,gi,sigma){
+  const N=2000,T=blankTally(model),by=T.byIdx;
+  const times=new Float64Array(model.runners.length);
+  const shock=new Float64Array(model.teams.length);
+  let done=0;
+  /* Paced on a timer, not on frames: this loop paints nothing until it
+     finishes, and a frame callback on a page that has stopped animating is at
+     the browser's discretion. Registered so closing the sheet stops it. */
+  const slice=()=>{DR.odds=setTimeout(step,0);};
+  function step(){
+    if(!DR.live)return;
+    const end=Math.min(N,done+200);
+    while(done<end){
+      draw(model,times,sigma,shock);
+      const f=playDistricts(model,by,times,null);
+      draw(model,times,sigma,shock);
+      f.push(gi);
+      playState(model,by,times,f,null,null,null);
+      done++;
+    }
+    if(done<N)return slice();
+    const g=by[gi];
+    let sum=0,seen=0;
+    for(let p=1;p<=FIELD;p++){sum+=p*g.hist[p];seen+=g.hist[p];}
+    const mean=(sum+(N-seen)*(FIELD+1))/N;   // the one place hist cannot hold
+    DR.oddsHTML='Across '+N.toLocaleString()+' more they win <b>'+pct(g.win,N)
+      +'</b>, finish top four <b>'+pct(g.top4,N)+'</b>, and average <b>'+mean.toFixed(1)
+      +'</b> on <b>'+Math.round(g.ptsSum/g.ptsN)+' points</b>.';
+    drShowOdds();
+  }
+  slice();
+}
+
+function closeRace(){
+  drCancel();
+  const el=document.getElementById("gl"); if(el) el.remove();
+}
+document.getElementById("brand").addEventListener("click",showDraft);
 document.getElementById("brand").addEventListener("keydown",e=>{
-  if(e.key==="Enter"||e.key===" "){e.preventDefault();showSeven();}});
+  if(e.key==="Enter"||e.key===" "){e.preventDefault();showDraft();}});
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeRace(); });
 
 document.querySelectorAll(".switch button[data-g]").forEach(b=>b.onclick=()=>{
