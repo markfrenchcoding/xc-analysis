@@ -70,6 +70,18 @@ ok(Math.max(...[...perTeam.values()].map(s => s.size)) <= S.ATHLETES_PER_TEAM,
    'no team is over the cap of ' + S.ATHLETES_PER_TEAM);
 ok(after.every(r => !/[,"]/.test(r.name)), 'no commas or quotes in a name');
 
+/* A stray quote is worse than a comma: the reader toggles quote mode on it, so
+   one unmatched " swallows the rest of the line - mark, grade, team and class
+   all folded into the name. athletic.net carries nicknames that way. */
+const nick = S.buildSeed([
+  { g:'M', name:'Benjamin "Finley" Crowell', school:'Jesuit', grade:'10', seconds:'16:00.00', dist:5000, date:'2026-09-05' },
+  { g:'M', name:'Stray " Quote', school:'Jesuit', grade:'10', seconds:'16:10.00', dist:5000, date:'2026-09-05' },
+  { g:'M', name:"Sean O'Brien", school:'Jesuit', grade:'11', seconds:'16:20.00', dist:5000, date:'2026-09-05' },
+], board).csv.split('\n').slice(1).map(l => l.split(',')[1]);
+eq(nick[0], 'Benjamin Finley Crowell', 'a nickname loses its quotes');
+eq(nick[1], 'Stray Quote', 'an unmatched quote is removed too');
+eq(nick[2], "Sean O'Brien", 'an apostrophe is left alone');
+
 /* ---------- trimming actually happens ----------
    An eighth athlete and a fourth mark have to be discarded, or the round trip
    above is passing because nothing was ever over the cap. */

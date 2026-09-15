@@ -36,8 +36,8 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
-- 3,645 rows currently across all five classifications: 2,306 athlete-boards,
-  216 schools. Pulled from meet results through Sep 12, 2026 by the refresh page
+- 4,923 rows currently across all five classifications: 3,187 athlete-boards,
+  216 schools, up to twelve deep a team. Pulled through Sep 12, 2026 by the refresh
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
@@ -201,10 +201,12 @@ more runners the database has never heard of. Nobody arrives either - no
 incoming freshmen, no year of improvement - so every team is understated, and
 the senior-heavy ones are understated worst.
 
-That is large, not cosmetic: 6A boys goes from 45 teams able to field five to
-**26**. The note under the switch is generated rather than written for exactly
-that reason, and it carries the live count, because how much of the board
-survives changes with the classification and the gender.
+It was large before the cap was raised: 6A boys went from 45 teams able to field
+five to **26**. At twelve deep it is **44 of 46**, and the board reads sensibly
+again - Franklin 58% rather than the 87% it showed when its rivals had vanished.
+The note under the switch is still generated rather than written, and still
+carries the live count, because how much survives changes with the
+classification and the gender.
 
 **The cap is twelve, not seven, and that is why.** `ATHLETES_PER_TEAM` in
 `pull/seed.js` was seven because seven is what a team races - right for this

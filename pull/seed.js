@@ -194,7 +194,15 @@
       // so it is dropped without being reported as one
       if (!b) { dropped.offBoard++; if (strip(r.school)) offBoardNames.add(strip(r.school)); continue; }
       if (r.date && r.date > latest) latest = r.date;
-      keep.push({ g: r.g, name: String(r.name || '').replace(/,/g, ' ').trim(),
+      /* Commas break the columns and quotes break worse. The seed is written
+         unquoted, and the reader toggles quote mode on any " it meets: a name
+         with a matched pair survives by luck, but a single stray one swallows
+         the rest of the line - mark, grade, team and class all folded into the
+         name, silently. athletic.net carries nicknames that way, so this is not
+         hypothetical: Benjamin "Finley" Crowell and Abigail "Abbie" Hamilton
+         both arrived with the deeper roster cap. */
+      keep.push({ g: r.g, name: String(r.name || '').replace(/[",]/g, ' ')
+                    .replace(/\s+/g, ' ').trim(),
                   sec, date: r.date || '', grade: String(r.grade || '').replace(/\D/g, ''),
                   team: b.name, cls: b.cls });
     }
