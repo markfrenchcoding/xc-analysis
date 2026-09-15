@@ -81,7 +81,7 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .gl-sec{margin:14px 17px 0;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
 @keyframes glRow{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
-  .gl,.gl-card,.pl-fr,.dream,.pk-team{animation:none}
+  .gl,.gl-card,.pl-fr,.dream,.pk-team,.pl-dot{animation:none}
   .pk-team{transition:none}
   .gl-tape{animation:none}
 }
@@ -141,10 +141,26 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .pl-wrap.over{height:0;margin-top:0;opacity:0;border-width:0;cursor:default}
 .pl-fin{position:absolute;right:15px;top:0;bottom:0;width:3px;background-size:3px 8px;
   background-image:linear-gradient(var(--text) 50%,var(--accent) 50%)}
-.pl-dot{position:absolute;left:0;top:0;width:4px;height:4px;border-radius:50%;
-  background:color-mix(in srgb,var(--dim) 65%,transparent)}
-.pl-dot.me{width:7px;height:7px;margin:-1.5px 0 0 -1.5px;background:var(--t1e);
-  box-shadow:0 0 0 2px color-mix(in srgb,var(--t1e) 20%,transparent)}
+/* Travel is on the `translate` property and the wobble is on `transform`, which
+   are separate properties that compose. That is what lets a runner surge and
+   fade a pixel either way without the arrival time drifting: the transition
+   still runs the full distance in exactly t/SPEED seconds. */
+.pl-dot{position:absolute;left:0;top:0;width:5px;height:5px;border-radius:50%;
+  margin:-.5px 0 0 -.5px;background:var(--dim);
+  animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{
+  0%,100%{transform:translate(0,0)}
+  25%{transform:translate(-1.8px,-.6px)}
+  50%{transform:translate(.2px,.5px)}
+  75%{transform:translate(1.8px,-.6px)}}
+/* The one team that does not exist is the one in the site's own red - every
+   other hue on the track is drawn from a band that excludes it - ringed in the
+   ground colour so it punches out of the crowd. */
+.pl-dot.me{width:9px;height:9px;margin:-2.5px 0 0 -2.5px;background:var(--accent);
+  box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px color-mix(in srgb,var(--accent) 45%,transparent);
+  z-index:2}
+.pl-wrap.done .pl-dot{animation:none;transform:none}
+.pl-chip{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
 .pl-clock{position:absolute;left:11px;top:8px;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums}
 .pl-skip{position:absolute;right:11px;top:8px;font-size:9.5px;color:var(--dim)}
@@ -4965,6 +4981,11 @@ const GHOST="Dream Team";
    what the race should feel like - except these sixteen are drawn from every
    classification in the state, because the draft is. */
 const DREAM_FIELD=16;
+/* A hue per school, stepped by the golden angle so consecutive teams never land
+   near each other, and wrapped into 25-335 degrees so the band the site's own
+   accent sits in stays reserved for the Dream Team. Mid lightness, because the
+   same dot has to read on both a near-white and a near-black track. */
+const teamHue=i=>"hsl("+(((i*137.508)%310)+25).toFixed(1)+",64%,56%)";
 /* timers are the finish-line reveals, which skipping cancels; odds is the
    background season loop, which it must not. */
 let DR={pool:[],pick:[],g:null,q:"",timers:[],odds:0,oddsHTML:"",live:false};
@@ -5186,7 +5207,7 @@ function paceLine(model,gi,line,res){
   el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="One race at Lane">'
     +'<div class="gl-tape"></div>'
     +'<div class="gl-hd"><h3>Lane, 5,000m</h3><p>'+line.length
-    +' on the line &mdash; the sixteen fastest schools in Oregon, plus seven who do not exist</p></div>'
+    +' on the line &mdash; the sixteen fastest schools in Oregon, a colour each, plus seven who do not exist</p></div>'
     +'<div class="pl-wrap" id="plWrap"><span class="pl-fin"></span>'
     +'<span class="pl-clock" id="plClock">0:00</span>'
     +'<span class="pl-skip">tap to skip</span></div>'
@@ -5199,9 +5220,14 @@ function paceLine(model,gi,line,res){
   const frag=document.createDocumentFragment();
   const dots=line.map((r,i)=>{
     const d=document.createElement("i");
-    d.className="pl-dot"+(r.team===gi?" me":"");
+    const me=r.team===gi;
+    d.className="pl-dot"+(me?" me":"");
+    if(!me) d.style.background=teamHue(r.team);
     const y=10+((i*7)%ROWS)*gy;
-    d.style.transform="translate("+x0+"px,"+y+"px)";
+    d.style.translate=x0+"px "+y+"px";
+    // strides out of step with each other, off the index rather than a random
+    d.style.animationDuration=(0.9+((i*37)%9)*0.11).toFixed(2)+"s";
+    d.style.animationDelay=(-((i*53)%19)*0.09).toFixed(2)+"s";
     frag.appendChild(d);
     return {el:d,y,t:r.t};
   });
@@ -5220,7 +5246,8 @@ function paceLine(model,gi,line,res){
     const row=document.createElement("div");
     row.className="pl-fr"+(s.r.team===gi?" me":"");
     const tag=s.r.team===gi?'<span class="dream">'+GHOST+'</span>'
-                           :'<em>'+who[s.r.ri].team+'</em>';
+      :'<em><i class="pl-chip" style="background:'+teamHue(s.r.team)+'"></i>'
+        +who[s.r.ri].team+'</em>';
     row.innerHTML='<span class="pl-pl">'+s.p+'</span><span class="pl-nm">'+who[s.r.ri].name
       +' '+tag+'</span><span class="pl-t">'+fmt(s.r.t)+'</span>';
     feed.appendChild(row);
@@ -5229,7 +5256,8 @@ function paceLine(model,gi,line,res){
     if(over)return; over=true;
     drFeedStop();
     DR.timers.push(setTimeout(()=>wrap.classList.add("over"),450));
-    for(const d of dots){d.el.style.transition="none";d.el.style.transform="translate("+x1+"px,"+d.y+"px)";}
+    wrap.classList.add("done");        // stops the wobble, so everyone lands exactly on the line
+    for(const d of dots){d.el.style.transition="none";d.el.style.translate=x1+"px "+d.y+"px";}
     while(shown<show.length) addRow(show[shown++]);
     document.getElementById("plClock").textContent=
       Math.floor(total/60)+":"+String(Math.floor(total%60)).padStart(2,"0");
@@ -5247,8 +5275,8 @@ function paceLine(model,gi,line,res){
     return finish();                    // the result, rather than a frozen track
   void wrap.offsetWidth;                // commit the start line before animating
   for(const d of dots){
-    d.el.style.transition="transform "+(d.t/SPEED)+"s linear";
-    d.el.style.transform="translate("+x1+"px,"+d.y+"px)";
+    d.el.style.transition="translate "+(d.t/SPEED)+"s linear";
+    d.el.style.translate=x1+"px "+d.y+"px";
   }
   for(const s of show)
     DR.timers.push(setTimeout(()=>{ if(!over) addRow(show[shown++]); },s.r.t/SPEED*1000));

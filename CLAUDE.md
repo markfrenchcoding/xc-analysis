@@ -213,9 +213,26 @@ name at 3rd and at 43rd. Taking them out of their school would drop it below the
 scoring five and quietly change the field they are being measured against, so
 the duplicate is the lesser distortion. The draft says so in a clause.
 
+**Every school on the track has its own hue**, stepped by the golden angle so
+consecutive teams never land near each other and wrapped into 25-335 degrees,
+which reserves the band the site's accent sits in. Mid lightness, because the
+same dot has to read on a near-white track and a near-black one. That leaves the
+seven who do not exist as the only red on the course, ringed in the ground
+colour so they punch out of the crowd - the same logic as the mark, where the
+team is accent among grey. The feed carries each school's hue as a chip beside
+its name.
+
 **The pace line is CSS, not a render loop.** Each dot gets one transition whose
 duration is that runner's own time, so the browser does the animation and the
-finishing order is exact by construction. Constant pace also means the field
+finishing order is exact by construction.
+
+**Travel is on `translate`; the wobble is on `transform`.** They are separate
+properties and they compose, which is what lets a runner surge and fade a pixel
+either way without the arrival time drifting - the transition still covers the
+full distance in exactly `t/SPEED` seconds. The wobble is one shared keyframe
+with a per-runner duration and negative delay taken from the index rather than a
+random, so a given race always wobbles the same way. `.pl-wrap.done` kills it at
+the finish, which is what guarantees all of them land exactly on the line. Constant pace also means the field
 starts bunched and strings out as the gaps compound, which is what a race looks
 like from above. The winner crosses in four and a half seconds — `SPEED` takes
 the max of that against a seven-second whole-race cap, because a drafted seven
