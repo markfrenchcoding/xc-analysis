@@ -73,11 +73,42 @@ spelling, or `Cleveland (OR)` will miss `Cleveland`.
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
 
-**The Runners board** lists the fifty best individuals in the division by mean
-finishing place at Lane, run against the same field the teams face with
-individual qualifiers included. Fifty, not everyone — the tail is hundreds of
-runners who reached Lane in a handful of seasons and the ranking there is noise.
-The footnote says how many athletes made it at all.
+**The Runners board sorts itself out in front of you**, the same way the team
+cards do: rows are absolutely positioned and moved with `translateY` off a
+measured step, so they pass each other as the odds firm up.
+
+Three things about it are not obvious.
+
+*Ninety rows are in play and fifty are shown.* The board ranks on mean finishing
+place, which is not knowable before the run, so the cards have to be built from
+something correlated with it — season best — and then allowed to re-order.
+Ninety gives the boundary room to move; anything past the fiftieth slot parks on
+the fiftieth and fades to nothing, still ranked and still able to come back.
+
+*The digits churn and lock.* `spin()` replaces digit characters with random ones
+at a probability that falls as the run progresses — `lock = frac²`, so almost
+everything is still spinning at halfway and almost nothing is by the end. Only
+digits are touched: a percent sign, a decimal point and an em dash all stay put,
+so the shape of a number never jumps and `<1%` never becomes something absurd in
+its punctuation. The point is that the board *arrives* at its answer.
+
+*The rail and the chip say different things.* The left rail carries the
+all-state tier — first team through seventh, second team through fourteenth,
+honorable mention through twenty-first, in `--t1`/`--t2`/`--t3` — with a group
+label above each block. The rank chip carries the podium, gold-silver-bronze on
+the top three only, echoing the `.rank` chip on a team card. Two different facts,
+so they get two different marks instead of fighting over one colour. `RCUTS` and
+`RTIER` hold the cuts; `rowY` offsets every row by the labels sitting above it.
+
+*No `will-change` on these rows*, unlike `.tcard`. Ninety elements promoted to
+their own compositor layer cost more than the hint saves — it made the board
+paint half-drawn. They do carry an opaque `background`, which is not decoration:
+two rows swapping slots slide through each other, and without something to
+occlude with the reader gets one name printed over another for half a second.
+
+The runner tally counts `win`, `top21` and `placeSum`/`n`. It used to count
+top-5/10/20, which matched nothing the board marks; twenty-one is the all-state
+line, so that is what is counted and what the column shows.
 
 **The flag: your Oregon Dream Team.** Tapping the checkered flag opens a
 draft. Pick any seven athletes in the state — any school, any classification —
@@ -408,18 +439,27 @@ tried first and was too weak: it shifted ~0.02 against a 0.02 threshold.
 
 ## Timers
 
-`nextTick` falls back to `setTimeout` when `document.hidden`. Browsers throttle
-`requestAnimationFrame` to nothing in background tabs, which strands a run
-mid-way. Every paced loop must use `nextTick`, not rAF directly. The two
-remaining rAF calls are cosmetic (measure/paint) and fine.
+`nextTick` schedules **both** a frame and a timer and lets the first to arrive
+win: the frame while the page is painting, the timer at 150ms when it is not.
+Every paced loop must use it rather than rAF directly.
+
+It used to check `document.hidden` and then hand the tick to
+`requestAnimationFrame`, which is a frame too late — a tab backgrounded *after*
+that check leaves the callback pending with no way back, and the run is stranded
+half-finished. That is not theoretical: the Runners board reproduced it every
+time, because a browser that has stopped painting stops delivering frames while
+`document.hidden` stays false. The belt-and-braces version also means a run
+started and then left alone still finishes.
 
 ## Layout gotcha
 
-Team cards are absolutely positioned and moved with `translateY`, so they sort
-smoothly during a run. The step height is **measured from a rendered card**
-(`measure()`), never hardcoded — a hardcoded 118px against content-sized cards
-is what caused overlapping cards once already. Re-measure on resize and after a
-run finishes.
+Team cards and runner rows are absolutely positioned and moved with
+`translateY`, so they sort smoothly during a run. The step height is **measured
+from a rendered card** (`measure()`, `measureRun()`), never hardcoded — a
+hardcoded 118px against content-sized cards is what caused overlapping cards
+once already. Re-measure on resize, after a run finishes, and when a tab that
+was hidden comes back: a hidden panel measures zero, so a board built while the
+reader was elsewhere has a stale step and overlaps.
 
 ## Audit harness
 

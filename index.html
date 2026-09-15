@@ -280,11 +280,45 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .title b{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;line-height:1;
   font-variant-numeric:tabular-nums}
 .title i{font-style:normal;font-size:8.5px;color:var(--dim);display:block;line-height:1.25}
-.rrow{display:flex;align-items:center;gap:8px;padding:7px 2px;border-top:1px solid var(--line)}
-.rrow:first-child{border-top:0}
-.rpl{width:26px;flex:none;text-align:right;font-family:'Barlow Condensed',sans-serif;
-  font-weight:700;font-size:15px;color:var(--dim);font-variant-numeric:tabular-nums}
-.rrow.p1 .rpl{color:var(--t1e)}
+/* Rows are absolutely positioned and moved with translateY, exactly like the
+   team cards, so they pass each other while the board sorts itself out. The
+   step height is measured from a rendered row, never assumed.
+   No will-change here, unlike .tcard: there are ninety of these against
+   forty-five cards, and promoting ninety elements to their own compositor
+   layer costs more than the hint saves - it made the pane drop frames and
+   paint the board half-drawn.
+   The background is not decoration: two rows swapping slots slide through each
+   other, and without something opaque to occlude with, the reader gets one
+   name printed over another for half a second. */
+#rboard{position:relative;margin-top:2px}
+.rrow{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;
+  padding:7px 2px 7px 11px;border-bottom:1px solid var(--line);background:var(--bg);
+  transition:transform .45s var(--ease),opacity .3s;contain:layout style}
+/* The rail carries the all-state tier; the chip carries the podium. Two
+   different facts, so they get two different marks rather than fighting over
+   one colour. */
+.rail{position:absolute;left:0;top:6px;bottom:7px;width:3px;border-radius:3px;
+  background:transparent;transition:background .45s}
+.rrow.a1 .rail{background:var(--t1)}
+.rrow.a2 .rail{background:var(--t2)}
+.rrow.a3 .rail{background:var(--t3)}
+.rrow.a4 .rail{background:var(--line)}
+.rpl{flex:none;min-width:28px;height:20px;padding:0 5px;border-radius:5px;display:grid;
+  place-items:center;background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
+  transition:background .4s,border-color .4s}
+.rpl u{display:block;transform:skewX(9deg);text-decoration:none;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;color:var(--muted);transition:color .4s}
+.rrow.p1 .rpl{background:var(--t1);border-color:var(--t1e)}.rrow.p1 .rpl u{color:#fff}
+.rrow.p2 .rpl{background:var(--t2);border-color:var(--t2e)}.rrow.p2 .rpl u{color:#1B1D21}
+.rrow.p3 .rpl{background:var(--t3);border-color:var(--t3e)}.rrow.p3 .rpl u{color:#fff}
+.rlab{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:6px;height:18px;
+  font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+  transition:transform .45s var(--ease)}
+.rlab i{width:14px;height:3px;border-radius:3px;background:var(--line);flex:none}
+.rlab.a1 i{background:var(--t1)}
+.rlab.a2 i{background:var(--t2)}
+.rlab.a3 i{background:var(--t3)}
 .rnm{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
 .rnt{min-width:0;line-height:1.24}
 .rnt b{display:block;font-weight:500;font-size:12.5px;overflow:hidden;
@@ -293,11 +327,13 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rfig{flex:none;width:44px;text-align:right;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.rfig b{display:block;font-weight:inherit;font-size:inherit}
+.rfig.spin b{color:var(--muted)}
 .rfig i{display:block;font-style:normal;font-size:8px;color:var(--dim);font-weight:400;
   font-family:'Barlow',sans-serif}
-.rhead{display:flex;gap:8px;padding:0 2px 5px;font-size:8.5px;letter-spacing:.06em;
+.rhead{display:flex;gap:8px;padding:0 2px 5px 11px;font-size:8.5px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--dim)}
-.rhead span:first-child{width:26px;flex:none}
+.rhead span:first-child{width:28px;flex:none}
 .rhead span:nth-child(2){flex:1}
 .rhead span:not(:first-child):not(:nth-child(2)){width:44px;flex:none;text-align:right}
 /* four figure columns squeeze the name to an ellipsis on a phone; "gets there"
@@ -4062,9 +4098,7 @@ function playState(model,byIdx,times,fieldIdx,indIdx,rTally,rTime){
       const place=k+1;
       r.n++; r.placeSum+=place;
       if(place===1)r.win++;
-      if(place<=5)r.top5++;
-      if(place<=10)r.top10++;
-      if(place<=20)r.top20++;
+      if(place<=21)r.top21++;      // all-state, three teams of seven
       if(place<r.best)r.best=place;
     }
   }
@@ -4114,7 +4148,7 @@ function runnerTally(model){
     tm.rIdx.forEach((ri,k)=>{
       by[ri]={ri,name:tm.roster[k].name,team:tm.name,league:tm.league,grade:tm.roster[k].grade,
         sb:tm.roster[k].sbRaw,marks:tm.roster[k].marks.length,
-        n:0,placeSum:0,win:0,top5:0,top10:0,top20:0,best:1e9};
+        n:0,placeSum:0,win:0,top21:0,best:1e9};
     });
   }
   return by;
@@ -4297,8 +4331,18 @@ const STEP=5, MAX_TOTAL=180, MAX_STEPS=30, PER_RUNNER_CAP=45;
 const MIN_GAIN=0.004;               // ignore a candidate that sits inside the noise
 /* requestAnimationFrame is throttled to a standstill in a background tab, which
    strands a run mid-way. Fall back to a timer when the page is hidden. */
-const nextTick=fn=>document.hidden?setTimeout(()=>fn(performance.now()),16)
-                                  :requestAnimationFrame(fn);
+/* Both a frame and a timer are scheduled, and the first to arrive wins: the
+   frame while the page is painting, the timer when it is not. The old version
+   checked document.hidden and then handed the tick to requestAnimationFrame,
+   which is a frame late - a tab backgrounded after that check leaves the
+   callback pending and strands the run half-finished, with no way back. This
+   also means a run started and then left alone still finishes. */
+const nextTick=fn=>{
+  let go=true;
+  const once=ts=>{ if(!go)return; go=false; fn(ts||performance.now()); };
+  if(!document.hidden) requestAnimationFrame(once);
+  setTimeout(once,document.hidden?16:150);
+};
 
 function wiTeamNow(){
   const model=buildModel(gender,DIST);
@@ -4583,6 +4627,8 @@ function runRunners(){
   go.textContent="Finish";go.classList.add("running");
   const T=blankTally(model), rt=runnerTally(model);
   const worlds=[{adj:null,byIdx:T.byIdx,rt}];
+  const pool=rt.filter(Boolean).sort((a,b)=>a.sb-b.sb).slice(0,RPOOL);
+  buildRunBoard(pool);
   const sigma=sigmaPct/100;
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
@@ -4590,8 +4636,6 @@ function runRunners(){
   const rb=document.getElementById("runbar3"),lab=document.getElementById("runlab3"),
         pack=document.getElementById("pack3");
   rb.classList.add("on");
-  document.getElementById("runOut").innerHTML=
-    '<div class="empty">Running '+nSims.toLocaleString()+' seasons&hellip;</div>';
   let done=0,t0=0;
   const dur=durMs();
   nextTick(function step(ts){
@@ -4602,40 +4646,126 @@ function runRunners(){
     rb.querySelector(".track i").style.width=(frac*100)+"%";
     pack.style.left=(frac*100)+"%";
     lab.textContent=done.toLocaleString()+" / "+nSims.toLocaleString();
+    paintRunners(pool,done,frac*frac);
     if(done<nSims)nextTick(step);
     else{
       rb.classList.remove("on");
       lab.textContent="±"+sigmaPct.toFixed(1)+"%";
       document.body.classList.remove("simming");
       go.textContent="Run again";go.classList.remove("running");running=false;
-      renderRunners(rt,done);
+      settleRunners(pool,done);
+      // rows were laid out against a measured step; re-measure now the footnote
+      // has text in it and the board has stopped moving
+      nextTick(()=>{measureRun();rcards.forEach(c=>c.pos=-1);settleRunners(pool,done);});
     }
   });
 }
-function renderRunners(rt,seasons){
-  const rows=rt.filter(r=>r&&r.n).map(r=>({...r,mean:r.placeSum/r.n,rate:r.n/seasons}));
-  const out=document.getElementById("runOut");
-  if(!rows.length){ out.innerHTML='<div class="empty">Nobody here reached Lane.</div>'; return; }
-  rows.sort((a,b)=>a.mean-b.mean);
-  const body=rows.slice(0,50).map((r,i)=>
-    '<div class="rrow'+(i===0?" p1":"")+'">'
-    +'<span class="rpl">'+(i+1)+'</span>'
-    +'<span class="rnm">'+crest(r.team,"crest")+'<span class="rnt"><b>'+r.name+'</b>'
-    +'<em>'+r.team+' &middot; '+fmt(r.sb)+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span></span>'
-    +'<span class="rfig">'+pct(r.win,seasons)+'<i>wins</i></span>'
-    +'<span class="rfig">'+pct(r.top10,seasons)+'<i>top 10</i></span>'
-    +'<span class="rfig">'+r.mean.toFixed(1)+'<i>avg place</i></span>'
-    +'<span class="rfig">'+pct(r.n,seasons)+'<i>gets there</i></span>'
-    +'</div>').join("");
-  out.innerHTML='<div class="rhead"><span></span><span>athlete</span><span>wins</span>'
-    +'<span>top 10</span><span>avg place</span><span>gets there</span></div>'+body
-    +'<p class="sub2" style="margin-top:9px">The fifty best of the '+rows.length.toLocaleString()+' athletes who reached Lane in at least one season. '
-    +'Ranked by average finish across the seasons the runner actually made it &mdash; a runner who is reliably twelfth outranks one who is fourth or fortieth. '
-    +'&ldquo;Gets there&rdquo; is how often they reached Lane at all, on a qualifying team or as an individual. '
-    +'A runner with a single race is rated slightly more cautiously than that one time suggests, because one race is thinner '
-    +'evidence than two — without that, the athletes who have raced least would look the best.</p>';
+/* Fifty rows are shown and ninety are in play. The board ranks on mean finishing
+   place, which is not knowable in advance, so the cards have to be built before
+   the run from something correlated with it — season best — and then allowed to
+   sort themselves out. Ninety gives the boundary room to move: a runner who ends
+   up fiftieth was never worse than about seventieth on paper. */
+const RPOOL=90, RSHOW=50;
+const RCUTS=[0,7,14,21];                 // where each all-state tier begins
+const RTIER=i=>i<7?1:i<14?2:i<21?3:4;
+let rcards=[], rlabs=[], rstepH=44, rlabH=20;
+
+function rowY(i){ return i*rstepH + rlabH*(1+(i>=7)+(i>=14)+(i>=21)); }
+
+/* Digits churn while the run is on and lock as it goes, so the board arrives at
+   its answer rather than being handed one. Only digits are touched — a percent
+   sign, a decimal point, an em dash all stay put, so the shape of the number
+   never jumps. lock rises with the square of progress: almost everything is
+   still spinning at the halfway mark, almost nothing is by the end. */
+function spin(s,lock){
+  if(lock>=1)return s;
+  let o="";
+  for(const ch of s)
+    o+=(ch>="0"&&ch<="9"&&Math.random()>lock)?String.fromCharCode(48+(Math.random()*10|0)):ch;
+  return o;
 }
 
+function buildRunBoard(pool){
+  const out=document.getElementById("runOut");
+  out.innerHTML='<div class="rhead"><span></span><span>athlete</span><span>wins</span>'
+    +'<span>all-state</span><span>avg place</span><span>gets there</span></div>'
+    +'<div id="rboard"></div>'
+    +'<p class="sub2" id="runFoot" style="margin-top:9px"></p>';
+  const board=document.getElementById("rboard");
+  rlabs=["First team all-state","Second team all-state","Honorable mention","Just outside"]
+    .map((txt,k)=>{
+      const d=document.createElement("div");
+      d.className="rlab a"+(k+1);
+      d.innerHTML='<i></i>'+txt;
+      board.appendChild(d);
+      return d;
+    });
+  rcards=pool.map(r=>{
+    const el=document.createElement("div");
+    el.className="rrow a4";
+    el.innerHTML='<span class="rail"></span><span class="rpl"><u>&mdash;</u></span>'
+      +'<span class="rnm">'+crest(r.team,"crest")+'<span class="rnt"><b>'+r.name+'</b>'
+      +'<em>'+r.team+' &middot; '+fmt(r.sb)+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span></span>'
+      +'<span class="rfig"><b>&mdash;</b><i>wins</i></span>'
+      +'<span class="rfig"><b>&mdash;</b><i>all-state</i></span>'
+      +'<span class="rfig"><b>&mdash;</b><i>avg place</i></span>'
+      +'<span class="rfig"><b>&mdash;</b><i>gets there</i></span>';
+    board.appendChild(el);
+    return {el,r,pos:-1,num:el.querySelector(".rpl u"),
+            f:el.querySelectorAll(".rfig b"),shown:["","","",""]};
+  });
+  measureRun();
+}
+
+// Measured from a rendered row, for the same reason the team cards are.
+function measureRun(){
+  if(!rcards.length)return;
+  const h=rcards[0].el.getBoundingClientRect().height;
+  if(h>0) rstepH=Math.round(h);
+  const lh=rlabs.length?rlabs[0].getBoundingClientRect().height:0;
+  if(lh>0) rlabH=Math.round(lh)+3;
+  const board=document.getElementById("rboard");
+  if(board) board.style.height=(RSHOW*rstepH+RCUTS.length*rlabH+6)+"px";
+  rlabs.forEach((d,k)=>{ d.style.transform="translateY("+(rowY(RCUTS[k])-rlabH)+"px)"; });
+}
+
+function paintRunners(pool,done,lock){
+  const mean=r=>r.n?r.placeSum/r.n:1e9;
+  const order=pool.slice().sort((a,b)=>mean(a)-mean(b));
+  const pos=new Map();
+  order.forEach((r,i)=>pos.set(r,i));
+  for(const c of rcards){
+    const i=pos.get(c.r);
+    if(c.pos!==i){
+      c.pos=i;
+      /* Everything past the fiftieth slot parks on the fiftieth and fades. It is
+         still ranked and still moving, so it can come back. */
+      c.el.style.transform="translateY("+rowY(Math.min(i,RSHOW))+"px)";
+      c.el.style.opacity=i<RSHOW?"1":"0";
+      c.num.textContent=i+1;
+      c.el.className="rrow a"+RTIER(i)+(i<3?" p"+(i+1):"");
+    }
+    if(i>=RSHOW)continue;                       // nothing off the board is read
+    const v=[pct(c.r.win,done),pct(c.r.top21,done),
+             c.r.n?(c.r.placeSum/c.r.n).toFixed(1):"\u2014",pct(c.r.n,done)];
+    for(let k=0;k<4;k++){
+      const s=spin(v[k],lock);
+      if(c.shown[k]!==s){c.shown[k]=s;c.f[k].textContent=s;}
+    }
+  }
+}
+
+function settleRunners(pool,done){
+  paintRunners(pool,done,1);
+  const foot=document.getElementById("runFoot");
+  if(foot) foot.innerHTML='All-state is marked the way Oregon awards it \u2014 first team through seventh, '
+    +'second team through fourteenth, honorable mention through twenty-first \u2014 against where a runner lands here. '
+    +'Ranked by average finish across the seasons the runner actually made it: a runner who is reliably twelfth '
+    +'outranks one who is fourth or fortieth. '
+    +'\u201cGets there\u201d is how often they reached Lane at all, on a qualifying team or as an individual. '
+    +'A runner with a single race is rated slightly more cautiously than that one time suggests, because one race is thinner '
+    +'evidence than two \u2014 without that, the athletes who have raced least would look the best.';
+}
 /* The last completed odds run, kept so a card can be opened afterwards and so
    the board can be re-laid-out when the Odds tab comes back into view. */
 let lastRun=null;
@@ -4730,6 +4860,7 @@ function clearOut(){
   document.getElementById("simOut").innerHTML="";
   const ro=document.getElementById("runOut");
   if(ro)ro.innerHTML='<div class="empty">Press Run to fill this in.</div>';
+  rcards=[];rlabs=[];
   closeRace();
   lastRun=null;
   for(const id of ["","2","3","4"]){
@@ -5211,6 +5342,8 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
      be re-laid-out the moment it comes back. */
   if(b.dataset.p==="p-sim"&&cards.length&&!running&&lastRun)
     nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(lastRun.tally,lastRun.done,true);});
+  if(b.dataset.p==="p-run"&&rcards.length&&!running)
+    nextTick(()=>{measureRun();rcards.forEach(c=>c.pos=-1);});
   scrollTo({top:0,behavior:"smooth"});});
 document.getElementById("go").onclick=()=>{
   if(running){skip=true;return;}
@@ -5221,7 +5354,11 @@ document.getElementById("go").onclick=()=>{
      runs the same simulation — only the progress strip moves. */
   run(on("p-lg")?"4":"");
 };
-addEventListener("resize",()=>{if(cards.length&&!running){measure();cards.forEach(c=>{c.pos=-1;});}});
+addEventListener("resize",()=>{
+  if(running)return;
+  if(cards.length){measure();cards.forEach(c=>{c.pos=-1;});}
+  if(rcards.length){measureRun();rcards.forEach(c=>{c.pos=-1;});}
+});
 
 function loadSeed(){
   setClass(CLS,gender);

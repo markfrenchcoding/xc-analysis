@@ -284,9 +284,7 @@ function playState(model,byIdx,times,fieldIdx,indIdx,rTally,rTime){
       const place=k+1;
       r.n++; r.placeSum+=place;
       if(place===1)r.win++;
-      if(place<=5)r.top5++;
-      if(place<=10)r.top10++;
-      if(place<=20)r.top20++;
+      if(place<=21)r.top21++;      // all-state, three teams of seven
       if(place<r.best)r.best=place;
     }
   }
@@ -363,7 +361,7 @@ function runnerTally(model){
     tm.rIdx.forEach((ri,k)=>{
       by[ri]={ri,name:tm.roster[k].name,team:tm.name,league:tm.league,grade:tm.roster[k].grade,
         sb:tm.roster[k].sbRaw,marks:tm.roster[k].marks.length,
-        n:0,placeSum:0,win:0,top5:0,top10:0,top20:0,best:1e9};
+        n:0,placeSum:0,win:0,top21:0,best:1e9};
     });
   }
   return by;
