@@ -222,41 +222,28 @@ colour so they punch out of the crowd - the same logic as the mark, where the
 team is accent among grey. The feed carries each school's hue as a chip beside
 its name.
 
-**They run the course, not a lane.** The field moves across an isometric Lane
-built from the OSAA course map: 30th Avenue down the whole west side, Poison Oak
-and Eldon Schafer across the top, the two ball fields, the start box, the soccer
-bowl, the track bowl, the campus as extruded boxes, three long ponds filling the
-bottom half, and the four kilometre markers where the map puts them. The ball
-fields fan from home plate rather than sitting as rectangles, the ponds have
-their corners knocked off, the track has a stand along its south side, and a
-scatter of trees lines the verges - squares and ovals alone read as a diagram,
-not a place.
+**They run the real course.** The route is the GPS trace of the state meet -
+5,105m, 1,141 points - not a drawing. `course/state_3rd.gpx` is in the repo
+and `node course/build_course.js` rebuilds the whole scene from it, so replacing
+the GPX gives a new course for free. Three earlier attempts drew the route by hand
+off the printed map and all three were wrong in the same way: they missed that
+the race finishes with a loop of the track itself.
 
-**The site is portrait, and getting that wrong is what made the first attempt
-look generic.** Plan is 0-124 east by 0-144 south, read off the printed map at
-roughly five map pixels to the unit, projected two-to-one (`(X-Y)*0.72`,
-`(X+Y)*0.36`) so east lands right and south lands bottom the way the map reads.
-Squeezing the same features into a square plan put the ponds in the wrong
-proportion to everything else and read as any-campus-anywhere.
+**The scenery is placed against the trace, not beside it.** The oval is measured
+off the closing loop, which is what guarantees the runners finish on the track
+they are drawn on. Everything else sits in ground the course provably never
+touches: grid the site at 8m, mark every cell within 16m of the trace, take the
+largest clear rectangles, and put the ponds, ball fields, soccer bowl and campus
+in those. Nothing can overlap the route because the route chose the gaps.
 
-**The ground is an L, not a rectangle.** Campus runs east across the top, the
-ponds run south down the west, and the south-east quarter is not part of the
-site - drawing it as a full diamond spent a third of the frame on nothing.
+**Heights are exaggerated about ninefold.** At true scale a twenty-metre
+building is two pixels of extrusion and the whole thing reads flat. The ground
+is a slab with one visible edge face for the same reason.
 
-**The route is two laps of the same ground**, traced off the OSAA map that has
-the course drawn on it. Lap one: the top stretch west to east through 1K, east
-around the track bowl, back across the middle to 1 Mile on the west side, then
-round the FIRST pond to 2K. Lap two: up the east side to 3K by the parking, the
-top stretch back east to west through 2 Miles, down the west side again, the
-DEEPER loop round the first and second ponds to 4K, and home up the east side to
-the finish beside the track.
-
-**That ordering is forced by the markers, and it explains 1K and 3K.** They sit a
-few metres apart on the map because they are two different passes over the same
-stretch, not one line - which is also why the two laps are drawn as parallel
-tracks along the top and down the west side rather than on top of each other.
-Get that wrong and the course reads as a lazy S through the middle of campus,
-which is what the first two attempts did.
+**The frame is rotated six degrees before projecting.** The site is 834m by
+371m; six degrees is the angle whose two-to-one dimetric projection fills the
+frame best, found by sweeping all of them. Do not hand-tune it - re-run the
+sweep if the extent changes.
 
 **Positions are computed, not transitioned.** CSS motion paths are the obvious
 fit and were tried first: `offset-path` with a per-runner `offset-distance`
