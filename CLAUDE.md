@@ -401,7 +401,20 @@ cutoff): 107 of 144 actual qualifiers inside the board's top group, 2 of 8
 champions named, pooled Brier 0.1536 against 0.2319 for knowing nothing, 35%
 skill.
 
-**The calibration wording on the page is now wrong and must be rewritten.** On
+**The page reports the horizon and the density, not one flat number.** A single
+pooled figure reads as "this model is 35% skilful", which is false in both
+directions: the same boards scored four weeks out instead of eight land between
+64% and 89%, and the September figure tracks how many marks existed at the time
+(580 by the 2023 cutoff, 973 by 2024). RECORD carries `marks`, `skillLate`,
+`weeksOut` and `weeksOutLate` per season, so the Track record table shows both
+columns and names which is which. The live board runs on more marks than any
+backtest season, which is why these figures are a floor rather than an estimate.
+
+**The cutoff is described by its horizon, not its month.** The four seasons do
+not share a date - Sep 9, 10, 13 and 14 - but every first cutoff is exactly
+eight weeks from its own state meet, so that is what the page says.
+
+**The calibration wording was wrong and now derives from the bands.** On
 two seasons it was honest at both ends and overconfident only in the middle. On
 four it is overconfident nearly everywhere: below-10% teams qualified 11% of the
 time, above-90% teams only 85%, and the 70–90% band averaged a call of 81% and

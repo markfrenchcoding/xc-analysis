@@ -22,6 +22,14 @@ console.log('publishing the backtest — ' + SEASONS.toLocaleString() + ' season
   + SIGMA + '%');
 
 /* ---------- the September pass, board by board ---------- */
+/* How many marks the model actually had at a cutoff. athletic.net's coverage
+   has grown - 14 meets by the 2022 September cutoff, 33 by the same point in
+   2025 - so the same date is not the same information set, and a reader
+   comparing seasons deserves to see that rather than guess at it. */
+const seedRows = (year, cutoff) => fs.readFileSync(
+  path.join(__dirname, 'data', year + '-seed-' + cutoff + '.csv'), 'utf8')
+  .trim().split(/\r?\n/).length - 1;
+
 const pooled = [];
 const perSeason = [];
 for (const year of YEARS) {
@@ -36,9 +44,22 @@ for (const year of YEARS) {
     // the favourite is the team most likely to WIN; a list sorted by P(qualify)
     // breaks its ties arbitrarily among everyone sitting at 100%
     const fav = teams.reduce((x, y) => (y.win > x.win ? y : x));
+    /* The same board four weeks out. Without it a reader has no way to tell a
+       model that is weak from a model that is early, and those are different
+       things to know about a September projection. */
+    const lateCut = L.cutoffs(year)[2];
+    const lt = L.odds(year, gender, lateCut, SIGMA, SEASONS);
+    const lb = L.brier(lt.teams.map(x => [x.p, x.actual]));
+    const lbase = lt.teams.reduce((s, x) => s + x.actual, 0) / lt.teams.length;
+    const lref = L.brier(lt.teams.map(x => [lbase, x.actual]));
+
     perSeason.push({
       year: +year, g: gender, cutoff, field: order.length, found,
       skill: Math.round(100 * (1 - bs / bref)),
+      skillLate: Math.round(100 * (1 - lb / lref)),
+      foundLate: lt.teams.filter(x => x.modelled).slice(0, lt.order.length)
+        .filter(x => x.actual).length,
+      marks: seedRows(year, cutoff),
       fav: fav.name, favP: Math.round(100 * fav.win),
       champ: order[0], hit: fav.name === order[0],
     });
@@ -127,6 +148,14 @@ const R = {
   sigma: SIGMA,
   runs: SEASONS,
   bands, horizon, perSeason,
+  cutoffLate: label(L.cutoffs(YEARS[0])[2]),
+  /* The seasons share a horizon, not a date - every first cutoff is exactly
+     eight weeks from its own state meet, and the months differ. Say the thing
+     that is true of all four. */
+  weeksOut: Math.round((new Date(L.truthFor(YEARS[0]).stateDate)
+    - new Date(L.cutoffs(YEARS[0])[0])) / 6048e5),
+  weeksOutLate: Math.round((new Date(L.truthFor(YEARS[0]).stateDate)
+    - new Date(L.cutoffs(YEARS[0])[2])) / 6048e5),
   built: new Date().toISOString().slice(0, 10),
 };
 

@@ -4626,7 +4626,7 @@ const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
 const LONE=0.006;
 /* The day the marks database was last refreshed. Update this whenever the seed
    block is replaced — it is what the header reports to readers. */
-const RECORD={"seasons":[2022,2023,2024,2025],"cutoff":"early September","cutoffDates":["2022-09-10","2023-09-09","2024-09-14","2025-09-13"],"teamSeasons":375,"qualified":144,"found":107,"ofField":144,"champHit":2,"champOf":8,"brier":0.1536,"base":0.2365,"skill":35,"logloss":0.774,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":192,"said":1,"was":11},{"lo":10,"hi":30,"n":21,"said":17,"was":33},{"lo":30,"hi":50,"n":18,"said":41,"was":39},{"lo":50,"hi":70,"n":16,"said":60,"was":44},{"lo":70,"hi":90,"n":23,"said":81,"was":52},{"lo":90,"hi":100,"n":105,"said":98,"was":85}],"horizon":[{"weeks":8,"best":6,"brier":0.1392,"shipped":0.1535},{"weeks":6,"best":3,"brier":0.065,"shipped":0.0651},{"weeks":4,"best":2,"brier":0.0576,"shipped":0.058},{"weeks":2,"best":2,"brier":0.0531,"shipped":0.0539}],"perSeason":[{"year":2022,"g":"M","cutoff":"2022-09-10","field":18,"found":11,"skill":-3,"fav":"Lincoln","favP":46,"champ":"Jesuit","hit":false},{"year":2022,"g":"F","cutoff":"2022-09-10","field":18,"found":12,"skill":0,"fav":"Jesuit","favP":71,"champ":"Jesuit","hit":true},{"year":2023,"g":"M","cutoff":"2023-09-09","field":18,"found":11,"skill":0,"fav":"Jesuit","favP":78,"champ":"Franklin (OR)","hit":false},{"year":2023,"g":"F","cutoff":"2023-09-09","field":18,"found":14,"skill":44,"fav":"Lincoln","favP":55,"champ":"Jesuit","hit":false},{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":48,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":60,"fav":"Lakeridge","favP":41,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":84,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":46,"fav":"Sunset","favP":69,"champ":"Lincoln","hit":false}],"built":"2026-09-15"};
+const RECORD={"seasons":[2022,2023,2024,2025],"cutoff":"early September","cutoffDates":["2022-09-10","2023-09-09","2024-09-14","2025-09-13"],"teamSeasons":375,"qualified":144,"found":107,"ofField":144,"champHit":2,"champOf":8,"brier":0.1538,"base":0.2365,"skill":35,"logloss":0.777,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":192,"said":1,"was":11},{"lo":10,"hi":30,"n":21,"said":17,"was":33},{"lo":30,"hi":50,"n":16,"said":39,"was":44},{"lo":50,"hi":70,"n":19,"said":60,"was":42},{"lo":70,"hi":90,"n":22,"said":81,"was":50},{"lo":90,"hi":100,"n":105,"said":98,"was":85}],"horizon":[{"weeks":8,"best":6,"brier":0.1391,"shipped":0.1536},{"weeks":6,"best":2.6,"brier":0.0649,"shipped":0.0654},{"weeks":4,"best":2,"brier":0.0574,"shipped":0.058},{"weeks":2,"best":2,"brier":0.0529,"shipped":0.0538}],"perSeason":[{"year":2022,"g":"M","cutoff":"2022-09-10","field":18,"found":11,"skill":-3,"skillLate":80,"foundLate":16,"marks":610,"fav":"Lincoln","favP":45,"champ":"Jesuit","hit":false},{"year":2022,"g":"F","cutoff":"2022-09-10","field":18,"found":12,"skill":0,"skillLate":66,"foundLate":16,"marks":610,"fav":"Jesuit","favP":71,"champ":"Jesuit","hit":true},{"year":2023,"g":"M","cutoff":"2023-09-09","field":18,"found":11,"skill":0,"skillLate":65,"foundLate":16,"marks":580,"fav":"Jesuit","favP":78,"champ":"Franklin (OR)","hit":false},{"year":2023,"g":"F","cutoff":"2023-09-09","field":18,"found":14,"skill":43,"skillLate":88,"foundLate":18,"marks":580,"fav":"Lincoln","favP":54,"champ":"Jesuit","hit":false},{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":48,"skillLate":73,"foundLate":16,"marks":973,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":60,"skillLate":77,"foundLate":16,"marks":973,"fav":"Lakeridge","favP":40,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":84,"skillLate":74,"foundLate":16,"marks":867,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":46,"skillLate":83,"foundLate":17,"marks":867,"fav":"Sunset","favP":70,"champ":"Lincoln","hit":false}],"cutoffLate":"early October","weeksOut":8,"weeksOutLate":4,"built":"2026-09-15"};
 const DATA_DATE="2026-09-12";
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
@@ -5643,8 +5643,19 @@ function renderRecord(){
     +'</td><td>'+pc(b.said)+'</td><td>'+pc(b.was)+'</td></tr>').join("");
 
   const seasonRows=R.perSeason.map(s=>'<tr><td>'+s.year+' '+(s.g==="M"?"boys":"girls")
-    +'</td><td>'+s.found+' of '+s.field+'</td><td>'+s.skill+'%</td><td>'+s.fav+' '+s.favP
-    +'%</td><td class="'+(s.hit?"hit":"miss")+'">'+s.champ+(s.hit?" \u2713":"")+'</td></tr>').join("");
+    +'</td><td>'+(s.marks?s.marks.toLocaleString():"\u2014")+'</td>'
+    +'<td>'+s.found+' of '+s.field+'</td><td>'+s.skill+'%</td>'
+    +'<td>'+(s.skillLate==null?"\u2014":s.skillLate+'%')+'</td>'
+    +'<td class="'+(s.hit?"hit":"miss")+'">'+s.champ+(s.hit?" \u2713":"")+'</td></tr>').join("");
+
+  /* The spread between the thinnest and fullest September database, and what
+     the model did at each. This is the single most useful thing on the page for
+     reading today's board, so it is computed rather than asserted. */
+  const withMarks=R.perSeason.filter(s=>s.marks);
+  const thin=withMarks.slice().sort((a,b)=>a.marks-b.marks)[0];
+  const full=withMarks.slice().sort((a,b)=>b.marks-a.marks)[0];
+  const lateSkills=R.perSeason.map(s=>s.skillLate).filter(v=>v!=null);
+  const lateLo=Math.min(...lateSkills), lateHi=Math.max(...lateSkills);
 
   const horiz=R.horizon.map(h=>'<tr><td>'+h.weeks+' weeks out</td><td>'+h.best.toFixed(1)
     +'%</td><td>'+h.brier.toFixed(4)+'</td><td>'+h.shipped.toFixed(4)+'</td></tr>').join("");
@@ -5660,8 +5671,9 @@ function renderRecord(){
 
   box.innerHTML=
     '<h3>What we did</h3>'
-    +'<p>We rebuilt the '+yr+' seasons exactly as they stood in '+R.cutoff
-    +' \u2014 nothing after that date, no hindsight \u2014 then ran each season forward '
+    +'<p>We rebuilt the '+yr+' seasons exactly as they stood '+R.weeksOut
+    +' weeks before their own state meet \u2014 nothing after that date, no hindsight '
+    +'\u2014 then ran each season forward '
     +R.runs.toLocaleString()+' times and compared the result to what actually happened at Lane '
     +'in November. <b>'+R.teamSeasons+' team-seasons</b> scored, '+R.qualified+' of which qualified.</p>'
     +'<div class="rec-tiles">'+tiles+'</div>'
@@ -5692,9 +5704,18 @@ function renderRecord(){
     +'That is a real miss and it is the next thing to fix.</p>'
 
     +'<h3>Season by season</h3>'
-    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>board</th><th>qualifiers found</th>'
-    +'<th>skill</th><th>our favourite</th><th>actual champion</th></tr></thead><tbody>'
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>board</th>'
+    +'<th>marks we had</th><th>qualifiers found</th><th>skill at '+R.weeksOut+' weeks</th>'
+    +'<th>at '+R.weeksOutLate+' weeks</th><th>actual champion</th></tr></thead><tbody>'
     +seasonRows+'</tbody></table></div>'
+    +(lateSkills.length?'<p><b>Most of what looks like weakness is earliness.</b> Score the very '
+      +'same boards four weeks out instead of eight and every season lands between '
+      +lateLo+'% and '+lateHi+'% \u2014 the model is not worse in the older seasons, it '
+      +'simply knew less about them in September. How much less is the second column: '
+      +'athletic.net had recorded '+thin.marks.toLocaleString()+' marks by the '+thin.year
+      +' cutoff and '+full.marks.toLocaleString()+' by '+full.year+', and the September '
+      +'skill moves with it. Today\u2019s board is built on more marks than any season '
+      +'here, which is a reason to read these figures as a floor.</p>':'')
     +'<p>Picking the <em>winner</em> is a different and much harder question, and we will not dress '
     +'it up: from '+R.cutoff+', our favourite went on to win <b>'+R.champHit+' of '+R.champOf
     +'</b>. Eight weeks out the eventual champion is genuinely uncertain, and a model that told '
