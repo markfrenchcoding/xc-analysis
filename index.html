@@ -236,8 +236,12 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rpl{width:26px;flex:none;text-align:right;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;font-size:15px;color:var(--dim);font-variant-numeric:tabular-nums}
 .rrow.p1 .rpl{color:var(--t1e)}
-.rnm{flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rnm em{font-style:normal;color:var(--dim);font-size:10.5px}
+.rnm{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
+.rnt{min-width:0;line-height:1.24}
+.rnt b{display:block;font-weight:500;font-size:12.5px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.rnm em{display:block;font-style:normal;color:var(--dim);font-size:10.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rfig{flex:none;width:44px;text-align:right;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
 .rfig i{display:block;font-style:normal;font-size:8px;color:var(--dim);font-weight:400;
@@ -251,8 +255,26 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    is the one that is almost always 100%, so it is the one that goes */
 @media (max-width:430px){
   .rrow .rfig:last-child,.rhead span:last-child{display:none}
-  .rnm em{display:block;line-height:1.3}
+  .rnm em{line-height:1.3}
 }
+.td-hd{display:flex;gap:8px;padding:3px 17px 5px;font-size:8.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--dim)}
+.td-hd span:first-child{width:16px;flex:none}
+.td-hd span:nth-child(2){flex:1}
+.td-hd span:not(:first-child):not(:nth-child(2)){width:52px;flex:none;text-align:right}
+.td-row{display:flex;align-items:center;gap:8px;padding:6px 17px;font-size:12.5px}
+.td-row+.td-row{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+.td-row.out{opacity:.5}
+.td-pl{width:16px;flex:none;text-align:right;color:var(--dim);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+.td-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-nm em{font-style:normal;color:var(--dim);font-size:10px}
+.td-t{flex:none;width:52px;text-align:right;font-variant-numeric:tabular-nums;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13.5px}
+.td-t.sim{color:var(--t1e)}
+.tcard{cursor:default}
+.tcard.tappable{cursor:pointer}
+.tcard.tappable:focus-visible{outline:2px solid var(--t1e);outline-offset:2px}
 .title .pnum{margin-top:3px}
 .title .pnum b{font-size:13px;color:var(--muted)}
 .strip{display:flex;align-items:flex-end;gap:1.5px;height:15px;margin-bottom:6px}
@@ -3425,18 +3447,38 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
   </section>
 
   <section class="panel" id="p-run">
+    <div class="switch clsw" role="group" aria-label="Classification">
+      <button data-c="6A" aria-pressed="true">6A</button>
+      <button data-c="5A">5A</button>
+      <button data-c="4A">4A</button>
+      <button data-c="3A">3A</button>
+      <button data-c="2A/1A">2A/1A</button>
+    </div>
+    <div class="switch" role="group" aria-label="Race">
+      <button data-g="M" aria-pressed="true">Boys</button>
+      <button data-g="F" aria-pressed="false">Girls</button>
+    </div>
     <h2 class="sec">Runners</h2>
     <p class="sub2">Where each athlete finishes at Lane, across every simulated season &mdash; run against the same field the teams face, individual qualifiers included.</p>
-    <div id="runOut"><div class="empty">Run the simulation to fill this in.</div></div>
+    <div id="rbhost3"></div>
+    <div id="runOut"><div class="empty">Press Run to fill this in.</div></div>
   </section>
 
   <section class="panel" id="p-lg">
+    <div class="switch clsw" role="group" aria-label="Classification">
+      <button data-c="6A" aria-pressed="true">6A</button>
+      <button data-c="5A">5A</button>
+      <button data-c="4A">4A</button>
+      <button data-c="3A">3A</button>
+      <button data-c="2A/1A">2A/1A</button>
+    </div>
     <div class="switch" role="group" aria-label="Race">
       <button data-g="M" aria-pressed="true">Boys</button>
       <button data-g="F" aria-pressed="false">Girls</button>
     </div>
     <h2 class="sec">The seven leagues</h2>
     <p class="sub2">Two teams out of each league go straight to Lane. Everyone else is chasing two at-large spots.</p>
+    <div id="rbhost4"></div>
     <div id="lgOut"></div>
   </section>
 
@@ -3950,8 +3992,13 @@ function playDistricts(model,byIdx,times,indOut){
   return field;
 }
 
-function playState(model,byIdx,times,fieldIdx,indIdx,rTally){
+function playState(model,byIdx,times,fieldIdx,indIdx,rTally,rTime){
   const {teams}=model;
+  /* Every runner on a qualifying team, summed. Divided later by that team's
+     ptsN — the count of seasons it actually got to Lane — which is the same
+     set of seasons, so the two always agree. No sort, no allocation: this is
+     cheap enough to leave switched on for the ordinary odds run. */
+  if(rTime) for(const i of fieldIdx) for(const ri of teams[i].rIdx) rTime[ri]+=times[ri];
   const res=scoreMeet(fieldIdx.map(i=>teams[i]),times,SC,PL);
   /* Individual places are scored over everyone on the line — qualifying teams
      plus the individual qualifiers, who run but are struck from team scoring. */
@@ -3991,7 +4038,7 @@ function oneSeason(model,worlds,sigma,times,shock,tmp){
   const fields=worlds.map((w,i)=>playDistricts(model,w.byIdx,shift(times,w.adj,tmp),inds[i]));
   draw(model,times,sigma,shock);        // state is a fresh race, not a replay
   worlds.forEach((w,i)=>{
-    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i],inds[i],w.rt);
+    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i],inds[i],w.rt,w.rtm);
   });
 }
 function shift(times,adj,tmp){
@@ -4082,6 +4129,9 @@ function buildBoard(tally){
         <span class="odd" data-k="wild"><b>—</b><i>at-large</i></span>
         <span class="odd" data-k="auto"><b>—</b><i>auto</i></span>
       </div>`;
+    el.addEventListener("click",()=>showTeam(t.idx));
+    el.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();showTeam(t.idx);}});
     board.appendChild(el);
     return {el,t,pos:-1,prev:{}};
   });
@@ -4488,19 +4538,25 @@ function runRunners(){
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
-  const rb=document.getElementById("runbar"),lab=document.getElementById("runlab");
+  const rb=document.getElementById("runbar3"),lab=document.getElementById("runlab3"),
+        pack=document.getElementById("pack3");
   rb.classList.add("on");
+  document.getElementById("runOut").innerHTML=
+    '<div class="empty">Running '+nSims.toLocaleString()+' seasons&hellip;</div>';
   let done=0,t0=0;
   const dur=durMs();
   nextTick(function step(ts){
     if(!t0)t0=ts;
     const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/dur)));
     while(done<target){oneSeason(model,worlds,sigma,times,shock,tmp);done++;}
-    rb.querySelector(".track i").style.width=(done/nSims*100)+"%";
-    lab.textContent="runners "+done.toLocaleString()+"/"+nSims.toLocaleString();
+    const frac=done/nSims;
+    rb.querySelector(".track i").style.width=(frac*100)+"%";
+    pack.style.left=(frac*100)+"%";
+    lab.textContent=done.toLocaleString()+" / "+nSims.toLocaleString();
     if(done<nSims)nextTick(step);
     else{
-      rb.classList.remove("on");lab.textContent="";
+      rb.classList.remove("on");
+      lab.textContent="±"+sigmaPct.toFixed(1)+"%";
       document.body.classList.remove("simming");
       go.textContent="Run again";go.classList.remove("running");running=false;
       renderRunners(rt,done);
@@ -4512,10 +4568,11 @@ function renderRunners(rt,seasons){
   const out=document.getElementById("runOut");
   if(!rows.length){ out.innerHTML='<div class="empty">Nobody here reached Lane.</div>'; return; }
   rows.sort((a,b)=>a.mean-b.mean);
-  const body=rows.slice(0,60).map((r,i)=>
+  const body=rows.slice(0,50).map((r,i)=>
     '<div class="rrow'+(i===0?" p1":"")+'">'
     +'<span class="rpl">'+(i+1)+'</span>'
-    +'<span class="rnm">'+crest(r.team,"crest")+' '+r.name+' <em>'+r.team+' &middot; '+fmt(r.sb)+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span>'
+    +'<span class="rnm">'+crest(r.team,"crest")+'<span class="rnt"><b>'+r.name+'</b>'
+    +'<em>'+r.team+' &middot; '+fmt(r.sb)+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span></span>'
     +'<span class="rfig">'+pct(r.win,seasons)+'<i>wins</i></span>'
     +'<span class="rfig">'+pct(r.top10,seasons)+'<i>top 10</i></span>'
     +'<span class="rfig">'+r.mean.toFixed(1)+'<i>avg place</i></span>'
@@ -4523,13 +4580,19 @@ function renderRunners(rt,seasons){
     +'</div>').join("");
   out.innerHTML='<div class="rhead"><span></span><span>athlete</span><span>wins</span>'
     +'<span>top 10</span><span>avg place</span><span>gets there</span></div>'+body
-    +'<p class="sub2" style="margin-top:9px">Ranked by average finish across the seasons the runner actually made it &mdash; a runner who is reliably twelfth outranks one who is fourth or fortieth. '
+    +'<p class="sub2" style="margin-top:9px">The fifty best of the '+rows.length.toLocaleString()+' athletes who reached Lane in at least one season. '
+    +'Ranked by average finish across the seasons the runner actually made it &mdash; a runner who is reliably twelfth outranks one who is fourth or fortieth. '
     +'&ldquo;Gets there&rdquo; is how often they reached Lane at all, on a qualifying team or as an individual. '
     +'A runner with a single race is rated slightly more cautiously than that one time suggests, because one race is thinner '
     +'evidence than two — without that, the athletes who have raced least would look the best.</p>';
 }
 
-function run(){
+/* The last completed odds run, kept so a card can be opened afterwards and so
+   the board can be re-laid-out when the Odds tab comes back into view. */
+let lastRun=null;
+
+function run(bid){
+  bid=bid||"";
   if(running){skip=true;return;}
   const model=buildModel(gender,DIST);
   if(!model.runners.length){
@@ -4542,11 +4605,12 @@ function run(){
   const go=document.getElementById("go");
   go.textContent="Finish";go.classList.add("running");
   const T=blankTally(model), tally=T.list;
-  const worlds=[{adj:null,byIdx:T.byIdx}];
+  const rtm=new Float64Array(model.runners.length);
+  const worlds=[{adj:null,byIdx:T.byIdx,rtm}];
   buildBoard(tally);
   document.getElementById("board").classList.add("running");
-  const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
-        pack=document.getElementById("pack");
+  const rb=document.getElementById("runbar"+bid),lab=document.getElementById("runlab"+bid),
+        pack=document.getElementById("pack"+bid);
   rb.classList.add("on");
   const sigma=sigmaPct/100;
   const times=new Float64Array(model.runners.length);
@@ -4568,12 +4632,14 @@ function run(){
       paint(tally,done,true);
       settle(tally);
       renderLeagues(tally,model,done);
+      lastRun={model,tally,byIdx:T.byIdx,rtm,done};
+      cards.forEach(c=>{c.el.classList.add("tappable");c.el.tabIndex=0;});
       rb.classList.remove("on");
       lab.textContent=`±${sigmaPct.toFixed(1)}%`;
       go.textContent="Run again";go.classList.remove("running");
       running=false;
       document.body.classList.remove("simming");
-      requestAnimationFrame(()=>{measure();cards.forEach(c=>c.pos=-1);paint(tally,done,true);});
+      nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(tally,done,true);});
     }
   });
 }
@@ -4593,15 +4659,38 @@ function syncVar(){
   document.querySelectorAll('.seg button[data-v]').forEach(x=>
     x.setAttribute("aria-pressed",Math.abs(+x.dataset.v/10-sigmaPct)<.05));
 }
+/* The progress strip is one lump of markup with three inline runner SVGs in it.
+   Cloning the original onto the other panels at load keeps it from being pasted
+   four times into a file that is edited by hand. */
+function mountRunbars(){
+  const src=document.getElementById("runbar");
+  for(const id of ["3","4"]){
+    const host=document.getElementById("rbhost"+id);
+    if(!host)continue;
+    const el=src.cloneNode(true);
+    el.id="runbar"+id;
+    el.classList.remove("on");
+    el.querySelector(".pack").id="pack"+id;
+    el.querySelector(".runlab").id="runlab"+id;
+    el.querySelector(".track i").style.width="0";
+    host.replaceWith(el);
+  }
+}
+
 function clearOut(){
   document.getElementById("simOut").innerHTML="";
-  for(const id of ["","2"]){
+  const ro=document.getElementById("runOut");
+  if(ro)ro.innerHTML='<div class="empty">Press Run to fill this in.</div>';
+  closeRace();
+  lastRun=null;
+  for(const id of ["","2","3","4"]){
     const rb=document.getElementById("runbar"+id);
     if(!rb)continue;
     document.getElementById("runlab"+id).textContent="";
     rb.classList.remove("on");
     rb.querySelector(".track i").style.width="0";
-    document.getElementById("pack"+id).style.left="0";
+    const pk=document.getElementById("pack"+id);
+    if(pk)pk.style.left="0";
   }
   const wo=document.getElementById("wiOut"); if(wo)wo.innerHTML="";
   cards=[];
@@ -4642,11 +4731,9 @@ function chuteSeven(){
   }
   return [...best.values()].sort((a,b)=>a.sb-b.sb).slice(0,7);
 }
-function showSeven(){
-  const seven=chuteSeven();
-  if(seven.length<7)return;
-  document.body.classList.add("gunlap-fire");
-  setTimeout(()=>document.body.classList.remove("gunlap-fire"),1500);
+/* The blurred sheet is shared: the flag opens the Chute Seven into it, a card
+   on the odds board opens that team's seven. One element, one dismiss path. */
+function overlay(){
   let el=document.getElementById("gl");
   if(!el){
     el=document.createElement("div");
@@ -4654,6 +4741,55 @@ function showSeven(){
     document.body.appendChild(el);
     el.addEventListener("click",e=>{ if(e.target===el) closeRace(); });
   }
+  return el;
+}
+
+/* A team's seven, opened from its card once a run has finished. The only place
+   on the site that shows what the model actually did with a mark: the season
+   best it was handed, and the average of the times it drew at Lane. The gap is
+   the caution — sampling a slower race, plus a skew that stretches bad days
+   further than good ones, so the average lands behind the best. */
+function showTeam(idx){
+  if(!lastRun)return;
+  const {model,byIdx,rtm,done}=lastRun;
+  const tm=model.teams[idx];
+  if(!tm||!tm.roster)return;
+  const row=byIdx[idx];
+  const n=row?row.ptsN:0;
+  const el=overlay();
+  const body=tm.roster.map((r,k)=>{
+    const sim=n?rtm[tm.rIdx[k]]/n:0;
+    return '<div class="td-row'+(k>=SC?" out":"")+'">'
+      +'<span class="td-pl">'+(k+1)+'</span>'
+      +'<span class="td-nm">'+r.name+' <em>'+(YR[r.grade]||"")+'</em></span>'
+      +'<span class="td-t">'+fmt(r.sbRaw)+'</span>'
+      +'<span class="td-t sim">'+(n?fmt(sim):"—")+'</span>'
+      +'<span class="td-t">'+(n?"+"+(sim-r.sbRaw).toFixed(1)+"s":"")+'</span>'
+      +'</div>';
+  }).join("");
+  const avg=n?row.ptsSum/n:0;
+  el.innerHTML='<div class="gl-card" role="dialog" aria-label="'+tm.name+' at Lane">'
+    +'<div class="gl-tape"></div>'
+    +'<div class="gl-hd"><h3>'+tm.name+'</h3>'
+    +'<p>'+ABBR[tm.league]+' &middot; '+(gender==="M"?"Boys":"Girls")+' '+CLS+'</p></div>'
+    +'<div class="gl-sec">Season best vs simulated time at Lane</div>'
+    +'<div class="td-hd"><span></span><span>athlete</span><span>best</span>'
+    +'<span>sim</span><span>gap</span></div>'+body
+    +'<div class="gl-kick">'
+    +(n?'Reached Lane in <b>'+pct(n,done)+'</b> of '+done.toLocaleString()+' seasons, scoring <b>'
+        +Math.round(avg)+'</b> points on average when it got there. '
+      :'Did not reach Lane in any of the '+done.toLocaleString()+' simulated seasons, so there is no time to show. ')
+    +'The simulated column averages only the seasons this team reached Lane, the same slice the points figure uses'
+    +(tm.roster.length>SC?'. Only the first '+SC+' score':'')+'.</div>'
+    +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+}
+
+function showSeven(){
+  const seven=chuteSeven();
+  if(seven.length<7)return;
+  document.body.classList.add("gunlap-fire");
+  setTimeout(()=>document.body.classList.remove("gunlap-fire"),1500);
+  const el=overlay();
   const lead=seven[0].sb;
   const schools=new Set(seven.map(x=>x.team));
   const tally={}; seven.forEach(x=>tally[x.team]=(tally[x.team]||0)+1);
@@ -4687,7 +4823,8 @@ function showSeven(){
   </div>`;
   document.getElementById("glAgain").onclick=()=>{
     gender=gender==="M"?"F":"M";
-    document.querySelectorAll(".switch button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
+    document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
+    setClass(CLS,gender);syncHead();
     clearOut();wiAdj={};renderWhatIf();
     showSeven();
   };
@@ -4710,14 +4847,22 @@ document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
-  document.getElementById("go").style.display=/p-sim|p-wi|p-run/.test(b.dataset.p)?"":"none";
+  document.getElementById("go").style.display=/p-sim|p-wi|p-run|p-lg/.test(b.dataset.p)?"":"none";
   if(b.dataset.p==="p-wi")renderWhatIf();
+  /* Cards are absolutely positioned off a measured step height, and a hidden
+     panel measures zero — so a board built while the Odds tab was away has to
+     be re-laid-out the moment it comes back. */
+  if(b.dataset.p==="p-sim"&&cards.length&&!running&&lastRun)
+    nextTick(()=>{measure();cards.forEach(c=>c.pos=-1);paint(lastRun.tally,lastRun.done,true);});
   scrollTo({top:0,behavior:"smooth"});});
 document.getElementById("go").onclick=()=>{
   if(running){skip=true;return;}
-  if(document.getElementById("p-run").classList.contains("on"))return runRunners();
-  if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();
-  run();
+  const on=id=>document.getElementById(id).classList.contains("on");
+  if(on("p-run"))return runRunners();
+  if(on("p-wi"))return runWhatIf();
+  /* The Leagues board is a by-product of the odds run, so running from that tab
+     runs the same simulation — only the progress strip moves. */
+  run(on("p-lg")?"4":"");
 };
 addEventListener("resize",()=>{if(cards.length&&!running){measure();cards.forEach(c=>{c.pos=-1;});}});
 
@@ -4730,7 +4875,7 @@ function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
 }
-loadSeed();syncVar();clearOut();renderWhatIf();
+loadSeed();mountRunbars();syncVar();clearOut();renderWhatIf();
 </script>
 </body>
 </html>

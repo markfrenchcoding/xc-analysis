@@ -263,8 +263,13 @@ function playDistricts(model,byIdx,times,indOut){
   return field;
 }
 
-function playState(model,byIdx,times,fieldIdx,indIdx,rTally){
+function playState(model,byIdx,times,fieldIdx,indIdx,rTally,rTime){
   const {teams}=model;
+  /* Every runner on a qualifying team, summed. Divided later by that team's
+     ptsN — the count of seasons it actually got to Lane — which is the same
+     set of seasons, so the two always agree. No sort, no allocation: this is
+     cheap enough to leave switched on for the ordinary odds run. */
+  if(rTime) for(const i of fieldIdx) for(const ri of teams[i].rIdx) rTime[ri]+=times[ri];
   const res=scoreMeet(fieldIdx.map(i=>teams[i]),times,SC,PL);
   /* Individual places are scored over everyone on the line — qualifying teams
      plus the individual qualifiers, who run but are struck from team scoring. */
@@ -338,7 +343,7 @@ function oneSeason(model,worlds,sigma,times,shock,tmp){
   const fields=worlds.map((w,i)=>playDistricts(model,w.byIdx,shift(times,w.adj,tmp),inds[i]));
   draw(model,times,sigma,shock);        // state is a fresh race, not a replay
   worlds.forEach((w,i)=>{
-    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i],inds[i],w.rt);
+    if(fields[i].length>=2) playState(model,w.byIdx,shift(times,w.adj,tmp),fields[i],inds[i],w.rt,w.rtm);
   });
 }
 

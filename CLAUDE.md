@@ -71,6 +71,12 @@ spelling, or `Cleveland (OR)` will miss `Cleveland`.
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
 
+**The Runners board** lists the fifty best individuals in the division by mean
+finishing place at Lane, run against the same field the teams face with
+individual qualifiers included. Fifty, not everyone — the tail is hundreds of
+runners who reached Lane in a handful of seasons and the ranking there is noise.
+The footnote says how many athletes made it at all.
+
 **The Chute Seven.** Tapping the checkered flag counts down the seven fastest
 individuals in the division, seventh to first, across every school — with a
 kicker on how many schools are represented and the fact that those seven as one
@@ -79,6 +85,45 @@ the one question the site never otherwise answers. An earlier version replayed a
 single simulated state meet; it looked good and was redundant, because it was
 the tool again with less of it. `chuteSeven()` reads `DATA` directly rather than
 the model, so athletes on teams too short to score still appear.
+
+**Every board carries the same two switches.** Classification and Boys/Girls
+appear on Odds, Runners and Leagues. They are not three sets of state — the
+handlers select `.clsw button` and `.switch button[data-g]` across the whole
+document, so all three groups light together and one `setClass` runs. Anything
+that flips gender in code must do the same; the easter egg's "switch to the
+girls" once used a bare `.switch button` selector and quietly unlit the
+classification row, because those buttons have no `data-g`.
+
+**One progress strip, cloned.** `mountRunbars()` copies `#runbar` onto the
+Runners and Leagues panels at load and renumbers the ids (`runbar3`,
+`runbar4`). The strip carries three inline runner SVGs; pasting it four times
+into a hand-edited file is how it drifts out of sync. `run(bid)` takes the
+suffix so the Leagues tab drives its own bar, and `clearOut()` resets all four.
+
+**Every tab with results has a Run button.** Leagues runs the ordinary
+simulation — that board is a by-product of it — so pressing Run there fills the
+Odds board too. The button's visibility is one regex in the tab handler.
+
+**Cards are tappable after a run, and open a team sheet.** `lastRun` holds the
+model, tally and per-runner time sums from the last completed odds run;
+clicking a card opens that team's seven in the same blurred overlay the flag
+uses, showing each runner's season best beside the average time the model drew
+for them at Lane. The gap is the model's caution made visible — sampling a
+slower race, plus a skew that stretches bad days further than good ones. Both
+columns average only the seasons the team qualified, the same slice as the
+points figure.
+
+Collecting those times costs almost nothing: `playState` sums `times[ri]` for
+every runner on a qualifying team, no sort and no allocation, and the divisor is
+that team's `ptsN` — the same set of seasons by construction. It is left
+switched on for the ordinary run.
+
+**Re-measure when the Odds tab comes back.** Cards are absolutely positioned off
+a step height measured from a rendered card, and a hidden panel measures zero.
+A board built while the user was on Leagues therefore has a stale step and
+overlaps. The tab handler re-measures and repaints on return. Use `nextTick`,
+never `requestAnimationFrame`, for that callback: a throttled or background tab
+never delivers the frame and the board is left broken.
 
 **Points are conditional, and the card says so.** Each card shows the mean score
 at Lane averaged over the seasons that team actually qualified — "pts when
