@@ -51,14 +51,19 @@ const iso = (x, y) => {
    touches: grid the site at 8m, mark every cell within 16m of the trace, and
    take the largest clear rectangles. */
 const track = { cx: -55.5, cy: -99, rx: 49, ry: 80 };
-const ponds = [[-378, -198, -176, -148], [-382, -138, -168, -92], [-372, -84, -160, -48]];
+/* Two ponds, north-west, inside the loop with the course running between them -
+   which is where the route planner puts them, not the south-west corner the
+   printed map suggested. Sized to keep the trace 13m clear. */
+const ponds = [[-377, 74, -283, 136], [-253, 68, -195, 126]];
 const fields = [[22, -104, 118, -56], [22, -46, 118, -2]];
+// plain grass inside the eastern loop: the satellite shows practice fields
+// there, not the buildings that used to sit on them
+const greens = [[140, 4, 210, 44], [222, 10, 268, 46]];
 const soccer = [-48, 58, 118, 90];
 const builds = [                                              // x0,y0,x1,y1,height in metres
   [198, -196, 268, -150, 21], [280, -192, 352, -146, 15], [360, -186, 414, -140, 12],
   [196, -132, 262, -88, 17], [276, -128, 344, -84, 13], [352, -124, 412, -80, 10],
   [200, -74, 266, -36, 12], [278, -70, 340, -34, 9], [350, -66, 400, -34, 7],
-  [140, 4, 210, 44, 9], [222, 10, 268, 46, 7],
 ];
 const trees = [
   [-150, 120], [-250, 140], [-330, 150], [-60, 110], [40, 100], [140, 96], [240, 120],
@@ -68,19 +73,25 @@ const trees = [
 ];
 
 /* ---------- frame ---------- */
+// the slab is the outermost thing drawn, so it sizes the frame along with
+// everything else; leave it out and its corners hang off the edge
+const MARGIN = 40;
+const gx0 = Math.min(...T.map(p => p[0])) - MARGIN, gx1 = Math.max(...T.map(p => p[0])) + MARGIN;
+const gy0 = Math.min(...T.map(p => p[1])) - MARGIN, gy1 = Math.max(...T.map(p => p[1])) + MARGIN;
 const all = [];
+for (const c of [[gx0, gy0], [gx1, gy0], [gx1, gy1], [gx0, gy1]]) all.push(iso(c[0], c[1]));
 for (const p of T) all.push(iso(p[0], p[1]));
-for (const [x0, y0, x1, y1] of [...ponds, ...fields, soccer, ...builds.map(b => b.slice(0, 4))])
+for (const [x0, y0, x1, y1] of [...ponds, ...fields, ...greens, soccer, ...builds.map(b => b.slice(0, 4))])
   for (const c of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) all.push(iso(c[0], c[1]));
 for (let a = 0; a < 8; a++)
   all.push(iso(track.cx + track.rx * Math.cos(a / 8 * 6.283),
                track.cy + track.ry * Math.sin(a / 8 * 6.283)));
 const bx0 = Math.min(...all.map(p => p[0])), bx1 = Math.max(...all.map(p => p[0]));
 const by0 = Math.min(...all.map(p => p[1])), by1 = Math.max(...all.map(p => p[1]));
-const VW = 200, VH = 100, PAD = 5;
+const VW = 200, VH = 100, PAD = 6;
 const K = Math.min((VW - 2 * PAD) / (bx1 - bx0), (VH - 2 * PAD) / (by1 - by0));
 const OX = PAD - bx0 * K + (VW - 2 * PAD - (bx1 - bx0) * K) / 2;
-const OY = PAD - by0 * K + (VH - 2 * PAD - (by1 - by0) * K) / 2;
+const OY = PAD - by0 * K + (VH - 2 * PAD - (by1 - by0) * K) / 2 + 2;
 // heights are exaggerated: at true scale a building is two pixels and nothing
 // reads as standing up
 const pj = (x, y, h = 0) => {
@@ -126,9 +137,6 @@ const tree = (x, y) => {
 
 const F = [];
 // a slab with a visible edge, so the site reads as a model rather than a fill
-const m = 40;
-const gx0 = Math.min(...T.map(p => p[0])) - m, gx1 = Math.max(...T.map(p => p[0])) + m;
-const gy0 = Math.min(...T.map(p => p[1])) - m, gy1 = Math.max(...T.map(p => p[1])) + m;
 const cs = [[gx0, gy0], [gx1, gy0], [gx1, gy1], [gx0, gy1]];
 const low = cs.map(c => pj(c[0], c[1], -9)), top = cs.map(c => pj(c[0], c[1]));
 let deep = 0;
@@ -139,6 +147,7 @@ F.push('<polygon class="c-ground" points="' + top.map(p => p.join(' ')).join(' '
 
 for (const [a, b, c, d] of ponds) F.push(poly(soft(a, b, c, d, 14), 'c-water'));
 F.push(poly(soft(soccer[0], soccer[1], soccer[2], soccer[3], 10), 'c-grass'));
+for (const [a, b, c, d] of greens) F.push(poly(soft(a, b, c, d, 8), 'c-grass'));
 F.push(ballField(fields[0][0], fields[0][1], 46));
 F.push(ballField(fields[1][0], fields[1][1], 44));
 F.push(ellipse(track.cx, track.cy, track.rx, track.ry, 'c-track'));
@@ -169,7 +178,7 @@ const SCENE = `<svg class="pl-map" viewBox="0 0 ${VW} ${VH}" preserveAspectRatio
   + tag(T[0][0], T[0][1], -6, -6, 'START', '')
   + tag(T[T.length - 1][0], T[T.length - 1][1], 6, -4, 'FINISH', 'c-fin')
   + tag(track.cx, track.cy - track.ry - 26, -12, 2, 'TRACK BOWL', 'c-sm')
-  + tag((ponds[1][0] + ponds[1][2]) / 2, (ponds[1][1] + ponds[1][3]) / 2, -10, 2, 'THE PONDS', 'c-sm')
+  + tag((ponds[0][0] + ponds[1][2]) / 2, ponds[0][1] - 52, -11, 3, 'THE PONDS', 'c-sm')
   + tag(280, -30, -10, 16, 'CAMPUS', 'c-sm')
   + '</svg>';
 

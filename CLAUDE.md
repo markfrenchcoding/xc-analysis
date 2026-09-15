@@ -236,6 +236,16 @@ touches: grid the site at 8m, mark every cell within 16m of the trace, take the
 largest clear rectangles, and put the ponds, ball fields, soccer bowl and campus
 in those. Nothing can overlap the route because the route chose the gaps.
 
+**The clear-rectangle test says where a thing CAN go, not where it IS.** The
+ponds first landed in the south-west because that is where the biggest hole was;
+they are actually two ponds north-west, inside the loop, with the course running
+between them. A route planner screenshot settled it. Same for the two buildings
+that sat inside the eastern loop - that ground is practice fields. When in doubt
+about a landmark, find a picture; the geometry only rules placements out.
+
+**The ground slab is in the frame calculation.** It is the outermost thing
+drawn, so leaving it out of the bounding box hangs its corners off the edge.
+
 **Heights are exaggerated about ninefold.** At true scale a twenty-metre
 building is two pixels of extrusion and the whole thing reads flat. The ground
 is a slab with one visible edge face for the same reason.
