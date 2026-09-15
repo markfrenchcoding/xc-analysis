@@ -85,6 +85,14 @@ Leagues is the exception to per-frame painting: it is a full `innerHTML` rebuild
 rather than cards that move, so it refreshes twice a second. Enough to watch the
 numbers firm up, cheap enough not to fight the run.
 
+**Leagues runs at two rates, and that is the fix.** The structure - which teams,
+in which order, in which league - is a full `innerHTML` rebuild twice a second,
+which is as often as it needs to change. The **digits** churn every frame, by
+walking the `.drow .v` text nodes that are already there and spinning each
+one off a `data-v` attribute holding its settled value. Spinning only on the
+rebuild was the first attempt and it was wrong: at two frames a second it reads
+as a flicker, not as numbers arriving.
+
 **Leagues churns its digits too.** It is rebuilt wholesale twice a second rather
 than painted every frame, so it never picked up the `spin()` the other two
 boards use and sat frozen while they were visibly working. Same function, same
@@ -196,8 +204,19 @@ falling over, which is why it gets its own `rankPopFlat` keyframe. And
 out of them, or between two finishes - because ranks five and below just need
 new text, which is most cards on most frames.
 
-**The coaches chip is a fixed 62px, right-justified, with the league to its
-left.** Unranked teams render an empty `.poll-gap` of the same width rather
+**The plate number is centred by geometry, not by a guessed baseline.**
+`dominant-baseline="central"` with `y` at half the viewBox height puts the
+optical middle of the glyphs on the middle of the shape. Checked by measuring
+both bounding boxes rather than by eye: the text centre lands at 49.5, 36.9
+against the plate's 50, 36.9.
+
+**The number is solid black, which is why the plates were lightened.** The four
+plate gradients are the same four finishes as `--t1`..`--t4` but a good
+deal lighter, because black has to read across the whole plate and not only
+across its top half. Darken them back and the ink disappears into the bottom of
+the blue and the pewter.
+
+**The coaches chip is a fixed 56px, centred, with the league to its left.** Unranked teams render an empty `.poll-gap` of the same width rather
 than nothing, or the league abbreviation shuffles left and right down the board.
 It reads `OSAA #10`, because two unlabelled hash numbers on one row is the
 same failure the Track record page had.
@@ -1006,6 +1025,51 @@ run is live, and they cost one element between them.
 
 `will-change:transform` stays on the cards, because they really do transform
 while sorting. It stays **off** the ninety runner rows for the same arithmetic.
+
+## The bottom bar
+
+Three tabs and one button. The tabs are how you move around the site; the button
+does one thing. So the tabs take the room (`flex:1`, set in the display face,
+uppercase) and Run is capped at 38% and 190px - still the loudest element on the
+page by colour, no longer by area. It was the other way round, at roughly two
+thirds button.
+
+## The home-screen icon
+
+**iOS will not use an SVG favicon for a home-screen shortcut.** Given no
+`apple-touch-icon` it renders a screenshot of the page or the first letter of
+the title, which is why a shortcut showed a bare "C".
+
+`node pull/make-icon.js` writes `apple-touch-icon.png` at the repo root: 180
+square, no dependencies, PNG written by hand around Node's own zlib. It draws
+the same seven runners from the same coordinates as the tab icon, supersampled
+four times and box-averaged down, which is the antialiasing. The formation is
+laid into 74% of the square because iOS masks the corners to a squircle and
+crops a few percent off every edge.
+
+**That is now three copies of one drawing** - the page mark, the tab icon and
+this - and none of them can share a source: the page bakes its scale into the
+coordinates, the tab icon is a data URI that cannot read a custom property, and
+this one is pixels. Redraw the formation and all three need it. The accent is
+hardcoded here for the same reason it is in the favicon.
+
+The app still works without the file; only the shortcut changes.
+
+## The How tab diagrams
+
+**All three are drawn on a 200-unit-wide viewBox, and that is the whole mobile
+fix.** A figure is always the column width, so a label written at 8 units on a
+336-wide box rendered at 7.7px on a phone. The same label on a 200-wide box
+renders at 13px. Nothing about the drawings was too complex; the coordinate
+space was too wide for the type in it. **Check the effective pixel size after
+any change** - multiply the CSS font-size by (rendered width / viewBox width).
+
+They carry the accent now rather than `--t1e`, so they belong to the site
+rather than to the trophy palette. The percentage figure fills 53 of 100 dots in
+accent and leaves 47 as hollow rings, which is a clearer read than a hundred
+dots at graded opacity. Labels inside a box have to fit that box: two of them
+overflowed at the first attempt and were shortened, with the long version moved
+to the caption where it has the full column width.
 
 ## Cancelling a run
 
