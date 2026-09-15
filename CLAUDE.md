@@ -18,6 +18,12 @@ terminal or git CLI. Any change must survive being uploaded as a single file via
 drag-and-drop. **Do not split this into modules, add a bundler, or introduce
 npm.** If you need to work on it locally, edit the file directly.
 
+`pull/refresh.html` is served from the same deployment and is the one exception
+worth understanding, because it is not one. It is a maintenance page the owner
+opens to rebuild the database; `index.html` never loads it, never links to it,
+and remains a single self-contained file that can be dropped on GitHub on its
+own. The rule is about the app, and the app is still one file.
+
 The Vercel project framework preset is **Other**. It must stay that way — it was
 set to Python for a while and every deploy failed in two seconds looking for an
 entrypoint that did not exist.
@@ -129,13 +135,18 @@ falls back to initials when a name is missing. It covers all 214 schools in the
 seed; before the other classifications shipped it held only the 6A 47, so every
 5A-and-below card fell back to initials.
 
-Refresh with `GetTeamCore?teamId={id}&sport=xc&year=2026` — the response carries
-`team.MascotUrl`. Two gotchas: the url comes back protocol-relative
-(`//lh3.googleusercontent.com/...`) and without a size suffix, so prefix
-`https:` and append `=s96` to match the existing entries. And **pace it** — at
-320ms a request 105 of 167 came back empty; at 900ms with three retries all 167
-resolved. Key the map by the seed's display name, not athletic.net's own
-spelling, or `Cleveland (OR)` will miss `Cleveland`.
+**Crests refresh themselves now.** They used to be their own 167-request pass
+against `GetTeamCore`, paced at 900ms because at 320ms a request 105 of them came
+back empty. That is gone: the single `GetTree` call the refresh already makes to
+find Oregon's team ids carries `MascotUrl` on the same rows, so the map is
+rebuilt for free every time the database is. See **Rebuilding the database**.
+
+Two details survive in `patchLogos`. The url comes back protocol-relative
+(`//lh3.googleusercontent.com/...`) and unsized, so it needs `https:` in front
+and `=s96` behind. And the map is keyed by the seed's display name, not
+athletic.net's spelling, or `Cleveland (OR)` misses `Cleveland`. It merges
+rather than replaces, so a school with no athletic.net team this season keeps
+the crest it already had.
 
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
@@ -513,25 +524,88 @@ How tab says this outright — do not let the site imply otherwise.
 
 ### Rebuilding the database
 
-`scratchpad` tooling, in order: scrape `osaa.org/activities/bxc/teams-leagues`
-and the `gxc` page for 2026 membership (all five panels are in the DOM at once,
-one table per league); resolve those names to athletic.net team ids from meets
-already pulled; crawl every team calendar for meets with results; pull every
-5,000m division; then build the seed with top three marks per athlete and top
-seven per team.
+**There is a button for this now.** Open
+[chutexc.vercel.app/pull/refresh.html](https://chutexc.vercel.app/pull/refresh.html),
+press Start, wait about fifteen minutes, read the summary, download the rebuilt
+`index.html` and drop it on GitHub. It saves as it goes, so the tab can be
+closed and reopened. `pull/README.md` is the operating manual; what follows is
+why it is shaped the way it is.
 
-Two things that cost time. OSAA and athletic.net spell schools differently
-(`Benson` / `Benson Tech`, `Nelson` / `Adrienne Nelson`, `Jefferson, Portland` /
-`Jefferson-Portland`) and several entries are co-ops filed under the lead school
-(`The Dalles / Dufur`, `Heppner / Ione`, `Union / Cove`), so an alias table is
-unavoidable. And athletic.net suffixes ambiguous names — strip a trailing
-`(OR)` or the board will show `Cleveland (OR)` where it has always said
-`Cleveland`.
+**It is a web page because Node cannot reach athletic.net.** Cloudflare answers
+Node with a challenge page — a plain `fetch` gets a 403 and `Just a moment...`.
+The same endpoints answer a real browser normally *and* send permissive CORS, so
+the page works served from anywhere; confirmed from `chutexc.vercel.app` and from
+`localhost`. Nothing is uploaded — the file is assembled in the tab and handed
+to the browser's own download.
 
-Current coverage: 2,974 marks, 2,221 athlete-boards, 214 schools. Ten schools
-have no athletic.net id and 43 more have an id but no 5,000m result yet; they
-simply do not appear, the same as any team short of the scoring depth. Nearly
-all are 1A schools that have only raced 3k so far.
+```
+node pull/test_seed.js        # 39 checks, no network
+```
+
+The transformation lives in `pull/seed.js` and is loadable from both Node and the
+page, so the code the test exercises is the code that runs. It round-trips the
+shipped seed: feed all 2,974 rows back in and the same 2,974 must come out.
+
+**Oregon is division 87377** (`World > United States > High School > Oregon`).
+One `GetTree` call returns 765 alignment rows over 438 schools carrying both
+`SchoolID` and `MascotUrl` — which retired two whole steps. Team ids no longer
+have to be resolved from meets already pulled, and the crest map is no longer a
+separate 167-request pass; both fall out of that single request. 230 of the 231
+board schools have an athletic.net team. **Elgin** does not, and cannot be
+aliased into existence.
+
+**The alias table was mostly backwards and is now three entries.** `CLASSES` is
+the authority on what a school is called and it already spells the awkward ones
+athletic.net's way — `Benson Tech`, `McDaniel`, `Adrienne Nelson`,
+`Ida B. Wells`, `Jefferson-Portland`, `The Dalles`, `Heppner`, `Union`. Aliases
+written the other way round (OSAA → athletic.net) actively *broke* three
+matches. Only `Livingstone Adventist Academy`, `Northwest Christian Academy` and
+`Valor Christian International` genuinely differ. Map athletic.net → the board,
+never the reverse. Stripping a trailing `(OR)` still matters, or the board shows
+`Cleveland (OR)` where it has always said `Cleveland`.
+
+**Distance is in the division's name and nowhere else.** There is no distance
+field: `"5,000 Meters Varsity"`, `"3,000 Meters Novice"`, `"3 Miles Varsity
+Boys"`. `divMetres` parses it. The imperial divisions are dropped on purpose —
+the board is 5,000m and nothing is ever converted — so a meet whose only races
+are 3-mile races correctly contributes nothing, and a log line reading `0
+results` there is right rather than broken.
+
+**Summer is not the season.** athletic.net files July running-camp time trials
+under the same season (`"5,000 Meters Week 1"`, Steens Mountain, 374 results).
+`SEASON_START` cuts at mid-August, which is where OSAA practice opens.
+
+**An empty race is usually just an empty race.** I guessed the opposite first and
+was wrong, and the wrong guess is the instructive one. Asked too fast this API
+is documented to answer with blanks rather than 429s, so an empty `resultsXC`
+looked like a throttle worth retrying, and the `teams` array looked like the
+signal — populated when throttled, empty when the race never ran. It is not:
+`teams` is the *meet's* entry list and comes back populated either way. Division
+1099351 at meet 275793 is simply a JV girls race with no results posted, and the
+heuristic sat there backing off for 28 seconds against a race that was never
+going to answer. Nothing in a single response distinguishes the two cases. So
+the code does one cheap retry and then believes it, and puts the suspicion where
+it can actually be evaluated: if more than 40% of a run's races come back empty,
+*that* is the shape of being rationed, and the report says so.
+
+**The report is the safety rail.** The summary prints what was dropped and why,
+and shouts if the seed shrank by more than a tenth — which is what a partial
+crawl looks like from the outside. Do not upload a file that shrank without
+reading the log.
+
+**Resume must advance the index before it saves.** Saving "meet 40 done" while
+meet 40's rows are only half in re-pulls it on resume and gives every athlete in
+it the same mark twice, quietly eating real mark slots. `buildSeed` also
+deduplicates on day-and-time as a backstop: nobody runs two 5,000m races in one
+afternoon in the same hundredth of a second.
+
+Current coverage: 2,974 marks, 2,221 athlete-boards, 214 schools. The schools
+that do not appear have no 5,000m result yet, the same as any team short of the
+scoring depth. Nearly all are 1A schools that have only raced 3k so far.
+
+**`index.html` is untouched by any of this.** `pull/` is maintenance tooling that
+sits beside the app; the app stays one self-contained file that can still be
+uploaded by drag-and-drop on its own.
 
 ## How the simulation works
 

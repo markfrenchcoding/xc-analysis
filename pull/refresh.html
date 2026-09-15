@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Chute — refresh the database</title>
+<style>
+:root{
+  --bg:#12100f; --panel:#1b1917; --raised:#242120; --line:#332f2c;
+  --ink:#f0ece7; --dim:#9a928a; --accent:#c8553d; --good:#5d9b6b; --warn:#c9a227;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:21px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--dim);margin:0 0 24px;font-size:13.5px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin:0 0 10px;font-weight:600}
+button{font:600 14px/1 inherit;padding:11px 18px;border-radius:7px;border:1px solid var(--line);
+  background:var(--raised);color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+button.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.bar{height:5px;background:var(--raised);border-radius:3px;overflow:hidden;margin:14px 0 7px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.stat{color:var(--dim);font:12.5px/1.5 var(--mono)}
+#log{font:12px/1.5 var(--mono);color:var(--dim);background:#0d0c0b;border:1px solid var(--line);
+  border-radius:7px;padding:11px;height:230px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+#log b{color:var(--ink);font-weight:400}
+#log .e{color:var(--accent)}
+#log .w{color:var(--warn)}
+#log .k{color:var(--good)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td{padding:4px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{color:var(--dim);width:48%}
+td:last-child{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hid{display:none}
+.note{font-size:12.5px;color:var(--dim);margin:10px 0 0}
+ol{margin:8px 0 0;padding-left:20px;font-size:13.5px;color:var(--dim)}
+ol b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:12.5px;background:var(--raised);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Refresh the database</h1>
+<p class="sub">Reads this season's Oregon results off athletic.net and hands back a finished
+<code>index.html</code>. Nothing is uploaded anywhere — the file is built in this tab.</p>
+
+<div class="card">
+  <h2>Run it</h2>
+  <div class="row">
+    <button id="go" class="go">Start</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="reset">Start over</button>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="stat" id="stat">Idle.</div>
+  <p class="note">It takes about fifteen minutes and paces itself deliberately, so athletic.net
+  is not hammered. You can close the tab and come back — it picks up where it stopped.</p>
+</div>
+
+<div class="card hid" id="sumCard">
+  <h2>What came back</h2>
+  <table id="sum"></table>
+  <div class="row" style="margin-top:14px">
+    <button id="dl" class="go">Download index.html</button>
+  </div>
+  <p class="note">Then open the repo on GitHub, click <b>index.html</b>, choose <b>Edit</b> →
+  upload, and drop this file on top of it.</p>
+</div>
+
+<div class="card">
+  <h2>Log</h2>
+  <div id="log"></div>
+</div>
+
+<div class="card">
+  <h2>What it does</h2>
+  <ol>
+    <li>Asks athletic.net for every <b>Oregon high school</b> and keeps the ones on an OSAA board.</li>
+    <li>Walks each school's <b>calendar</b> for meets that have results.</li>
+    <li>Pulls every <b>5,000 m division</b> of those meets.</li>
+    <li>Keeps each athlete's three fastest and each team's seven fastest, and refreshes the crests.</li>
+  </ol>
+</div>
+
+</div>
+
+<script src="seed.js"></script>
+<script>
+/* Refresh harness.
+ *
+ * This runs in a browser rather than under Node because Cloudflare answers Node
+ * with a challenge page. Everything it does is a plain GET or POST against the
+ * same public endpoints the athletic.net site itself uses.
+ *
+ * The transformation lives in seed.js, which is tested under Node by
+ * pull/test_seed.js. What is here is the crawl: pacing, resumption and the
+ * report at the end.
+ */
+const API = 'https://www.athletic.net/api/v1/';
+const OREGON_DIV = 87377;        // World > United States > High School > Oregon
+const SEASON = new Date().getFullYear();
+
+/* Pacing. 320ms a request was measured returning empties; 900ms with retries
+   came back clean every time. Results POSTs get a longer gap again. */
+const GAP_GET = 900, GAP_POST = 1500, RETRIES = 3;
+
+const $ = s => document.querySelector(s);
+const logEl = $('#log');
+function log(msg, cls) {
+  const t = new Date().toTimeString().slice(0, 8);
+  logEl.insertAdjacentHTML('beforeend',
+    '<span class="' + (cls || '') + '">' + t + '  ' + msg + '</span>\n');
+  logEl.scrollTop = logEl.scrollHeight;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function progress(done, total, what) {
+  $('#bar').style.width = (total ? 100 * done / total : 0).toFixed(1) + '%';
+  $('#stat').textContent = what + '  ' + done + ' / ' + total;
+}
+
+/* ---------- state, so a closed tab is not fifteen minutes lost ---------- */
+const KEY = 'chute.refresh.v1';
+let S = null, stopping = false, running = false;
+const blank = () => ({ stage: 'teams', teams: [], logos: {}, ti: 0,
+                       meets: [], mi: 0, rows: [], started: new Date().toISOString() });
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {
+  log('could not save progress (' + e.name + ') — do not close the tab', 'w'); } }
+function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
+
+/* ---------- the network ---------- */
+async function get(url, opts) {
+  for (let i = 0; i < RETRIES; i++) {
+    try {
+      const r = await fetch(API + url, opts);
+      if (r.ok) return await r.json();
+      // 429 and 5xx are worth waiting out; a 404 never becomes a 200
+      if (r.status === 404) throw new Error('404 ' + url);
+      log('  ' + r.status + ' on ' + url.slice(0, 48) + ', retrying', 'w');
+    } catch (e) {
+      if (/404/.test(e.message)) throw e;
+      log('  ' + e.message.slice(0, 60) + ', retrying', 'w');
+    }
+    await sleep(GAP_GET * (i + 2));
+  }
+  throw new Error('gave up on ' + url);
+}
+const post = (url, body, jwt) => get(url, { method: 'POST',
+  headers: { 'Content-Type': 'application/json', anettokens: jwt },
+  body: JSON.stringify(body) });
+
+/* ---------- stage 1: who is on a board ---------- */
+async function findTeams(board) {
+  log('asking for every Oregon high school');
+  const t = await get('DivisionHome/GetTree?sport=xc&divisionId=' + OREGON_DIV
+    + '&depth=4&includeTeams=true');
+  const seen = new Map(), logos = {};
+  for (const r of t.alignedTeams || []) {
+    const b = Seed.lookup(r.SchoolName);
+    if (!board[b]) continue;                       // not an OSAA school we model
+    const name = Object.values(board[b])[0].name;  // spell it the board's way
+    if (r.MascotUrl && !logos[name]) logos[name] = 'https:' + r.MascotUrl + '=s96';
+    const prev = seen.get(name);
+    // one school can be aligned to several divisions; keep the busiest row
+    if (!prev || (r.ResultCount || 0) > prev.results)
+      seen.set(name, { id: r.SchoolID, name, results: r.ResultCount || 0 });
+  }
+  const teams = [...seen.values()];
+  const onBoard = new Set(Object.values(board).map(v => Object.values(v)[0].name));
+  const absent = [...onBoard].filter(n => !seen.has(n));
+  log('<b>' + teams.length + '</b> of ' + onBoard.size + ' board schools have an athletic.net team');
+  if (absent.length) log('  no team on athletic.net: ' + absent.join(', '), 'w');
+  return { teams, logos };
+}
+
+/* ---------- stage 2: which meets have results ---------- */
+async function teamMeets(team) {
+  const core = await get('TeamHome/GetTeamCore?teamId=' + team.id + '&sport=xc&year=' + SEASON);
+  if (!core.jwtTeamHome) return [];
+  await sleep(GAP_GET);
+  const cal = await get('TeamHomeCal/GetCalendar?seasonId=' + SEASON,
+    { headers: { anettokens: core.jwtTeamHome } });
+  return (Array.isArray(cal) ? cal : []).filter(m => m.MeetHasResults).map(m => m.MeetID);
+}
+
+/* ---------- stage 3: the results themselves ---------- */
+// "5,000 Meters Varsity" -> 5000. The division carries no distance field, only
+// this label, so a meet's 3k novice race is filtered out here and nowhere else.
+function divMetres(name) {
+  const m = String(name || '').match(/([\d,]+)\s*Meters/i);
+  return m ? +m[1].replace(/,/g, '') : 0;
+}
+/* Empty divisions are normal. Plenty of JV and novice races are on the schedule
+   with no results ever posted, and the response for one is a clean 200 with an
+   empty resultsXC. There is nothing in it that says which kind of empty it is —
+   the `teams` array is the whole meet's entry list and comes back populated
+   either way, so it cannot tell them apart.
+
+   So: one cheap retry in case a blank was transient, then believe it. What is
+   not trusted is the aggregate. Asked too fast this API has a documented habit
+   of answering with blanks rather than 429s, and the signature of that is most
+   of the day's races coming back empty at once, which the report checks for. */
+let divsRead = 0, divsEmpty = 0;
+async function divRows(meetId, divId, jwt) {
+  divsRead++;
+  let rows = (await post('Meet/GetResultsData3', { divId, meetId }, jwt)).resultsXC || [];
+  if (!rows.length) {
+    await sleep(GAP_POST);
+    rows = (await post('Meet/GetResultsData3', { divId, meetId }, jwt)).resultsXC || [];
+  }
+  if (!rows.length) divsEmpty++;
+  return rows;
+}
+
+async function meetRows(meetId) {
+  const md = await get('Meet/GetMeetData?meetId=' + meetId + '&sport=xc');
+  const date = (md.meet && (md.meet.MeetDate || md.meet.StartDate) || '').slice(0, 10);
+  const divs = (md.xcDivisions || []).filter(d => divMetres(d.DivName) === 5000);
+  const out = [];
+  for (const d of divs) {
+    await sleep(GAP_POST);
+    if (stopping) break;
+    for (const r of await divRows(meetId, d.IDMeetDiv, md.jwtMeet)) {
+      if (r.Exhibition) continue;                  // unattached, does not belong to a roster
+      out.push({
+        g: r.Gender, name: ((r.FirstName || '') + ' ' + (r.LastName || '')).trim(),
+        school: r.SchoolName, grade: r.Grade || r.AgeGrade || '',
+        seconds: r.SortValue || r.Result,          // SortValue is already seconds
+        dist: 5000, date,
+      });
+    }
+  }
+  return { rows: out, name: (md.meet || {}).Name || ('meet ' + meetId), date, divs: divs.length };
+}
+
+/* ---------- the run ---------- */
+async function run() {
+  running = true; stopping = false;
+  $('#go').disabled = true; $('#stop').disabled = false;
+  try {
+    log('reading the site\'s own CLASSES block');
+    const html = await (await fetch('../index.html', { cache: 'no-store' })).text();
+    const { board } = Seed.parseClasses(html);
+
+    if (S.stage === 'teams') {
+      const f = await findTeams(board);
+      S.teams = f.teams; S.logos = f.logos; S.stage = 'cal'; S.ti = 0; save();
+    }
+
+    if (S.stage === 'cal') {
+      const all = new Set(S.meets);
+      // A school with no results yet has nothing on its calendar worth walking.
+      const live = S.teams.filter(t => t.results > 0);
+      if (!S.ti) log('walking ' + live.length + ' calendars (' +
+        (S.teams.length - live.length) + ' schools have no results yet)');
+      for (; S.ti < live.length; S.ti++) {
+        if (stopping) { save(); return log('stopped', 'w'); }
+        const t = live[S.ti];
+        progress(S.ti, live.length, 'calendars');
+        try {
+          for (const id of await teamMeets(t)) all.add(id);
+        } catch (e) { log('  ' + t.name + ': ' + e.message, 'e'); }
+        S.meets = [...all];
+        if (S.ti % 10 === 0) save();
+        await sleep(GAP_GET);
+      }
+      S.meets = [...all]; S.stage = 'meets'; S.mi = 0; save();
+      log('<b>' + S.meets.length + '</b> meets with results');
+    }
+
+    if (S.stage === 'meets') {
+      // The index advances before the save, never after: saving "meet 40 done"
+      // while meet 40's rows are only half in would re-pull it on resume and
+      // give every athlete in it the same mark twice.
+      while (S.mi < S.meets.length) {
+        if (stopping) { save(); return log('stopped', 'w'); }
+        progress(S.mi, S.meets.length, 'meets');
+        const id = S.meets[S.mi];
+        try {
+          const r = await meetRows(id);
+          if (stopping) { save(); return log('stopped', 'w'); }   // a half-read meet is not done
+          S.rows.push(...r.rows);
+          log(r.date + '  ' + r.name.slice(0, 44) + '  <b>' + r.rows.length + '</b> results');
+        } catch (e) { log('  meet ' + id + ': ' + e.message, 'e'); }
+        S.mi++;
+        save();
+        await sleep(GAP_GET);
+      }
+      S.stage = 'done'; save();
+    }
+
+    finish(html, board);
+  } catch (e) {
+    log(e.message, 'e');
+    log('progress is saved — press Start to pick up where it stopped', 'w');
+  } finally {
+    running = false; $('#go').disabled = false; $('#stop').disabled = true;
+  }
+}
+
+/* ---------- the report, and the file ---------- */
+let BUILT = null;
+function finish(html, board) {
+  progress(1, 1, 'done');
+  const b = Seed.buildSeed(S.rows, board);
+  const date = b.latest || new Date().toISOString().slice(0, 10);
+  let out = Seed.patchIndex(html, b.csv, date);
+  out = Seed.patchLogos(out, S.logos);
+
+  const was = (html.match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
+    .trim().split('\n').length - 1;
+  const rowsCell = b.rows + (b.rows === was ? '' : '  (' + (b.rows > was ? '+' : '')
+    + (b.rows - was) + ')');
+
+  const cells = [
+    ['Results read', S.rows.length.toLocaleString()],
+    ['Rows in the seed', rowsCell],
+    ['Athletes', b.athletes.toLocaleString()],
+    ['Schools', b.schools],
+    ['Team boards', b.teams],
+    ['Crests', Object.keys(S.logos).length],
+    ['Results through', date],
+    ['Dropped — not 5,000 m', b.dropped.dist],
+    ['Dropped — before the season', b.dropped.preseason],
+    ['Dropped — no usable time', b.dropped.unparsed],
+    ['Dropped — school not on a board', b.dropped.offBoard],
+    ['Races with no results posted', divsEmpty + ' of ' + divsRead],
+  ];
+  $('#sum').innerHTML = cells.map(c => '<tr><td>' + c[0] + '</td><td>' + c[1] + '</td></tr>').join('');
+  $('#sumCard').classList.remove('hid');
+
+  log('<b>' + b.rows + '</b> rows, ' + b.schools + ' schools, results through <b>' + date + '</b>', 'k');
+  if (b.offBoard.length)
+    log('ran in Oregon meets but is not on a board: ' + b.offBoard.length + ' schools '
+      + '(out-of-state, middle school, or club) — ' + b.offBoard.slice(0, 12).join(', ')
+      + (b.offBoard.length > 12 ? ' …' : ''));
+  // a handful of blank JV races is ordinary; most of the card coming back blank
+  // is the API rationing, and the seed built from it would be missing real teams
+  if (divsRead > 20 && divsEmpty > divsRead * 0.4)
+    log(divsEmpty + ' of ' + divsRead + ' races came back empty. That is the shape of being '
+      + 'rate-limited, not of a quiet season — wait an hour and run it again before '
+      + 'uploading this.', 'e');
+  if (b.rows < was * 0.9)
+    log('the seed SHRANK by more than a tenth — look at the log before uploading this', 'e');
+
+  BUILT = out;
+  log('ready to download', 'k');
+}
+
+$('#dl').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([BUILT], { type: 'text/html' }));
+  a.download = 'index.html';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+};
+$('#go').onclick = () => { if (!running) { S = load() || blank(); run(); } };
+$('#stop').onclick = () => { stopping = true; log('stopping after this request…', 'w'); };
+$('#reset').onclick = () => {
+  if (running) return log('stop it first', 'w');
+  localStorage.removeItem(KEY); S = blank(); BUILT = null;
+  $('#sumCard').classList.add('hid'); logEl.textContent = '';
+  progress(0, 0, 'Idle.'); $('#stat').textContent = 'Idle.';
+  log('cleared');
+};
+
+(function boot() {
+  const prev = load();
+  if (prev && prev.stage !== 'done') {
+    const n = prev.stage === 'cal' ? prev.ti + ' calendars' : prev.mi + ' meets';
+    log('there is a part-finished run from ' + prev.started.slice(0, 16).replace('T', ' ')
+      + ' — ' + n + ' in. Start resumes it; Start over throws it away.', 'w');
+  } else {
+    log('ready');
+  }
+})();
+</script>
+</body>
+</html>
