@@ -75,7 +75,7 @@ body.gunlap-fire .glyph .cl{animation-duration:.32s}
 .gl-sec{margin:14px 17px 0;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
 @keyframes glRow{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
-  .gl,.gl-card,.pl-fr{animation:none}
+  .gl,.gl-card,.pl-fr,.dream{animation:none}
   .gl-tape{animation:none}
 }
 .gl-kick{margin:13px 17px 0;padding:11px 12px;border-radius:11px;background:var(--bg);
@@ -88,6 +88,13 @@ body.gunlap-fire .glyph .cl{animation-duration:.32s}
 .gl-esc{margin:8px 17px 0;font-size:10px;color:var(--dim);text-align:center}
 /* ---- the draft: seven runners from anywhere in the state ---- */
 .gl-wide{max-width:452px}
+.dream{font-weight:700;color:transparent;-webkit-text-fill-color:transparent;
+  background-image:linear-gradient(90deg,#E0913C,#E23F58,#7B6FE0,#3FA3C9,#2FA37E,#E0913C);
+  background-size:280% 100%;-webkit-background-clip:text;background-clip:text;
+  animation:dreamRun 5s linear infinite}
+@keyframes dreamRun{to{background-position:280% 0}}
+.gl-hd h3 .dream{letter-spacing:0}
+.pl-nm .dream{font-size:10px}
 .dr-slots{display:flex;flex-wrap:wrap;gap:5px;margin:12px 17px 0}
 .dr-slot{flex:1 1 calc(25% - 4px);min-width:88px;display:flex;align-items:center;gap:5px;
   min-height:32px;padding:4px 6px;border-radius:9px;background:var(--bg);
@@ -138,7 +145,7 @@ body.gunlap-fire .glyph .cl{animation-duration:.32s}
 .pl-fr{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;
   animation:glRow .3s ease-out backwards}
 .pl-fr+.pl-fr{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
-.pl-fr.me .pl-nm{color:var(--t1e);font-weight:600}
+.pl-fr.me .pl-nm{font-weight:600}
 .pl-pl{width:22px;flex:none;text-align:right;color:var(--dim);
   font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
 .pl-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -4818,24 +4825,29 @@ function showTeam(idx){
 }
 
 
-/* ---------- the flag: a team that cannot exist ---------- */
-/* The board is locked to real rosters, which leaves one question it can never
-   answer - what if these seven ran together? Draft any seven athletes in the
-   state, from any school and any classification, and they are entered at Lane
-   as an extra team: raced once in front of you, then two thousand more times
-   for the odds.
+/* ---------- the flag: your Oregon Dream Team ---------- */
+/* Every board on this site is locked to real rosters inside one classification,
+   which leaves two questions it can never answer: what if these seven ran
+   together, and what if every school in Oregon lined up at once? The draft is
+   both. Pick any seven athletes in the state and they race the sixteen fastest
+   schools in Oregon - 6A through 1A, whoever is quickest - once in front of you,
+   then two thousand more times for the odds.
 
-   No engine change. The squad is appended to the model as a team with no
-   league, so playDistricts never sees it, and it is pushed into the state field
-   by hand. Everything downstream - draw, scoreMeet, playState - treats it like
-   any other team, which is the point: these are the same numbers the board runs
-   on, not a toy beside them.
+   No engine change. It builds its own field with stateModel and scores it with
+   the same draw() and scoreMeet() the board uses: same marks, same top-three
+   sampling, same shared team shock, same skewed individual noise. There are no
+   districts because there is no season, so blankTally and playState are not
+   involved either - the tally here is four running totals.
 
    Drafted runners are ghosts. Their own school still lines up with them, so a
    star drafted away is on the course twice. That is deliberate: taking them out
-   would drop their school below the scoring depth and quietly change the field
+   would drop their school below the scoring five and quietly change the field
    they are being measured against. */
-const GHOST="The Impossible Team";
+const GHOST="Dream Team";
+/* How many real schools line up. Sixteen matches a 6A state field, which is
+   what the race should feel like - except these sixteen are drawn from every
+   classification in the state, because the draft is. */
+const DREAM_FIELD=16;
 /* timers are the finish-line reveals, which skipping cancels; odds is the
    background season loop, which it must not. */
 let DR={pool:[],pick:[],g:null,q:"",timers:[],odds:0,oddsHTML:"",live:false};
@@ -4877,14 +4889,59 @@ function draftPool(g){
   return out.sort((x,y)=>x.sbRaw-y.sbRaw);
 }
 
+/* The sixteen fastest schools in Oregon by scoring-five average, across every
+   classification at once. This is not a board the site otherwise has: there is
+   no OSAA meet where a 1A school lines up against a 6A one, which is exactly
+   why the draft gets to. Built here rather than through buildModel because that
+   filters on the selected classification and carries that board's berths and
+   scoring depth; none of it applies to a meet that does not exist. Five score
+   and seven run, the NFHS default. */
+function stateModel(g){
+  const byTeam=new Map();
+  for(const r of DATA){
+    if(r.g!==g||r.dist!==DIST)continue;
+    if(!byTeam.has(r.team))byTeam.set(r.team,new Map());
+    const m=byTeam.get(r.team);
+    if(!m.has(r.name))m.set(r.name,{name:r.name,grade:r.grade,cls:r.cls,marks:[]});
+    m.get(r.name).marks.push(r.sb);
+  }
+  const all=[];
+  for(const [name,m] of byTeam){
+    const roster=[...m.values()];
+    for(const a of roster){
+      a.marks.sort((x,y)=>x-y);
+      a.marks=a.marks.slice(0,3);
+      a.sbRaw=a.marks[0];
+      if(a.marks.length===1)a.marks=[a.marks[0]*(1+LONE)];
+      a.sb=a.marks[0];
+      a.w=MARK_W[a.marks.length-1].slice();
+    }
+    roster.sort((x,y)=>x.sb-y.sb);
+    const seven=roster.slice(0,7);
+    if(seven.length<5)continue;                    // cannot field a scoring five
+    all.push({name,roster:seven,avg5:seven.slice(0,5).reduce((s,a)=>s+a.sb,0)/5});
+  }
+  all.sort((a,b)=>a.avg5-b.avg5);
+  const teams=[],runners=[];
+  for(const x of all.slice(0,DREAM_FIELD)){
+    const idx=teams.length;
+    const rIdx=x.roster.map(a=>{
+      runners.push({marks:a.marks,w:a.w,sb:a.sb,t:idx});
+      return runners.length-1;
+    });
+    teams.push({name:x.name,idx,rIdx,roster:x.roster,avg5:x.avg5,short:0});
+  }
+  return {teams,runners};
+}
+
 function addGuest(model,squad){
   const idx=model.teams.length;
   const rIdx=squad.map(a=>{
     model.runners.push({marks:a.marks,w:a.w,sb:a.sb,t:idx});
     return model.runners.length-1;
   });
-  model.teams.push({name:GHOST,league:"\u2014",idx,rIdx,short:0,roster:squad,
-    avg5:squad.slice(0,SC).reduce((s,a)=>s+a.sb,0)/SC});
+  model.teams.push({name:GHOST,idx,rIdx,short:0,roster:squad,
+    avg5:squad.slice(0,5).reduce((s,a)=>s+a.sb,0)/5});
   return idx;
 }
 
@@ -4897,9 +4954,9 @@ function showDraft(){
   setTimeout(()=>document.body.classList.remove("gunlap-fire"),1500);
   if(DR.g!==gender){DR.g=gender;DR.pool=draftPool(gender);DR.pick=[];DR.q="";}
   const el=overlay();
-  el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="The Impossible Team">'
+  el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="Your Oregon Dream Team">'
     +'<div class="gl-tape"></div>'
-    +'<div class="gl-hd"><h3>The Impossible Team</h3>'
+    +'<div class="gl-hd"><h3>Who Makes Your Oregon <span class="dream">Dream Team</span>?</h3>'
     +'<p>Seven runners who will never be on the same team. Put them on the line at Lane.</p></div>'
     +'<div class="dr-slots" id="drSlots"></div>'
     +'<div class="dr-meta" id="drMeta"></div>'
@@ -4942,14 +4999,14 @@ function drPaint(){
   const m=document.getElementById("drMeta");
   if(DR.pick.length<7){
     m.innerHTML='<b>'+DR.pick.length+' of seven.</b> Anyone in the state, any classification. '
-      +'They line up against the '+CLS+' field at Lane &mdash; as ghosts, so their own schools still race too.';
+      +'They line up against the sixteen fastest schools in Oregon &mdash; as ghosts, so their own schools still race too.';
   }else{
-    const five=DR.pick.slice(0,SC).reduce((x,a)=>x+a.sbRaw,0);
+    const five=DR.pick.slice(0,5).reduce((x,a)=>x+a.sbRaw,0);
     const schools=new Set(DR.pick.map(a=>a.team)).size;
     const classes=new Set(DR.pick.map(a=>a.cls)).size;
-    m.innerHTML='Scoring '+SC+' average <b>'+fmt(five/SC)+'</b> \u00b7 <b>'+schools+'</b> school'
+    m.innerHTML='Scoring five average <b>'+fmt(five/5)+'</b> \u00b7 <b>'+schools+'</b> school'
       +(schools===1?"":"s")+' \u00b7 <b>'+classes+'</b> classification'+(classes===1?"":"s")
-      +'. They line up against the '+CLS+' field at Lane.';
+      +'. They line up against the sixteen fastest schools in Oregon.';
   }
   const go=document.getElementById("drGo");
   go.disabled=DR.pick.length!==7;
@@ -4978,25 +5035,23 @@ function drList(){
   });
 }
 
-/* One race, drawn the way every race on this site is drawn: a full season to
-   settle who qualifies, then a fresh draw at Lane with the ghosts added. */
+/* One race, drawn the way every race on this site is drawn - same marks, same
+   sampling, same shared team shock and the same skewed individual noise. There
+   are no districts here because there is no season: the field is simply the
+   best sixteen schools in the state, so a draw and a score is the whole race. */
 function drRace(){
   drCancel();
   DR.live=true;DR.oddsHTML="";
-  const model=buildModel(gender,DIST);
+  const model=stateModel(gender);
+  if(model.teams.length<2)return;
   const gi=addGuest(model,DR.pick);
   const sigma=sigmaPct/100;
   const times=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
-  const T=blankTally(model);
   draw(model,times,sigma,shock);
-  const field=playDistricts(model,T.byIdx,times,null);
-  if(field.length<2){drCancel();return;}
-  draw(model,times,sigma,shock);
-  field.push(gi);
-  const res=scoreMeet(field.map(i=>model.teams[i]),times,SC,PL);
+  const res=scoreMeet(model.teams,times,5,7);
   const line=[];
-  for(const i of field) for(const ri of model.teams[i].rIdx) line.push({ri,t:times[ri],team:i});
+  for(const tm of model.teams) for(const ri of tm.rIdx) line.push({ri,t:times[ri],team:tm.idx});
   line.sort((a,b)=>a.t-b.t);
   paceLine(model,gi,line,res);
   ghostOdds(model,gi,sigma);
@@ -5013,8 +5068,8 @@ function paceLine(model,gi,line,res){
   const el=overlay();
   el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="One race at Lane">'
     +'<div class="gl-tape"></div>'
-    +'<div class="gl-hd"><h3>Lane, 5,000m</h3><p>'+line.length+' on the line &mdash; the '+CLS
-    +' state field, plus seven who do not exist</p></div>'
+    +'<div class="gl-hd"><h3>Lane, 5,000m</h3><p>'+line.length
+    +' on the line &mdash; the sixteen fastest schools in Oregon, plus seven who do not exist</p></div>'
     +'<div class="pl-wrap" id="plWrap"><span class="pl-fin"></span>'
     +'<span class="pl-clock" id="plClock">0:00</span>'
     +'<span class="pl-skip">tap to skip</span></div>'
@@ -5035,11 +5090,11 @@ function paceLine(model,gi,line,res){
   });
   wrap.appendChild(frag);
   const total=line[line.length-1].t;
-  /* The winner crosses in eight seconds - unless the field has a long tail, and
-     a drafted seven can easily include a twenty-eight minute runner. Then the
-     whole race is compressed into twelve rather than leaving someone jogging
-     alone for another ten. */
-  const SPEED=Math.max(line[0].t/8,total/12);
+  /* The winner crosses in four and a half seconds - unless the field has a long
+     tail, and a drafted seven can easily include a twenty-eight minute runner.
+     Then the whole race is compressed into seven rather than leaving someone
+     jogging in alone. */
+  const SPEED=Math.max(line[0].t/4.5,total/7);
   // the rows worth watching: the first three across, and all seven ghosts
   const show=[];
   line.forEach((r,i)=>{ if(i<3||r.team===gi) show.push({p:i+1,r}); });
@@ -5047,20 +5102,23 @@ function paceLine(model,gi,line,res){
   const addRow=s=>{
     const row=document.createElement("div");
     row.className="pl-fr"+(s.r.team===gi?" me":"");
+    const tag=s.r.team===gi?'<span class="dream">'+GHOST+'</span>'
+                           :'<em>'+who[s.r.ri].team+'</em>';
     row.innerHTML='<span class="pl-pl">'+s.p+'</span><span class="pl-nm">'+who[s.r.ri].name
-      +' <em>'+who[s.r.ri].team+'</em></span><span class="pl-t">'+fmt(s.r.t)+'</span>';
+      +' '+tag+'</span><span class="pl-t">'+fmt(s.r.t)+'</span>';
     feed.appendChild(row);
   };
   const finish=()=>{
     if(over)return; over=true;
     drFeedStop();
-    DR.timers.push(setTimeout(()=>wrap.classList.add("over"),800));
+    DR.timers.push(setTimeout(()=>wrap.classList.add("over"),450));
     for(const d of dots){d.el.style.transition="none";d.el.style.transform="translate("+x1+"px,"+d.y+"px)";}
     while(shown<show.length) addRow(show[shown++]);
     document.getElementById("plClock").textContent=
       Math.floor(total/60)+":"+String(Math.floor(total%60)).padStart(2,"0");
     const p=res.findIndex(r=>r.idx===gi)+1, mine=res[p-1];
-    document.getElementById("plOut").innerHTML='<div class="gl-kick">In this one race they finished <b>'
+    document.getElementById("plOut").innerHTML='<div class="gl-kick">In this one race your '
+      +'<span class="dream">'+GHOST+'</span> finished <b>'
       +ord(p)+'</b> on <b>'+mine.total+' points</b>, '
       +(p===1?'ahead of <b>'+model.teams[res[1].idx].name+'</b>'
              :'behind <b>'+model.teams[res[0].idx].name+'</b>')
@@ -5077,46 +5135,49 @@ function paceLine(model,gi,line,res){
   }
   for(const s of show)
     DR.timers.push(setTimeout(()=>{ if(!over) addRow(show[shown++]); },s.r.t/SPEED*1000));
+  /* The result is on a timer, not on the end of the clock loop. A tab sent to
+     the background stops delivering frames, and the reader should still come
+     back to a finished race rather than one frozen at 0:00. */
+  DR.timers.push(setTimeout(finish,total/SPEED*1000+40));
   const clock=document.getElementById("plClock"),t0=performance.now();
-  nextTick(function tick(ts){
+  nextTick(function tick(ts){            // cosmetic only; finish is on its own timer
     if(!DR.live||over)return;
     const e=Math.min((ts-t0)/1000*SPEED,total);
     clock.textContent=Math.floor(e/60)+":"+String(Math.floor(e%60)).padStart(2,"0");
-    if(e<total)nextTick(tick); else finish();
+    if(e<total)nextTick(tick);
   });
 }
 
-/* Two thousand more seasons, chunked so the race keeps animating while they
-   run. The guest never goes through districts, so it qualifies every season -
-   which makes ptsN the season count and the points figure unconditional. */
+/* Two thousand more runnings of the same meet, chunked so the race keeps
+   animating while they go. Nothing is conditional here: the field is fixed, so
+   every season is the same seventeen teams and the averages need no caveat. */
 function ghostOdds(model,gi,sigma){
-  const N=2000,T=blankTally(model),by=T.byIdx;
+  const N=2000;
   const times=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
-  let done=0;
+  let done=0,win=0,top4=0,placeSum=0,ptsSum=0;
   /* Paced on a timer, not on frames: this loop paints nothing until it
      finishes, and a frame callback on a page that has stopped animating is at
      the browser's discretion. Registered so closing the sheet stops it. */
   const slice=()=>{DR.odds=setTimeout(step,0);};
   function step(){
     if(!DR.live)return;
-    const end=Math.min(N,done+200);
+    const end=Math.min(N,done+250);
     while(done<end){
       draw(model,times,sigma,shock);
-      const f=playDistricts(model,by,times,null);
-      draw(model,times,sigma,shock);
-      f.push(gi);
-      playState(model,by,times,f,null,null,null);
+      const res=scoreMeet(model.teams,times,5,7);
+      for(let p=0;p<res.length;p++) if(res[p].idx===gi){
+        placeSum+=p+1;ptsSum+=res[p].total;
+        if(p===0)win++;
+        if(p<4)top4++;
+        break;
+      }
       done++;
     }
     if(done<N)return slice();
-    const g=by[gi];
-    let sum=0,seen=0;
-    for(let p=1;p<=FIELD;p++){sum+=p*g.hist[p];seen+=g.hist[p];}
-    const mean=(sum+(N-seen)*(FIELD+1))/N;   // the one place hist cannot hold
-    DR.oddsHTML='Across '+N.toLocaleString()+' more they win <b>'+pct(g.win,N)
-      +'</b>, finish top four <b>'+pct(g.top4,N)+'</b>, and average <b>'+mean.toFixed(1)
-      +'</b> on <b>'+Math.round(g.ptsSum/g.ptsN)+' points</b>.';
+    DR.oddsHTML='Across '+N.toLocaleString()+' more they win <b>'+pct(win,N)
+      +'</b>, finish top four <b>'+pct(top4,N)+'</b>, and average <b>'+(placeSum/N).toFixed(1)
+      +'</b> on <b>'+Math.round(ptsSum/N)+' points</b>.';
     drShowOdds();
   }
   slice();

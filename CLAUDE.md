@@ -79,49 +79,74 @@ individual qualifiers included. Fifty, not everyone — the tail is hundreds of
 runners who reached Lane in a handful of seasons and the ranking there is noise.
 The footnote says how many athletes made it at all.
 
-**The flag: the Impossible Team.** Tapping the checkered flag opens a draft.
-Pick any seven athletes in Oregon — any school, any classification, both ends of
-the state — and they are entered at Lane as an extra team: raced once in front
-of you as a pace line, then two thousand more times for the odds.
+**The flag: your Oregon Dream Team.** Tapping the checkered flag opens a
+draft. Pick any seven athletes in the state — any school, any classification —
+and they race **the sixteen fastest schools in Oregon**, 6A through 1A, once in
+front of you as a pace line and then two thousand more times for the odds.
 
-It answers the one question the board structurally cannot. Every other view is
-locked to real rosters; this is the only place the tool can be asked about a
-squad that does not exist. An earlier egg replayed a simulated state meet and
-was redundant — it was the tool again with less of it. A second one counted down
-the seven fastest individuals in the division, which the Runners board now
-covers properly; that idea survives as the draft's "Fastest" button.
+It answers the two questions the board structurally cannot. Every other view is
+locked to real rosters inside one classification; this is the only place the
+tool can be asked about a squad that does not exist, or about a meet where a 4A
+school lines up against a 6A one. Both fields are real: the girls' sixteen
+currently include Banks and Crater, the boys' include Summit and Hood River
+Valley. An earlier egg replayed a simulated state meet and was redundant — it
+was the tool again with less of it. A second counted down the seven fastest
+individuals in the division, which the Runners board now covers properly; that
+idea survives as the draft's "Fastest" button.
 
-**No engine change, deliberately.** `addGuest` appends the squad to the model as
-a team with no league, so `playDistricts` never sees it, and `drRace` pushes it
-into the state field by hand. `draw`, `scoreMeet` and `playState` treat it like
-any other team. That is the point — these are the same numbers the board runs
-on, not a toy beside them. `draftPool` rebuilds marks exactly as `buildModel`
-does, top three with a lone mark regressed, minus the classification filter.
+**No engine change, and no board constants either.** `stateModel` builds its own
+field straight from `DATA` — every school in the state with a scoring five,
+ranked by five-average, top sixteen — because `buildModel` filters on the
+selected classification and carries that board's berths and scoring depth, none
+of which apply to a meet that does not exist. Marks are handled identically:
+top three, a lone mark regressed, `MARK_W` weights. Scoring is `scoreMeet` at
+five and seven, the NFHS default, and the draw is `draw()` — same shared team
+shock, same skewed individual noise. There are no districts because there is no
+season, so `playDistricts`, `playState` and `blankTally` are not involved; the
+tally is four running totals. Nothing is conditional: the field is fixed, so
+every one of the two thousand runnings is the same seventeen teams.
+
+**The classification switcher does not reach the draft**, deliberately. The
+board behind it still says 3A or 2A/1A; the race is always all of Oregon.
 
 **Drafted runners are ghosts.** Their own school still lines up with them, so a
 star drafted away is on the course twice and the results feed will show the same
 name at 3rd and at 43rd. Taking them out of their school would drop it below the
-scoring depth and quietly change the field they are being measured against, so
+scoring five and quietly change the field they are being measured against, so
 the duplicate is the lesser distortion. The draft says so in a clause.
 
 **The pace line is CSS, not a render loop.** Each dot gets one transition whose
 duration is that runner's own time, so the browser does the animation and the
 finishing order is exact by construction. Constant pace also means the field
 starts bunched and strings out as the gaps compound, which is what a race looks
-like from above. Only the clock is on `nextTick`. The winner crosses in eight
-seconds unless the tail is long — `SPEED` takes the max against a twelve-second
-whole-race cap, because a drafted seven can easily include a 28-minute runner
-and nobody wants to watch them jog in alone.
+like from above. The winner crosses in four and a half seconds — `SPEED` takes
+the max of that against a seven-second whole-race cap, because a drafted seven
+can easily include a 28-minute runner and nobody wants to watch them jog in
+alone. About six seconds end to end.
 
-**The two thousand seasons finish before the race does**, by a factor of fifty.
+**The result is on a timer, not on the end of the clock loop.** The clock is
+`nextTick` and purely cosmetic; `finish` is a `setTimeout` at the known race
+duration. A tab sent to the background stops delivering frames, and a reader
+coming back should find a finished race rather than one frozen at 0:00. This is
+the same hazard `nextTick` exists for, one level up.
+
+**The two thousand runnings finish before the race does**, by a factor of fifty.
 So `ghostOdds` holds its answer in `DR.oddsHTML` and whichever finishes second
 renders it. It is also paced on `setTimeout` rather than `nextTick`: it paints
 nothing until it is done, and a frame callback on a page that has stopped
 animating is at the browser's discretion.
 
 **Two timer lists, and they are not the same.** `DR.timers` holds the finish-line
-reveals, which tapping to skip cancels. `DR.odds` holds the season loop, which it
-must not — sharing one list meant skipping the race silently threw the odds away.
+reveals and the result, which tapping to skip cancels because skipping calls
+`finish` itself. `DR.odds` holds the season loop, which it must not — sharing one
+list meant skipping the race silently threw the odds away.
+
+**The moving colour is hardcoded, not taken from the palette.** `.dream` clips an
+animated six-stop gradient to the text. The trophy variables were the obvious
+source and are unusable for this: `--t2e` is a near-white silver and `--t1e` a
+pale blue, either of which vanishes against the light theme's own background
+once the fill is transparent. The six stops are mid-tone on purpose and were
+checked in both themes.
 
 **Points are conditional, and the card says so.** Each card shows the mean score
 at Lane averaged over the seasons that team actually qualified — "pts when
