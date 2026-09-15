@@ -223,11 +223,21 @@ team is accent among grey. The feed carries each school's hue as a chip beside
 its name.
 
 **They run the course, not a lane.** The field moves across an isometric Lane
-built from the OSAA course map: three ponds, the two ball fields, the soccer
-bowl, the track bowl, the campus as extruded boxes, and the four kilometre
-markers where the map puts them. Plan coordinates are projected two-to-one
-(`(X-Y)*0.86`, `(X+Y)*0.43`) so east lands right and south lands bottom, the way
-the printed map reads.
+built from the OSAA course map: 30th Avenue down the whole west side, Poison Oak
+and Eldon Schafer across the top, the two ball fields, the start box, the soccer
+bowl, the track bowl, the campus as extruded boxes, three long ponds filling the
+bottom half, and the four kilometre markers where the map puts them.
+
+**The site is portrait, and getting that wrong is what made the first attempt
+look generic.** Plan is 0-124 east by 0-144 south, read off the printed map at
+roughly five map pixels to the unit, projected two-to-one (`(X-Y)*0.72`,
+`(X+Y)*0.36`) so east lands right and south lands bottom the way the map reads.
+Squeezing the same features into a square plan put the ponds in the wrong
+proportion to everything else and read as any-campus-anywhere.
+
+**The ground is an L, not a rectangle.** Campus runs east across the top, the
+ponds run south down the west, and the south-east quarter is not part of the
+site - drawing it as a full diamond spent a third of the frame on nothing.
 
 **The route is drawn, not surveyed, and the overlay says so.** Landmarks and the
 K markers come off the map; the line joining them is a reconstruction of a
