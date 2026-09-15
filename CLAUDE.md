@@ -524,27 +524,53 @@ How tab says this outright — do not let the site imply otherwise.
 
 ### Rebuilding the database
 
-**There is a button for this now.** Open
-[chutexc.vercel.app/pull/refresh.html](https://chutexc.vercel.app/pull/refresh.html),
-press Start, wait about fifteen minutes, read the summary, download the rebuilt
-`index.html` and drop it on GitHub. It saves as it goes, so the tab can be
-closed and reopened. `pull/README.md` is the operating manual; what follows is
-why it is shaped the way it is.
+**It runs itself.** `pull\install-schedule.cmd`, double-clicked once, puts a
+weekly job in Windows Task Scheduler: `crawl.js` crawls, rewrites `index.html`,
+commits and pushes, and Vercel redeploys on the push. `pull/README.md` is the
+operating manual. The browser harness at
+[/pull/refresh.html](https://chutexc.vercel.app/pull/refresh.html) is still there
+for running it by hand from any machine, and is the fallback if the scheduled run
+is ever wrong.
 
-**It is a web page because Node cannot reach athletic.net.** Cloudflare answers
-Node with a challenge page — a plain `fetch` gets a 403 and `Just a moment...`.
-The same endpoints answer a real browser normally *and* send permissive CORS, so
-the page works served from anywhere; confirmed from `chutexc.vercel.app` and from
-`localhost`. Nothing is uploaded — the file is assembled in the tab and handed
-to the browser's own download.
+**It cannot run in the cloud, and that was measured rather than assumed.** A
+serverless function or a CI job was the obvious design. Cloudflare answers a
+**datacenter address** with a challenge page whatever asks: from a GitHub Actions
+runner both `curl` and Node's `fetch` got `403` and `Just a moment...`. From an
+ordinary home connection curl is served normally. So the scheduled job lives on
+the owner's machine, and there is no serverless function and no Action. Do not go
+looking for a cloud host that happens not to be blocked — the block is the site
+saying what it wants.
+
+**Why `crawl.js` talks through curl.** Node's own fetch is challenged even from a
+home connection and even given perfect browser headers, because undici's TLS
+fingerprint is unusual; curl is served. Nothing is being worked around - from
+that address curl is simply allowed. The upside is real: curl can read a `429`
+and its `Retry-After`, which the browser cannot (see below), so the headless
+backoff is informed where the page's is blind.
+
+**The unattended run refuses more readily than it writes.** `crawl.js` exits 0
+only when it wrote; 2 when it would not, and 3 when nothing had changed. It
+refuses on a seed that shrank by a tenth, on any meet that never answered, and on
+most races coming back empty. A job nobody is watching that writes anyway is
+worse than no job, because the failure arrives as a quietly wrong board rather
+than as an error.
 
 ```
-node pull/test_seed.js        # 39 checks, no network
+node pull/test_seed.js        # 61 checks, no network
+node pull/test_crawl.js       # 8 checks on the write guards
 ```
 
-The transformation lives in `pull/seed.js` and is loadable from both Node and the
-page, so the code the test exercises is the code that runs. It round-trips the
-shipped seed: feed all 2,974 rows back in and the same 2,974 must come out.
+**`seed.js` is the only thing the two crawls share, and that is deliberate.**
+Their transports have nothing in common — `fetch` under CORS against `curl`
+through a child process — and their backoffs differ for a real reason, because
+only one of them can read a 429. But the *reading* of athletic.net is identical,
+so `divMetres`, `resultRow` and `teamsFromTree` live in `seed.js` where both get
+them and the tests cover them. Left duplicated in the two crawlers they would
+drift the first time a field was renamed, and the browser would go on working
+while the scheduled run quietly rotted.
+
+It round-trips the shipped seed: feed all 3,645 rows back in and the same 3,645
+must come out.
 
 **Oregon is division 87377** (`World > United States > High School > Oregon`).
 One `GetTree` call returns 765 alignment rows over 438 schools carrying both
@@ -764,8 +790,15 @@ reader was elsewhere has a stale step and overlaps.
 
 ```
 node extract_model.js        # regenerate model.js after any signature change
-node audit2.js               # 47 checks
+node audit2.js               # 93 checks, 1 deliberate failure
+node pull/test_seed.js       # 61 checks on the seed builder, no network
+node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
 ```
+
+The two `pull` suites are quick and touch no network, so there is no reason not
+to run them alongside the audit. `test_crawl.js` lifts the guard rule out of
+`crawl.js` by text rather than restating it, so it fails loudly if that block
+moves rather than passing against a stale copy of the rule.
 
 It covers NFHS scoring (a perfect dual is **15-50**, not 15-40), displacement,
 the seven-runner cap, sixth-runner tiebreaks, and model-wiring invariants across

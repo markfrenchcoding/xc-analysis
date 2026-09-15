@@ -38,6 +38,65 @@
   const canonical = name => ALIAS[key(name)] || strip(name);
   const lookup = name => key(canonical(name));
 
+  /* ---------- what athletic.net's shapes mean ----------
+     Two crawls call this file: the browser harness and the headless scheduled
+     one. Their transports have nothing in common - fetch under CORS against
+     curl through a child process - and their backoffs differ for a real reason,
+     because only one of them can read a 429. But the *reading* of athletic.net
+     is identical, so it lives here where both get it and the tests cover it.
+     Left in the two crawlers it would drift the first time a field was renamed. */
+
+  const OREGON_DIV = 87377;            // World > United States > High School > Oregon
+
+  /* "5,000 Meters Varsity" -> 5000. The only place a division's distance is
+     recorded; there is no distance field. The imperial divisions ("3 Miles
+     Varsity Boys") are meant to come out as 0 and be dropped - the board is
+     5,000m and nothing is ever converted - so a meet of nothing but 3-mile
+     races contributing no rows is right rather than broken. */
+  function divMetres(name) {
+    const m = String(name || '').match(/([\d,]+)\s*Meters/i);
+    return m ? +m[1].replace(/,/g, '') : 0;
+  }
+
+  /* One athletic.net result -> one row for buildSeed, or null to skip it.
+     SortValue is already seconds, which saves parsing Result, but it is also
+     where the 999999 scratch sentinel lives - buildSeed's bounds catch that. */
+  function resultRow(r, date) {
+    if (!r || r.Exhibition) return null;     // unattached, not on anyone's roster
+    return {
+      g: r.Gender,
+      name: ((r.FirstName || '') + ' ' + (r.LastName || '')).trim(),
+      school: r.SchoolName,
+      grade: r.Grade || r.AgeGrade || '',
+      seconds: r.SortValue || r.Result,
+      dist: 5000,
+      date: date || '',
+    };
+  }
+
+  /* The Oregon division tree -> the teams worth crawling, and their crests.
+     One school is aligned to several divisions (its league, its classification,
+     a regional grouping), so it appears several times; keep the busiest row,
+     which is the one whose ResultCount is real. */
+  function teamsFromTree(alignedTeams, board) {
+    const seen = new Map(), logos = {};
+    for (const r of alignedTeams || []) {
+      const b = board[lookup(r.SchoolName)];
+      if (!b) continue;                      // not a school on an OSAA board
+      const name = Object.values(b)[0].name;  // spell it the board's way
+      if (r.MascotUrl && !logos[name]) logos[name] = 'https:' + r.MascotUrl + '=s96';
+      const prev = seen.get(name);
+      if (!prev || (r.ResultCount || 0) > prev.results)
+        seen.set(name, { id: r.SchoolID, name, results: r.ResultCount || 0 });
+    }
+    const onBoard = new Set(Object.values(board).map(v => Object.values(v)[0].name));
+    return {
+      teams: [...seen.values()],
+      logos,
+      absent: [...onBoard].filter(n => !seen.has(n)).sort(),
+    };
+  }
+
   /* ---------- reading the site's own config ---------- */
   function parseClasses(html) {
     const m = html.match(/const CLASSES=(\{[\s\S]*?\n\});/);
@@ -221,5 +280,6 @@
 
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
            patchIndex, patchLogos, SEASON_START, MIN_5K, MAX_5K,
+           OREGON_DIV, divMetres, resultRow, teamsFromTree,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };
 }));

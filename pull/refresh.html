@@ -105,7 +105,6 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--raised);padding:1
  * report at the end.
  */
 const API = 'https://www.athletic.net/api/v1/';
-const OREGON_DIV = 87377;        // World > United States > High School > Oregon
 const SEASON = new Date().getFullYear();
 
 /* Pacing, and it is not one number — **the rate limit is per endpoint**, which
@@ -190,25 +189,13 @@ const post = (url, body, jwt) => get(url, { method: 'POST',
 /* ---------- stage 1: who is on a board ---------- */
 async function findTeams(board) {
   log('asking for every Oregon high school');
-  const t = await get('DivisionHome/GetTree?sport=xc&divisionId=' + OREGON_DIV
+  const t = await get('DivisionHome/GetTree?sport=xc&divisionId=' + Seed.OREGON_DIV
     + '&depth=4&includeTeams=true');
-  const seen = new Map(), logos = {};
-  for (const r of t.alignedTeams || []) {
-    const b = Seed.lookup(r.SchoolName);
-    if (!board[b]) continue;                       // not an OSAA school we model
-    const name = Object.values(board[b])[0].name;  // spell it the board's way
-    if (r.MascotUrl && !logos[name]) logos[name] = 'https:' + r.MascotUrl + '=s96';
-    const prev = seen.get(name);
-    // one school can be aligned to several divisions; keep the busiest row
-    if (!prev || (r.ResultCount || 0) > prev.results)
-      seen.set(name, { id: r.SchoolID, name, results: r.ResultCount || 0 });
-  }
-  const teams = [...seen.values()];
-  const onBoard = new Set(Object.values(board).map(v => Object.values(v)[0].name));
-  const absent = [...onBoard].filter(n => !seen.has(n));
-  log('<b>' + teams.length + '</b> of ' + onBoard.size + ' board schools have an athletic.net team');
-  if (absent.length) log('  no team on athletic.net: ' + absent.join(', '), 'w');
-  return { teams, logos };
+  // the reading of the tree is shared with the headless crawl, in seed.js
+  const f = Seed.teamsFromTree(t.alignedTeams, board);
+  log('<b>' + f.teams.length + '</b> board schools have an athletic.net team');
+  if (f.absent.length) log('  no team on athletic.net: ' + f.absent.join(', '), 'w');
+  return f;
 }
 
 /* ---------- stage 2: which meets have results ---------- */
@@ -222,12 +209,6 @@ async function teamMeets(team) {
 }
 
 /* ---------- stage 3: the results themselves ---------- */
-// "5,000 Meters Varsity" -> 5000. The division carries no distance field, only
-// this label, so a meet's 3k novice race is filtered out here and nowhere else.
-function divMetres(name) {
-  const m = String(name || '').match(/([\d,]+)\s*Meters/i);
-  return m ? +m[1].replace(/,/g, '') : 0;
-}
 /* Empty divisions are normal. Plenty of JV and novice races are on the schedule
    with no results ever posted, and the response for one is a clean 200 with an
    empty resultsXC. There is nothing in it that says which kind of empty it is —
@@ -255,19 +236,14 @@ async function divRows(meetId, divId, jwt) {
 async function meetRows(meetId) {
   const md = await get('Meet/GetMeetData?meetId=' + meetId + '&sport=xc');
   const date = (md.meet && (md.meet.MeetDate || md.meet.StartDate) || '').slice(0, 10);
-  const divs = (md.xcDivisions || []).filter(d => divMetres(d.DivName) === 5000);
+  const divs = (md.xcDivisions || []).filter(d => Seed.divMetres(d.DivName) === 5000);
   const out = [];
   for (const d of divs) {
     await sleep(GAP_POST);
     if (stopping) break;
     for (const r of await divRows(meetId, d.IDMeetDiv, md.jwtMeet)) {
-      if (r.Exhibition) continue;                  // unattached, does not belong to a roster
-      out.push({
-        g: r.Gender, name: ((r.FirstName || '') + ' ' + (r.LastName || '')).trim(),
-        school: r.SchoolName, grade: r.Grade || r.AgeGrade || '',
-        seconds: r.SortValue || r.Result,          // SortValue is already seconds
-        dist: 5000, date,
-      });
+      const row = Seed.resultRow(r, date);
+      if (row) out.push(row);
     }
   }
   return { rows: out, name: (md.meet || {}).Name || ('meet ' + meetId), date, divs: divs.length };

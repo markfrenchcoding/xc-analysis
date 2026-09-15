@@ -1,35 +1,74 @@
 # Refreshing the database
 
 The seed inside `index.html` is a snapshot of this season's 5,000 m results.
-This folder is how it gets replaced without anyone typing a CSV.
+This folder replaces it. There are two ways to run it and they share all the
+code that matters.
 
-## Doing it
+## Scheduled, on this machine
 
-1. Open **https://chutexc.vercel.app/pull/refresh.html**
-2. Press **Start** and leave the tab open. It takes about fifteen minutes.
-3. Read the summary it prints. If the row count collapsed or it says races
-   would not answer, do not upload — wait an hour and press Start again.
-4. Press **Download index.html**.
-5. On GitHub, open `index.html` → **Edit** → upload, and drop the new file on
-   top of the old one. Commit.
+```
+pull\install-schedule.cmd        double-click once
+```
 
-It saves as it goes, so closing the tab costs nothing. Reopen it and press
-Start and it carries on from where it stopped. **Start over** throws the
-part-finished run away.
+Every Monday at 07:30 it crawls, rewrites `index.html`, commits and pushes;
+Vercel redeploys on the push. Nobody has to be watching. The log of the last run
+is `pull/last-run.log`.
 
-## Why it is a web page and not a script
+```
+schtasks /run    /tn "Chute database refresh"     run it now
+schtasks /delete /tn "Chute database refresh" /f  stop it
+node pull/crawl.js --dry                          crawl and report, write nothing
+node pull/crawl.js --resume                       pick up an interrupted run
+```
 
-athletic.net sits behind Cloudflare, which answers Node with a challenge page
-instead of data — verified, a plain `fetch` from Node gets a 403 and
-`Just a moment...`. From a real browser session the same endpoints answer
-normally, and they send permissive CORS, so the page can be served from
-anywhere. It is confirmed working from `chutexc.vercel.app` and from
-`localhost`.
+`crawl.js` exits **0** when it wrote a new database, **2** when it refused to
+because something looked wrong, and **3** when nothing had changed. Only 0 is
+committed. The refusals matter more than the successes: it will not write a seed
+that shrank by more than a tenth, or one built from a run where meets went
+unanswered or most races came back empty. Those are what a half-finished crawl
+looks like from the outside, and an unattended job that writes anyway is worse
+than no job at all.
 
-Nothing is uploaded. The rebuilt file is assembled in the tab and handed to the
-browser's own download.
+**The machine has to be on.** A missed Monday is not made up; it simply goes
+again the following week, and the site keeps serving the seed it already has.
 
-## What it actually does
+**The push needs credentials that work without anyone there.** The scheduled
+task runs as you but with no console to prompt at, so a git push that would ask
+for a password simply fails and the log says so. If it does, open the repo once
+in GitHub Desktop or run a manual `git push` so Windows Credential Manager holds
+the token, and the scheduled run will use the same one. Everything up to the
+push still happened, so the rebuilt `index.html` is sitting in the working tree
+ready to commit by hand.
+
+## By hand, from any browser
+
+**https://chutexc.vercel.app/pull/refresh.html** — press Start, wait about
+fifteen minutes, read the summary, press Download, and drop the file on GitHub.
+It saves as it goes, so the tab can be closed and reopened.
+
+Worth keeping for three reasons: it works from a machine that has no checkout,
+it shows the crawl happening rather than a log after the fact, and it is the
+fallback if the scheduled run is ever wrong.
+
+## Why this cannot run in the cloud
+
+It was the obvious design and it does not work. Cloudflare serves athletic.net
+and it answers a **datacenter address** with a challenge page whatever asks —
+measured, not assumed: from a GitHub Actions runner, `curl` and Node's `fetch`
+both got `403` and `Just a moment...`. From an ordinary home connection curl is
+served normally. So there is no serverless function and no CI job, and it is not
+worth hunting for a cloud host that happens not to be blocked — the block is the
+site saying what it wants.
+
+That is also why the scheduled job lives on this machine, and why the browser
+harness was built first.
+
+**And why curl rather than `fetch`.** Node's own fetch is challenged even from
+here and even given perfect browser headers, because undici's TLS fingerprint is
+unusual. curl is served. Nothing is being worked around: from this address curl
+is simply allowed.
+
+## What it does
 
 | step | requests |
 |---|---|
@@ -99,10 +138,18 @@ the same season (`"5,000 Meters Week 1"`); `SEASON_START` cuts at mid-August.
   patchers for the seed block, `DATA_DATE` and the `LOGO` map. No network, no
   DOM, loadable from both Node and the page, so the tested code is the code
   that runs.
-- **`refresh.html`** — the crawl: pacing, resumption, the log and the report.
+- **`refresh.html`** — the crawl in a browser: pacing, resumption, the live log
+  and the report.
+- **`crawl.js`** — the same crawl headless, for the scheduled run. Talks through
+  curl, so unlike the page it can read a 429 and its `Retry-After` instead of
+  backing off blind.
+- **`refresh.cmd`**, **`install-schedule.cmd`** — the weekly job and its
+  one-double-click installer.
 - **`test_seed.js`** — `node pull/test_seed.js`. Round-trips the shipped seed
   through the builder and requires the same rows back, then checks the caps,
-  the dedupe, the season floor and all three patchers. 39 checks.
+  the dedupe, the season floor, the plausibility bounds and all three patchers.
+  42 checks, no network — which is the whole reason the transformation lives
+  apart from the two crawls that call it.
 
 `index.html` is untouched by all of this and stays a single self-contained
 file — these are maintenance tools that sit beside it, not parts of it.

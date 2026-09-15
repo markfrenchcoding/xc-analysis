@@ -146,5 +146,40 @@ eq(Object.keys(LM).length, Object.keys(LM0).length + 1, 'nothing else is lost');
 ok(Object.keys(LM).join('|') === Object.keys(LM).slice().sort().join('|'), 'crests come out sorted');
 ok(logos.split('const LOGO=').length === 2, 'one LOGO map, not two');
 
+/* ---------- the shapes both crawls read ---------- */
+eq(S.OREGON_DIV, 87377, 'Oregon is division 87377');
+eq(S.divMetres('5,000 Meters Varsity'), 5000, 'a 5k division');
+eq(S.divMetres('3,000 Meters Novice'), 3000, 'a 3k division');
+eq(S.divMetres('3 Miles Varsity Boys'), 0, 'an imperial division is not metres');
+eq(S.divMetres('5,000 Meters JV Boys Gold. (21mins-)'), 5000, 'a messy division name');
+eq(S.divMetres(''), 0, 'no name, no distance');
+
+const rawResult = { Gender:'M', FirstName:'Jaciah', LastName:'Lavier', SchoolName:'Jesuit',
+              Grade:'11', SortValue:970.5, Result:'16:10.50' };
+const rr = S.resultRow(rawResult, '2026-09-09');
+eq(rr.name, 'Jaciah Lavier', 'first and last are joined');
+eq(rr.seconds, 970.5, 'SortValue is preferred, being already seconds');
+eq(rr.dist, 5000, 'rows are 5k by construction');
+eq(rr.date, '2026-09-09', 'the meet date rides along');
+eq(S.resultRow({ ...rawResult, Exhibition:true }, '2026-09-09'), null, 'exhibition is skipped');
+eq(S.resultRow({ ...rawResult, SortValue:0 }, '').seconds, '16:10.50', 'no SortValue falls back to Result');
+eq(S.resultRow({ ...rawResult, Grade:'', AgeGrade:'12' }, '').grade, '12', 'AgeGrade is the fallback');
+
+// the tree hands the same school back under several divisions
+const tree = [
+  { SchoolID:220, SchoolName:'Jesuit', MascotUrl:'//x/a', ResultCount:0, DivisionID:1 },
+  { SchoolID:220, SchoolName:'Jesuit', MascotUrl:'//x/a', ResultCount:7, DivisionID:2 },
+  { SchoolID:999, SchoolName:'Battle Ground', MascotUrl:'//x/b', ResultCount:9, DivisionID:3 },
+  { SchoolID:81056, SchoolName:'Adrienne Nelson', MascotUrl:'//x/c', ResultCount:3, DivisionID:4 },
+];
+const ft = S.teamsFromTree(tree, board);
+const jes = ft.teams.find(x => x.name === 'Jesuit');
+eq(jes.results, 7, 'the busiest row for a school wins');
+eq(jes.id, 220, 'and carries its team id');
+ok(!ft.teams.some(x => x.name === 'Battle Ground'), 'an out-of-state school is not a team');
+eq(ft.logos.Jesuit, 'https://x/a=s96', 'the crest gets a scheme and a size');
+ok(ft.absent.includes('Elgin'), 'a board school with no team is reported absent');
+ok(ft.absent.length > 200, 'and so is everyone else not in this tiny tree');
+
 console.log(pass + ' passed' + (fail ? ', ' + fail + ' FAILED' : ''));
 process.exit(fail ? 1 : 0);
