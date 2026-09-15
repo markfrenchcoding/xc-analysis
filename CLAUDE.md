@@ -759,8 +759,9 @@ actual outcomes at each cutoff:
 | mid-October | 4 | 2.6% | 1.2% |
 | late October | 2 | 2.3% | 0.0% |
 
-(Those fell after the  and  fixes — a better model needs less
-slack. Regenerate with , which writes them into the site.)
+(Those fell after the `MARK_W` and `LONE` fixes — a better model needs less
+slack. Regenerate with `node backtest/publish.js`, which writes them into the
+site.)
 
 `CAL.sd` is 2.3%, which is about right from four weeks out and much too narrow in
 September. At the September cutoff, teams given 70-90% qualified only 50% of the
