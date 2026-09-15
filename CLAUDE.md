@@ -151,6 +151,18 @@ the crest it already had.
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
 
+**The site opens dark, whatever the machine prefers.** It used to read
+`prefers-color-scheme` on load and switch to light, which meant most visitors
+never saw the design as it was built - the board, the crests and the pace line
+are all drawn against the dark ground first, and the light theme is the
+alternative rather than the other half. The toggle is still there and still
+works both ways; this only decides where a visit starts.
+
+It does not remember a choice between visits, deliberately: "default to dark on
+entry" and "remember that I picked light" are different promises, and only the
+first was asked for. Adding `localStorage` would be a couple of lines if the
+second is ever wanted.
+
 **The Runners board sorts itself out in front of you**, the same way the team
 cards do: rows are absolutely positioned and moved with `translateY` off a
 measured step, so they pass each other as the odds firm up.
@@ -187,6 +199,17 @@ occlude with the reader gets one name printed over another for half a second.
 The runner tally counts `win`, `top21` and `placeSum`/`n`. It used to count
 top-5/10/20, which matched nothing the board marks; twenty-one is the all-state
 line, so that is what is counted and what the column shows.
+
+**The marker goes on every board, because the toggle always reached them.**
+Teams, Runners, Leagues and What if are all painted from the one model
+`buildModel` returns, so next season applied to all four from the first commit -
+but only the Teams board carried the "Next season" strip, which made the other
+three look as though they had ignored the switch. They had not; they just said
+nothing. The strip is on `#board`, `#runOut`, `#lgOut` and `#wiOut` now.
+
+Worth generalising: a control that changes shared state needs its evidence on
+every surface that state reaches, or the surfaces that stay quiet read as
+broken.
 
 **Next season, which is this season minus its seniors.** A switch in `#ctl`
 beside Boys/Girls sets `NEXT_SEASON`, and `buildModel` drops every grade-12 row.

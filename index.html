@@ -271,10 +271,18 @@ header .asof{color:var(--muted);font-size:10.5px}
 .vsw{margin:10px 0 11px}
 .ns-note{margin:8px 2px 0;font-size:12.5px;line-height:1.45;color:var(--dim)}
 .ns-note em{font-style:normal;color:var(--text)}
-/* a quiet standing reminder that the board is not this year's */
+/* A quiet standing reminder that the board is not this year's - on every board
+   the roster feeds, not just the first one. The toggle always applied to
+   Runners and Leagues, because all three are painted from the one model that
+   buildModel returns, but only Teams said so, which made the other two look as
+   though they had ignored it. What if is included for the same reason: it
+   re-runs buildModel too. */
 /* two spaces after the escape on purpose: a CSS escape sequence eats the space
    that terminates it, so one is consumed and one survives into the text */
-body.nextseason #board::before{content:"Next season \2014  seniors graduated";
+body.nextseason #board::before,
+body.nextseason #runOut::before,
+body.nextseason #lgOut::before,
+body.nextseason #wiOut::before{content:"Next season \2014  seniors graduated";
   display:block;margin:0 0 9px;padding:5px 9px;border-radius:6px;
   background:var(--raised);color:var(--dim);font-size:12px;letter-spacing:.02em}
 .rec-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;margin:14px 0 4px}
@@ -7129,10 +7137,11 @@ document.getElementById("theme").onclick=()=>{
   r.setAttribute("data-theme",next);
   document.querySelector('meta[name=theme-color]').setAttribute("content",next==="dark"?"#0D0D0F":"#FBFBFC");
 };
-if(matchMedia("(prefers-color-scheme: light)").matches){
-  document.documentElement.setAttribute("data-theme","light");
-  document.querySelector('meta[name=theme-color]').setAttribute("content","#FBFBFC");
-}
+/* The site opens dark, whatever the machine prefers. It used to read
+   prefers-color-scheme and switch to light on arrival, which meant most
+   visitors never saw the design as it was built - the board, the crests and the
+   pace line are all drawn against the dark ground first. The toggle is right
+   there for anyone who wants otherwise; this only decides where they start. */
 
 document.getElementById("vRange").oninput=e=>{sigmaPct=+e.target.value/10;syncVar();};
 const nFromIdx=i=>i===0?1:i*250;     // 1, 250, 500 ... 5000
