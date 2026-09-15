@@ -63,8 +63,13 @@ const bands = bins.map(([lo, hi]) => {
 
 /* ---------- how the right dial moves with the horizon ---------- */
 console.log('  horizon sweep, ' + HSEASONS.toLocaleString() + ' seasons per point');
-const SIGMAS = [2.0, 2.3, 2.6, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0];
-const STATE_DAY = { 2024: '2024-11-09', 2025: '2025-11-08' };
+/* Wide enough that the answer is never the edge of the range. With four
+   seasons the eight-week optimum came back as exactly 6.0%, the old top of the
+   sweep, which is not a measurement - it is a sweep that ran out. sweep.js had
+   already gone to 8.0 for the same reason. */
+const SIGMAS = [2.0, 2.3, 2.6, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0, 9.0];
+// every season carries its own state meet date in its truth file
+const STATE_DAY = Object.fromEntries(YEARS.map(y => [y, L.truthFor(y).stateDate]));
 const nCuts = Math.min(...YEARS.map(y => L.cutoffs(y).length));
 const horizon = [];
 for (let ci = 0; ci < nCuts; ci++) {

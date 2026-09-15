@@ -376,26 +376,41 @@ the **Track record** view renders from it.
 
 ```
 node backtest/publish.js               # 20,000 seasons, 5,000 for the horizon sweep
-node backtest/publish.js 20000 12000   # what is currently published, about three minutes
+node backtest/publish.js 20000 12000   # what is currently published, about seven minutes
 ```
 
 **Re-run it after anything that touches the model.** The qualifier count, the
 calibration bands and the champion record are stable run to run. The horizon row
 is the noisy one, which is why the published figures come from a 12,000-season
-sweep rather than the default — at 4,000 the eight-week best sigma flickers
-between 4.5% and 5.0%, which is the difference between two claims that both
-reproduce and one that does not.
+sweep rather than the default — at 4,000 the eight-week best sigma flickers,
+which is the difference between a claim that reproduces and one that does not.
+
+**Check the sweep did not simply run out.** It returned exactly 6.0% when 6.0%
+was the top of `SIGMAS`, which is not a measurement. The range goes to 9.0% now
+and still picks 6%. Any answer equal to the first or last entry should be
+treated as unmeasured until the range is widened.
 
 `publish.js` also writes a readable cutoff label rather than a date, because the
-two seasons do not share a cutoff *date*, only a cutoff *week*.
+seasons do not share a cutoff *date*, only a cutoff *week* — every first cutoff
+is exactly 8.0 weeks from its own state meet. Each season's state meet date is
+recorded in its truth file; a hardcoded table produced NaN weeks the moment a
+season was added.
 
-**What the Track record view says, as of the last run:** 59 of 72 actual
-qualifiers inside the board's top group, 1 of 4 champions named, pooled Brier
-0.0918 against 0.2319 for knowing nothing, 60% skill. The calibration is honest
-at both ends — above-90% teams qualified 94% of the time, below-10% teams got
-there 6% — and too confident in the middle, where the 70–90% band averaged a
-call of 81% and came in at 60%. That miss is stated on the page rather than
-buried, and it is the same horizon problem as open item 2.
+**What the Track record view says, as of the last run** (four seasons, September
+cutoff): 107 of 144 actual qualifiers inside the board's top group, 2 of 8
+champions named, pooled Brier 0.1536 against 0.2319 for knowing nothing, 35%
+skill.
+
+**The calibration wording on the page is now wrong and must be rewritten.** On
+two seasons it was honest at both ends and overconfident only in the middle. On
+four it is overconfident nearly everywhere: below-10% teams qualified 11% of the
+time, above-90% teams only 85%, and the 70–90% band averaged a call of 81% and
+came in at 52%.
+
+Both of those are September numbers and September is the thin end — see the
+backtest section. At the October cutoffs the same model runs 72% to 81% skill
+across all four seasons. Whatever the page ends up saying, it should not quote a
+single pooled figure as though the model had one accuracy.
 
 **Do not read the favourite off a list sorted by P(qualify).** Half the field
 sits at 100% to qualify and those ties break arbitrarily, so the first row is
@@ -817,19 +832,89 @@ but it would bite if that cap were ever raised.
 ## Backtest
 
 `backtest/` rebuilds a past season's database as of a chosen date, simulates it,
-and compares against Lane in November. See `backtest/README.md`. Two seasons are
-committed, 2024 and 2025, at four cutoffs each — mid-September through late
-October — which is 197 team-seasons per cutoff.
+and compares against Lane in November. See `backtest/README.md`. **Four seasons
+are committed, 2022 through 2025**, at four cutoffs each, and the whole pipeline
+is now scripted: `pull_season.js` then `build_season.js`, with 155 checks in
+`test_build.js`.
+
+**A season pulls in about two and a half minutes**, because a team's entire
+season comes back from `TeamHome/GetResultsGrid?teamId=N&seasonId=YYYY` in one
+unauthenticated GET — every result, not just bests, with a `meets[]` array
+carrying the dates. One request per team. Walking calendars and then every
+division of every meet costs several hundred requests against the one rate
+limited endpoint and takes forty minutes a season. The eight championship meets
+are still read the slow way, because only the meet endpoint carries division
+names and the district varsity race has to be told from the junior varsity one.
+
+**Two bugs in the ground truth were found when the seasons were added, and both
+had been there the whole time.**
+
+*Junior Varsity is not Varsity.* Five of the seven districts spell their second
+race "5,000 Meters Junior Varsity", and `/Varsity/i` matches it, so the district
+result quietly contained the JV race. It did not look wrong - a team's five
+fastest are its varsity five either way, so the winning score barely moved - but
+every score below the winner inflated and schools that could not field five
+varsity runners suddenly could. 2025 PIL was published as nine scoring teams
+when it had seven. Verified against athletic.net before touching it: the
+committed file matched with-JV scoring exactly. The state field is unchanged, so
+the outcome variable was never wrong; what was wrong was which teams get scored
+and the district places feeding the top-14 individual-qualifier rule.
+
+*Summer was in the database.* athletic.net files the Steens Mountain camp's July
+**uphill** 5k under the season - 108 of them in 2022, running 21:19 to 47:39,
+with 26 athletes carrying nothing else at the September cutoff. The live seed
+already dropped these via `SEASON_START`; the backtest did not, so it was
+scoring a model fed differently from the live one. Same mid-August floor now.
+
+**And one in the new puller**: the 2025 state meet page hosts all nine
+classifications where 2022-2024 are 6A only, so taking every 5,000m division
+pulled 145 schools into 2025 instead of 50. Harmless to the seeds, which filter
+to league members, but it made the seasons look unlike each other. The state
+meet is now read through the same `/6A/` filter `build_season.js` uses.
+
+**What four seasons say, and it is worse than two did.** Pooled at the September
+cutoff: 107 of 144 qualifiers inside the board, 2 of 8 champions, Brier 0.1536
+against 0.2319 for knowing nothing, 35% skill. The calibration is now
+overconfident at both ends, not just the middle - below-10% teams qualified 11%
+of the time and above-90% teams only 85%. **Do not leave the How tab saying the
+calibration is "honest at both ends".**
+
+**But the model is not worse on the older seasons.** At the October cutoffs all
+four land between 72% and 81% skill, a spread of 5 to 9 points. What differs is
+the September information set: athletic.net held 14 meets by the 2022 cutoff and
+33 by the same point in 2025, every cutoff being exactly 8.0 weeks from its own
+state meet. The September figure is a statement about how thin the database is
+that early, not about the season. Quote per cutoff; pooling describes neither.
+
+**Excluding meets was tried properly and bought nothing.** Five reasons for
+dropping a meet were written down first in `exclusion_rules.js`, 2023 was held
+out, and the rules were judged on the other three and then applied once to it.
+The only rule that helped in development - dropping small fields - was the worst
+of all on the holdout, 0.2197 against a baseline of 0.1869. Nothing survived.
+That is a better footing for the published numbers than a tuned figure would
+have been: picking exclusions by their effect on the score and then quoting the
+score measures the search, not the model. `backtest/exclusions.js`, and the
+README section, keep the full table including the losers. Restricting to meets
+common to all four seasons was also tried (`common_meets.js`,
+`common_value.js`) and is worse still - only twenty meets recur, none early
+enough for September, and forcing every team onto whichever of them they
+happened to attend widens the spread between seasons from 5 points to 66.
 
 **The variance dial depends on how far out you are.** Sweeping sigma against
 actual outcomes at each cutoff:
 
 | information set | weeks to state | best sigma | implied drift |
 |---|---|---|---|
-| mid-September | 8 | **4.5%** | 3.9% |
-| late September | 6 | 2.6% | 1.2% |
-| mid-October | 4 | 2.6% | 1.2% |
-| late October | 2 | 2.3% | 0.0% |
+| mid-September | 8 | **6.0%** | 5.5% |
+| late September | 6 | 3.0% | 1.9% |
+| mid-October | 4 | 2.0% | 0.0% |
+| late October | 2 | 2.0% | 0.0% |
+
+Four seasons, and the September figure is no longer pinned to the edge of the
+sweep - `publish.js` stopped at 6.0% and returned exactly 6.0%, which is a sweep
+running out rather than a measurement. The range now runs to 9.0% and still
+picks 6%. **Using it is the largest honest gain available**: September Brier
+falls from 0.1535 to 0.1392, about 9%, with no change to the data at all.
 
 (Those fell after the `MARK_W` and `LONE` fixes — a better model needs less
 slack. Regenerate with `node backtest/publish.js`, which writes them into the

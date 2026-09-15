@@ -4626,7 +4626,7 @@ const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
 const LONE=0.006;
 /* The day the marks database was last refreshed. Update this whenever the seed
    block is replaced — it is what the header reports to readers. */
-const RECORD={"seasons":[2024,2025],"cutoff":"mid-September","cutoffDates":["2024-09-14","2025-09-13"],"teamSeasons":197,"qualified":72,"found":59,"ofField":72,"champHit":1,"champOf":4,"brier":0.0918,"base":0.2319,"skill":60,"logloss":0.301,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":106,"said":1,"was":6},{"lo":10,"hi":30,"n":8,"said":17,"was":25},{"lo":30,"hi":50,"n":9,"said":40,"was":44},{"lo":50,"hi":70,"n":14,"said":60,"was":50},{"lo":70,"hi":90,"n":9,"said":82,"was":56},{"lo":90,"hi":100,"n":51,"said":98,"was":94}],"horizon":[{"weeks":8,"best":4.5,"brier":0.0829,"shipped":0.0919},{"weeks":6,"best":2.6,"brier":0.0569,"shipped":0.0577},{"weeks":4,"best":2.6,"brier":0.0551,"shipped":0.0555},{"weeks":2,"best":2.3,"brier":0.0515,"shipped":0.0515}],"perSeason":[{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":50,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":61,"fav":"Lakeridge","favP":40,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":85,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":47,"fav":"Sunset","favP":70,"champ":"Lincoln","hit":false}],"built":"2026-09-15"};
+const RECORD={"seasons":[2022,2023,2024,2025],"cutoff":"early September","cutoffDates":["2022-09-10","2023-09-09","2024-09-14","2025-09-13"],"teamSeasons":375,"qualified":144,"found":107,"ofField":144,"champHit":2,"champOf":8,"brier":0.1536,"base":0.2365,"skill":35,"logloss":0.774,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":192,"said":1,"was":11},{"lo":10,"hi":30,"n":21,"said":17,"was":33},{"lo":30,"hi":50,"n":18,"said":41,"was":39},{"lo":50,"hi":70,"n":16,"said":60,"was":44},{"lo":70,"hi":90,"n":23,"said":81,"was":52},{"lo":90,"hi":100,"n":105,"said":98,"was":85}],"horizon":[{"weeks":8,"best":6,"brier":0.1392,"shipped":0.1535},{"weeks":6,"best":3,"brier":0.065,"shipped":0.0651},{"weeks":4,"best":2,"brier":0.0576,"shipped":0.058},{"weeks":2,"best":2,"brier":0.0531,"shipped":0.0539}],"perSeason":[{"year":2022,"g":"M","cutoff":"2022-09-10","field":18,"found":11,"skill":-3,"fav":"Lincoln","favP":46,"champ":"Jesuit","hit":false},{"year":2022,"g":"F","cutoff":"2022-09-10","field":18,"found":12,"skill":0,"fav":"Jesuit","favP":71,"champ":"Jesuit","hit":true},{"year":2023,"g":"M","cutoff":"2023-09-09","field":18,"found":11,"skill":0,"fav":"Jesuit","favP":78,"champ":"Franklin (OR)","hit":false},{"year":2023,"g":"F","cutoff":"2023-09-09","field":18,"found":14,"skill":44,"fav":"Lincoln","favP":55,"champ":"Jesuit","hit":false},{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":48,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":60,"fav":"Lakeridge","favP":41,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":84,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":46,"fav":"Sunset","favP":69,"champ":"Lincoln","hit":false}],"built":"2026-09-15"};
 const DATA_DATE="2026-09-12";
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
@@ -5650,6 +5650,13 @@ function renderRecord(){
     +'%</td><td>'+h.brier.toFixed(4)+'</td><td>'+h.shipped.toFixed(4)+'</td></tr>').join("");
 
   const worst=R.bands.reduce((a,b)=>(b.said-b.was)>(a.said-a.was)?b:a);
+  /* Whether the board is overconfident, and where, is a fact about the bands -
+     so read it off them rather than asserting it. Weighted by how many teams
+     sit in each band, because a ten-team band should not outvote a hundred. */
+  const wN=R.bands.reduce((s,b)=>s+b.n,0);
+  const lean=R.bands.reduce((s,b)=>s+b.n*(b.said-b.was),0)/wN;
+  const top=R.bands[R.bands.length-1], bot=R.bands[0];
+  const endsHold=(top.said-top.was)<=8 && (bot.was-bot.said)<=8;
 
   box.innerHTML=
     '<h3>What we did</h3>'
@@ -5670,11 +5677,18 @@ function renderRecord(){
     +'<p class="rec-note">Across: what the board said. Up: how often it happened. Each dot is one '
     +'band and bigger dots hold more teams — above the line we were too cautious, below it too '
     +'confident.</p>'
-    +'<p>The two ends are where most of the board lives and they hold up: '
-    +'teams shown above 90% qualified '+pc(R.bands[R.bands.length-1].was)+' of the time, and teams '
-    +'written off below 10% got there anyway '+pc(R.bands[0].was)+' of the time. '
-    +'<b>The middle is where we are still too confident</b> \u2014 the '+worst.lo+'\u2013'+worst.hi
-    +'% band averaged a call of '+pc(worst.said)+' and came in at '+pc(worst.was)+'. '
+    +'<p>The two ends are where most of the board lives. Teams shown above 90% qualified '
+    +pc(top.was)+' of the time, and teams written off below 10% got there anyway '
+    +pc(bot.was)+' of the time. '
+    +(endsHold
+      ? 'Both ends hold up. <b>The middle is where we are still too confident</b>'
+      : '<b>Neither end is as sharp as it looks, and the middle is worse</b>')
+    +' \u2014 the '+worst.lo+'\u2013'+worst.hi+'% band averaged a call of '+pc(worst.said)
+    +' and came in at '+pc(worst.was)+'. '
+    +(lean>3
+      ? 'Taken together the board\u2019s calls run about '+Math.round(lean)
+        +' points ahead of what happened, so read a high number as confident rather than settled. '
+      : '')
     +'That is a real miss and it is the next thing to fix.</p>'
 
     +'<h3>Season by season</h3>'

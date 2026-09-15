@@ -1,5 +1,6 @@
 backtest/raw/
 backtest/data/*-single.csv
+backtest/data/*-common.csv
 _new_index.html
 pull/.probe.json
 pull/.commit-msg

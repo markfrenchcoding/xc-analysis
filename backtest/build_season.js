@@ -9,10 +9,32 @@ const path = require('path');
 const { fitCourses } = require('../fit_courses.js');
 
 const YEAR = process.argv[2];
-const RAW = process.argv[3] || path.join(__dirname, 'raw');
+// argv[3] is an optional raw directory; flags must not be mistaken for one
+const RAWARG = process.argv.slice(3).find(a => !a.startsWith('--'));
+const RAW = RAWARG || path.join(__dirname, 'raw');
 if (!YEAR) { console.error('usage: node build_season.js <year> [rawDir]'); process.exit(1); }
 
 const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'seasons.json'), 'utf8'))[YEAR];
+
+/* --common also writes a second set of seeds restricted to meets that recur
+   across the seasons, so the years can be compared on a fixed information set
+   rather than on whatever athletic.net happened to record that year. Generate
+   the list with common_meets.js. Diagnostic only, and only from mid-October:
+   see the note in that file for why September cannot be done this way. */
+const COMMON = process.argv.includes('--common');
+
+/* --xrule=NAME writes one more set of seeds with a named exclusion rule from
+   exclusion_rules.js applied, so a reason for dropping meets can be measured
+   rather than argued about. See exclusions.js. */
+const XARG = (process.argv.find(a => a.startsWith('--xrule=')) || '').split('=')[1];
+const XRULE = XARG ? require('./exclusion_rules.js')[XARG] : null;
+if (XARG && !XRULE) { console.error('no exclusion rule called ' + XARG); process.exit(1); }
+let COMMON_IDS = null;
+if (COMMON) {
+  const f = path.join(__dirname, 'common-meets.json');
+  if (!fs.existsSync(f)) { console.error('run common_meets.js first'); process.exit(1); }
+  COMMON_IDS = new Set(JSON.parse(fs.readFileSync(f, 'utf8')).meets[YEAR] || []);
+}
 if (!cfg) { console.error('no seasons.json entry for ' + YEAR); process.exit(1); }
 
 const split = l => { const o = []; let c = '', q = false;
@@ -23,12 +45,45 @@ const fmt = s => { const m = Math.floor(s / 60); return m + ':' + (s - m * 60).t
 const esc = v => /[",]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : String(v);
 
 const meta = JSON.parse(fs.readFileSync(path.join(RAW, 'y' + YEAR + '_meta.json'), 'utf8'));
+const SEASON_START = '-08-15';   // matches pull/seed.js
 const rows = fs.readFileSync(path.join(RAW, 'y' + YEAR + '_raw.csv'), 'utf8').trim()
   .split(/\r?\n/).slice(1).map(split)
   .map(c => ({ aid: c[0], name: c[1] + ' ' + c[2], grade: c[3], school: c[5],
                g: c[6], dist: +c[7], s: +c[8], mid: c[9], divName: c[11] }))
   // 3,000m is not modelled: the state meet and every league championship are 5,000m
-  .filter(r => r.dist === 5000);
+  .filter(r => r.dist === 5000)
+  /* Summer is not the season, the same rule the live seed applies in
+     pull/seed.js. athletic.net files the Steens Mountain camp's July uphill 5k
+     under the season, and it is an uphill: 2022's 108 of them run from 21:19 to
+     47:39. Twenty-six athletes had nothing else on their record at the
+     September cutoff, so the model was asked to believe in a squad of
+     twenty-five minute 6A runners - and September is the cutoff every published
+     figure is quoted from. The backtest has to be fed by the same rule as the
+     live board or it is not measuring the same model. */
+  .filter(r => (meta.meets[r.mid] || {}).date >= YEAR + SEASON_START);
+
+/* What a rule is allowed to know about a meet. Deliberately only things about
+   the meet itself - never anything about how the model scores with it in. */
+const meetStats = {};
+for (const r of rows) {
+  const s = meetStats[r.mid] = meetStats[r.mid]
+    || { id: r.mid, name: (meta.meets[r.mid] || {}).name || '',
+         date: (meta.meets[r.mid] || {}).date || '', finishers: 0, schools: new Set() };
+  s.finishers++; s.schools.add(r.school);
+}
+for (const s of Object.values(meetStats)) s.schools = s.schools.size;
+
+/* A district's varsity race, and not its junior varsity one.
+   "Junior Varsity" contains "Varsity", and five of the seven districts spell it
+   exactly that way, so the obvious /Varsity/i quietly folded the JV race into
+   the district result. It did not look wrong: the winning score barely moves,
+   because a team's five fastest are its varsity five either way. What moved was
+   everything downstream - JV runners take places, so every score below the
+   winner inflates, and a school that cannot field five varsity runners suddenly
+   can. 2025 PIL was published as nine scoring teams when it had seven.
+   Checked against athletic.net: with JV the committed result matched exactly,
+   varsity-only differs from it, so every season built before this was wrong. */
+const isVarsity = divName => /varsity/i.test(divName) && !/junior\s*varsity|\bjv\b/i.test(divName);
 
 // NFHS scoring over a raw result list, mirroring scoreMeet: top five score,
 // six and seven displace, a team that cannot field five is removed first.
@@ -51,12 +106,17 @@ function score(list) {
     .sort((a, b) => a.score - b.score || ((a.sixth ?? 1e9) - (b.sixth ?? 1e9)));
 }
 
-const truth = { year: +YEAR, cutoffs: cfg.cutoffs, leagues: { M: {}, F: {} },
+/* The state meet's own date, recorded so nothing downstream keeps a table of
+   them. publish.js needs it to say how far out a cutoff was, and its hardcoded
+   list produced NaN weeks the moment a fifth season was configured. */
+const STATE_DATE = (meta.meets[cfg.state] || {}).date || '';
+
+const truth = { year: +YEAR, stateDate: STATE_DATE, cutoffs: cfg.cutoffs, leagues: { M: {}, F: {} },
                 districts: { M: {}, F: {} }, state: { M: [], F: [] }, berths: {} };
 
 for (const [league, mid] of Object.entries(cfg.districts)) {
   for (const g of ['M', 'F']) {
-    const varsity = rows.filter(r => r.mid === mid && r.g === g && /Varsity/i.test(r.divName));
+    const varsity = rows.filter(r => r.mid === mid && r.g === g && isVarsity(r.divName));
     if (!varsity.length) continue;
     truth.leagues[g][league] = [...new Set(varsity.map(r => r.school))].sort();
     truth.districts[g][league] = score(varsity);
@@ -80,7 +140,7 @@ for (const g of ['M', 'F']) {
     if (n < 5) return false;
     const mid = leagueOf[school];
     if (!mid) return true;                       // no district found; keep it
-    const d = rows.filter(r => r.mid === mid && r.g === g && /Varsity/i.test(r.divName))
+    const d = rows.filter(r => r.mid === mid && r.g === g && isVarsity(r.divName))
                   .sort((a, b) => a.s - b.s);
     const place = {}; d.forEach((r, i) => place[r.aid] = i + 1);
     const theirs = st.filter(r => r.school === school).map(r => place[r.aid]).filter(Boolean);
@@ -107,13 +167,20 @@ function coursesAt(CUTOFF) {
   return courseCache.get(CUTOFF);
 }
 
+/* A rule may ask a meet's fitted difficulty. It is fitted from marks at the
+   cutoff, like every other course number here, so no rule can see the future. */
+let cfRule = null;
+const cfForRule = mid => (cfRule ? cfRule.factorFor(mid, 5000) : 1);
+
 // the marks database as of the cutoff, built exactly the way index.html builds its seed
-function seedFor(g, CUTOFF, useCourse) {
+function seedFor(g, CUTOFF, useCourse, onlyCommon, xrule) {
   const members = new Set();
   for (const l in truth.leagues[g]) truth.leagues[g][l].forEach(t => members.add(t));
   const info = rows.filter(r => r.g === g && members.has(r.school)
     && !(cfg.exclude || []).includes(r.mid)
-    && (meta.meets[r.mid] || {}).date <= CUTOFF);
+    && (meta.meets[r.mid] || {}).date <= CUTOFF
+    && (!onlyCommon || COMMON_IDS.has(String(r.mid)))
+    && !(xrule && xrule.test(Object.assign({ factor: cfForRule(r.mid) }, meetStats[r.mid]))));
   // with adjustment off every factor is 1, so ranking falls back to raw time
   // and the seed is byte-identical to the one built before this existed
   const cf = useCourse ? coursesAt(CUTOFF) : { factorFor: () => 1 };
@@ -166,6 +233,44 @@ for (const CUTOFF of cfg.cutoffs) {
   }
   fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + "-course.csv"), lines.join("\n") + "\n");
   fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + ".csv"), plain.join("\n") + "\n");
+
+  /* The same cutoff restricted to meets that recur across the seasons. Named
+     so lib.odds can read it by passing CUTOFF + "-common" as the cutoff, which
+     needs no change there. */
+  if (COMMON) {
+    const c = ["gender,athlete,mark,grade,team,dist"];
+    let n = 0, five = 0;
+    for (const g of ["M", "F"]) {
+      const rows = seedFor(g, CUTOFF, false, true);
+      n += rows.length;
+      const per = {};
+      for (const a of rows) { (per[a.school] = per[a.school] || 0); per[a.school]++; }
+      five += Object.values(per).filter(x => x >= 5).length;
+      for (const a of rows) for (const m of a.marks)
+        c.push([g, a.name, fmt(m.raw), a.grade, a.school, a.dist].map(esc).join(","));
+    }
+    fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + "-common.csv"), c.join("\n") + "\n");
+    console.log("    common-meet only: " + n + " athletes, " + (c.length - 1) + " marks, "
+      + five + " teams can field five");
+  }
+  /* The same cutoff with a named exclusion rule applied. Read back by passing
+     CUTOFF + "-x" + rule as the cutoff to lib.odds, which needs no change. */
+  if (XRULE) {
+    cfRule = coursesAt(CUTOFF);
+    const x = ["gender,athlete,mark,grade,team,dist"];
+    let n = 0;
+    for (const g of ["M", "F"]) {
+      const rowsX = seedFor(g, CUTOFF, false, false, XRULE);
+      n += rowsX.length;
+      for (const a of rowsX) for (const m of a.marks)
+        x.push([g, a.name, fmt(m.raw), a.grade, a.school, a.dist].map(esc).join(","));
+    }
+    cfRule = null;
+    fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + "-x" + XARG + ".csv"),
+      x.join("\n") + "\n");
+    console.log("    " + XARG + ": " + n + " athletes, " + (x.length - 1) + " marks");
+  }
+
   const cf = coursesAt(CUTOFF);
   console.log("  " + CUTOFF + ": " + athletes + " athletes, " + (lines.length - 1) + " marks, "
     + (100 * multi / athletes).toFixed(0) + "% with more than one"

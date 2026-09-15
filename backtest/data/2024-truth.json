@@ -1,5 +1,6 @@
 {
  "year": 2024,
+ "stateDate": "2024-11-09",
  "cutoffs": [
   "2024-09-14",
   "2024-09-28",
@@ -9,7 +10,6 @@
  "leagues": {
   "M": {
    "Portland Interscholastic": [
-    "Benson Tech",
     "Cleveland (OR)",
     "Franklin (OR)",
     "Grant",
@@ -68,13 +68,11 @@
     "Roseburg",
     "Sheldon (OR)",
     "South Eugene",
-    "South Medford",
-    "Willamette"
+    "South Medford"
    ]
   },
   "F": {
    "Portland Interscholastic": [
-    "Benson Tech",
     "Cleveland (OR)",
     "Franklin (OR)",
     "Grant",
@@ -107,7 +105,6 @@
     "Barlow",
     "Central Catholic",
     "Clackamas",
-    "David Douglas",
     "Gresham",
     "Reynolds",
     "Sandy"
@@ -143,49 +140,39 @@
   "M": {
    "Portland Interscholastic": [
     {
-     "team": "Franklin (OR)",
-     "score": 66,
-     "sixth": 34
-    },
-    {
      "team": "Lincoln",
-     "score": 67,
-     "sixth": 22
+     "score": 59,
+     "sixth": 20
     },
     {
-     "team": "Ida B. Wells",
-     "score": 71,
-     "sixth": 24
-    },
-    {
-     "team": "Grant",
-     "score": 78,
+     "team": "Franklin (OR)",
+     "score": 61,
      "sixth": 32
     },
     {
+     "team": "Ida B. Wells",
+     "score": 64,
+     "sixth": 21
+    },
+    {
+     "team": "Grant",
+     "score": 71,
+     "sixth": 30
+    },
+    {
      "team": "Cleveland (OR)",
-     "score": 149,
-     "sixth": 41
+     "score": 138,
+     "sixth": 38
     },
     {
      "team": "McDaniel",
-     "score": 168,
-     "sixth": 47
-    },
-    {
-     "team": "Jefferson-Portland",
-     "score": 177,
-     "sixth": 60
+     "score": 156,
+     "sixth": 44
     },
     {
      "team": "Roosevelt (OR)",
-     "score": 212,
-     "sixth": 56
-    },
-    {
-     "team": "Benson Tech",
-     "score": 259,
-     "sixth": 62
+     "score": 194,
+     "sixth": 48
     }
    ],
    "Metro": [
@@ -211,18 +198,18 @@
     },
     {
      "team": "Beaverton",
-     "score": 152,
-     "sixth": 39
+     "score": 150,
+     "sixth": 38
     },
     {
      "team": "Southridge",
-     "score": 166,
-     "sixth": 43
+     "score": 163,
+     "sixth": 42
     },
     {
      "team": "Aloha",
-     "score": 203,
-     "sixth": 47
+     "score": 199,
+     "sixth": 46
     }
    ],
    "Pacific": [
@@ -280,28 +267,28 @@
     },
     {
      "team": "David Douglas",
-     "score": 137,
-     "sixth": 53
+     "score": 134,
+     "sixth": 52
     },
     {
      "team": "Sandy",
-     "score": 140,
-     "sixth": 39
+     "score": 139,
+     "sixth": 38
     },
     {
      "team": "Barlow",
      "score": 146,
-     "sixth": 48
+     "sixth": 47
     },
     {
      "team": "Gresham",
-     "score": 156,
-     "sixth": 45
+     "score": 154,
+     "sixth": 44
     },
     {
      "team": "Reynolds",
-     "score": 218,
-     "sixth": 55
+     "score": 216,
+     "sixth": 53
     }
    ],
    "Three Rivers": [
@@ -318,12 +305,12 @@
     {
      "team": "Lake Oswego",
      "score": 65,
-     "sixth": 36
+     "sixth": 35
     },
     {
      "team": "Tigard",
-     "score": 94,
-     "sixth": 33
+     "score": 92,
+     "sixth": 32
     },
     {
      "team": "Lakeridge",
@@ -332,7 +319,7 @@
     },
     {
      "team": "Tualatin",
-     "score": 137,
+     "score": 138,
      "sixth": 40
     }
    ],
@@ -340,12 +327,12 @@
     {
      "team": "West Salem",
      "score": 42,
-     "sixth": 25
+     "sixth": 27
     },
     {
      "team": "McNary",
      "score": 44,
-     "sixth": 23
+     "sixth": 21
     },
     {
      "team": "Sprague",
@@ -354,13 +341,8 @@
     },
     {
      "team": "South Salem",
-     "score": 80,
-     "sixth": 28
-    },
-    {
-     "team": "North Salem",
-     "score": 144,
-     "sixth": 34
+     "score": 78,
+     "sixth": 24
     }
    ],
    "Southwest": [
@@ -372,32 +354,27 @@
     {
      "team": "Sheldon (OR)",
      "score": 49,
-     "sixth": 28
+     "sixth": 27
     },
     {
      "team": "South Medford",
      "score": 67,
-     "sixth": 33
+     "sixth": 36
     },
     {
      "team": "North Medford",
-     "score": 91,
+     "score": 92,
      "sixth": 29
     },
     {
      "team": "Roseburg",
-     "score": 113,
-     "sixth": 36
+     "score": 111,
+     "sixth": 34
     },
     {
      "team": "Grants Pass",
-     "score": 158,
-     "sixth": 43
-    },
-    {
-     "team": "Willamette",
-     "score": 216,
-     "sixth": 48
+     "score": 154,
+     "sixth": 41
     }
    ]
   },
@@ -411,36 +388,31 @@
     {
      "team": "Franklin (OR)",
      "score": 44,
-     "sixth": 29
+     "sixth": 28
     },
     {
      "team": "Ida B. Wells",
-     "score": 72,
-     "sixth": 33
+     "score": 71,
+     "sixth": 32
     },
     {
      "team": "Grant",
-     "score": 92,
-     "sixth": 27
+     "score": 88,
+     "sixth": 26
     },
     {
      "team": "Cleveland (OR)",
-     "score": 148,
-     "sixth": 41
+     "score": 143,
+     "sixth": 40
     },
     {
      "team": "McDaniel",
-     "score": 153,
-     "sixth": 48
+     "score": 148,
+     "sixth": null
     },
     {
      "team": "Jefferson-Portland",
-     "score": 212,
-     "sixth": 51
-    },
-    {
-     "team": "Roosevelt (OR)",
-     "score": 218,
+     "score": 205,
      "sixth": null
     }
    ],
@@ -453,21 +425,21 @@
     {
      "team": "Sunset",
      "score": 45,
-     "sixth": 22
+     "sixth": 21
     },
     {
      "team": "Westview",
      "score": 52,
-     "sixth": 26
+     "sixth": 25
     },
     {
      "team": "Mountainside",
-     "score": 108,
+     "score": 105,
      "sixth": 36
     },
     {
      "team": "Beaverton",
-     "score": 146,
+     "score": 143,
      "sixth": 41
     },
     {
@@ -477,8 +449,8 @@
     },
     {
      "team": "Southridge",
-     "score": 186,
-     "sixth": 48
+     "score": 181,
+     "sixth": 47
     }
    ],
    "Pacific": [
@@ -526,33 +498,23 @@
     },
     {
      "team": "Adrienne Nelson",
-     "score": 61,
-     "sixth": 24
+     "score": 57,
+     "sixth": 22
     },
     {
      "team": "Sandy",
      "score": 65,
-     "sixth": 23
+     "sixth": 21
     },
     {
      "team": "Clackamas",
-     "score": 68,
-     "sixth": 29
+     "score": 65,
+     "sixth": 27
     },
     {
      "team": "Barlow",
-     "score": 153,
-     "sixth": 35
-    },
-    {
-     "team": "Gresham",
-     "score": 185,
-     "sixth": 45
-    },
-    {
-     "team": "David Douglas",
-     "score": 201,
-     "sixth": 48
+     "score": 147,
+     "sixth": 33
     }
    ],
    "Three Rivers": [
@@ -574,16 +536,16 @@
     {
      "team": "West Linn",
      "score": 116,
-     "sixth": 35
+     "sixth": 36
     },
     {
      "team": "St Mary's Academy",
-     "score": 133,
-     "sixth": 37
+     "score": 131,
+     "sixth": 35
     },
     {
      "team": "Tualatin",
-     "score": 159,
+     "score": 154,
      "sixth": 43
     },
     {
@@ -610,50 +572,45 @@
     },
     {
      "team": "McNary",
-     "score": 98,
-     "sixth": 29
+     "score": 97,
+     "sixth": 30
     },
     {
      "team": "North Salem",
-     "score": 116,
+     "score": 114,
      "sixth": null
     }
    ],
    "Southwest": [
     {
      "team": "South Eugene",
-     "score": 38,
-     "sixth": 17
+     "score": 35,
+     "sixth": 21
     },
     {
      "team": "Grants Pass",
-     "score": 86,
-     "sixth": 28
+     "score": 80,
+     "sixth": 26
     },
     {
      "team": "South Medford",
-     "score": 90,
-     "sixth": 32
+     "score": 82,
+     "sixth": 30
     },
     {
      "team": "Roseburg",
-     "score": 94,
-     "sixth": 33
+     "score": 87,
+     "sixth": 31
     },
     {
      "team": "North Medford",
-     "score": 104,
-     "sixth": 38
+     "score": 98,
+     "sixth": 35
     },
     {
      "team": "Sheldon (OR)",
-     "score": 139,
-     "sixth": 43
-    },
-    {
-     "team": "Willamette",
-     "score": 165,
-     "sixth": 48
+     "score": 129,
+     "sixth": null
     }
    ]
   }
