@@ -85,6 +85,12 @@ Leagues is the exception to per-frame painting: it is a full `innerHTML` rebuild
 rather than cards that move, so it refreshes twice a second. Enough to watch the
 numbers firm up, cheap enough not to fight the run.
 
+**Leagues churns its digits too.** It is rebuilt wholesale twice a second rather
+than painted every frame, so it never picked up the `spin()` the other two
+boards use and sat frozen while they were visibly working. Same function, same
+`lock = frac²` curve, read off the live `RUN` so a finished board is left
+alone.
+
 **The leagues heading is generated, not written.** It used to say "The seven
 leagues" on every board, including the five-league and four-league ones.
 `syncViewText` builds it from `LG.length`, `autoTotal()`, `AT_LARGE` and
@@ -145,6 +151,41 @@ borrowed those colours and were re-cut rather than left dangling: the overlay's
 top tape is now a moving row of accent dots, and the pace line's finish post
 keeps its stripes — a finish line really is striped — in `--text` and
 `--accent`.
+
+**The top four carry the state trophy, not a rank chip.** OSAA's award is a
+walnut plaque cut to the shape of Oregon with a metallic plate inset on it, so
+that is what ranks one to four show: the state outline in wood, the plate in the
+same `--t1`..`--t4` finishes the distribution bars use, and the place
+engraved into it. Four, because OSAA awards four trophies - the same reason the
+bars colour four places and nothing below.
+
+The base is deliberately left off. At forty pixels a stem and foot become two
+grey pixels under the shape and cost the silhouette its readability. The outline
+itself is drawn, not traced: both northern corners high with the Columbia
+sagging between them, the Snake wiggling down the top third of the east side,
+then dead-straight south and east borders. That is the least you can draw and
+still have it read as Oregon at this size.
+
+Three things about it. **An SVG gradient cannot read a CSS custom property**, so
+the four plate gradients repeat the `--t1`..`--t4` stops by hand in a
+`<defs>` block at the top of the body - change one and change the other.
+**The trophy is not skewed**, unlike the plain chip: the lean belongs to the
+wordmark and to things that read as type, and a leaning plaque looks like it is
+falling over, which is why it gets its own `rankPopFlat` keyframe. And
+`paint` only rebuilds the mark when its *kind* changes - into the trophies,
+out of them, or between two finishes - because ranks five and below just need
+new text, which is most cards on most frames.
+
+**The coaches chip is a fixed 62px, right-justified, with the league to its
+left.** Unranked teams render an empty `.poll-gap` of the same width rather
+than nothing, or the league abbreviation shuffles left and right down the board.
+It reads `OSAA #10`, because two unlabelled hash numbers on one row is the
+same failure the Track record page had.
+
+**There was a glow on the leading card and it is gone.** The first thing anyone
+asked about it was what it meant, which is the answer: the rank mark already
+says who leads, so the ring was a second unlabelled signal for a fact the card
+states outright. Nothing on the board should need a legend it does not have.
 
 **Crests.** `LOGO` maps display name to a school's mascot image, and `crest()`
 falls back to initials when a name is missing. It covers the schools in the
@@ -890,6 +931,20 @@ single 5s step, which strands a greedy search at zero. It falls back through
 softer signals — at-large → makes-state, win → top4 → top10 → makes-state — and
 finally to mean district score, which always moves. Mean league *place* was
 tried first and was too weak: it shifted ~0.02 against a 0.02 threshold.
+
+## Cancelling a run
+
+**Every paced loop carries the generation it started in.** `runGen` increments
+in `cancelRun()`, which `clearOut()` calls, so every switch that invalidates
+the model stops the loop for free rather than each handler having to remember.
+
+This was a real bug and the symptom was misleading. Changing classification
+mid-run left the loop stepping against a model that had just been thrown away:
+`clearOut` sets `RUN=null` and `cards=[]`, the next tick dereferenced
+`RUN`, the exception killed the loop, and **`running` was left true for the
+life of the page** - so every later press of Run hit the `if(running)` guard and
+did nothing at all. It looked like a rendering fault and was a state-machine
+one. Guarded loops: the Odds run, `runWorlds`, and the solver.
 
 ## Timers
 

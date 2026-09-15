@@ -432,11 +432,11 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    --n so it reads as the board filling from the front. */
 .tcard{animation:cardIn .5s var(--ease) both;animation-delay:calc(var(--n,0) * 22ms)}
 @keyframes cardIn{from{opacity:0}to{opacity:1}}
-/* The leader is lit. --t1e is the same blue the first-place chip uses, so the
-   glow and the rank agree about who is winning. */
-#board .tcard.lead{border-color:color-mix(in srgb,var(--t1e) 45%,var(--line));
-  box-shadow:0 0 0 1px color-mix(in srgb,var(--t1e) 22%,transparent),
-             0 6px 26px -10px color-mix(in srgb,var(--t1e) 55%,transparent)}
+/* There WAS a glow on the leading card here. It was removed: the first thing
+   anyone asked about it was what it meant, which is the answer - the rank chip
+   already says who is leading, so the ring was a second unlabelled mark for a
+   fact the card states outright. Nothing on the board should need a legend it
+   does not have. */
 /* Hover cannot move the card, so it lights it instead. */
 .tcard.tappable:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));
   box-shadow:0 0 0 1px var(--glow),0 8px 30px -12px var(--glow)}
@@ -454,10 +454,25 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rank u{display:block;transform:skewX(9deg);text-decoration:none;
   font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;color:var(--muted);transition:color .4s}
-.rank.p1{background:var(--t1);border-color:var(--t1e)}.rank.p1 u{color:#fff}
-.rank.p2{background:var(--t2);border-color:var(--t2e)}.rank.p2 u{color:#1B1D21}
-.rank.p3{background:var(--t3);border-color:var(--t3e)}.rank.p3 u{color:#fff}
-.rank.p4{background:var(--t4);border-color:var(--t4e)}.rank.p4 u{color:#EDEFF2}
+/* A trophy is an object, not a badge: no chip behind it, no border, and no
+   skew. The lean belongs to the wordmark and to things that read as type; a
+   leaning plaque just looks like it is falling over. */
+.rank.tr{background:none;border:0;padding:0;transform:none;
+  min-width:0;width:40px;height:30px;place-items:center}
+.tro-svg{width:100%;height:100%;display:block;overflow:visible;
+  filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55))}
+.tro-n{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;
+  text-anchor:middle;font-variant-numeric:tabular-nums}
+/* Engraved: the number is cut into the plate, so it takes a dark fill with a
+   one-unit light edge below it rather than sitting on top as flat ink. */
+.rank.p1 .tro-n{fill:#0B2A6B;stroke:#9CBEFF;stroke-width:.6;paint-order:stroke}
+.rank.p2 .tro-n{fill:#4A4F58;stroke:#FFF;stroke-width:.6;paint-order:stroke}
+.rank.p3 .tro-n{fill:#5A3212;stroke:#F6D3AE;stroke-width:.6;paint-order:stroke}
+.rank.p4 .tro-n{fill:#14161A;stroke:#9AA0AA;stroke-width:.6;paint-order:stroke}
+/* The flip keyframe for a mark that is not skewed. */
+@keyframes rankPopFlat{
+  0%{transform:scale(1)}38%{transform:scale(1.22)}100%{transform:scale(1)}}
+.rank.tr.bump{animation:rankPopFlat .42s var(--ease)}
 .crest{width:26px;height:26px;border-radius:5px;flex:none;object-fit:contain;background:var(--raised)}
 .crest.fb,.crest-sm.fb{display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;color:var(--muted);border:1px solid var(--line);letter-spacing:-.02em}
@@ -468,10 +483,11 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   text-transform:uppercase;letter-spacing:.004em;display:block;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.08}
 .tc-lg{font-style:normal;color:var(--dim);font-size:9.5px;flex:none;
-  letter-spacing:.1em;text-transform:uppercase}
+  letter-spacing:.1em;text-transform:uppercase;text-align:right}
 /* The coaches poll rank. Outlined rather than filled so it reads as somebody
    else's opinion sitting on our card, not as one of our own numbers. */
-.poll{flex:none;display:inline-flex;align-items:baseline;gap:1px;
+.poll,.poll-gap{flex:none;width:62px;box-sizing:border-box}
+.poll{display:inline-flex;align-items:baseline;justify-content:flex-end;gap:3px;
   font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
   line-height:1;padding:3px 6px 4px;border-radius:5px;
   border:1px solid var(--t1e);color:var(--t1e);font-variant-numeric:tabular-nums}
@@ -774,6 +790,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   .tc-name b{font-size:24px}
   .rank{min-width:42px;height:30px}
   .rank u{font-size:19px}
+  .rank.tr{width:46px;height:35px}
   .crest{width:30px;height:30px}
 
   /* Prose does not want the extra room. The How tab ran to 131 characters a
@@ -5740,6 +5757,17 @@ M,Spencer Craigen,37:49.55,12,Weston-McEwen,5000,2A/1A
 M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
 </script>
 
+<!-- The four plate finishes, defined once and referenced by every trophy chip.
+     An SVG gradient cannot read a CSS custom property, so these repeat the
+     --t1..--t4 stops by hand; change one and change the other. They are metal
+     in both themes, so there is no light-mode variant. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="trg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7BA6FF"/><stop offset="1" stop-color="#12379E"/></linearGradient>
+<linearGradient id="trg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDFEFF"/><stop offset="1" stop-color="#969DA8"/></linearGradient>
+<linearGradient id="trg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0B784"/><stop offset="1" stop-color="#834C1D"/></linearGradient>
+<linearGradient id="trg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#868C96"/><stop offset="1" stop-color="#24272D"/></linearGradient>
+<linearGradient id="trgw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8A5C33"/><stop offset="1" stop-color="#4E3018"/></linearGradient>
+</defs></svg>
 <div class="wrap">
   <header>
     <span class="brand" id="brand" role="button" tabindex="0" aria-label="Run a single state meet"><svg class="glyph" viewBox="0 0 32 32" aria-hidden="true"><g class="pk-team"><g class="pk-score"><circle cx="27.71" cy="10.57" r="2.79"/><circle cx="17.85" cy="5.58" r="2.79"/><circle cx="26.3" cy="20.55" r="2.79"/><circle cx="16.44" cy="15.56" r="2.79"/><circle cx="6.58" cy="10.57" r="2.79"/></g><g class="pk-disp"><circle cx="15.05" cy="25.54" r="2.49"/><circle cx="5.17" cy="20.55" r="2.49"/></g></g></svg><h1>CHUTE</h1></span>
@@ -6114,6 +6142,14 @@ let nSims=5000;          // 1, then 250-step increments to 5,000
    only board modelled. Marks at other distances are dropped from the seed. */
 const DIST=5000;
 
+/* Every paced loop carries the generation it was started in and stops the
+   moment that number moves. Without it, changing classification mid-run left
+   the loop stepping against a model that had just been thrown away: clearOut
+   sets RUN=null and cards=[], the next tick dereferenced RUN, the exception
+   killed the loop, and `running` was left true for the life of the page - so every
+   later press of Run hit the `if(running)` guard and did nothing. That is the
+   "have to refresh the page" bug, and it was never a rendering fault. */
+let runGen=0;
 let DATA=[], gender="M", sigmaPct=CAL.sd, running=false, skip=false,
     cards=[], stepH=100;
 
@@ -6449,12 +6485,27 @@ function paintBar(s,p,count){
    next to the model's own rank rather than on a page of its own.
    Only about twelve teams a board are ranked; everyone else gets nothing,
    because "unranked" is what the poll actually says about them. */
+/* Oregon, at the only size this is ever drawn. */
+const OR_PATH="M2.5 9L8 12L14 15L20 17L26 18L32 17.5L38 18.5L44 17L50 16L56 15L62 13.5L68 12L74 10.5L80 9L86 7.5L90 6L92 11L90 16L92 22L90 27L91 32L89.5 36L89 40L89 72L2 72L1.6 65L2.8 58L1.4 51L2.6 44L1.2 37L2.6 30L1.4 23L2.8 16Z";
+/* Top four get the plaque; everyone else keeps the plain chip. Four because
+   OSAA awards four trophies, which is the same reason the distribution bars
+   colour the first four places and nothing below. */
+function rankMark(i){
+  const n=i+1;
+  if(i>=4)return '<u>#'+n+'</u>';
+  return '<svg class="tro-svg" viewBox="0 0 100 76" aria-hidden="true">'
+    +'<path fill="url(#trgw)" d="'+OR_PATH+'"/>'
+    +'<path fill="url(#trg'+n+')" d="'+OR_PATH+'"'
+    +' transform="translate(50 39) scale(.8) translate(-50 -39)"/>'
+    +'<text class="tro-n" x="50" y="53">'+n+'</text></svg>';
+}
+
 function pollChip(name){
   const p=(typeof POLL!=="undefined"&&POLL[CLS+"|"+gender])||null;
-  if(!p||!(name in p))return "";
+  if(!p||!(name in p))return '<i class="poll-gap"></i>';
   const r=p[name];
   return '<span class="poll'+(r?'':' rv')+'" title="OSAAtoday coaches poll">'
-    +(r?'<u>POLL</u>'+r:'<u>POLL</u>RV')+'</span>';
+    +'<u>OSAA</u>'+(r?'#'+r:'RV')+'</span>';
 }
 
 function buildBoard(tally){
@@ -6483,8 +6534,8 @@ function buildBoard(tally){
         <span class="rank"><u>#—</u></span>
         ${crest(t.name,"crest")}
         <span class="tc-name"><b>${t.name}</b></span>
-        ${pollChip(t.name)}
         <i class="tc-lg">${ABBR[t.league]}</i>
+        ${pollChip(t.name)}
       </div>
       <div class="tc-big">
         <span class="title"><span class="tnum"><svg class="tro" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10v6a5 5 0 0 1-10 0V2Z"/><path d="M7 3.5H4v2.2A3.8 3.8 0 0 0 7.2 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M17 3.5h3v2.2A3.8 3.8 0 0 1 16.8 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.6 13h2.8v4.2h-2.8z"/><path d="M7.6 19.6h8.8V22H7.6z"/></svg><b>—</b></span><i>wins state</i></span>
@@ -6527,8 +6578,13 @@ function paint(tally,done,full){
       c.pos=i;
       el.style.transform=`translateY(${i*stepH}px)`;
       const rk=el.querySelector(".rank");
-      rk.firstElementChild.textContent="#"+(i+1);
-      rk.className="rank"+(i<4?" p"+(i+1):"");
+      /* Only rebuild when the KIND of mark changes - into the trophies, out of
+         them, or between two finishes. Ranks 5 and below just get new text,
+         which is most cards on most frames of a run. */
+      const kind=i<4?i+1:0;
+      if(c.kind!==kind){c.kind=kind;rk.innerHTML=rankMark(i);}
+      else if(!kind)rk.firstElementChild.textContent="#"+(i+1);
+      rk.className="rank"+(i<4?" p"+(i+1)+" tr":"");
       /* Restarting a CSS animation needs the class off, a reflow read, then the
          class on. Without the offsetWidth read the browser coalesces both
          changes into one style pass and nothing plays at all. Only on a real
@@ -6536,7 +6592,7 @@ function paint(tally,done,full){
       if(moved){
         rk.classList.remove("bump");void rk.offsetWidth;rk.classList.add("bump");
       }
-      el.classList.toggle("lead",i===0);
+
     }
     const ws=pct(t.win,done);
     if(prev.win!==ws){
@@ -6601,6 +6657,8 @@ function settle(tally){
 }
 
 function renderLeagues(tally,model,done){
+  const lock=(RUN&&RUN.done<nSims)?RUN.lock:1;
+  const sp=s=>spin(s,lock);
   let html="";
   for(const lg of LG){
     const list=tally.filter(t=>t.league===lg).sort((a,b)=>b.auto-a.auto||b.qual-a.qual||a.avg5-b.avg5);
@@ -6610,9 +6668,13 @@ function renderLeagues(tally,model,done){
       <div class="dbody"><div class="dlab"><span></span><span>auto</span><span>at-large</span></div>`;
     if(!list.length) html+=`<div class="thin">No team here can field five runners.</div>`;
     for(const t of list){
+      /* Leagues is rebuilt wholesale twice a second rather than painted every
+         frame, so it never got the digit churn the other two boards have and
+         looked frozen while they were visibly working. Same spin(), same lock
+         curve, driven off the live RUN so a finished board is left alone. */
       html+=`<div class="drow"><span class="nm">${crest(t.name,"crest-sm")}${t.name}</span>
-        <span class="v" style="color:${oddColor(t.auto,done)}">${pct(t.auto,done)}</span>
-        <span class="v" style="color:${oddColor(t.wild,done)}">${pct(t.wild,done)}</span></div>`;
+        <span class="v" style="color:${oddColor(t.auto,done)}">${sp(pct(t.auto,done))}</span>
+        <span class="v" style="color:${oddColor(t.wild,done)}">${sp(pct(t.wild,done))}</span></div>`;
     }
     if(shorts.length) html+=`<div class="thin">Under five runners: ${shorts.map(s=>s.name).join(", ")}</div>`;
     html+=`</div></div>`;
@@ -6751,7 +6813,9 @@ function runWorlds(model,worlds,seasons,label,onEnd){
   const sigma=sigmaPct/100;
   const dur=Math.max(320,FULL_MS*seasons/5000);
   let done=0,t0=0;
+  const gen=runGen;
   nextTick(function step(ts){
+    if(gen!==runGen)return;                 // the model this was built on is gone
     if(!t0)t0=ts;
     const target=Math.max(done+1,Math.min(seasons,Math.floor(seasons*(ts-t0)/dur)));
     done=catchUp(done,target,()=>oneSeason(model,worlds,sigma,times,shock,tmp));
@@ -6909,7 +6973,9 @@ function solveGoal(){
     finishSolve(cur,key,label,p0,b,total,stalled);
   };
 
+  const gen=runGen;
   nextTick(function tick(){
+    if(gen!==runGen)return;                 // the roster this was solving for is gone
     const total=Object.values(cur).reduce((s,v)=>s+v,0);
     if(best>=GOAL_P||step>=MAX_STEPS||total>=MAX_TOTAL){stop(best,total);return;}
     const p=sweep(cur);
@@ -7119,7 +7185,9 @@ function run(){
   const shock=new Float64Array(model.teams.length);
   let done=0,t0=0,frame=0;
 
+  const gen=runGen;
   nextTick(function step(ts){
+    if(gen!==runGen)return;                 // the model this was built on is gone
     if(!t0)t0=ts;
     const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/durMs())));
     done=catchUp(done,target,()=>oneSeason(model,worlds,sigma,times,shock,tmp));
@@ -7497,7 +7565,21 @@ function syncVar(){
     x.setAttribute("aria-pressed",Math.abs(+x.dataset.v/10-sigmaPct)<.05));
   syncDialSummary();
 }
+/* Stop whatever is in flight and put the controls back. Called by clearOut, so
+   every switch that invalidates the model gets this for free rather than each
+   handler having to remember. */
+function cancelRun(){
+  runGen++;
+  running=false;skip=false;
+  document.body.classList.remove("simming");
+  const go=document.getElementById("go");
+  if(go){go.textContent="Run";go.classList.remove("running");}
+  const b=document.getElementById("board");
+  if(b)b.classList.remove("running");
+}
+
 function clearOut(){
+  cancelRun();
   document.getElementById("simOut").innerHTML="";
   const ro=document.getElementById("runOut");
   if(ro)ro.innerHTML='<div class="empty">Press Run to fill this in.</div>';
