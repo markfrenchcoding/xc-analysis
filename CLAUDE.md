@@ -289,6 +289,26 @@ season, so `playDistricts`, `playState` and `blankTally` are not involved; the
 tally is four running totals. Nothing is conditional: the field is fixed, so
 every one of the two thousand runnings is the same seventeen teams.
 
+**The Dream field needs a full seven, not a scoring five.** OSAA scores with
+five and the season boards use that rule, but this is an exhibition against the
+sixteen fastest schools in the state and the field is picked on a *top-five*
+average. A school with five good runners and nothing behind them got in on a
+number that ignored the two it could not fill, then sent whoever was left onto
+the course. That is where the dots crawling a minute behind the field came from:
+the Banks girls made the sixteen on a 20:30 five and their sixth runner is
+25:01, seven minutes off the leader. Requiring seven drops them, lifts McDaniel
+in, and takes the slowest runner on the course from 25:01 to 23:10. The boys'
+field does not change.
+
+The remaining spread is real and should stay. Seven run and five score, so sixth
+and seventh runners are genuinely that far back, and `SPEED` already compresses
+the race so the last of them still finishes inside ten and a half seconds.
+
+Worth recording because the first guess was wrong: the suspicion was that the
+race was pulling runners down to a team's twelfth. It was not. `stateModel` has
+always done `roster.slice(0,7)`, and measuring every team in the field confirmed
+all sixteen were at seven. The roster cap was innocent; the *entry* rule was not.
+
 **The classification switcher does not reach the draft**, deliberately. The
 board behind it still says 3A or 2A/1A; the race is always all of Oregon.
 
@@ -911,6 +931,70 @@ once already. Re-measure on resize, after a run finishes, and when a tab that
 was hidden comes back: a hidden panel measures zero, so a board built while the
 reader was elsewhere has a stale step and overlaps.
 
+## How the site is written
+
+The owner's note was "so much of the language reeks of AI", and it was right.
+The tics, all mine:
+
+- an em-dash aside bolted onto a sentence that had already finished
+- "not X but Y" and "X rather than Y" used for rhythm, not contrast
+- a closing aphorism telling the reader what to think about what they just read
+- explaining the reasoning behind a design decision to somebody who did not ask
+- three-part lists where two items were the honest number
+
+**The rule: short sentences, concrete nouns, and no summing up.** State the
+thing, then stop. A reader who wants the reasoning can read this file.
+
+**Name the jargon once, at the bottom, or not at all.** The Track record view
+led with a Brier score, called the calibration plot "reliability" and used
+"information set" as a column heading. Every number on that page is the same
+number it was; what changed is that each now says what it *means* before it says
+what it is, the chart has labelled axes, and the two statistical terms are
+defined in one line at the foot of the page for anyone checking the work. The
+page is read by parents, runners and coaches. Write for them.
+
+**This applies to the site only.** Commit messages and this file are working
+notes and can say why.
+
+## The coaches poll
+
+Every card carries the team's place in the **OSAAtoday coaches poll**, in an
+outlined blue chip labelled POLL so it cannot be mistaken for one of our own
+numbers. It is the only statewide human ranking of these teams and it is
+genuinely different information: coaches see head-to-head results, who is hurt
+and who is peaking, none of which the model knows. Where the two disagree is the
+interesting part of the board - on the September data Grant leads the 6A boys at
+44% to win and sits **tenth** in the poll, while poll-leading Lincoln is second.
+
+`node pull/poll.js` rebuilds it. Three things to know:
+
+**The article ids change every week.** The poll is rewritten on Thursdays during
+the season and published at `osaa.org/today/article/<id>/view`, a new id each
+time - so the defaults in the file go stale by design. Pass the new pair:
+`node pull/poll.js 5100 5101` (boys, girls). `--dry` parses and reports without
+writing.
+
+**It is parsed off the text, not the markup.** Strip the tags, then walk the
+lines: a classification on its own line, then `1.`, then the school, then the
+vote count. The markup around the poll changes; the shape of the poll does not.
+
+**"Others receiving significant votes" is kept, as rank 0, shown as RV.** Those
+teams are ranked ahead of every unranked team, so throwing them away loses real
+information. An entry only counts if the next line is a vote count - without
+that check the author's byline, which sits just past the last classification,
+parsed as a 2A/1A team.
+
+**118 of 121 poll entries match a board team.** The three that do not are two
+co-ops that do not exist on the board and girls' Enterprise, which the poll
+lists under 2A/1A and the board carries in 3A. Unmatched entries are reported,
+never guessed at. The alias table maps poll spelling to board spelling and is
+mostly co-ops written out in full: `The Dalles / Dufur` to `The Dalles`,
+`Heppner / Ione` to `Heppner`. **Map poll to board, never the reverse** - the
+same rule the athletic.net alias table had to learn.
+
+Only about twelve teams a board are ranked. Everyone else shows nothing, because
+"unranked" is what the poll actually says about them.
+
 ## The board is a broadcast graphic
 
 **The team card is a lower-third, not a list row.** It used to be five equal
@@ -939,6 +1023,20 @@ sixth `.odd`.
 blue as a chip earns its value, which is right for a support number and wrong
 for a headline that should read at full strength from the first frame. `paint`
 skips it for `.hero`.
+
+**`.tcard`'s `transform` belongs to `translateY`, and that is now three
+separate bugs' worth of lesson.** The sorting owns it, so no hover scale, no
+entrance slide, no pop may touch it. An effect that wants movement either
+animates a **child** - which has its own transform - or uses a property the
+sorting does not own: opacity, box-shadow, border-color. The cards fade in on
+opacity with the stagger on `--n`; hover lights the card instead of lifting it;
+the rank chip's flip keeps `skewX(-9deg)` inside every keyframe, because leaving
+it out un-skews the chip for the length of the animation. Same family as the
+mark's baked-in skew and the pace line's split of `translate` from `transform`.
+
+**Restarting a CSS animation needs the reflow read.** `classList.remove`, then
+`void el.offsetWidth`, then `classList.add`. Without the read the browser
+coalesces both changes into one style pass and nothing plays.
 
 **`.tcard .tc-big b` is two classes deep on purpose.** It has to beat `.odd b`
 further down the sheet whatever order the two end up in, or a rule meant for the
@@ -1058,6 +1156,12 @@ conditional mean the card shows.
 **It costs about 20KB a snapshot**, so a weekly season adds roughly 250KB to a
 380KB file. That is the one thing to watch. If it gets uncomfortable the answer
 is a shared name table, not fewer columns - the names are most of the bytes.
+
+**Called it carries its own classification and gender.** `#ctl` owns both
+everywhere else and is hidden on the How tab, so without `FWD_CLS`/`FWD_G` the
+archive was stuck on whatever the Odds board happened to be set to and nine of
+the ten boards were unreachable. They start from the board so the first look is
+never arbitrary - the same rule the draft's own gender switch follows.
 
 **The Called it grid shows one figure at a time**, chosen by a switch, because
 five numbers times N dates times 45 teams is a wall. Qualify ties break on win:

@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;
+  --bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;--glow:rgba(240,69,92,.16);
   --text:#F3F3F4;--muted:#A2A2AB;--dim:#6C6C77;
   --accent:#F0455C;--accent-2:#C2364A;--accent-3:#7E3444;
   --t1:linear-gradient(180deg,#7BA6FF,#12379E);--t1e:#9CBEFF;
@@ -41,6 +41,14 @@
 html{margin:0;padding:0;background:var(--bg);color-scheme:dark;transition:background .3s}
 [data-theme="light"] html,html[data-theme="light"]{color-scheme:light}
 body{margin:0;padding:0}
+/* A flat near-black page reads as a terminal. Two very wide, very faint pools of
+   colour behind everything give it depth without becoming a gradient anyone
+   would notice or name. Fixed, so they do not travel with the scroll. */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(240,69,92,.10), transparent 62%),
+    radial-gradient(900px 560px at 92% 4%, rgba(124,158,255,.075), transparent 60%)}
+.wrap,.bar,header{position:relative;z-index:1}
 body{background:var(--bg);color:var(--text);font-family:'Barlow',system-ui,sans-serif;
   font-size:15px;line-height:1.45;padding-bottom:calc(64px + env(safe-area-inset-bottom));
   overflow-x:hidden;transition:background .3s,color .3s}
@@ -297,6 +305,9 @@ body.nextseason #wiOut::before{content:"Next season \2014  seniors graduated";
 .rec-tbl td{padding:6px 0;border-top:1px solid var(--line);text-align:right;
   color:var(--muted);font-variant-numeric:tabular-nums}
 .rec-tbl td:first-child{color:var(--text)}
+.rec-chart .axl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:7px;
+  letter-spacing:.12em;fill:var(--dim)}
+.rec-chart .axn{font-size:6px;fill:var(--dim);opacity:.8;font-style:italic}
 .rec-tbl .hit{color:var(--t1e);font-weight:600}
 .rec-tbl .miss{color:var(--dim)}
 .fwd-tm{font-style:normal;color:var(--dim);font-size:10.5px;margin-left:6px}
@@ -332,7 +343,8 @@ body.nextseason #wiOut::before{content:"Next season \2014  seniors graduated";
   font-weight:500;padding:6px 0;border-radius:7px;cursor:pointer;transition:color .2s,background .2s}
 .switch button[aria-pressed="true"]{background:var(--raised);color:var(--text)}
 
-h2.sec{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16.5px;margin:16px 0 2px}
+h2.sec{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:19px;
+  text-transform:uppercase;letter-spacing:.015em;margin:18px 0 3px}
 .sub2{color:var(--dim);font-size:12.5px;margin:0 0 9px;line-height:1.4}
 
 .dial{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin:8px 0 0;box-shadow:var(--shadow)}
@@ -415,6 +427,26 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .tcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
   background:linear-gradient(to top,var(--accent) calc(var(--q,0) * 100%),var(--line) 0);
   transition:background .35s}
+/* Cards fade up the board in order rather than all appearing at once. Opacity
+   only - see the rule at the top of this block - with the stagger carried on
+   --n so it reads as the board filling from the front. */
+.tcard{animation:cardIn .5s var(--ease) both;animation-delay:calc(var(--n,0) * 22ms)}
+@keyframes cardIn{from{opacity:0}to{opacity:1}}
+/* The leader is lit. --t1e is the same blue the first-place chip uses, so the
+   glow and the rank agree about who is winning. */
+#board .tcard.lead{border-color:color-mix(in srgb,var(--t1e) 45%,var(--line));
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--t1e) 22%,transparent),
+             0 6px 26px -10px color-mix(in srgb,var(--t1e) 55%,transparent)}
+/* Hover cannot move the card, so it lights it instead. */
+.tcard.tappable:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));
+  box-shadow:0 0 0 1px var(--glow),0 8px 30px -12px var(--glow)}
+/* When a card changes position the rank flips. The skew has to be inside the
+   keyframe or the chip un-skews for the length of the animation. */
+@keyframes rankPop{
+  0%{transform:skewX(-9deg) scale(1)}
+  38%{transform:skewX(-9deg) scale(1.22)}
+  100%{transform:skewX(-9deg) scale(1)}}
+.rank.bump{animation:rankPop .42s var(--ease)}
 .tc-head{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .rank{flex:none;min-width:37px;height:27px;padding:0 7px;border-radius:5px;display:grid;place-items:center;
   background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
@@ -437,6 +469,16 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.08}
 .tc-lg{font-style:normal;color:var(--dim);font-size:9.5px;flex:none;
   letter-spacing:.1em;text-transform:uppercase}
+/* The coaches poll rank. Outlined rather than filled so it reads as somebody
+   else's opinion sitting on our card, not as one of our own numbers. */
+.poll{flex:none;display:inline-flex;align-items:baseline;gap:1px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
+  line-height:1;padding:3px 6px 4px;border-radius:5px;
+  border:1px solid var(--t1e);color:var(--t1e);font-variant-numeric:tabular-nums}
+.poll u{text-decoration:none;font-size:7px;letter-spacing:.09em;opacity:.75;
+  align-self:center}
+.poll.rv{border-color:var(--line);color:var(--dim);font-size:10px;padding:4px 6px}
+.poll.rv u{font-size:7px}
 
 /* Three numbers across, at the size a scoreboard would set them. The specificity
    here is deliberate - .tcard .tc-big b beats the .odd b further down the sheet
@@ -450,7 +492,9 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .tcard .tc-big i{font-style:normal;display:block;font-size:8px;letter-spacing:.11em;
   text-transform:uppercase;color:var(--dim);margin-top:4px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tcard .tc-big .title b{color:var(--accent)}
+.tcard .tc-big .title b{color:var(--accent);
+  text-shadow:0 0 22px color-mix(in srgb,var(--accent) 38%,transparent)}
+.tcard .tc-big .hero b{text-shadow:0 0 20px color-mix(in srgb,var(--text) 14%,transparent)}
 .tcard .tc-big .hero b{color:var(--text)}
 .tcard .tc-big .pnum b{color:var(--muted);font-size:clamp(21px,6.4vw,27px)}
 .tnum{display:flex;align-items:center;gap:4px}
@@ -536,6 +580,13 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .tcard.tappable{cursor:pointer}
 .tcard.tappable:focus-visible{outline:2px solid var(--t1e);outline-offset:2px}
 .strip{display:flex;align-items:flex-end;gap:2px;height:16px;margin-bottom:8px}
+/* While seasons are running the whole board breathes very slightly at the
+   edges. It is the only thing on the page that says "this is still going"
+   once the reader has scrolled past the progress strip. */
+#board.running .tcard{animation:cardIn .5s var(--ease) both,liveEdge 2.4s ease-in-out infinite}
+@keyframes liveEdge{
+  0%,100%{border-color:var(--line)}
+  50%{border-color:color-mix(in srgb,var(--accent) 26%,var(--line))}}
 .strip s{flex:1;background:var(--line);border-radius:1px;height:2px;text-decoration:none;
   transition:height .2s var(--ease),background-color .3s,opacity .3s}
 /* while the pack is moving every bar cycles the spectrum, staggered into a wave */
@@ -5757,7 +5808,7 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
     <div class="view on" id="v-teams"><div id="simOut"></div></div>
     <div class="view" id="v-runners">
       <h2 class="sec">Runners</h2>
-      <p class="sub2">Where each athlete finishes at Lane, across every simulated season &mdash; run against the same field the teams face, individual qualifiers included.</p>
+      <p class="sub2">Where each runner finishes at Lane, averaged over every simulated season. They race the same field the teams do, individual qualifiers included.</p>
       <div id="runOut"><div class="empty">Press Run to fill this in.</div></div>
     </div>
     <div class="view" id="v-leagues">
@@ -5874,9 +5925,9 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
     </div>
     <div class="view" id="v-called">
       <h2 class="sec">Called it</h2>
-      <p class="sub2">What the board said, on the day it said it, before the races it was
-        talking about. Written by <code>node backtest/snapshot.js</code> and pushed the same
-        morning &mdash; the commit dates are in public.</p>
+      <p class="sub2">What the board said on the day it said it, before any of those races
+        were run. Each snapshot is committed and pushed the same morning, so the dates are
+        public and we cannot go back and change them.</p>
       <div class="doc" id="fwdOut"></div>
     </div>
   </section>
@@ -6053,6 +6104,8 @@ const LONE=0.006;
    block is replaced — it is what the header reports to readers. */
 const RECORD={"seasons":[2022,2023,2024,2025],"cutoff":"early September","cutoffDates":["2022-09-10","2023-09-09","2024-09-14","2025-09-13"],"teamSeasons":375,"qualified":144,"found":107,"ofField":144,"champHit":2,"champOf":8,"brier":0.1538,"base":0.2365,"skill":35,"logloss":0.777,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":192,"said":1,"was":11},{"lo":10,"hi":30,"n":21,"said":17,"was":33},{"lo":30,"hi":50,"n":16,"said":39,"was":44},{"lo":50,"hi":70,"n":19,"said":60,"was":42},{"lo":70,"hi":90,"n":22,"said":81,"was":50},{"lo":90,"hi":100,"n":105,"said":98,"was":85}],"horizon":[{"weeks":8,"best":6,"brier":0.1391,"shipped":0.1536},{"weeks":6,"best":2.6,"brier":0.0649,"shipped":0.0654},{"weeks":4,"best":2,"brier":0.0574,"shipped":0.058},{"weeks":2,"best":2,"brier":0.0529,"shipped":0.0538}],"perSeason":[{"year":2022,"g":"M","cutoff":"2022-09-10","field":18,"found":11,"skill":-3,"skillLate":80,"foundLate":16,"marks":610,"fav":"Lincoln","favP":45,"champ":"Jesuit","hit":false},{"year":2022,"g":"F","cutoff":"2022-09-10","field":18,"found":12,"skill":0,"skillLate":66,"foundLate":16,"marks":610,"fav":"Jesuit","favP":71,"champ":"Jesuit","hit":true},{"year":2023,"g":"M","cutoff":"2023-09-09","field":18,"found":11,"skill":0,"skillLate":65,"foundLate":16,"marks":580,"fav":"Jesuit","favP":78,"champ":"Franklin (OR)","hit":false},{"year":2023,"g":"F","cutoff":"2023-09-09","field":18,"found":14,"skill":43,"skillLate":88,"foundLate":18,"marks":580,"fav":"Lincoln","favP":54,"champ":"Jesuit","hit":false},{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":48,"skillLate":73,"foundLate":16,"marks":973,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":60,"skillLate":77,"foundLate":16,"marks":973,"fav":"Lakeridge","favP":40,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":84,"skillLate":74,"foundLate":16,"marks":867,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":46,"skillLate":83,"foundLate":17,"marks":867,"fav":"Sunset","favP":70,"champ":"Lincoln","hit":false}],"cutoffLate":"early October","weeksOut":8,"weeksOutLate":4,"built":"2026-09-15"};
 const SNAPSHOTS=[{"taken":"2026-09-15","through":"2026-09-12","marks":4923,"sigma":2.3,"runs":20000,"boards":{"6A|M":{"t":{"Adrienne Nelson":[21,21,0,394],"Barlow":[0,0,0,0],"Beaverton":[0,0,0,0],"Benson Tech":[0,0,0,0],"Central Catholic":[997,997,0,253],"Century":[170,150,0,275],"Clackamas":[968,968,0,249],"Cleveland":[0,0,0,0],"David Douglas":[14,14,0,404],"Forest Grove":[0,0,0,404],"Franklin":[897,246,45,145],"Glencoe":[0,0,0,0],"Grant":[971,880,433,78],"Grants Pass":[0,0,0,0],"Gresham":[0,0,0,0],"Ida B. Wells":[76,1,0,267],"Jesuit":[383,380,0,290],"Lake Oswego":[189,69,0,259],"Lakeridge":[541,227,0,207],"Lincoln":[999,874,355,79],"McDaniel":[3,0,0,311],"McKay":[0,0,0,0],"McMinnville":[851,844,0,226],"McNary":[100,100,0,460],"Mountainside":[616,614,0,259],"Newberg":[14,13,0,354],"North Medford":[12,12,0,456],"North Salem":[16,16,0,479],"Oregon City":[406,158,0,221],"Reynolds":[0,0,0,0],"Roosevelt":[0,0,0,0],"Roseburg":[54,54,0,432],"Sheldon":[19,19,0,419],"Sherwood":[993,993,7,170],"South Eugene":[977,977,0,243],"South Medford":[937,937,0,328],"South Salem":[858,858,0,434],"Southridge":[0,0,0,0],"Sprague":[1000,1000,0,331],"Sunset":[329,325,0,302],"Tigard":[87,18,0,259],"Tualatin":[819,596,5,174],"West Linn":[971,933,155,106],"West Salem":[26,26,0,452],"Westview":[687,681,0,238]},"r":[["Paul Hretcanu","Tigard",61,952,251],["George Lora","Ida B. Wells",118,817,55],["Peter James","Lincoln",120,846,50],["James Fullerton","Grant",123,814,115],["Eben Cole","Grant",141,774,54],["Isaiah Carpenter","McMinnville",145,785,30],["Ash Carlson","Lakeridge",154,741,23],["Malcolm Dimoff","Lincoln",165,739,12],["Sriharsha Padigi","Westview",181,691,11],["Jack Denton","Lincoln",187,677,7],["Ian Houston","West Linn",216,591,5],["Atticus Gorski","West Linn",218,589,4],["Kole Norman","Sherwood",223,567,4],["Seth Kugel","Lincoln",234,545,2],["Hunter McKenzie","Oregon City",256,435,2],["Maximillian Nevarez","Central Catholic",256,478,3],["Ammon Bitton","Century",274,421,1],["Ethan Hansen","Century",288,387,1],["Sam Cranganu","West Linn",304,341,0],["Jayden Atkins","Tualatin",304,323,1],["Cameron Acton","Westview",309,481,10],["Nolan Gorsegner","Ida B. Wells",332,182,0],["Maxim Mezentsev","Tualatin",332,256,0],["Khalil Sabzalian","South Eugene",334,620,96],["Henry Tachouet","Lincoln",366,201,0],["Cole Bruni","Lakeridge",374,151,0],["Jack McDaniel","Grant",392,615,146],["Felix Wang","Lake Oswego",392,404,44],["Lincoln Eames","Franklin",393,332,2],["Tyler Williams","Tualatin",410,115,0]]},"6A|F":{"t":{"Adrienne Nelson":[503,503,0,454],"Barlow":[0,0,0,0],"Beaverton":[0,0,0,0],"Central Catholic":[579,579,0,443],"Century":[29,29,0,372],"Clackamas":[918,918,0,370],"Cleveland":[0,0,0,0],"David Douglas":[0,0,0,0],"Forest Grove":[0,0,0,0],"Franklin":[990,974,203,104],"Glencoe":[1,1,0,443],"Grant":[438,199,1,207],"Grants Pass":[0,0,0,0],"Gresham":[0,0,0,0],"Ida B. Wells":[136,24,0,225],"Jesuit":[1000,1000,149,108],"Lake Oswego":[0,0,0,326],"Lakeridge":[569,229,1,178],"Lincoln":[901,790,13,152],"McDaniel":[51,12,0,252],"McKay":[0,0,0,0],"McMinnville":[970,970,0,308],"McNary":[0,0,0,0],"Mountainside":[930,929,0,224],"Newberg":[0,0,0,0],"North Medford":[962,962,0,331],"North Salem":[506,506,0,398],"Oregon City":[0,0,0,0],"Roosevelt":[0,0,0,0],"Sheldon":[0,0,0,0],"Sherwood":[1000,1000,554,79],"South Eugene":[1000,1000,32,156],"South Medford":[38,38,0,428],"South Salem":[0,0,0,0],"Southridge":[4,3,0,389],"Sprague":[538,538,0,386],"St Mary's Academy":[895,651,21,141],"Sunset":[69,67,0,347],"Tigard":[536,206,1,175],"Tualatin":[791,465,9,156],"West Linn":[690,448,16,159],"West Salem":[956,956,0,340],"Westview":[0,0,0,0]},"r":[["Eleanor Wyatt","West Linn",17,1000,610],["Sophia Service","Tigard",25,999,316],["Violet Wilbourn","Tualatin",107,899,4],["Grace Keene","Mountainside",110,895,3],["Evylee Bugher","Sherwood",114,859,12],["Titi Paternoster","St Mary's Academy",119,869,2],["Quinn Hanley","Jesuit",130,847,2],["Ellie Welsh","Jesuit",136,834,1],["Evangeline Johnson Hess","South Eugene",147,738,25],["Tyler Thomas","Sherwood",149,736,20],["Gwyn Fairchild","Lincoln",163,751,1],["Megan Coffield","St Mary's Academy",168,728,0],["Alison Fajardo","Franklin",171,727,1],["Lucy Tomb","Sherwood",220,597,1],["Ramona Tarlow","Lakeridge",223,522,0],["Maren Naone","Forest Grove",238,510,0],["Lyvia Mitchell","Franklin",253,513,0],["Julia Olivares","Lincoln",255,440,0],["Nora Moore","Ida B. Wells",257,414,0],["Millie Grabenhorst","Ida B. Wells",273,353,0],["Breeanna Hollins","Sherwood",278,501,0],["Clara Surratt","Lakeridge",280,320,0],["Ingrid Haugo","Franklin",289,393,0],["Zia Eichenauer","Franklin",290,335,0],["Rosemary Otto","Franklin",294,324,0],["Paige Holland","Tualatin",317,232,0],["Lauren Gerlach","Tualatin",328,205,0],["Julia Hretcanu","Tigard",333,173,0],["Hayden Shimp","Sherwood",334,286,0],["Anya Augustine","Jesuit",345,183,0]]},"5A|M":{"t":{"Aloha":[3,1,0,324],"Ashland":[1,0,0,300],"Bend":[998,862,0,136],"Caldera":[92,0,0,269],"Canby":[964,948,0,185],"Centennial":[968,946,0,186],"Churchill":[0,0,0,0],"Corvallis":[1000,1000,0,320],"Crater":[1000,1000,1,104],"Crescent Valley":[1000,1000,0,261],"Crook County":[8,0,0,291],"Dallas":[0,0,0,395],"Eagle Point":[0,0,0,0],"Hillsboro":[0,0,0,0],"Hood River Valley":[988,977,2,138],"La Salle Prep":[76,23,0,279],"Lebanon":[0,0,0,0],"Liberty":[129,29,0,256],"Milwaukie":[0,0,0,0],"Mountain View":[941,137,0,184],"North Eugene":[519,22,0,242],"Putnam":[243,77,0,253],"Ridgeview":[0,0,0,0],"Sandy":[0,0,0,0],"Silverton":[0,0,0,0],"South Albany":[0,0,0,0],"Springfield":[984,968,0,167],"St Helens":[0,0,0,0],"Summit":[1000,1000,985,33],"Thurston":[0,0,0,0],"West Albany":[0,0,0,388],"Willamette":[84,10,0,292],"Wilsonville":[1000,1000,12,84],"Woodburn":[0,0,0,0]},"r":[["Ashenafi McKinnis","North Eugene",15,1000,704],["Bjorn Blankenship","Summit",26,1000,207],["Clayton Jero","Summit",49,999,17],["Landon Kjorstad","Summit",61,996,4],["Hudson Boaz","Summit",62,996,5],["Kyle Peterson","Wilsonville",120,924,0],["Tyler Dougall","Wilsonville",121,922,0],["Ryder White","Crater",128,903,0],["Caden Wenger","Bend",144,861,0],["Nathan Goode","Crater",153,830,0],["Leandro Walker","Springfield",156,779,0],["Diego Urrutia","Ashland",169,693,0],["Kai Blankenship","Summit",177,746,0],["Jaycob Aguas","Canby",181,678,0],["Gus VandenHeuvel","Hood River Valley",182,670,1],["Archer Hughes","Wilsonville",187,700,0],["Adrian Estes","Springfield",189,667,60],["Emmett South","Bend",208,609,0],["Reece Hvall","Crater",210,601,0],["Nolan Lam","Wilsonville",229,521,0],["Fisher Olin","Bend",234,479,0],["Gavin Littrell","Summit",245,433,0],["Colt Madsen","Mountain View",246,403,0],["Joshua Carley","Hood River Valley",252,503,1],["Lucas Everton","Liberty",257,272,0],["Grayson Warner","Wilsonville",264,366,0],["Conlan O'Sullivan","Mountain View",265,315,0],["Kannon Whiting","Crook County",270,57,0],["Sam Schwager","Hood River Valley",278,491,0],["John Rispler","Putnam",303,156,0]]},"5A|F":{"t":{"Aloha":[0,0,0,352],"Ashland":[896,354,0,202],"Bend":[1000,999,1,130],"Caldera":[527,1,0,231],"Canby":[635,635,0,282],"Centennial":[1000,1000,806,51],"Churchill":[0,0,0,0],"Corvallis":[395,191,0,251],"Crater":[1000,1000,191,72],"Crescent Valley":[969,809,0,188],"Crook County":[0,0,0,0],"Dallas":[1000,1000,0,126],"Eagle Point":[0,0,0,0],"Hood River Valley":[943,942,0,234],"La Salle Prep":[0,0,0,0],"Lebanon":[0,0,0,0],"Liberty":[376,376,0,291],"Mountain View":[255,1,0,241],"North Eugene":[12,1,0,278],"Putnam":[0,0,0,0],"Ridgeview":[0,0,0,0],"Sandy":[61,58,0,300],"Silverton":[0,0,0,0],"Springfield":[939,645,0,194],"Summit":[1000,999,1,127],"Thurston":[0,0,0,338],"West Albany":[2,1,0,292],"Willamette":[0,0,0,0],"Wilsonville":[990,990,0,239],"Woodburn":[0,0,0,0]},"r":[["Alexa Montgomery","Crescent Valley",20,1000,501],["Annie Herd","Centennial",45,999,70],["Isabella Wells","Springfield",47,997,69],["Zoe Montgomery","Crescent Valley",59,996,17],["Alma Galicia","Crater",79,987,7],["Lauren Burrup","Centennial",92,975,3],["Savina Davis","Hood River Valley",97,791,328],["Mackenzie Harsch","Centennial",100,966,1],["Amber Green","Dallas",108,952,2],["Avery Hoffman","Dallas",111,946,1],["Anna Millar","Centennial",116,944,1],["Grace Havniear","Crater",144,874,0],["Haddie Barsalou","Crater",146,869,0],["Emma Wigelsworth","Crater",147,863,0],["Miley Morical","Caldera",152,810,0],["Lyla Rose","Ashland",152,803,0],["Scout Zundel","Ashland",180,684,0],["Ellen Auxier","Springfield",185,664,0],["Lydia Jensen","Centennial",187,713,0],["Hannah Miller","Bend",193,675,0],["Magnolia Rowles","Bend",213,572,0],["Ava Ontiveros","Crater",234,461,0],["Camila Gonzalez Montes","North Eugene",244,114,0],["Lucy Millar","Centennial",254,349,0],["Kloey Drewsen","Summit",260,298,0],["Georgia Black","Wilsonville",278,236,0],["Sage Jones","Summit",285,186,0],["Elizabeth Rauber","Summit",285,188,0],["Lola Marshall","Summit",290,158,0],["Aspen Bradbury","Caldera",292,118,0]]},"4A|M":{"t":{"Astoria":[411,1,0,248],"Baker":[151,4,0,282],"Banks":[230,0,0,253],"Cascade":[0,0,0,330],"Cascade Christian":[0,0,0,327],"Central":[996,561,0,175],"Cottage Grove":[992,55,20,157],"Elmira":[2,0,0,279],"Estacada":[187,0,0,258],"Gladstone":[348,0,0,262],"Henley":[0,0,0,0],"Hidden Valley":[0,0,0,0],"Junction City":[0,0,0,0],"Klamath Union":[1000,1000,3,169],"La Grande":[1000,996,1,168],"Madras":[10,0,0,325],"Marist":[1000,945,389,98],"Marshfield":[2,0,0,330],"Mazama":[0,0,0,0],"Molalla":[997,55,10,141],"Newport":[0,0,0,311],"North Bend":[23,0,0,270],"Ontario":[0,0,0,0],"Philomath":[631,3,0,235],"Phoenix":[0,0,0,0],"Scappoose":[988,544,157,127],"Seaside":[0,0,0,0],"Stayton":[995,436,0,183],"The Dalles":[1000,945,353,100],"Tillamook":[43,0,0,268],"Valley Catholic":[994,455,67,133]},"r":[["Corbin Sage","Marist",11,1000,963],["Lazarus Taylor","The Dalles",74,976,5],["Mark Madsen","Klamath Union",80,955,11],["Luke Sorenson","The Dalles",85,965,4],["Nick Wood","Molalla",95,951,2],["Kaden May","La Grande",103,937,2],["Zeb Stelzer","The Dalles",117,911,1],["Avery Chandler","Newport",125,889,1],["Anderson Wirth","Marist",129,853,0],["Ronan McElligott","Marist",143,843,0],["Harlen Sampson","Valley Catholic",147,703,6],["Cooper Altenburg","La Grande",157,799,0],["Diego Velazquez","Tillamook",157,770,0],["Jake Kenton","Molalla",181,708,0],["Corban Stanton","Estacada",182,478,0],["Brandon Wagar","Stayton",185,681,0],["Jennings Albrecht","Cottage Grove",185,638,1],["Hudson Stange","Central",188,670,0],["Alec Zaw-Tun","Valley Catholic",233,559,0],["Tristan Haas","Scappoose",234,634,2],["Angelo Pedrini","North Bend",237,492,0],["Thomas Butler","Central",249,357,0],["Galen Murch","Philomath",255,420,0],["Raleigh Collier","North Bend",258,428,1],["Davin Olson","Estacada",279,158,0],["Gabriel Schwartz","Baker",282,457,0],["Tyler Kenton","Molalla",287,177,0],["Jonas Southwell","Klamath Union",298,142,0],["Henry Herron","Scappoose",319,594,0],["Remington Sharkey","Cottage Grove",321,211,0]]},"4A|F":{"t":{"Astoria":[436,0,0,272],"Baker":[729,0,0,249],"Banks":[1000,992,570,60],"Cascade":[358,0,0,272],"Cascade Christian":[0,0,0,0],"Central":[56,0,0,282],"Cottage Grove":[1000,611,0,166],"Estacada":[81,0,0,285],"Gladstone":[479,0,0,249],"Henley":[5,0,0,307],"Junction City":[8,0,0,300],"Klamath Union":[1000,1000,0,206],"La Grande":[1000,1000,0,154],"Madras":[57,0,0,265],"Marist":[998,389,0,160],"Marshfield":[136,0,0,277],"Mazama":[2,0,0,289],"Molalla":[2,0,0,317],"Newport":[21,0,0,286],"North Bend":[621,1,0,235],"Philomath":[1000,1000,430,63],"Phoenix":[2,0,0,315],"Scappoose":[1000,8,1,117],"Seaside":[0,0,0,0],"Stayton":[997,0,0,195],"The Dalles":[1000,1000,0,119],"Tillamook":[8,0,0,307],"Valley Catholic":[3,0,0,299]},"r":[["Katherine Kessi","Scappoose",10,1000,968],["Cassidy Smart","Philomath",28,1000,26],["Molly Schoolmeester","Banks",39,1000,3],["Olivia Hernandez","Philomath",46,1000,2],["Lydia Shellman","Banks",53,1000,0],["Rachael Kelly","Banks",73,998,0],["Meaza Wilson","Banks",93,989,0],["Addison Horning","North Bend",126,764,0],["Tori Sherman","Marist",130,933,0],["Mary Jane Hill","Marist",131,928,0],["Lindsey Brown","La Grande",133,927,0],["Iman Paisner","Scappoose",160,679,0],["Alessandra Meza","The Dalles",165,816,0],["Lucy Shah","Marist",166,716,0],["Alexandra Curtis","Newport",181,659,0],["Annika Baltzley","Central",198,590,0],["Josie Brace","The Dalles",216,553,0],["Piper Pedder","Philomath",217,567,0],["Sienna Bushnell","Philomath",219,532,0],["Rowyn Earl","Cottage Grove",220,536,0],["McKenzie Heimbuck","Scappoose",245,382,0],["Carly Knutson","Cottage Grove",268,255,0],["Austin Hilton","Baker",269,406,0],["Reagan Nuno","Philomath",269,313,0],["Evelyn Segrin","La Grande",271,242,0],["Miette Putnam","Estacada",272,269,0],["Lyla Bourgoine","Scappoose",274,540,0],["Marley Perry","The Dalles",278,203,0],["Callie Delamarter","Madras",279,314,0],["Josie Ginestar","Henley",303,388,0]]},"3A|M":{"t":{"Blanchet Catholic":[18,18,0,280],"Burns":[980,980,0,194],"Catlin Gabel":[0,0,0,0],"Corbett":[999,999,0,173],"Douglas":[0,0,0,0],"Enterprise":[30,27,0,253],"Gervais":[0,0,0,0],"Glide":[133,43,0,223],"Harrisburg":[982,982,0,217],"Horizon Christian":[69,66,0,264],"Illinois Valley":[0,0,0,0],"McLoughlin":[0,0,0,0],"Neah-Kah-Nie":[1000,1000,140,82],"Nyssa":[994,994,1,144],"Oregon Episcopal":[125,121,0,249],"Pleasant Hill":[507,202,0,197],"Portland Adventist":[0,0,0,0],"Rainier":[0,0,0,0],"Riverdale":[815,814,0,212],"Santiam Christian":[1000,1000,0,213],"Scio":[67,67,0,310],"Sisters":[625,395,0,183],"Siuslaw":[1000,1000,589,58],"St Mary's":[10,1,0,235],"Sutherlin":[0,0,0,0],"Sweet Home":[1000,1000,270,70],"Trinity Lutheran":[713,359,0,189],"Vale":[0,0,0,250],"Warrenton":[0,0,0,0],"Westside Christian":[0,0,0,0],"Willamina":[104,104,0,316],"Yamhill-Carlton":[830,830,0,269]},"r":[["Tytus Janssen","Santiam Christian",21,1000,436],["Henry Stone","Siuslaw",21,1000,429],["Bentley Nelson","Siuslaw",66,997,3],["Gus Kirby","Neah-Kah-Nie",74,942,91],["Acen Webber","Sweet Home",108,906,4],["Elijah Rodriguez","Sweet Home",114,840,8],["Thaddius Downs","Burns",135,825,1],["Dylan Sigman","Neah-Kah-Nie",142,705,8],["Duncan Fritts","Vale",145,722,7],["Calvin DeLay","Trinity Lutheran",146,674,0],["Caden Warner","Sisters",153,627,0],["Aiden Koroush","Harrisburg",153,780,0],["Evan Knight","Sweet Home",161,737,0],["Ryker Burr","Sweet Home",163,810,0],["Ethan Lutz","Blanchet Catholic",179,656,0],["Greysen Doyle","Siuslaw",183,720,0],["Joel Yarber","Harrisburg",187,676,0],["Ezra King","Siuslaw",190,689,0],["Henry Dotson","Siuslaw",194,671,0],["Gage Roper","Pleasant Hill",195,353,0],["Pedro (Julio) Santana","Nyssa",202,776,1],["John Peterson","St Mary's",205,95,0],["R Weiss","Neah-Kah-Nie",211,664,12],["Kaden Seaton","Pleasant Hill",220,269,0],["Ben Hayner","Sisters",237,341,0],["Taylor Heier","Illinois Valley",245,211,0],["Mason Schermer","Trinity Lutheran",261,206,0],["Jack Cole","Neah-Kah-Nie",266,469,0],["Louis Kistner","Sweet Home",273,326,0],["Yair Brito Xilot","Siuslaw",275,215,0]]},"3A|F":{"t":{"Blanchet Catholic":[259,259,0,131],"Burns":[0,0,0,0],"Catlin Gabel":[361,2,0,94],"Coquille":[0,0,0,0],"Corbett":[1000,998,69,48],"Enterprise":[997,997,0,87],"Gervais":[0,0,0,0],"Glide":[939,817,1,69],"Harrisburg":[740,740,0,109],"Horizon Christian":[0,0,0,0],"La Pine":[0,0,0,0],"Nyssa":[3,3,0,135],"Oregon Episcopal":[1000,1000,926,36],"Pleasant Hill":[0,0,0,0],"Rainier":[0,0,0,0],"Santiam Christian":[1000,1000,0,69],"Scio":[1,1,0,159],"Sisters":[13,3,0,109],"Siuslaw":[573,261,0,83],"St Mary's":[144,33,0,94],"Sweet Home":[970,886,4,63],"Trinity Lutheran":[0,0,0,0],"Vale":[0,0,0,0],"Willamina":[0,0,0,0]},"r":[["Claire Horton","Corbett",10,1000,985],["Abby Wilson","Oregon Episcopal",28,1000,9],["Ella Henthorn","Coquille",33,1000,5],["Ellie Tyler","Catlin Gabel",48,827,0],["Andy Bryant","Oregon Episcopal",62,1000,0],["Kate Vasanth","Oregon Episcopal",66,1000,0],["Laynee Adkins-Stewart","Santiam Christian",71,1000,0],["Lilly Weer","Enterprise",87,999,0],["Emma Whitton","Sweet Home",94,996,0],["Vivi Duval","Corbett",97,1000,0],["Grace DeLay","Trinity Lutheran",102,904,0],["Halle Goodman","Glide",118,968,0],["Miley Richardson","Harrisburg",142,980,0],["Sophie Kalenius","Santiam Christian",146,988,0],["Samira Zambrano","Santiam Christian",149,986,0],["Payton Hartley","Nyssa",162,737,0],["Kyra Brown","Enterprise",168,886,0],["Cassie Spencer","Sweet Home",175,771,0],["Morgan Fitting","Glide",183,760,0],["Nellie Smith","Pleasant Hill",192,25,0],["Esther Arthur","St Mary's",193,117,0],["Claire McNeill","Siuslaw",208,375,0],["Maanya Mittel","St Mary's",210,91,0],["Brynna Hurt","Glide",215,558,0],["Elaia Pastor","Corbett",233,396,0],["Hosanna Stone","Siuslaw",236,212,0],["Claire Turner","Corbett",239,328,0],["Kali Vogel","Sweet Home",243,280,0],["Hadley Gunderson","Burns",251,275,0],["Gabby VaVerka","Blanchet Catholic",252,66,0]]},"2A/1A|M":{"t":{"Bandon":[1000,1000,2,123],"C.S. Lewis Academy":[757,751,0,274],"Clatskanie":[0,0,0,349],"Columbia Christian":[8,0,0,269],"Crosshill Christian":[968,967,0,277],"Culver":[843,843,0,313],"Four Rivers":[957,957,0,274],"Glendale":[0,0,0,0],"Grant Union":[222,213,0,353],"Heppner":[101,95,0,342],"Knappa":[1000,1000,928,38],"Lakeview":[889,889,0,351],"Nestucca":[0,0,0,0],"New Hope Christian":[0,0,0,0],"Nixyaawii Community":[0,0,0,0],"Oakland":[270,268,0,347],"Oregon School for the Deaf":[0,0,0,0],"Paideia Classical Christian":[973,723,0,149],"Perrydale":[0,0,0,0],"Portland Christian":[139,14,0,254],"Regis":[1000,1000,0,157],"Riverside-WLWV":[0,0,0,0],"Southwest Christian":[376,15,0,212],"St Paul":[252,234,0,343],"St. Stephen's Academy":[708,79,0,191],"Stanfield":[692,686,0,321],"Toledo":[224,192,0,314],"Trinity Academy":[1000,1000,70,75],"Union":[1000,1000,0,170],"Vernonia":[709,170,0,188],"Western Christian":[859,856,0,268],"Weston-McEwen":[52,50,0,352]},"r":[["Conner Hill","Toledo",22,1000,390],["Rowdy Justus","Knappa",28,1000,360],["Logan Affolter","Knappa",48,1000,24],["Isaac Williamson","Oakland",57,999,12],["Kyler Rodriguez","Knappa",67,985,19],["Beckett Pahls","Bandon",73,872,194],["Judah Gunderson","Trinity Academy",92,985,0],["Phineas Gunderson","Trinity Academy",99,977,0],["Adam Spears","Paideia Classical Christian",133,883,0],["Eli Nicholson","Bandon",141,794,1],["Oliver Spears","Paideia Classical Christian",153,821,0],["Paul Thompson","Knappa",179,676,0],["Elias Piercy","Regis",189,695,0],["Kaysun Carmack","Clatskanie",192,240,0],["Trey Lempea","Knappa",204,621,0],["Mason Vu","Nestucca",206,121,0],["Ian Garlitz","Union",210,585,0],["Harper Stoops","Regis",215,562,0],["Stuart McLaughlin","Regis",215,563,0],["Abram Votrobeck","Columbia Christian",223,68,0],["Filip Thistle","St. Stephen's Academy",223,369,0],["Luke Carpenter","Southwest Christian",227,193,0],["Elias Liebert","Trinity Academy",229,493,0],["Linus Folz","Trinity Academy",229,488,0],["Jonah Naffin","C.S. Lewis Academy",255,343,0],["Blake Pultz","Vernonia",256,404,0],["Iliya Demchenko","Portland Christian",269,223,0],["Atticus Muir","Trinity Academy",272,263,0],["Bryce Burton","Union",273,377,0],["Isaiah White","St. Stephen's Academy",274,188,0]]},"2A/1A|F":{"t":{"Bandon":[929,678,102,65],"Crosshill Christian":[250,243,0,108],"East Linn Christian":[998,998,74,66],"Four Rivers":[0,0,0,0],"Heppner":[601,115,2,79],"Imbler":[0,0,0,0],"Knappa":[884,580,389,54],"Lakeview":[901,322,49,67],"Nixyaawii Community":[0,0,0,0],"Paideia Classical Christian":[981,404,240,55],"Portland Christian":[0,0,0,0],"Southwest Christian":[177,2,0,90],"St. Stephen's Academy":[0,0,0,0],"Trinity Academy":[542,14,2,78],"Union":[965,885,141,60],"Vernonia":[11,0,0,97],"Western Christian":[760,759,1,100],"Weston-McEwen":[0,0,0,114]},"r":[["Jael Legutki","Bandon",24,999,770],["Evelyn Hodgson","Weston-McEwen",26,1000,139],["Piper Braseth","Imbler",51,997,15],["Chloe McNair","Southwest Christian",53,834,9],["Addilyn Draeger","Vernonia",70,648,37],["Brooklyn Hendricks","Heppner",77,971,2],["Ella Garland","Trinity Academy",84,669,0],["Bailey Cogbill","Paideia Classical Christian",92,980,0],["Corina Phillips","Crosshill Christian",108,966,0],["Emma Halblieb","Lakeview",117,986,0],["Orinthia O'Neill","Vernonia",119,306,0],["Allie Presley","East Linn Christian",134,935,0],["Emma Jackson","Knappa",148,608,24],["Jada Ryder","Bandon",150,751,1],["Ava Smith","Portland Christian",155,277,1],["Josephine le Roux","Trinity Academy",166,467,0],["Kallin Culver","Union",171,762,0],["Audrey Bertuleit","St. Stephen's Academy",173,5,0],["Brynn Weishaar","Union",178,770,0],["Gia Savage","Union",181,766,0],["Bristol Weichal","Knappa",184,594,0],["Lily Ashworth","Paideia Classical Christian",189,722,0],["Zoey Lackey","Knappa",195,593,0],["Addalee Tague","Lakeview",195,668,0],["Morgan Lalonde","East Linn Christian",209,580,0],["Mikalie Duncan","Heppner",218,337,0],["Erin Davey","East Linn Christian",225,466,0],["Annabelle Bradley","Western Christian",234,453,0],["Olivia Roberts","Paideia Classical Christian",240,334,0],["Talia Holcomb","Paideia Classical Christian",240,326,0]]}},"forced":{"on":"2026-09-15","why":"same day, same database, no race between - rewritten only to add the auto-qualify, points and individual columns","was":1}}];
+const POLL={"6A|M":{"Lincoln":1,"Jesuit":2,"Sunset":3,"Central Catholic":4,"Sherwood":5,"South Eugene":6,"Ida B. Wells":7,"Franklin":8,"Lakeridge":8,"Grant":10,"West Linn":0},"5A|M":{"Crater":1,"Summit":2,"Bend":3,"Corvallis":4,"Wilsonville":5,"Hood River Valley":6,"Caldera":7,"North Eugene":8,"Crescent Valley":9,"Milwaukie":10,"Ashland":0,"Aloha":0},"4A|M":{"La Grande":1,"Molalla":2,"Klamath Union":3,"Cottage Grove":4,"Newport":5,"Stayton":6,"The Dalles":7,"Philomath":8,"Tillamook":9,"Marist":10,"Valley Catholic":0,"Phoenix":0},"3A|M":{"Siuslaw":1,"Neah-Kah-Nie":2,"Nyssa":3,"Oregon Episcopal":4,"Santiam Christian":5,"Enterprise":6,"Westside Christian":7,"Riverside":8,"Pleasant Hill":9,"Burns":10,"Vale":0,"Yamhill-Carlton":0,"Harrisburg":0},"2A/1A|M":{"Union":1,"Knappa":2,"Bandon":3,"Southwest Christian":4,"Regis":5,"St. Stephen's Academy":6,"Trinity Academy":7,"Heppner":9,"Country Christian":10,"Vernonia":10,"Culver":0},"6A|F":{"Jesuit":1,"Lincoln":2,"Sherwood":3,"West Linn":4,"South Eugene":5,"Franklin":6,"Ida B. Wells":7,"Sunset":8,"North Medford":9,"Tigard":10,"Lakeridge":0},"5A|F":{"Crater":1,"Summit":2,"Ashland":3,"Caldera":4,"Corvallis":5,"Bend":6,"Dallas":7,"Wilsonville":8,"Crescent Valley":9,"Churchill":10,"Thurston":0},"4A|F":{"Klamath Union":1,"Philomath":2,"La Grande":3,"Banks":4,"Scappoose":5,"Cottage Grove":6,"The Dalles":7,"North Bend":8,"Stayton":9,"Baker":10,"Molalla":0},"3A|F":{"Oregon Episcopal":1,"Siuslaw":2,"Catlin Gabel":3,"Santiam Christian":4,"St Mary's":5,"Westside Christian":6,"Glide":7,"Sisters":7,"Coquille":9,"Pleasant Hill":10,"Trinity Lutheran":0,"Sweet Home":0},"2A/1A|F":{"Union":1,"Bandon":2,"Heppner":3,"Imbler":5,"Central Linn":6,"Western Christian":7,"Lakeview":8,"Kennedy":9,"Knappa":9,"Southwest Christian":9,"Santiam":0,"Regis":0,"St. Stephen's Academy":0,"East Linn Christian":0}};
+const POLL_DATE="2026-09-15";
 const DATA_DATE="2026-09-12";
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
@@ -6389,11 +6442,26 @@ function paintBar(s,p,count){
   }
 }
 
+/* The coaches poll. It is the only statewide human ranking of these teams and
+   it is a different opinion from the board's - coaches see head-to-head results,
+   who is hurt and who is peaking, none of which the model knows. Where the two
+   disagree is the interesting part of the page, so the poll sits on the card
+   next to the model's own rank rather than on a page of its own.
+   Only about twelve teams a board are ranked; everyone else gets nothing,
+   because "unranked" is what the poll actually says about them. */
+function pollChip(name){
+  const p=(typeof POLL!=="undefined"&&POLL[CLS+"|"+gender])||null;
+  if(!p||!(name in p))return "";
+  const r=p[name];
+  return '<span class="poll'+(r?'':' rv')+'" title="OSAAtoday coaches poll">'
+    +(r?'<u>POLL</u>'+r:'<u>POLL</u>RV')+'</span>';
+}
+
 function buildBoard(tally){
   const box=document.getElementById("simOut");
   box.innerHTML=`
     <h2 class="sec">Odds by team</h2>
-    <p class="sub2">Points are what a team averages in the seasons it gets to Lane, so a team that rarely qualifies can still show a good number. Bars are where a team finishes at state across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
+    <p class="sub2">Points are a team's average score in the seasons it reaches Lane, so a team that rarely gets there can still show a good one. The blue chip on each card is that team&rsquo;s place in the OSAAtoday coaches poll, which is a separate opinion from ours. The bars show where it finished across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
     <div class="legend">
       <span><i style="background:var(--t1)"></i>1st</span>
       <span><i style="background:var(--t2)"></i>2nd</span>
@@ -6403,14 +6471,19 @@ function buildBoard(tally){
       ${FIELD>10?`<span><i style="background:var(--line)"></i>11–${FIELD}</span>`:""}
     </div><div id="board"></div>`;
   const board=document.getElementById("board");
-  cards=tally.map(t=>{
+  cards=tally.map((t,ci)=>{
     const el=document.createElement("div");
     el.className="tcard";
+    /* Capped at sixteen steps. Uncapped, the forty-fifth card starts a full
+       second after the first and the board looks slow to load rather than
+       eager; past the sixteenth nobody is watching that far down anyway. */
+    el.style.setProperty("--n",Math.min(ci,16));
     el.innerHTML=`
       <div class="tc-head">
         <span class="rank"><u>#—</u></span>
         ${crest(t.name,"crest")}
         <span class="tc-name"><b>${t.name}</b></span>
+        ${pollChip(t.name)}
         <i class="tc-lg">${ABBR[t.league]}</i>
       </div>
       <div class="tc-big">
@@ -6450,11 +6523,20 @@ function paint(tally,done,full){
   for(const c of cards){
     const {el,t,prev}=c, i=pos.get(t.idx);
     if(c.pos!==i){
+      const moved=c.pos>=0;
       c.pos=i;
       el.style.transform=`translateY(${i*stepH}px)`;
       const rk=el.querySelector(".rank");
       rk.firstElementChild.textContent="#"+(i+1);
       rk.className="rank"+(i<4?" p"+(i+1):"");
+      /* Restarting a CSS animation needs the class off, a reflow read, then the
+         class on. Without the offsetWidth read the browser coalesces both
+         changes into one style pass and nothing plays at all. Only on a real
+         move, so the first paint does not fire forty-five of them at once. */
+      if(moved){
+        rk.classList.remove("bump");void rk.offsetWidth;rk.classList.add("bump");
+      }
+      el.classList.toggle("lead",i===0);
     }
     const ws=pct(t.win,done);
     if(prev.win!==ws){
@@ -7102,12 +7184,19 @@ document.getElementById("dsum").onclick=()=>{dialsTouched=true;setDials(!dialsOp
    boards and each leads with a different figure, so the archive carries all of
    them and this picks between them rather than printing a wall. */
 let FWD_K="qual";
+/* The Called it view carries its own classification and gender, because #ctl -
+   which owns both everywhere else - is hidden on the How tab. Without these the
+   archive was permanently stuck on whatever the Odds board happened to be set
+   to, and there was no way to reach the other nine boards at all. They start
+   from the board so the first look is never arbitrary, the same rule the draft
+   follows. */
+let FWD_CLS=null, FWD_G=null;
 const FWD_VIEWS=[
-  ["qual","Reach Lane","Chance of being one of the FIELD teams at Lane."],
-  ["auto","Auto-qualify","Chance of finishing top two in their league — the Leagues board's own number. At-large is the rest of the Reach Lane column, because auto + at-large = qualify is an invariant, not an estimate."],
-  ["win","Win it","Chance of winning the state meet."],
-  ["pts","Points","Mean score at Lane over the seasons that team qualified — conditional, so it does not fall neatly down the board."],
-  ["run","Runners","Mean finishing place at Lane for the thirty runners the board ranked highest."]
+  ["qual","Reach Lane","Each team's chance of being one of the FIELD at the state meet."],
+  ["auto","Auto-qualify","Chance of taking one of their league's automatic spots. The at-large route makes up the rest of the Reach Lane column."],
+  ["win","Win it","Each team's chance of winning the state meet outright."],
+  ["pts","Points","Average score at Lane, counting only the seasons that team got there. Lower is better."],
+  ["run","Runners","Average finishing place at Lane for the thirty runners we ranked highest."]
 ];
 
 /* A board is either {t:{name:[qual,auto,win,pts]},r:[...]} or, for entries
@@ -7128,26 +7217,42 @@ function renderForward(){
   if(!box)return;
   const S=(typeof SNAPSHOTS!=="undefined"&&SNAPSHOTS)||[];
   if(!S.length){
-    box.innerHTML='<p>No snapshots yet. The weekly refresh writes one each time the '
-      +'database moves.</p>';
+    box.innerHTML='<p>Nothing archived yet. One gets written every time the weekly refresh '
+      +'finds new results.</p>';
     return;
   }
   const d=s=>new Date(s+"T00:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"});
   const pc=v=>v==null?"\u2014":(v>=995?"100":v/10<1?"<1":(v/10).toFixed(v<100?1:0))+"%";
-  const key=CLS+"|"+gender, side=gender==="M"?"boys":"girls";
+  if(!FWD_CLS)FWD_CLS=CLS;
+  if(!FWD_G)FWD_G=gender;
+  const key=FWD_CLS+"|"+FWD_G, side=FWD_G==="M"?"boys":"girls";
 
   /* Only the board being looked at. Ten boards of every team would be a wall,
      and the switchers above already say which one the reader chose. */
   const rows=S.filter(s=>s.boards&&s.boards[key]);
-  const sw='<div class="switch fsw" role="group" aria-label="Archived figure">'
+  const sw='<div class="switch clsw" role="group" aria-label="Classification">'
+    +Object.keys(CLASSES).map(c=>'<button data-fc="'+c+'" aria-pressed="'+(c===FWD_CLS)+'">'+c+'</button>').join("")
+    +'</div>'
+    +'<div class="switch" role="group" aria-label="Boys or girls">'
+    +[["M","Boys"],["F","Girls"]].map(([k,l])=>'<button data-fg="'+k+'" aria-pressed="'+(k===FWD_G)+'">'+l+'</button>').join("")
+    +'</div>'
+    +'<div class="switch fsw" role="group" aria-label="Archived figure">'
     +FWD_VIEWS.map(([k,l])=>'<button data-fk="'+k+'" aria-pressed="'+(k===FWD_K)+'">'+l+'</button>').join("")
     +'</div>';
-  const wire=()=>box.querySelectorAll(".fsw button").forEach(b=>b.onclick=()=>{
-    FWD_K=b.dataset.fk; renderForward();
-  });
+  const wire=()=>{
+    box.querySelectorAll(".fsw button").forEach(b=>b.onclick=()=>{
+      FWD_K=b.dataset.fk; renderForward();
+    });
+    box.querySelectorAll("[data-fc]").forEach(b=>b.onclick=()=>{
+      FWD_CLS=b.dataset.fc; renderForward();
+    });
+    box.querySelectorAll("[data-fg]").forEach(b=>b.onclick=()=>{
+      FWD_G=b.dataset.fg; renderForward();
+    });
+  };
 
   if(!rows.length){
-    box.innerHTML=sw+'<p>Nothing archived for '+CLS+' '+side+' yet.</p>';
+    box.innerHTML=sw+'<p>Nothing archived for '+FWD_CLS+' '+side+' yet.</p>';
     wire(); return;
   }
 
@@ -7169,8 +7274,8 @@ function renderForward(){
     names=[...new Set(rowsR.flatMap(m=>Object.keys(m)))]
       .sort((a,b)=>((lastR[a]?lastR[a].place:1e9)-(lastR[b]?lastR[b].place:1e9))||(a<b?-1:1));
     if(!names.length){
-      box.innerHTML=sw+'<p class="sub2">'+meta[2]+'</p><p>The individual board was not '
-        +'archived yet when these snapshots were taken. It is from the next one on.</p>';
+      box.innerHTML=sw+'<p class="sub2">'+meta[2]+'</p><p>We had not started archiving the '
+        +'individual board when these snapshots were taken. It starts from the next one.</p>';
       wire(); return;
     }
     body=names.slice(0,30).map(n=>{
@@ -7178,7 +7283,7 @@ function renderForward(){
       return '<tr><td>'+n+'<em class="fwd-tm">'+(any?any.team:"")+'</em></td>'
         +rowsR.map(m=>'<td>'+(m[n]?(m[n].place/10).toFixed(1):"\u2014")+'</td>').join("")+'</tr>';
     }).join("");
-    unit="Mean finishing place \u2014 lower is better.";
+    unit="Lower is better.";
   }else{
     const last=rows[rows.length-1].boards[key];
     const all=s=>Array.isArray(s.boards[key].r)?Object.keys(s.boards[key].t):Object.keys(s.boards[key]);
@@ -7200,15 +7305,14 @@ function renderForward(){
         const v=fwdTeam(s.boards[key],n,FWD_K);
         return '<td>'+(FWD_K==="pts"?(v?v:"\u2014"):pc(v))+'</td>';
       }).join("")+'</tr>').join("");
-    unit=FWD_K==="pts"?"Mean score at Lane \u2014 lower is better, and only over the seasons "
-      +"that team got there.":"";
+    unit=FWD_K==="pts"?"Lower is better. Only counts the seasons a team actually qualified.":"";
   }
 
   const first=rows[0], latest=rows[rows.length-1];
   const forced=rows.filter(s=>s.forced);
   box.innerHTML=sw
-    +'<p class="sub2">'+meta[2].replace("FIELD",FIELD)+'</p>'
-    +'<p><b>'+rows.length+' snapshot'+(rows.length===1?'':'s')+'</b> for '+CLS+' '+side
+    +'<p class="sub2">'+meta[2].replace("FIELD",FIELD+" teams")+'</p>'
+    +'<p><b>'+rows.length+' snapshot'+(rows.length===1?'':'s')+'</b> for '+FWD_CLS+' '+side
     +', the first from '+d(first.taken)+' on '+first.marks.toLocaleString()+' marks'
     +(rows.length>1?', the latest from '+d(latest.taken)+' on '+latest.marks.toLocaleString()
       +' marks':'')+'.'+(unit?' '+unit:'')+'</p>'
@@ -7217,12 +7321,12 @@ function renderForward(){
     +(names.length>(FWD_K==="run"?30:24)
       ?'<p class="rec-note">Top '+(FWD_K==="run"?30:24)+' by the most recent call.</p>':'')
     +(forced.length?'<p class="rec-note">\u2020 '+forced.map(s=>d(s.taken)+' was rewritten: '
-      +s.forced.why).join('; ')+'. The archive records its own amendments rather than '
-      +'hiding them; git carries both versions.</p>':'')
-    +'<p>Each column was written before the Saturday that followed it and pushed that '
-    +'morning, so the dates are checkable against the repository rather than against us. '
-    +'When Lane is run these become a scored forward record; until then they are simply '
-    +'the claims, on the record, in order.</p>';
+      +s.forced.why).join('; ')+'. We log every change to this page rather than hiding it. '
+      +'Both versions are in the public repository.</p>':'')
+    +'<p>Every column here was written before that weekend\u2019s races and pushed the same '
+    +'morning. You can check the dates yourself in the public repository. Once Lane is run '
+    +'we will score these against what happened. Until then they are just the claims, in '
+    +'order, with dates on them.</p>';
   wire();
 }
 
@@ -7232,23 +7336,36 @@ function renderRecord(){
   const R=RECORD, pc=v=>Math.round(v)+"%";
   const yr=R.seasons.join(" and ");
 
+  /* Four plain answers, not four statistics. Each tile leads with the thing a
+     reader can check and says in words what would count as good. */
   const tiles=[
-    [R.found+" of "+R.ofField,"teams that qualified were inside the board\u2019s top group"],
-    [R.skill+"%","better than guessing the base rate, measured as Brier skill"],
-    [R.champHit+" of "+R.champOf,"championship races where our favourite went on to win"],
-    [R.brier.toFixed(4),"Brier score \u2014 lower is better, "+R.base.toFixed(4)+" is knowing nothing"],
+    [R.found+" of "+R.ofField,
+     "teams that really made it to Lane were in our top group beforehand"],
+    [R.champHit+" of "+R.champOf,
+     "times the team we called the favourite actually won"],
+    [R.skill+"% better",
+     "than simply guessing that every team has an average chance"],
+    [R.runs.toLocaleString(),
+     "seasons played out for each board we scored"],
   ].map(([b,i])=>'<div class="rec-tile"><b>'+b+'</b><i>'+i+'</i></div>').join("");
 
-  // reliability: what we said against what happened, with the line we want to sit on
-  const X=v=>(30+v/100*166).toFixed(1), Y=v=>(94-v/100*80).toFixed(1);
-  let chart='<svg class="rec-chart" viewBox="0 0 206 112" role="img" '
-    +'aria-label="What the board said against how often it happened">'
+  /* The calibration plot, with both axes actually labelled on the drawing.
+     Before this it was two numbered scales and a dashed diagonal, and you had
+     to read a paragraph underneath to find out which way round it went. */
+  const X=v=>(38+v/100*158).toFixed(1), Y=v=>(88-v/100*74).toFixed(1);
+  let chart='<svg class="rec-chart" viewBox="0 0 206 126" role="img" '
+    +'aria-label="What we said against how often it happened">'
     +'<path class="ideal" d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'"/>'
     +'<path class="ax" d="M'+X(0)+' '+Y(0)+'H'+X(100)+'M'+X(0)+' '+Y(0)+'V'+Y(100)+'"/>';
   for(const v of [0,50,100]){
-    chart+='<text x="'+X(v)+'" y="106" text-anchor="middle">'+v+'%</text>'
-      +'<text x="24" y="'+(+Y(v)+2)+'" text-anchor="end">'+v+'%</text>';
+    chart+='<text x="'+X(v)+'" y="'+(+Y(0)+9)+'" text-anchor="middle">'+v+'%</text>'
+      +'<text x="33" y="'+(+Y(v)+2.4)+'" text-anchor="end">'+v+'%</text>';
   }
+  chart+='<text class="axl" x="'+X(50)+'" y="121" text-anchor="middle">WHAT WE SAID</text>'
+    +'<text class="axl" x="9" y="'+Y(50)+'" text-anchor="middle" '
+    +'transform="rotate(-90 9 '+Y(50)+')">HOW OFTEN IT HAPPENED</text>'
+    +'<text class="axn" x="'+X(100)+'" y="'+(+Y(100)-4)+'" text-anchor="end">'
+    +'perfect calls sit on this line</text>';
   for(const b of R.bands)
     chart+='<circle class="pt" cx="'+X(b.said)+'" cy="'+Y(b.was)+'" r="'
       +(2.2+Math.sqrt(b.n)*0.42).toFixed(1)+'"/>';
@@ -7263,103 +7380,97 @@ function renderRecord(){
     +'<td>'+(s.skillLate==null?"\u2014":s.skillLate+'%')+'</td>'
     +'<td class="'+(s.hit?"hit":"miss")+'">'+s.champ+(s.hit?" \u2713":"")+'</td></tr>').join("");
 
-  /* The spread between the thinnest and fullest September database, and what
-     the model did at each. This is the single most useful thing on the page for
-     reading today's board, so it is computed rather than asserted. */
   const withMarks=R.perSeason.filter(s=>s.marks);
   const thin=withMarks.slice().sort((a,b)=>a.marks-b.marks)[0];
   const full=withMarks.slice().sort((a,b)=>b.marks-a.marks)[0];
   const lateSkills=R.perSeason.map(s=>s.skillLate).filter(v=>v!=null);
   const lateLo=Math.min(...lateSkills), lateHi=Math.max(...lateSkills);
 
-  const horiz=R.horizon.map(h=>'<tr><td>'+h.weeks+' weeks out</td><td>'+h.best.toFixed(1)
-    +'%</td><td>'+h.brier.toFixed(4)+'</td><td>'+h.shipped.toFixed(4)+'</td></tr>').join("");
+  const horiz=R.horizon.map(h=>'<tr><td>'+h.weeks+' weeks before the state meet</td>'
+    +'<td>'+h.best.toFixed(1)+'%</td><td>'+h.brier.toFixed(4)+'</td>'
+    +'<td>'+h.shipped.toFixed(4)+'</td></tr>').join("");
 
   const worst=R.bands.reduce((a,b)=>(b.said-b.was)>(a.said-a.was)?b:a);
-  /* Whether the board is overconfident, and where, is a fact about the bands -
-     so read it off them rather than asserting it. Weighted by how many teams
-     sit in each band, because a ten-team band should not outvote a hundred. */
   const wN=R.bands.reduce((s,b)=>s+b.n,0);
   const lean=R.bands.reduce((s,b)=>s+b.n*(b.said-b.was),0)/wN;
   const top=R.bands[R.bands.length-1], bot=R.bands[0];
   const endsHold=(top.said-top.was)<=8 && (bot.was-bot.said)<=8;
 
   box.innerHTML=
-    '<h3>What we did</h3>'
-    +'<p>We rebuilt the '+yr+' seasons exactly as they stood '+R.weeksOut
-    +' weeks before their own state meet \u2014 nothing after that date, no hindsight '
-    +'\u2014 then ran each season forward '
-    +R.runs.toLocaleString()+' times and compared the result to what actually happened at Lane '
-    +'in November. <b>'+R.teamSeasons+' team-seasons</b> scored, '+R.qualified+' of which qualified.</p>'
+    '<h3>We tested this against seasons we already know the answer to</h3>'
+    +'<p>We rebuilt the '+yr+' seasons as they looked '+R.weeksOut+' weeks before each '
+    +'state meet. Nothing after that date went in. Then we played each season out '
+    +R.runs.toLocaleString()+' times and checked the result against what really happened at '
+    +'Lane. That is <b>'+R.teamSeasons+' teams</b> judged, '+R.qualified+' of which made it.</p>'
     +'<div class="rec-tiles">'+tiles+'</div>'
 
-    +'<h3>Are the odds honest?</h3>'
-    +'<p>This is the question worth asking. Anyone can rank teams; the hard part is being right '
-    +'about <em>how sure</em> you are. Group every team by what the board said, then count how '
-    +'often it actually happened. A perfectly honest model sits on the dashed line.</p>'
+    +'<h3>When we say 70%, does it happen 70% of the time?</h3>'
+    +'<p>Ranking teams is easy. The hard part is being right about how sure you are. '
+    +'So we grouped every team by what we said about it, then counted how often that '
+    +'thing actually happened. Each dot is one group. Bigger dots hold more teams.</p>'
     +chart
-    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>the board said</th>'
-    +'<th>teams</th><th>average call</th><th>what happened</th></tr></thead><tbody>'
-    +bandRows+'</tbody></table></div>'
-    +'<p class="rec-note">Across: what the board said. Up: how often it happened. Each dot is one '
-    +'band and bigger dots hold more teams — above the line we were too cautious, below it too '
-    +'confident.</p>'
-    +'<p>The two ends are where most of the board lives. Teams shown above 90% qualified '
-    +pc(top.was)+' of the time, and teams written off below 10% got there anyway '
+    +'<p class="rec-note">A dot above the line means we were too cautious. Below the '
+    +'line means we were too confident.</p>'
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>we said</th>'
+    +'<th>how many teams</th><th>our average call</th><th>how often it happened</th>'
+    +'</tr></thead><tbody>'+bandRows+'</tbody></table></div>'
+    +'<p>Most teams sit at one end or the other. Teams we put above 90% made it '
+    +pc(top.was)+' of the time. Teams we wrote off below 10% got there anyway '
     +pc(bot.was)+' of the time. '
     +(endsHold
-      ? 'Both ends hold up. <b>The middle is where we are still too confident</b>'
-      : '<b>Neither end is as sharp as it looks, and the middle is worse</b>')
-    +' \u2014 the '+worst.lo+'\u2013'+worst.hi+'% band averaged a call of '+pc(worst.said)
-    +' and came in at '+pc(worst.was)+'. '
+      ? 'Both ends are about right. <b>The middle is where we are too confident.</b>'
+      : '<b>Neither end is as sharp as it looks, and the middle is worse.</b>')
+    +' The '+worst.lo+'\u2013'+worst.hi+'% group averaged a call of '+pc(worst.said)
+    +' and came in at '+pc(worst.was)+'.'
     +(lean>3
-      ? 'Taken together the board\u2019s calls run about '+Math.round(lean)
-        +' points ahead of what happened, so read a high number as confident rather than settled. '
+      ? ' Overall our calls run about '+Math.round(lean)+' points high, so treat a big '
+        +'number as confident rather than settled.'
       : '')
-    +'That is a real miss and it is the next thing to fix.</p>'
+    +'</p>'
 
     +'<h3>Season by season</h3>'
     +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>board</th>'
-    +'<th>marks we had</th><th>qualifiers found</th><th>skill at '+R.weeksOut+' weeks</th>'
-    +'<th>at '+R.weeksOutLate+' weeks</th><th>actual champion</th></tr></thead><tbody>'
-    +seasonRows+'</tbody></table></div>'
-    +(lateSkills.length?'<p><b>Most of what looks like weakness is earliness.</b> Score the very '
-      +'same boards four weeks out instead of eight and every season lands between '
-      +lateLo+'% and '+lateHi+'% \u2014 the model is not worse in the older seasons, it '
-      +'simply knew less about them in September. How much less is the second column: '
-      +'athletic.net had recorded '+thin.marks.toLocaleString()+' marks by the '+thin.year
-      +' cutoff and '+full.marks.toLocaleString()+' by '+full.year+', and the September '
-      +'skill moves with it. Today\u2019s board is built on more marks than any season '
-      +'here, which is a reason to read these figures as a floor.</p>':'')
-    +'<p>Picking the <em>winner</em> is a different and much harder question, and we will not dress '
-    +'it up: from '+R.cutoff+', our favourite went on to win <b>'+R.champHit+' of '+R.champOf
-    +'</b>. Eight weeks out the eventual champion is genuinely uncertain, and a model that told '
-    +'you otherwise would be lying to you.</p>'
+    +'<th>race results we had</th><th>qualifiers we caught</th>'
+    +'<th>better than guessing, '+R.weeksOut+' weeks out</th>'
+    +'<th>same board, '+R.weeksOutLate+' weeks out</th><th>who actually won</th>'
+    +'</tr></thead><tbody>'+seasonRows+'</tbody></table></div>'
+    +(lateSkills.length?'<p><b>Most of what looks like weakness is just being early.</b> '
+      +'Score the very same boards '+R.weeksOutLate+' weeks out instead of '+R.weeksOut
+      +' and every season lands between '+lateLo+'% and '+lateHi+'%. The older seasons are '
+      +'not harder. We simply knew less about them in September, and the second column '
+      +'shows how much less: '+thin.marks.toLocaleString()+' race results by the '+thin.year
+      +' cutoff against '+full.marks.toLocaleString()+' by '+full.year+'. Today\u2019s board '
+      +'runs on more results than any season in this table, so read these as a floor.</p>':'')
+    +'<p>Picking the <b>winner</b> is much harder, and we will not dress it up. From '
+    +R.cutoff+', the team we called the favourite went on to win <b>'+R.champHit+' of '
+    +R.champOf+'</b>. Eight weeks out, nobody knows who wins.</p>'
 
-    +'<h3>How far out you are changes the answer</h3>'
-    +'<p>The race-day dial ships at '+R.sigma+'%, which is how much a runner varies from one '
-    +'afternoon to the next. A September projection also has to cover eight weeks of fitness, '
-    +'injury and roster change. Sweeping the dial against the real outcomes at four points in '
-    +'the season shows exactly that:</p>'
-    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>information set</th>'
-    +'<th>dial that fits best</th><th>error there</th><th>error at '+R.sigma+'%</th>'
+    +'<h3>Early-season numbers are wider than they look</h3>'
+    +'<p>The race-day dial is set to '+R.sigma+'%. That covers how much a runner varies '
+    +'from one afternoon to the next. A September projection also has to cover eight weeks '
+    +'of training, injuries and runners joining or leaving. It does not, yet. Here is the '
+    +'size of that gap, measured four ways:</p>'
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>when we looked</th>'
+    +'<th>dial that would have fitted</th><th>our error at that dial</th>'
+    +'<th>our error at the '+R.sigma+'% we ship</th>'
     +'</tr></thead><tbody>'+horiz+'</tbody></table></div>'
-    +'<p>The right dial <b>falls as November approaches</b>. That is the signature of a horizon '
-    +'term the model does not have yet, and it is why early-season odds should be read as a shape '
-    +'rather than a promise. We know the size of the gap because we measured it.</p>'
+    +'<p>The dial that fits <b>keeps falling as November gets closer</b>. That is the gap '
+    +'showing up in the numbers. It is why an early-season figure is a shape rather than a '
+    +'promise, and we would rather tell you the size of it than quietly widen the bars.</p>'
 
     +'<h3>What this does not cover</h3>'
-    +'<p>All of the above is <b>6A</b>, which is where the history is. Every classification runs '
-    +'on the same engine and the same data, and each one\u2019s qualifying rules come straight from '
-    +'OSAA \u2014 but 2026 is the first year of four-runner scoring for the small-school girls, and '
-    +'last season they raced as one combined division, so there is no like-for-like history to '
-    +'score those boards against yet. Treat these numbers as evidence about the method, not as a '
-    +'measured accuracy for every board.</p>'
-    +'<p class="rec-note">Last run '+R.built+' \u00b7 '+R.runs.toLocaleString()+' seasons per board '
+    +'<p>Everything above is <b>6A</b>, because that is where the history is. Every other '
+    +'classification runs on the same engine, the same race results and OSAA\u2019s own '
+    +'qualifying rules. But 2026 is the first year the small-school girls score four runners '
+    +'instead of five, and last season they raced as one combined division, so there is no '
+    +'matching history to test those boards against. Take these numbers as evidence about '
+    +'the method, not as a measured accuracy for every board.</p>'
+    +'<p class="rec-note">If you want to check the working: the error column is a Brier '
+    +'score and the \u201cbetter than guessing\u201d column is Brier skill against the base '
+    +'rate. Last run '+R.built+' \u00b7 '+R.runs.toLocaleString()+' seasons per board '
     +'\u00b7 dial '+R.sigma+'% \u00b7 log loss '+R.logloss.toFixed(3)+'</p>';
 }
 
-// The leagues view is the only heading that has to move with the board.
 function syncViewText(){
   document.getElementById("lgSub").textContent=
     LG.length+" leagues send "+autoTotal()+" teams straight to Lane. "
@@ -7586,7 +7697,18 @@ function stateModel(g){
     }
     roster.sort((x,y)=>x.sb-y.sb);
     const seven=roster.slice(0,7);
-    if(seven.length<5)continue;                    // cannot field a scoring five
+    /* Seven, not five. OSAA lets a team score with five and the season boards
+       rightly use that rule, but this is an exhibition against the sixteen
+       fastest schools in the state and the field is chosen on a top-five
+       average - so a school with five good runners and nothing behind them gets
+       in on a number that ignores the two it cannot fill, then sends whoever is
+       left onto the course. That is where the dots crawling in a minute behind
+       the field came from: Banks' girls made the sixteen on a 20:30 five and
+       their sixth runner is 25:01, seven minutes off the leader. Requiring a
+       full seven drops them and lifts McDaniel in, and the slowest runner on
+       the course goes 25:01 -> 23:10. The rest of the spread is real: seven run,
+       five score, and sixth and seventh runners are genuinely this far back. */
+    if(seven.length<7)continue;
     all.push({name,roster:seven,avg5:seven.slice(0,5).reduce((s,a)=>s+a.sb,0)/5});
   }
   all.sort((a,b)=>a.avg5-b.avg5);
