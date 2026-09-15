@@ -97,25 +97,41 @@ its chance of winning, averaged only over the seasons it actually qualified —
 teams that never get there show a dash rather than a fake zero. `blankTally`
 carries `ptsSum`/`ptsN` and `playState` fills them.
 
-**The mark.** Sixteen runners on a staggered four-by-four lattice, nine of them
-the rest of the field at 34% and seven of them a team: five filled, six and
-seven drawn hollow, because five score and two displace. It is the rule the
-simulator runs on, drawn.
+**The mark.** Seven runners: five filled, six and seven drawn hollow, because
+five score and two displace. It is the rule the simulator runs on, drawn.
+
+It used to be sixteen - the seven against nine more of the field at 34% - and
+the field was dropped because the favicon had been carrying the seven alone
+since the start, and the seven alone is the better mark. The page and the tab
+are now the same drawing at two sizes, which is what a logo should be. The
+coordinates were recomputed rather than transformed, scaled 1.468 about the
+group's own centre so the seven fill the square the sixteen used to; the
+`stroke-width` on the hollow pair and the surge translates were scaled by the
+same factor, or they would read as thinner and smaller against bigger dots.
 
 Three things about it are load-bearing:
 
 *The lean is the wordmark's.* CHUTE is set in Anton with `skewX(-8deg)`, and the
-lattice carries the same eight degrees so the two read as one object rather than
-an icon beside a word. **The skew is baked into the coordinates, not applied as a
-transform** — skewing a circle turns it into an ellipse. The field leans; the
-runners stay round. If the wordmark's angle ever changes, the sixteen `cx` values
-have to be recomputed, not re-transformed.
+seven carry the same eight degrees so the two read as one object rather than an
+icon beside a word. **The skew is baked into the coordinates, not applied as a
+transform** — skewing a circle turns it into an ellipse. The formation leans;
+the runners stay round. If the wordmark's angle ever changes, the seven `cx`
+values have to be recomputed, not re-transformed.
 
-*The tab icon is a different drawing.* Sixteen dots at sixteen pixels is a
-speckle, so the favicon carries the seven alone, scaled up to fill the square.
-It is a data URI and therefore cannot use custom properties: the accent is
-hardcoded `#F0455C`, which reads on both a light and a dark tab strip. Change the
-accent and that hex has to change with it.
+The same rule is why the enlargement is baked in too, though for a second
+reason: `.pk-team` already owns `transform` for the surge, so a scale parked
+there would be overwritten the moment anyone tapped the mark.
+
+*The tab icon is the same drawing, and still a separate copy.* It is a data URI
+and therefore cannot use custom properties: the accent is hardcoded `#F0455C`,
+which reads on both a light and a dark tab strip. Change the accent and that hex
+has to change with it. It reaches its size with a transform where the page bakes
+it into the coordinates, so the two are not literally the same string - if the
+formation is ever redrawn, both need it.
+
+**The tab says `Chute` and nothing else.** It used to carry
+"— Oregon cross country state odds", which is a description rather than a name
+and read as noise in a row of tabs.
 
 *The seven surge on tap.* `.pk-team` animates on `body.gunlap-fire`, which is the
 class the flag's ripple used and the draft still sets. A transform on an SVG
