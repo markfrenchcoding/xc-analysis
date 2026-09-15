@@ -550,6 +550,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:8px 13px calc(8px + env(safe-area-inset-bottom))}
 .bar-inner{max-width:600px;margin:0 auto;display:flex;gap:7px}
+
 .tabs{display:flex;gap:2px;background:var(--surface);border-radius:9px;padding:2px;flex:none}
 .tabs button{background:none;border:0;color:var(--dim);font-family:inherit;font-size:12px;padding:7px 8px;
   border-radius:7px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap}
@@ -642,6 +643,67 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+/* These two blocks live at the end of the sheet on purpose. A media query adds
+   no specificity - it is a condition, not a weight - so a desktop override
+   written up with the layout rules loses to any base rule further down the
+   file. That is not hypothetical: .wirow's override sat 340 lines above
+   .wirow's own grid-template-columns and did nothing at all until it moved
+   here. Anything added below this point must stay below it. */
+/* ---------- desktop ----------
+   The site was a 600px column at every width: on a laptop it used under half
+   the viewport and read as a phone app someone had opened by mistake. Widening
+   the column gives the five stat legs of a team card room to breathe and cuts
+   the scroll, without touching the positioning machinery. */
+@media (min-width:900px){
+  .wrap,.bar-inner{max-width:880px}
+
+  /* Classification, gender and season were three full-width rows stacked on top
+     of each other, so on a laptop the first team was below the fold behind a
+     wall of controls the reader had already set. They are one row now. */
+  .ctl-row{display:flex;gap:8px;align-items:stretch}
+  .ctl-row>.switch{flex:1;margin:10px 0 8px}
+  .ctl-row>.clsw{flex:1.6;margin-bottom:8px}
+
+  /* The two dials sit side by side rather than stacked - they are independent
+     settings and reading one never depends on the other. */
+  .dials{display:flex;gap:18px}
+  .dials>.dial{flex:1;min-width:0}
+
+  /* A wider card can afford the numbers at their real size. */
+  .tcard{padding-left:16px;padding-right:16px}
+
+  /* Prose does not want the extra room. The How tab ran to 131 characters a
+     line at 880px, about twice a comfortable measure, which is the one place
+     where widening the column made the page harder to read rather than easier.
+     Only the text-level elements are capped: figures, tables and the stat
+     tiles still take the full width, because a diagram genuinely wants it. */
+  .doc p,.doc h3,.doc h4,.doc ul,.doc ol,.sub2{max-width:66ch}
+
+  /* Leagues is the one board that CAN take a real second column: it is a whole
+     innerHTML rebuild rather than cards moved against a measured step, so there
+     is no positioning machinery to teach an x axis. It is also the view that
+     needed it most - a .drow is "1fr auto auto", so every extra pixel went into
+     the gap between a team's name and its two numbers. Two columns of ~430px
+     put the numbers back beside the names and halve a seven-league scroll. */
+  #lgOut{columns:2;column-gap:12px}
+  .dgroup{break-inside:avoid}
+
+  /* Same "1fr eats everything" problem on the what-if roster, but the rows are
+     siblings of the heading and the goal picker inside #wiRoster, so columns
+     would take those with them. Instead the name column gets a ceiling and the
+     trailing empty span - which is already in the markup - absorbs the rest, so
+     every stepper lines up at one tab stop with the row border still running
+     the full width. */
+  .wirow{grid-template-columns:minmax(0,480px) auto 1fr}
+}
+
+/* The draft is a different object - a dialog, not a page - so it keeps its own
+   width. But the course map inside it is the one thing that genuinely wants the
+   room, so it gets some on a large screen. */
+@media (min-width:900px){
+  .gl-wide{max-width:640px}
+}
+
 </style>
 </head>
 <body>
@@ -5582,20 +5644,22 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
   </header>
 
   <div class="ctl" id="ctl">
-    <div class="switch clsw" role="group" aria-label="Classification">
-      <button data-c="6A" aria-pressed="true">6A</button>
-      <button data-c="5A">5A</button>
-      <button data-c="4A">4A</button>
-      <button data-c="3A">3A</button>
-      <button data-c="2A/1A">2A/1A</button>
-    </div>
-    <div class="switch" role="group" aria-label="Race">
-      <button data-g="M" aria-pressed="true">Boys</button>
-      <button data-g="F" aria-pressed="false">Girls</button>
-    </div>
-    <div class="switch" role="group" aria-label="Season">
-      <button data-ns="0" aria-pressed="true">This season</button>
-      <button data-ns="1" aria-pressed="false">Next season</button>
+    <div class="ctl-row">
+      <div class="switch clsw" role="group" aria-label="Classification">
+        <button data-c="6A" aria-pressed="true">6A</button>
+        <button data-c="5A">5A</button>
+        <button data-c="4A">4A</button>
+        <button data-c="3A">3A</button>
+        <button data-c="2A/1A">2A/1A</button>
+      </div>
+      <div class="switch" role="group" aria-label="Race">
+        <button data-g="M" aria-pressed="true">Boys</button>
+        <button data-g="F" aria-pressed="false">Girls</button>
+      </div>
+      <div class="switch" role="group" aria-label="Season">
+        <button data-ns="0" aria-pressed="true">This season</button>
+        <button data-ns="1" aria-pressed="false">Next season</button>
+      </div>
     </div>
     <p class="ns-note" id="nsNote" hidden></p>
     <button class="dsum" id="dsum" aria-expanded="true" aria-controls="dials">

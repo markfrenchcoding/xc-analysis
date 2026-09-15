@@ -911,6 +911,46 @@ once already. Re-measure on resize, after a run finishes, and when a tab that
 was hidden comes back: a hidden panel measures zero, so a board built while the
 reader was elsewhere has a stale step and overlaps.
 
+## Desktop
+
+**It was a 600px column at every width.** On a laptop the site used under half
+the viewport, forty-five cards in one column, and read as a phone app somebody
+had opened by mistake. Everything below is additive and lives behind
+`@media (min-width:900px)`; the phone layout is the one that was designed and
+the one most people use, and it is unchanged.
+
+**The column widened; the board did not split.** Two columns of team cards is
+the obvious move and it is the one to avoid: the cards are absolutely positioned
+against a *measured* step, so a second column means teaching `measure()` and
+`paint()` an x axis — the machinery that put cards on top of each other once
+already. Widening to 880px gets most of the benefit for none of that risk.
+
+**Leagues is the exception, and the reason is worth generalising.** It is the
+one board rebuilt wholesale by `innerHTML` rather than moved against a measured
+step, so it has no positioning machinery to teach and `columns:2` is free. It
+also needed it most: a `.drow` is `1fr auto auto`, so every pixel the widening
+added went straight into the gap between a team's name and its two numbers. Two
+columns of ~420px put the numbers back beside the names and halve the scroll.
+**A view can take a second column exactly when nothing measures it.**
+
+**Prose was the one thing the extra room made worse.** The How tab ran to 131
+characters a line at 880px, about twice a comfortable measure. Only text-level
+elements are capped at `66ch`; figures, tables and the stat tiles still take the
+full width, because a diagram genuinely wants it.
+
+**The three switches are one row.** Classification, gender and season were three
+full-width rows stacked, which put the first team below the fold behind controls
+the reader had already set. The `.ctl-row` wrapper deliberately has **no styles
+outside the media query**, so below 900px it is an inert `div` and the phone
+layout is byte-for-byte what it was.
+
+**The desktop blocks sit at the end of the stylesheet, and must stay there.** A
+media query carries no specificity — it is a condition, not a weight — so an
+override written up among the layout rules loses to any base rule further down
+the file. That is not hypothetical: `.wirow`'s override sat 340 lines above
+`.wirow`'s own `grid-template-columns` and did nothing at all, silently, until
+it moved. Anything added below that point must stay below it.
+
 ## Audit harness
 
 `extract_model.js` regenerates `model.js` by lifting the pure functions out of
