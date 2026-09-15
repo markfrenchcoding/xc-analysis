@@ -1123,6 +1123,17 @@ repeat what the preview's own title already says.
 
 ## The How tab diagrams
 
+**The bracket is a bracket now, and what it was before is worth recording.** The
+seven wires were each drawn as `M46 y H 54 V 29`: every one ran to the same
+point and then along it, so six drew over each other down a column that also sat
+*underneath* the node rectangle. The two nodes had different left edges and
+different widths, and two paths ended in mid-air.
+
+A bracket has four parts and each is drawn **once**: a stub out of each lane, one
+spine collecting them, one feed into each node, and a merge back out. Nothing
+overlaps anything and every line ends on something. If it looks tangled again,
+count how many times a path covers the same pixels.
+
 **The qualification diagram animates the process rather than labelling a picture
 of it.** Two teams light up in each of the seven leagues, wires carry them
 across, and sixteen seats fill at Lane - fourteen in order, then two more a beat
@@ -1228,8 +1239,53 @@ what it is, the chart has labelled axes, and the two statistical terms are
 defined in one line at the foot of the page for anyone checking the work. The
 page is read by parents, runners and coaches. Write for them.
 
+**The em-dash aside is the loudest tell, and the fix is never to swap the
+punctuation.** It is to work out what the sentence was doing. Half of them were
+two sentences pretending to be one, and the rest were a list that wanted a
+colon. Eighteen were rewritten. A dash standing in for a missing value stays:
+that is what a dash is for.
+
+Other tics found in the same pass: an opening line that performed modesty
+("this is the part we would want to see if we were you"), `rather than` used
+three times in four paragraphs as filler contrast, and a third consecutive
+heading of the form "X is not Y".
+
+**The pass also caught a factual error, which is the real argument for doing
+it.** The How tab still said "the 2024 and 2025 seasons" long after the harness
+had grown to four, so the page was understating its own evidence. It reads from
+`RECORD.seasons` now, via `syncHowText()`. **Nothing the site publishes
+should be typed in, and that includes the parts that read as prose** - the
+`RECORD` constant existed precisely to stop this and the sentence had simply
+never been wired to it. When proofreading copy, check the numbers in it too.
+
 **This applies to the site only.** Commit messages and this file are working
 notes and can say why.
+
+## One accent, and where the medals are allowed
+
+The site had drifted into two accents without anyone deciding to. **`--accent`
+(gold) is the site's colour**: it marks the thing the reader came for and the
+controls that get them there. **`--t1`..`--t4` are the OSAA medals and
+belong only where a place is being named** - the trophy plates, the distribution
+bars, and the legend above them.
+
+Everything else is neutral. Hover states, focus rings, a search field's border,
+and "how confident are we" have nothing to do with finishing first, and painting
+them first-place blue is how the page ended up with two accents arguing.
+Thirteen such uses were found and changed. In particular:
+
+- `oddColor` ramped dim toward `--t1e`, which said *first place* on a number
+  about at-large berths. It ramps toward `--text` now. Confidence is not a medal.
+- The coaches chip was a blue outline. It is neutral: someone else's opinion,
+  stated quietly. **The legend described it as "the blue chip" and had to change
+  with it** - a colour named in prose is a second place the palette can rot.
+
+**The fourth plate is black, and it is the one plate that does not take black
+ink.** OSAA's fourth-place award really is a dark plaque, so `trg4` is
+`#3C4047 -> #101215` and `.rank.p4 .tro-n` engraves in pewter instead. A
+black number on a black plate is not a choice anyone would defend. The
+distribution bar keeps a lighter `--t4`, because a bar has to be visible
+against the card and a plate does not.
 
 ## The coaches poll
 
