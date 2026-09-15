@@ -299,6 +299,42 @@ header .asof{color:var(--muted);font-size:10.5px}
 .switch{display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);
   border-radius:9px;padding:2px;margin:10px 0 8px}
 .clsw{margin-bottom:7px}
+/* ---------- find a school ---------- */
+.find{position:relative;margin:10px 0 8px}
+.find-i{position:absolute;left:11px;top:50%;margin-top:-8px;width:16px;height:16px;
+  color:var(--dim);pointer-events:none}
+#findQ{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);
+  border-radius:11px;padding:11px 34px 11px 34px;font-family:inherit;font-size:14px;
+  -webkit-appearance:none;appearance:none}
+#findQ::-webkit-search-cancel-button{display:none}
+#findQ::placeholder{color:var(--dim)}
+#findQ:focus{outline:none;border-color:var(--accent)}
+#findX{position:absolute;right:7px;top:50%;margin-top:-13px;width:26px;height:26px;
+  border:0;border-radius:50%;background:var(--raised);color:var(--muted);
+  font-size:17px;line-height:1;cursor:pointer}
+#findOut{position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:30;
+  background:var(--surface);border:1px solid var(--line);border-radius:11px;
+  box-shadow:0 12px 34px -12px rgba(0,0,0,.9);overflow:hidden;max-height:290px;
+  overflow-y:auto}
+.find-r{display:flex;align-items:center;gap:9px;width:100%;background:none;border:0;
+  border-top:1px solid var(--line);padding:9px 11px;cursor:pointer;text-align:left;
+  color:var(--text);font-family:inherit}
+.find-r:first-child{border-top:0}
+.find-r:hover,.find-r.on{background:var(--raised)}
+.find-r b{flex:1;min-width:0;font-family:var(--disp);font-weight:600;font-size:14.5px;
+  text-transform:uppercase;letter-spacing:.01em;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.find-r i{font-style:normal;font-size:10px;color:var(--dim);letter-spacing:.08em;
+  text-transform:uppercase;flex:none}
+.find-none{padding:12px;color:var(--dim);font-size:13px;text-align:center}
+/* The card somebody was sent to. It fades out on its own so a shared link does
+   not leave the board permanently marked up. */
+@keyframes foundFlash{
+  0%,58%{box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 0 0 2px var(--accent),
+    0 12px 34px -14px var(--glow)}
+  100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 1px 1px rgba(0,0,0,.35),
+    0 10px 24px -14px rgba(0,0,0,.95)}}
+.tcard.found{animation:foundFlash 3.4s var(--ease) both}
 /* One set of controls above every view. How is the only page with nothing to
    set, so it is the only one that hides them. */
 .ctl.off{display:none}
@@ -5904,6 +5940,18 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
   </header>
 
   <div class="ctl" id="ctl">
+    <!-- 231 schools and a visitor wants exactly one of them. Everything else on
+         this page assumes you already know which board to look at. -->
+    <div class="find" id="find">
+      <svg class="find-i" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+      <input id="findQ" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Find your school" aria-label="Find your school"
+             aria-expanded="false" aria-controls="findOut" role="combobox">
+      <button id="findX" aria-label="Clear" hidden>&times;</button>
+      <div id="findOut" role="listbox" hidden></div>
+    </div>
     <div class="ctl-row">
       <div class="switch clsw" role="group" aria-label="Classification">
         <button data-c="6A" aria-pressed="true">6A</button>
@@ -6093,7 +6141,12 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
 
       <h3>What it does not know</h3>
       <p>Courses. A flat park and a hilly farm are treated alike, and that is the biggest gap. We have measured it and we are working on it.</p>
-      <p>The future. Nobody gets injured, nobody has a breakthrough, and the top seven in September are the top seven in November. Real seasons are less tidy, so the further out you are, the more the true spread exceeds what any model shows. Read early-season numbers as a shape rather than a promise. They sharpen as the season fills in.</p>
+      <p>The future, in detail. We do not know who gets injured, who has a breakthrough,
+        or who joins the squad in October. We do know roughly <em>how much</em> that
+        matters, because we measured it against four past seasons, so the board widens
+        its spread by a fixed amount that depends only on how far away Lane is. It is an
+        allowance for surprise, not a prediction of one. Early-season numbers are still a
+        shape rather than a promise, and they sharpen on their own as November gets closer.</p>
       <p>The committee. At-large selection here is a sensible stand-in for a room full of people who also weigh league strength and head-to-head.</p>
       <p>We would rather say all of this up front than have you find it later.</p>
     </div>
@@ -6258,6 +6311,70 @@ function setClass(c,g){
    The ratio is uniform so it cannot change finishing order; only the spread
    enters the model. */
 const CAL={ratio:1.008,sd:2.3,n:293};
+
+/* Saturday 7 November 2026, from OSAA's own season dates page for cross
+   country. Check it each August alongside the qualification allocations: the
+   championship is not always the same Saturday, and the four backtested
+   seasons ran Nov 5, Nov 4, Nov 9 and Nov 8. */
+const STATE_DATE="2026-11-07";
+
+/* HOW FAR OUT ARE WE, AND WHAT DOES THAT COST
+   The dial is race-day spread: how much a runner varies from one afternoon to
+   the next. A September projection also has to cover eight weeks of training,
+   injury, runners joining and runners leaving, and it did not. The backtest
+   measured the gap by sweeping sigma against real outcomes at four points in
+   each season, and the answer moves a long way: 6.0% eight weeks out against
+   2.0% from four weeks in.
+
+   Variances add, exactly as TEAM_SHARE already assumes, so
+
+       total^2 = raceDay^2 + drift^2
+
+   and the drift falls out of what was measured rather than being chosen:
+   drift = sqrt(best^2 - raceDay^2) at each cutoff. That keeps CAL.sd meaning
+   race-day spread, which is what the dial's own helper text says it means.
+
+   It is read off RECORD.horizon rather than written down here, so re-running
+   backtest/publish.js moves the curve with the evidence.
+
+   BETWEEN the measured points it interpolates; OUTSIDE them it holds the
+   nearest measured value rather than extrapolating. Eleven weeks out is not
+   something the backtest has ever looked at, and a curve fitted to four points
+   should not be asked what it thinks about a fifth. */
+function weeksOut(){
+  if(typeof STATE_DATE!=="string"||typeof DATA_DATE!=="string")return null;
+  const a=Date.parse(DATA_DATE+"T00:00:00"), b=Date.parse(STATE_DATE+"T00:00:00");
+  if(isNaN(a)||isNaN(b))return null;
+  return (b-a)/6048e5;                       // ms in a week
+}
+
+function driftCurve(){
+  if(typeof RECORD==="undefined"||!RECORD.horizon)return [];
+  return RECORD.horizon
+    .map(h=>({w:h.weeks, d:Math.sqrt(Math.max(0,h.best*h.best-CAL.sd*CAL.sd))}))
+    .sort((x,y)=>x.w-y.w);
+}
+
+function driftPct(){
+  const w=weeksOut(), c=driftCurve();
+  if(w==null||!c.length)return 0;
+  if(w<=c[0].w)return c[0].d;
+  if(w>=c[c.length-1].w)return c[c.length-1].d;
+  for(let i=1;i<c.length;i++){
+    if(w<=c[i].w){
+      const a=c[i-1], b=c[i];
+      return a.d+(b.d-a.d)*(w-a.w)/(b.w-a.w);
+    }
+  }
+  return 0;
+}
+
+/* What the simulation actually runs on. The dial stays race-day; this is the
+   only place the two are combined. */
+function totalSigma(dial){
+  const d=driftPct();
+  return Math.sqrt(dial*dial+d*d);
+}
 /* Sampling weights, indexed by how many marks an athlete has.
 
    These used to be [0.25, 0.50, 0.25] truncated and renormalised, which handed a
@@ -6307,6 +6424,127 @@ let DATA=[], gender="M", sigmaPct=CAL.sd, running=false, skip=false,
 
 /* the header repeats whatever the switcher is showing */
 /* Fill the How tab's prose from the harness rather than from memory. */
+/* ============ FIND A SCHOOL, AND LINK TO ONE ============
+   Two halves of the same problem. The board shows one classification and one
+   gender at a time, so a visitor who wants their own school has to know which
+   of ten boards it is on, and anybody sharing the page can only ever send
+   somebody to 6A boys. Both are solved by naming a board in the URL.
+
+   The hash is #6A/boys or #6A/boys/Grant. It is written with replaceState on
+   every switch, so the address bar always describes what is on screen and the
+   back button is not filled with every toggle. */
+const SCHOOLS=(()=>{
+  const out=[];
+  for(const cls of Object.keys(CLASSES))
+    for(const g of ["M","F"]){
+      const lg=CLASSES[cls][g]&&CLASSES[cls][g].lg;
+      if(!lg)continue;
+      for(const L of Object.keys(lg))
+        for(const name of lg[L]) out.push({name,cls,g,league:L,k:name.toLowerCase()});
+    }
+  return out;
+})();
+
+let FOCUS=null;              // a team to reveal once the board has settled
+
+function boardHash(){
+  const g=gender==="M"?"boys":"girls";
+  return "#"+encodeURIComponent(CLS)+"/"+g+(FOCUS?"/"+encodeURIComponent(FOCUS):"");
+}
+function writeHash(){
+  try{history.replaceState(null,"",boardHash());}catch(e){}
+}
+function readHash(){
+  const h=decodeURIComponent(location.hash.replace(/^#/,"")).trim();
+  if(!h)return null;
+  const p=h.split("/").map(s=>s.trim()).filter(Boolean);
+  if(!p.length)return null;
+  const cls=Object.keys(CLASSES).find(c=>c.toLowerCase()===p[0].toLowerCase());
+  if(!cls)return null;
+  const g=/^g/i.test(p[1]||"")?"F":"M";
+  return {cls,g,team:p[2]?decodeURIComponent(p[2]):null};
+}
+
+/* Reveal a team once the numbers have stopped moving. Called from settle, so
+   the card is already in its final position and scrolling lands on the right
+   one rather than on whatever was there while it sorted. */
+function revealFocus(){
+  if(!FOCUS)return;
+  const hit=cards.find(c=>c.t.name===FOCUS);
+  FOCUS=null;
+  if(!hit)return;
+  const el=hit.el;
+  el.classList.remove("found");void el.offsetWidth;el.classList.add("found");
+  const y=el.getBoundingClientRect().top+window.scrollY-Math.max(90,innerHeight*0.28);
+  try{window.scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}
+  catch(e){window.scrollTo(0,y);}
+}
+
+/* Switch to the board a school is on and run it. Somebody who searched for
+   their school wants that school's odds, not an empty board and a button. */
+function goToSchool(s){
+  CLS=s.cls;gender=s.g;
+  setClass(CLS,gender);
+  document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
+  document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
+  syncHead();syncViewText();renderForward();
+  if(NEXT_SEASON)syncNextNote();
+  clearOut();wiAdj={};renderWhatIf();
+  document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.p==="p-sim"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-sim"));
+  // put the Teams view in front without going through the click handler,
+  // which would also scroll to the top and fight the reveal below
+  VIEW="v-teams";
+  const sim=document.getElementById("p-sim");
+  sim.querySelectorAll(".vsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.view==="v-teams"));
+  sim.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id==="v-teams"));
+  FOCUS=s.name;writeHash();
+  run();
+}
+
+function initFind(){
+  const q=document.getElementById("findQ"),out=document.getElementById("findOut"),
+        x=document.getElementById("findX");
+  if(!q||!out)return;
+  let hits=[],at=-1;
+  const close=()=>{out.hidden=true;out.innerHTML="";q.setAttribute("aria-expanded","false");at=-1;};
+  const draw=()=>{
+    const s=q.value.trim().toLowerCase();
+    x.hidden=!s;
+    if(s.length<2){close();return;}
+    /* Name first, then league, so typing "pil" finds a league and typing
+       "linc" finds the school. Starts-with beats contains. */
+    const seen=new Set();
+    hits=SCHOOLS.filter(o=>o.k.includes(s)||o.league.toLowerCase().includes(s))
+      .sort((a,b)=>(b.k.startsWith(s)-a.k.startsWith(s))||a.name.localeCompare(b.name))
+      .filter(o=>{const key=o.name+"|"+o.cls+"|"+o.g;if(seen.has(key))return false;seen.add(key);return true;})
+      .slice(0,8);
+    if(!hits.length){out.innerHTML='<div class="find-none">No school by that name.</div>';
+      out.hidden=false;q.setAttribute("aria-expanded","true");return;}
+    out.innerHTML=hits.map((o,i)=>'<button class="find-r" role="option" data-i="'+i+'">'
+      +'<b>'+o.name+'</b><i>'+o.cls+' '+(o.g==="M"?"boys":"girls")+'</i></button>').join("");
+    out.hidden=false;q.setAttribute("aria-expanded","true");
+    out.querySelectorAll(".find-r").forEach(b=>b.onclick=()=>pick(+b.dataset.i));
+  };
+  const pick=i=>{
+    const s=hits[i];if(!s)return;
+    q.value="";x.hidden=true;close();q.blur();
+    goToSchool(s);
+  };
+  q.addEventListener("input",draw);
+  q.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){q.value="";close();x.hidden=true;return;}
+    if(!hits.length||out.hidden)return;
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+      e.preventDefault();
+      at=(at+(e.key==="ArrowDown"?1:hits.length-1))%hits.length;
+      out.querySelectorAll(".find-r").forEach((b,i)=>b.classList.toggle("on",i===at));
+    }else if(e.key==="Enter"){e.preventDefault();pick(at<0?0:at);}
+  });
+  x.onclick=()=>{q.value="";close();x.hidden=true;q.focus();};
+  document.addEventListener("click",e=>{if(!e.target.closest("#find"))close();});
+}
+
 function syncHowText(){
   if(typeof RECORD==="undefined")return;
   const s=document.getElementById("howSeasons");
@@ -6892,6 +7130,7 @@ function settle(tally){
      board has stopped moving. */
   fitNames();
   nextTick(fitNames);
+  nextTick(revealFocus);
   for(const {el,t} of cards){
     let maxH=1;
     for(let p=1;p<=FIELD;p++) if(t.hist[p]>maxH)maxH=t.hist[p];
@@ -7059,7 +7298,7 @@ function runWorlds(model,worlds,seasons,label,onEnd){
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
-  const sigma=sigmaPct/100;
+  const sigma=totalSigma(sigmaPct)/100;
   const dur=Math.max(320,FULL_MS*seasons/5000);
   let done=0,t0=0;
   const gen=runGen;
@@ -7156,7 +7395,7 @@ function solveGoal(){
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
-  const sigma=sigmaPct/100;
+  const sigma=totalSigma(sigmaPct)/100;
   const roster=team.roster.map(r=>r.name);
 
   /* One pass scores the current plan and all seven +5s variants against
@@ -7446,7 +7685,7 @@ function run(){
   const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
         pack=document.getElementById("pack");
   rb.classList.add("on");
-  const sigma=sigmaPct/100;
+  const sigma=totalSigma(sigmaPct)/100;
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
@@ -7474,7 +7713,7 @@ function run(){
       foldDials();
       cards.forEach(c=>{c.el.classList.add("tappable");c.el.tabIndex=0;});
       rb.classList.remove("on");
-      lab.textContent=`±${sigmaPct.toFixed(1)}%`;
+      lab.textContent=`±${totalSigma(sigmaPct).toFixed(1)}%`;
       go.textContent="Run again";go.classList.remove("running");
       running=false;
       document.body.classList.remove("simming");lockDials(false);
@@ -7501,8 +7740,10 @@ function setDials(open){
 }
 function foldDials(){ if(!dialsTouched) setDials(false); }
 function syncDialSummary(){
+  const d=driftPct();
   document.getElementById("dsumT").textContent=dialsOpen?"Hide settings"
-    :"\u00b1"+sigmaPct.toFixed(1)+"% \u00b7 "+nSims.toLocaleString()+" seasons";
+    :"\u00b1"+sigmaPct.toFixed(1)+"%"+(d>0.05?" +"+d.toFixed(1)+"% drift":"")
+      +" \u00b7 "+nSims.toLocaleString()+" seasons";
 }
 document.getElementById("dsum").onclick=()=>{dialsTouched=true;setDials(!dialsOpen);};
 
@@ -7688,6 +7929,13 @@ function renderForward(){
       +' marks':'')+'.'+(unit?' '+unit:'')+'</p>'
     +'<div class="rec-wrap"><table class="rec-tbl fwd-tbl"><thead>'+head+'</thead><tbody>'
     +body+'</tbody></table></div>'
+    /* If the model changed between snapshots, a column can move because WE
+       moved rather than because a race happened. Say so rather than letting a
+       reader read a step change as news. */
+    +(new Set(rows.map(s=>s.sigma)).size>1
+      ?'<p class="rec-note">Spread used: '+rows.map(s=>d(s.taken)+' at ±'+s.sigma+'%').join(', ')
+        +'. Where that changes, part of the move between columns is the model and not the season. '
+        +'We log it rather than quietly restating the earlier numbers.</p>':'')
     +(names.length>(FWD_K==="run"?30:24)
       ?'<p class="rec-note">Top '+(FWD_K==="run"?30:24)+' by the most recent call.</p>':'')
     +(forced.length?'<p class="rec-note">\u2020 '+forced.map(s=>d(s.taken)+' was rewritten: '
@@ -7704,7 +7952,8 @@ function renderRecord(){
   const box=document.getElementById("recOut");
   if(!box||typeof RECORD==="undefined")return;
   const R=RECORD, pc=v=>Math.round(v)+"%";
-  const yr=R.seasons.join(" and ");
+  const yr=R.seasons.length>2?(R.seasons[0]+" to "+R.seasons[R.seasons.length-1])
+                              :R.seasons.join(" and ");
 
   /* Four plain answers, not four statistics. Each tile leads with the thing a
      reader can check and says in words what would count as good. */
@@ -7816,17 +8065,24 @@ function renderRecord(){
     +R.champOf+'</b>. Eight weeks out, nobody knows who wins.</p>'
 
     +'<h3>Early-season numbers are wider than they look</h3>'
-    +'<p>The race-day dial is set to '+R.sigma+'%. That covers how much a runner varies '
+    +'<p>The race-day dial is set to '+R.sigma+'%, which covers how much a runner varies '
     +'from one afternoon to the next. A September projection also has to cover eight weeks '
-    +'of training, injuries and runners joining or leaving. It does not, yet. Here is the '
-    +'size of that gap, measured four ways:</p>'
+    +'of training, injuries, and runners joining or leaving. We swept the dial against what '
+    +'really happened at four points in each season to find out how much:</p>'
     +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>when we looked</th>'
-    +'<th>dial that would have fitted</th><th>our error at that dial</th>'
-    +'<th>our error at the '+R.sigma+'% we ship</th>'
+    +'<th>dial that fitted best</th><th>our error at that dial</th>'
+    +'<th>our error at a flat '+R.sigma+'%</th>'
     +'</tr></thead><tbody>'+horiz+'</tbody></table></div>'
-    +'<p>The dial that fits <b>keeps falling as November gets closer</b>. That is the gap '
-    +'showing up in the numbers. It is why an early-season figure is a shape rather than a '
-    +'promise, and we would rather tell you the size of it than quietly widen the bars.</p>'
+    +'<p>The dial that fits <b>keeps falling as November gets closer</b>, and that gap is '
+    +'the season itself moving. <b>The board now covers it.</b> It adds an allowance on top '
+    +'of the race-day dial that depends only on how far away Lane is, taken straight from '
+    +'the middle column here, so today it runs at '+R.horizon[0].best+'% rather than '
+    +R.sigma+'% and narrows on its own week by week. That is worth about '
+    +Math.round((1-R.horizon[0].brier/R.horizon[0].shipped)*100)+'% off our error at this '
+    +'range, with no new data at all.</p>'
+    +'<p class="rec-note">The last column is what a fixed '+R.sigma+'% would have scored, '
+    +'which is what the board used to do. Between the measured points the allowance is '
+    +'interpolated; outside them it holds the nearest measured value rather than guessing.</p>'
 
     +'<h3>What this does not cover</h3>'
     +'<p>Everything above is <b>6A</b>, because that is where the history is. Every other '
@@ -7861,8 +8117,16 @@ function syncVar(){
   document.getElementById("vVal").textContent=sigmaPct.toFixed(1)+"%";
   const [ra,rb]=[17*60,20*60];
   const lbl=t=>Math.floor(t/60)+":"+String(Math.round(t%60)).padStart(2,"0");
-  document.getElementById("vNote").textContent=
-    `Two thirds of races land within ±${(ra*sigmaPct/100).toFixed(0)}s of a ${lbl(ra)} best, ±${(rb*sigmaPct/100).toFixed(0)}s of a ${lbl(rb)}.`;
+  const d=driftPct(), tot=totalSigma(sigmaPct), w=weeksOut();
+  document.getElementById("vNote").innerHTML=
+    `Two thirds of races land within ±${(ra*sigmaPct/100).toFixed(0)}s of a ${lbl(ra)} best, ±${(rb*sigmaPct/100).toFixed(0)}s of a ${lbl(rb)}.`
+    +(d>0.05
+      ? ` Lane is <b>${w.toFixed(0)} weeks</b> away, so we add <b>${d.toFixed(1)}%</b> for
+         everything that changes between now and then: training, injuries, runners
+         arriving and leaving. The board runs on <b>${tot.toFixed(1)}%</b> in total,
+         and that figure shrinks on its own as November gets closer.`
+      : ` Lane is close enough that the season itself has stopped moving the answer,
+         so the board runs on the dial alone.`);
   document.querySelectorAll('.seg button[data-v]').forEach(x=>
     x.setAttribute("aria-pressed",Math.abs(+x.dataset.v/10-sigmaPct)<.05));
   syncDialSummary();
@@ -8256,6 +8520,10 @@ function drRace(){
   const model=stateModel(DR.g);
   if(model.teams.length<2)return;
   const gi=addGuest(model,DR.pick);
+  /* No drift here, deliberately. The drift term covers what changes between
+     now and November; the Dream Team is a race today between a squad that
+     does not exist and the sixteen fastest schools in the state. There is no
+     horizon to cover, so this is race-day spread and nothing else. */
   const sigma=sigmaPct/100;
   const times=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
@@ -8497,7 +8765,7 @@ document.querySelectorAll(".switch button[data-g]").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
   setClass(CLS,gender);syncHead();syncViewText();renderForward();
   if(NEXT_SEASON) syncNextNote();
-  clearOut();wiAdj={};renderWhatIf();});
+  clearOut();wiAdj={};renderWhatIf();writeHash();});
 document.querySelectorAll(".switch button[data-ns]").forEach(b=>b.onclick=()=>{
   const on=b.dataset.ns==="1";
   if(on===NEXT_SEASON)return;
@@ -8535,7 +8803,7 @@ document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
   syncHead();syncViewText();renderForward();
   if(NEXT_SEASON) syncNextNote();
-  clearOut();wiAdj={};renderWhatIf();});
+  clearOut();wiAdj={};renderWhatIf();writeHash();});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
@@ -8568,7 +8836,23 @@ function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
 }
-loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();renderForward();syncHowText();armFigures();
+loadSeed();
+/* A link can name a board, and a shared link usually does. Apply it before
+   the first render so nobody watches the default board build and then jump. */
+(function(){
+  const h=readHash();
+  if(!h)return;
+  CLS=h.cls;gender=h.g;
+  setClass(CLS,gender);
+  document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
+  document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
+  if(h.team)FOCUS=h.team;
+})();
+syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();renderForward();syncHowText();armFigures();
+initFind();
+/* A link that named a team asked a question, so answer it. */
+if(FOCUS)run();
+writeHash();
 </script>
 </body>
 </html>

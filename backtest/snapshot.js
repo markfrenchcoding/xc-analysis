@@ -47,6 +47,35 @@ const seed = (html.match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''
 const through = (html.match(/const DATA_DATE="([\d-]+)"/) || [, ''])[1];
 if (!seed || !through) { console.error('could not read the seed or DATA_DATE'); process.exit(1); }
 
+/* The archive has to record what the BOARD said, so it runs on the same sigma
+   the board runs on: the race-day dial widened by the horizon allowance. Read
+   the pieces out of index.html rather than restating them, because a snapshot
+   taken at a different spread from the live page is not a record of anything.
+   The same interpolate-inside, hold-outside rule as the page. */
+const stateDate = (html.match(/const STATE_DATE="([\d-]+)"/) || [, ''])[1];
+const record = (() => {
+  const m = html.match(/\nconst RECORD=(\{[\s\S]*?\});\r?\n/);
+  try { return m ? JSON.parse(m[1]) : null; } catch (e) { return null; }
+})();
+const weeksOut = (stateDate && through)
+  ? (Date.parse(stateDate + 'T00:00:00') - Date.parse(through + 'T00:00:00')) / 6048e5
+  : null;
+const drift = (() => {
+  if (weeksOut == null || !record || !record.horizon) return 0;
+  const c = record.horizon
+    .map(h => ({ w: h.weeks, d: Math.sqrt(Math.max(0, h.best * h.best - M.CAL.sd * M.CAL.sd)) }))
+    .sort((a, b) => a.w - b.w);
+  if (!c.length) return 0;
+  if (weeksOut <= c[0].w) return c[0].d;
+  if (weeksOut >= c[c.length - 1].w) return c[c.length - 1].d;
+  for (let i = 1; i < c.length; i++) if (weeksOut <= c[i].w) {
+    const a = c[i - 1], b = c[i];
+    return a.d + (b.d - a.d) * (weeksOut - a.w) / (b.w - a.w);
+  }
+  return 0;
+})();
+const SIGMA = Math.sqrt(M.CAL.sd * M.CAL.sd + drift * drift);
+
 const parsed = M.parseCSV(seed);
 M.setDATA(parsed.rows);
 const marks = parsed.rows.length;
@@ -95,6 +124,8 @@ if (clash >= 0) {
 
 console.log('snapshot ' + taken + ' — from results through ' + through
   + ', ' + marks.toLocaleString() + ' marks, ' + RUNS.toLocaleString() + ' seasons a board');
+console.log('  ' + (weeksOut == null ? 'horizon unknown' : weeksOut.toFixed(1) + ' weeks to Lane')
+  + ', sigma ' + SIGMA.toFixed(2) + '% (' + M.CAL.sd + ' race-day + ' + drift.toFixed(2) + ' drift)');
 
 const boards = {};
 for (const cls of classNames) {
@@ -117,7 +148,7 @@ for (const cls of classNames) {
     const times = new Float64Array(model.runners.length);
     const tmp = new Float64Array(model.runners.length);
     const shock = new Float64Array(model.teams.length);
-    for (let i = 0; i < RUNS; i++) M.oneSeason(model, worlds, M.CAL.sd / 100, times, shock, tmp);
+    for (let i = 0; i < RUNS; i++) M.oneSeason(model, worlds, SIGMA / 100, times, shock, tmp);
 
     /* Tenths of a percent as integers, and only what one of the three boards
        actually leads with. A team is [qualify, auto-qualify, win, mean points]:
@@ -146,7 +177,8 @@ for (const cls of classNames) {
 }
 
 /* ---------- append, never amend ---------- */
-const entry = { taken, through, marks, sigma: M.CAL.sd, runs: RUNS, boards };
+const entry = { taken, through, marks, sigma: +SIGMA.toFixed(2), runs: RUNS, boards };
+if (weeksOut != null) entry.weeks = +weeksOut.toFixed(1);
 if (forced) entry.forced = forced;
 
 list.push(entry);

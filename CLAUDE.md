@@ -945,6 +945,68 @@ against OSAA's own qualification page, so `AT_LARGE=2` is right for this
 season - but check it each August, and never assume a past season used it.
 The backtest sets it per season from that year's results.
 
+## The horizon allowance (open item 2, shipped)
+
+**`total² = raceDay² + drift²`.** `CAL.sd` still means race-day spread, which
+is what the dial's own helper text says it means. The drift covers the eight
+weeks between the last result and Lane: training, injury, runners arriving and
+leaving.
+
+**The curve is read off `RECORD.horizon`, not written down.**
+`drift = sqrt(best² − raceDay²)` at each measured cutoff, so re-running
+`backtest/publish.js` moves the curve with the evidence. Today that is
+5.54% at eight weeks and 1.21% at six, and zero from four weeks in, where the
+best-fitting dial is already below the race-day floor.
+
+**Between the measured points it interpolates. Outside them it holds the nearest
+measured value.** Eleven weeks out is not something the backtest has ever looked
+at, and a curve through four points should not be asked about a fifth.
+
+**`STATE_DATE` is `2026-11-07`, from OSAA's own season dates page.** Check
+it each August with the qualification allocations: the championship is not
+always the same Saturday. The four backtested seasons ran Nov 5, Nov 4, Nov 9
+and Nov 8.
+
+**What it does to the board**, 6A boys on the September data: the favourite's
+chance of winning falls from 44% to 24%, qualifying comes off the ceiling
+(99.9% to 90%), and the field spreads. **The leader changes**, because Lincoln's
+five is more robust to noise than Grant's. That is the calibration fix the
+backtest asked for, worth about 9% off the error at this range with no new data.
+
+**The Dream Team does not get drift**, deliberately. It is a race today between
+a squad that does not exist and the sixteen fastest schools in the state. There
+is no horizon to cover.
+
+**Three things had to follow the model, and missing any one would have made the
+site lie:**
+
+- the dial's note and the collapsed summary now say the allowance and the total
+- the Track record's last column could no longer be called "the dial we ship",
+  because at eight weeks we ship the middle one. It is "a flat 2.3%" now.
+- `backtest/snapshot.js` runs at the same sigma and records it on the entry.
+  An archive taken at a different spread from the live page is a record of
+  nothing. Where entries disagree, the Called it view says so, because a column
+  can then move because **we** moved rather than because a race happened.
+
+## Find a school, and link to one
+
+The board shows one classification and one gender at a time, so a visitor who
+wants their own school had to know which of ten boards it is on, and anybody
+sharing the page could only send somebody to 6A boys.
+
+**The hash names a board: `#6A/boys` or `#6A/boys/Grant`.** It is written
+with `replaceState` on every switch, so the address bar always describes what
+is on screen and the back button is not filled with every toggle. A link that
+names a team **runs the board and reveals that card**, because a link that named
+a team asked a question.
+
+**`SCHOOLS` is built from `CLASSES`**, which is already the authority on who
+is on which board: 452 school-boards, matched on name or league.
+
+**Revealing happens in `settle`, not on the click.** The card has to be in its
+final position first, or the scroll lands on whichever team was in that slot
+while the board was still sorting.
+
 ## Worlds
 
 `oneSeason(model, worlds, sigma, times, shock, tmp)` scores N parallel worlds
@@ -1837,14 +1899,10 @@ Listed in the app's own "How" tab:
    the repeat venues, add a shared week term, re-run `course_value.js`. If it
    then beats raw marks, ship it and re-run `marks_value.js` and `markw.js` —
    both should flip.
-2. **Horizon-dependent variance.** The backtest measures the curve: best sigma
-   is 5.0% at eight weeks out, 3.0% at six, 2.6% from four weeks in.
-   `confound.js` rules out thin data as the cause. Implement as
-   `total² = raceDay² + drift²`, keeping `CAL.sd` at 2.3% for race-day and
-   decaying drift from ~4.4% in September toward zero at Lane. Do not simply
-   raise `CAL.sd` — the slider's own helper text describes race-day spread and
-   would become false. Note this is the same confound as item 1 seen from the
-   other side: drift and course-date are both "the season moves".
+2. ~~Horizon-dependent variance.~~ **Shipped** - see The horizon allowance.
+   The next step is to re-run  once a season has been scored against
+   the drift term in place, so the horizon table measures what now ships rather
+   than what used to.
 3. **Model roster attrition directly** instead of hiding it in drift. About 6%
    of September top-five places are not on the line at the league championship,
    and about two dozen runners in each state field were never in the September
