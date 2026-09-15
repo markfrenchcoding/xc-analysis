@@ -85,10 +85,16 @@ for (let ci = 0; ci < nCuts; ci++) {
   console.log('    ' + weeks.toFixed(0) + 'w out: best sigma ' + best.s + '%');
 }
 
-/* ---------- pack it ---------- */
-const seedRows = (fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8')
-  .match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
-  .trim().split(/\r?\n/).length - 1;
+/* ---------- pack it ----------
+   RECORD used to carry the live seed's row count as `marks`. It has been
+   dropped, and the reason is worth keeping: it was a 2026 number living inside
+   a record of the 2024 and 2025 backtest, so nothing that regenerates this file
+   has any reason to run when it changes. It duly went stale the moment the
+   database was refreshed - 2,974 against a seed of 3,645 - and now that the pull
+   is automated it would be wrong most weeks rather than occasionally.
+
+   Nothing rendered it, so nothing is lost. If a reader ever needs "how many
+   marks is the board built on", the page is holding DATA and can count them. */
 
 /* "mid-September" reads better than "2024-09-14", and the seasons do not share
    a cutoff date anyway - only a cutoff week. */
@@ -116,7 +122,6 @@ const R = {
   sigma: SIGMA,
   runs: SEASONS,
   bands, horizon, perSeason,
-  marks: seedRows,
   built: new Date().toISOString().slice(0, 10),
 };
 

@@ -1,3 +1,4 @@
 backtest/raw/
 backtest/data/*-single.csv
 _new_index.html
+pull/.probe.json
