@@ -226,7 +226,11 @@ its name.
 built from the OSAA course map: 30th Avenue down the whole west side, Poison Oak
 and Eldon Schafer across the top, the two ball fields, the start box, the soccer
 bowl, the track bowl, the campus as extruded boxes, three long ponds filling the
-bottom half, and the four kilometre markers where the map puts them.
+bottom half, and the four kilometre markers where the map puts them. The ball
+fields fan from home plate rather than sitting as rectangles, the ponds have
+their corners knocked off, the track has a stand along its south side, and a
+scatter of trees lines the verges - squares and ovals alone read as a diagram,
+not a place.
 
 **The site is portrait, and getting that wrong is what made the first attempt
 look generic.** Plan is 0-124 east by 0-144 south, read off the printed map at
@@ -239,10 +243,20 @@ proportion to everything else and read as any-campus-anywhere.
 ponds run south down the west, and the south-east quarter is not part of the
 site - drawing it as a full diamond spent a third of the frame on nothing.
 
-**The route is drawn, not surveyed, and the overlay says so.** Landmarks and the
-K markers come off the map; the line joining them is a reconstruction of a
-two-loop course. Do not let that caption get dropped - it is the difference
-between a schematic and a claim.
+**The route is two laps of the same ground**, traced off the OSAA map that has
+the course drawn on it. Lap one: the top stretch west to east through 1K, east
+around the track bowl, back across the middle to 1 Mile on the west side, then
+round the FIRST pond to 2K. Lap two: up the east side to 3K by the parking, the
+top stretch back east to west through 2 Miles, down the west side again, the
+DEEPER loop round the first and second ponds to 4K, and home up the east side to
+the finish beside the track.
+
+**That ordering is forced by the markers, and it explains 1K and 3K.** They sit a
+few metres apart on the map because they are two different passes over the same
+stretch, not one line - which is also why the two laps are drawn as parallel
+tracks along the top and down the west side rather than on top of each other.
+Get that wrong and the course reads as a lazy S through the middle of campus,
+which is what the first two attempts did.
 
 **Positions are computed, not transitioned.** CSS motion paths are the obvious
 fit and were tried first: `offset-path` with a per-runner `offset-distance`
