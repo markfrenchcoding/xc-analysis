@@ -45,23 +45,50 @@ team ids and mascot urls both come from — the crest map used to be a separate
 230 of the 231 schools on the OSAA boards have an athletic.net team. **Elgin**
 does not, and cannot be aliased into existence.
 
-## Two traps
+## Three traps
 
-**An empty race is usually a throttle, not an empty race.** Asked too fast,
-athletic.net answers `200` with an empty `resultsXC` rather than a `429`. A
-harness that believes it ships a database missing half the state, and nothing
-about the response looks like an error. The tell is inside the same payload: a
-throttled division still lists its `teams`, where a division that genuinely
-never ran lists none. `divRows` retries those, widens the gap between POSTs for
-everything afterwards, and counts what it could never get so the summary can
-say the database is incomplete.
+**The rate limit is per endpoint, and it is invisible from JavaScript.** This is
+the one that actually broke a run, so it is worth the detail.
+
+`GetResultsData3` allows roughly ten requests per ten seconds. Nothing else
+shares that budget — hammer it until it 429s and `GetMeetData` and
+`GetTeamCore` still answer 200 — which is why the calendar stage can make 450
+requests without a scratch while the results stage falls over after seven meets.
+
+When it trips, Cloudflare answers the CORS **preflight** with `429` and
+`Retry-After: 17`, and that reply carries no `Access-Control-Allow-Origin`. So
+the browser refuses to show it: `fetch` rejects with `TypeError: Failed to
+fetch` and the status and the retry hint are both unreadable from the page. The
+only fingerprint is the timing — it fails in about 20ms, and nothing real fails
+that fast.
+
+Two consequences are baked into the code. Results POSTs are spaced **2 seconds**
+(measured: at 1.0s it trips on the eleventh request, at 2.0s it ran fourteen for
+fourteen clean), which also keeps Chrome's preflight cache warm — the server
+sends no `Access-Control-Max-Age`, so the default is about five seconds, and a
+POST inside that window costs one request instead of two. And a suspected limit
+is backed off **30s, 60s, 120s, 180s**, blind. Retrying after a couple of
+seconds is worse than not retrying: every attempt spends another preflight and
+re-arms the limit.
+
+The preflight cannot be avoided. The endpoint requires `Content-Type:
+application/json` (`text/plain` gets 415) and the `anettokens` header (without
+it, 403), and either one alone forces a preflight.
+
+**An empty race is usually just an empty race.** Plenty of JV and novice races
+sit on the schedule with no results ever posted, and the response for one is a
+clean 200 with an empty `resultsXC`. Nothing distinguishes it from a blank
+handed back under load — the `teams` array is the whole meet's entry list and
+comes back populated either way. So the code retries once and then believes it,
+and puts the suspicion in the aggregate instead: if more than 40% of a run's
+races come back empty, the report says so.
 
 **Distance lives in the division's name and nowhere else.** There is no
 distance field — `"5,000 Meters Varsity"`, `"3,000 Meters Novice"`,
 `"3 Miles Varsity Boys"`. `divMetres` parses it. The imperial ones are dropped
 on purpose: the board is 5,000 m and nothing is ever converted between
 distances, so a meet whose only races are 3-mile races correctly contributes
-nothing.
+nothing, and a `0 results` line against one is right rather than broken.
 
 Summer is dropped too. athletic.net files July running-camp time trials under
 the same season (`"5,000 Meters Week 1"`); `SEASON_START` cuts at mid-August.

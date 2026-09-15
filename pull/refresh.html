@@ -108,9 +108,31 @@ const API = 'https://www.athletic.net/api/v1/';
 const OREGON_DIV = 87377;        // World > United States > High School > Oregon
 const SEASON = new Date().getFullYear();
 
-/* Pacing. 320ms a request was measured returning empties; 900ms with retries
-   came back clean every time. Results POSTs get a longer gap again. */
-const GAP_GET = 900, GAP_POST = 1500, RETRIES = 3;
+/* Pacing, and it is not one number — **the rate limit is per endpoint**, which
+   is measured, not assumed: hammer GetResultsData3 until it 429s and GetMeetData
+   and GetTeamCore both still answer 200. That is why the calendar stage can run
+   450 requests without a scratch while the results stage falls over.
+
+   GetResultsData3 allows about ten requests in ten seconds. Measured by sending
+   preflights at a fixed spacing: at 1.0s it trips on the eleventh, at 2.0s it
+   ran fourteen for fourteen clean. So 2s, which also keeps the browser's
+   preflight cache warm — the server sends no Access-Control-Max-Age, so Chrome
+   caches for about five seconds, and a POST issued inside that window costs one
+   request instead of two.
+
+   Everything else is a plain GET on a different endpoint and stays at 900ms. */
+const GAP_GET = 900, GAP_POST = 2000, RETRIES = 3;
+
+/* Being rate-limited is invisible from JavaScript. Cloudflare answers the
+   *preflight* with 429 and no Access-Control-Allow-Origin, so the browser
+   refuses to show the response at all: fetch rejects with TypeError "Failed to
+   fetch" in about 20ms, and the Retry-After: 17 sitting in that reply cannot be
+   read. A 20ms network failure is the fingerprint — nothing real fails that
+   fast — and it has to be backed off blind, generously. Retrying in a couple of
+   seconds is worse than useless: each attempt spends another preflight and
+   re-arms the limit, which is exactly how a run once burned through seven meets
+   in a row without recovering. */
+const COOLDOWN = [30000, 60000, 120000, 180000];
 
 const $ = s => document.querySelector(s);
 const logEl = $('#log');
@@ -130,27 +152,35 @@ function progress(done, total, what) {
 const KEY = 'chute.refresh.v1';
 let S = null, stopping = false, running = false;
 const blank = () => ({ stage: 'teams', teams: [], logos: {}, ti: 0,
-                       meets: [], mi: 0, rows: [], started: new Date().toISOString() });
+                       meets: [], mi: 0, rows: [], failed: [], started: new Date().toISOString() });
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {
   log('could not save progress (' + e.name + ') — do not close the tab', 'w'); } }
 function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
 
 /* ---------- the network ---------- */
 async function get(url, opts) {
-  for (let i = 0; i < RETRIES; i++) {
+  const name = url.split('?')[0];
+  for (let i = 0; i <= COOLDOWN.length; i++) {
+    let limited = false;
     try {
       const r = await fetch(API + url, opts);
       if (r.ok) return await r.json();
-      // 429 and 5xx are worth waiting out; a 404 never becomes a 200
       if (r.status === 404) throw new Error('404 ' + url);
-      log('  ' + r.status + ' on ' + url.slice(0, 48) + ', retrying', 'w');
+      if (r.status === 429) limited = true;
+      else log('  ' + r.status + ' on ' + name + ', retrying', 'w');
     } catch (e) {
-      if (/404/.test(e.message)) throw e;
-      log('  ' + e.message.slice(0, 60) + ', retrying', 'w');
+      if (/^404 /.test(e.message)) throw e;
+      // a cross-origin 429 reaches us only as this
+      limited = e instanceof TypeError;
+      if (!limited) log('  ' + e.message.slice(0, 60) + ', retrying', 'w');
     }
-    await sleep(GAP_GET * (i + 2));
+    if (i === COOLDOWN.length) break;
+    const wait = limited ? COOLDOWN[i] : GAP_GET * (i + 2);
+    if (limited) log('  rate limited on ' + name + ' — waiting '
+      + Math.round(wait / 1000) + 's', 'w');
+    await sleep(wait);
   }
-  throw new Error('gave up on ' + url);
+  throw new Error('gave up on ' + name);
 }
 const post = (url, body, jwt) => get(url, { method: 'POST',
   headers: { 'Content-Type': 'application/json', anettokens: jwt },
@@ -249,6 +279,8 @@ async function run() {
     const html = await (await fetch('../index.html', { cache: 'no-store' })).text();
     const { board } = Seed.parseClasses(html);
 
+    if (!S.failed) S.failed = [];
+
     if (S.stage === 'teams') {
       const f = await findTeams(board);
       S.teams = f.teams; S.logos = f.logos; S.stage = 'cal'; S.ti = 0; save();
@@ -288,10 +320,32 @@ async function run() {
           if (stopping) { save(); return log('stopped', 'w'); }   // a half-read meet is not done
           S.rows.push(...r.rows);
           log(r.date + '  ' + r.name.slice(0, 44) + '  <b>' + r.rows.length + '</b> results');
-        } catch (e) { log('  meet ' + id + ': ' + e.message, 'e'); }
+        } catch (e) {
+          // a meet that beat the retries is set aside, not dropped on the floor
+          log('  meet ' + id + ': ' + e.message, 'e');
+          if (!S.failed.includes(id)) S.failed.push(id);
+        }
         S.mi++;
         save();
         await sleep(GAP_GET);
+      }
+
+      /* Anything still unread gets one more pass, after a long sit. By now the
+         run is over, so there is nothing competing for the endpoint's budget. */
+      if (S.failed.length) {
+        log('retrying ' + S.failed.length + ' meets that would not answer', 'w');
+        await sleep(60000);
+        for (const id of S.failed.slice()) {
+          if (stopping) { save(); return log('stopped', 'w'); }
+          try {
+            const r = await meetRows(id);
+            S.rows.push(...r.rows);
+            S.failed = S.failed.filter(x => x !== id);
+            log('  recovered ' + r.name.slice(0, 40) + '  <b>' + r.rows.length + '</b> results', 'k');
+          } catch (e) { log('  meet ' + id + ' still will not answer', 'e'); }
+          save();
+          await sleep(GAP_GET);
+        }
       }
       S.stage = 'done'; save();
     }
@@ -332,6 +386,7 @@ function finish(html, board) {
     ['Dropped — no usable time', b.dropped.unparsed],
     ['Dropped — school not on a board', b.dropped.offBoard],
     ['Races with no results posted', divsEmpty + ' of ' + divsRead],
+    ['Meets that never answered', S.failed.length],
   ];
   $('#sum').innerHTML = cells.map(c => '<tr><td>' + c[0] + '</td><td>' + c[1] + '</td></tr>').join('');
   $('#sumCard').classList.remove('hid');
@@ -343,6 +398,9 @@ function finish(html, board) {
       + (b.offBoard.length > 12 ? ' …' : ''));
   // a handful of blank JV races is ordinary; most of the card coming back blank
   // is the API rationing, and the seed built from it would be missing real teams
+  if (S.failed.length)
+    log(S.failed.length + ' meets never answered, so results from them are missing. Wait an '
+      + 'hour and press Start again — it retries only what it still needs.', 'e');
   if (divsRead > 20 && divsEmpty > divsRead * 0.4)
     log(divsEmpty + ' of ' + divsRead + ' races came back empty. That is the shape of being '
       + 'rate-limited, not of a quiet season — wait an hour and run it again before '

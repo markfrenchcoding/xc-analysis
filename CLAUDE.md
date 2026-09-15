@@ -575,6 +575,40 @@ results` there is right rather than broken.
 under the same season (`"5,000 Meters Week 1"`, Steens Mountain, 374 results).
 `SEASON_START` cuts at mid-August, which is where OSAA practice opens.
 
+**The rate limit is per endpoint, and JavaScript cannot see it.** This is the one
+that broke the first live run, seven meets in a row, and it is worth knowing
+before touching the pacing.
+
+`GetResultsData3` allows about ten requests per ten seconds and nothing else
+shares that budget: hammer it until it 429s and `GetMeetData` and `GetTeamCore`
+still answer 200. That asymmetry is the whole shape of the crawl — the calendar
+stage makes 450 requests without a scratch, the results stage falls over.
+
+When it trips, Cloudflare answers the CORS **preflight** with `429` and
+`Retry-After: 17`, and that reply carries no `Access-Control-Allow-Origin`. The
+browser therefore refuses to show it: `fetch` rejects with `TypeError: Failed to
+fetch`, and both the status and the retry hint are unreadable from the page. It
+looks like a network error and is not one. **The fingerprint is the timing** — it
+fails in about 20ms, and nothing real fails that fast. `curl -X OPTIONS` is how
+to see the truth; the browser will never tell you.
+
+So results POSTs sit at **2 seconds** — measured, not guessed: at 1.0s spacing it
+trips on the eleventh request, at 2.0s it ran fourteen for fourteen clean. That
+gap also keeps Chrome's preflight cache warm, since the server sends no
+`Access-Control-Max-Age` and the default is about five seconds, so a POST inside
+that window costs one request rather than two. A suspected limit backs off
+**30s, 60s, 120s, 180s**, blind. Retrying after two seconds is worse than not
+retrying at all: each attempt spends another preflight and re-arms the limit.
+
+The preflight cannot be designed away. The endpoint demands
+`Content-Type: application/json` (`text/plain` returns 415) and the
+`anettokens` header (without it, 403), and either alone forces one.
+
+**A meet that beats the retries is set aside, not dropped**, and swept again
+after the run when nothing else is competing for the endpoint's budget. Whatever
+still fails is counted in the report, because a seed quietly missing six meets
+looks exactly like a seed that is fine.
+
 **An empty race is usually just an empty race.** I guessed the opposite first and
 was wrong, and the wrong guess is the instructive one. Asked too fast this API
 is documented to answer with blanks rather than 429s, so an empty `resultsXC`
