@@ -357,26 +357,41 @@ below a 25% qualifying rate to show the average rests on a thin slice of
 seasons, and the legend above the board says the same thing in words. Do not
 "fix" the ordering — the inversions are real information.
 
-**The How tab quotes live figures, and they will go stale.** Eight numbers are
-hardcoded into the markup: four describing the database (613 athletes, 868
-results, 47 schools, 5,000 seasons per run) and four from the backtest (81% of
-qualifiers inside the board's top group, 197 team-seasons scored, 96% of the
-above-90% band qualifying, 5% of the below-10% band qualifying). The champion
-record — two of four — is in the prose beneath them.
+**Nothing the site publishes is typed in any more.** The How tab used to hardcode
+eight figures and they drifted exactly as predicted: it was still claiming two of
+four champions after a model change had made it one of four, and 96% for a band
+that had become 94%. Those numbers live in a generated `RECORD` constant now and
+the **Track record** view renders from it.
 
-Regenerate with `node backtest/headline.js`, **not** by reading a single
-`backtest.js` run. Every figure is a Monte Carlo estimate, so one run is not a
-fact: across five runs of 20,000 seasons the qualifier count moves between 58
-and 59 of 72, which is the difference between publishing "81%" and "82%".
-`headline.js` reports the spread so a number can be quoted at a precision that
-will actually reproduce. The calibration bands are rock steady (96.0-96.1% and
-4.7%); the qualifier count is not.
+```
+node backtest/publish.js               # 20,000 seasons, 5,000 for the horizon sweep
+node backtest/publish.js 20000 12000   # what is currently published, about three minutes
+```
+
+**Re-run it after anything that touches the model.** The qualifier count, the
+calibration bands and the champion record are stable run to run. The horizon row
+is the noisy one, which is why the published figures come from a 12,000-season
+sweep rather than the default — at 4,000 the eight-week best sigma flickers
+between 4.5% and 5.0%, which is the difference between two claims that both
+reproduce and one that does not.
+
+`publish.js` also writes a readable cutoff label rather than a date, because the
+two seasons do not share a cutoff *date*, only a cutoff *week*.
+
+**What the Track record view says, as of the last run:** 59 of 72 actual
+qualifiers inside the board's top group, 1 of 4 champions named, pooled Brier
+0.0918 against 0.2319 for knowing nothing, 60% skill. The calibration is honest
+at both ends — above-90% teams qualified 94% of the time, below-10% teams got
+there 6% — and too confident in the middle, where the 70–90% band averaged a
+call of 81% and came in at 60%. That miss is stated on the page rather than
+buried, and it is the same horizon problem as open item 2.
 
 **Do not read the favourite off a list sorted by P(qualify).** Half the field
 sits at 100% to qualify and those ties break arbitrarily, so the first row is
 not the team most likely to win. `backtest.js` made exactly this mistake and
-reported the champion record as three of four when it is two of four — the
-published claim was overstated until it was caught. Both `backtest.js` and
+reported the champion record as three of four when the harness said two — the
+published claim was overstated until it was caught. (It is one of four now: the
+MARK_W and LONE fixes changed which team the model favours in 2024.) Both `backtest.js` and
 `baseline.js` now take the maximum of `win`.
 
 **Diagrams in the How tab.** Three, inline SVG, themed off the existing custom
@@ -665,10 +680,13 @@ actual outcomes at each cutoff:
 
 | information set | weeks to state | best sigma | implied drift |
 |---|---|---|---|
-| mid-September | 8 | **5.0%** | 4.4% |
-| late September | 6 | 3.0% | 1.9% |
+| mid-September | 8 | **4.5%** | 3.9% |
+| late September | 6 | 2.6% | 1.2% |
 | mid-October | 4 | 2.6% | 1.2% |
-| late October | 2 | 2.6% | 1.2% |
+| late October | 2 | 2.3% | 0.0% |
+
+(Those fell after the  and  fixes — a better model needs less
+slack. Regenerate with , which writes them into the site.)
 
 `CAL.sd` is 2.3%, which is about right from four weeks out and much too narrow in
 September. At the September cutoff, teams given 70-90% qualified only 50% of the

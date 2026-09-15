@@ -267,6 +267,29 @@ header .asof{color:var(--muted);font-size:10.5px}
    set, so it is the only one that hides them. */
 .ctl.off{display:none}
 .vsw{margin:10px 0 11px}
+.rec-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;margin:14px 0 4px}
+.rec-tile{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--surface)}
+.rec-tile b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:24px;line-height:1.05;letter-spacing:-.01em}
+.rec-tile i{display:block;font-style:normal;font-size:10.5px;color:var(--dim);margin-top:3px;line-height:1.35}
+.rec-wrap{overflow-x:auto;margin:10px 0 2px}
+.rec-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.rec-tbl th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:9.5px;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--dim);text-align:right;padding:0 0 5px}
+.rec-tbl th:first-child,.rec-tbl td:first-child{text-align:left}
+.rec-tbl td{padding:6px 0;border-top:1px solid var(--line);text-align:right;
+  color:var(--muted);font-variant-numeric:tabular-nums}
+.rec-tbl td:first-child{color:var(--text)}
+.rec-tbl .hit{color:var(--t1e);font-weight:600}
+.rec-tbl .miss{color:var(--dim)}
+.rec-note{font-size:10.5px;color:var(--dim);margin:6px 0 0;line-height:1.45}
+.rec-chart{width:100%;height:auto;display:block;margin:6px 0 2px}
+.rec-chart .ax{stroke:var(--line);stroke-width:.7}
+.rec-chart .ideal{stroke:var(--dim);stroke-width:.7;stroke-dasharray:2.5 2.5;opacity:.7;fill:none}
+.rec-chart .pt{fill:var(--t1e);fill-opacity:.85}
+.rec-chart text{fill:var(--dim);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:6px}
+.doc code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  background:var(--raised);padding:1px 5px;border-radius:5px}
 .view{display:none}
 .view.on{display:block}
 /* Open until the first run finishes, then folded to a line. max-height rather
@@ -3659,6 +3682,11 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
 
 
   <section class="panel" id="p-doc">
+    <div class="switch vsw" role="group" aria-label="View">
+      <button data-view="v-how" aria-pressed="true">How it works</button>
+      <button data-view="v-record" aria-pressed="false">Track record</button>
+    </div>
+    <div class="view on" id="v-how">
     <h2 class="sec">How this works</h2>
     <div class="doc">
 
@@ -3736,16 +3764,8 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
 
       <h3>Checked against seasons we already know</h3>
       <p>This is the part we would want to see if we were you.</p>
-      <p>We rebuilt the 2024 and 2025 seasons exactly as they stood in mid-September — <b>96,265 race results</b>, nothing after that date, no hindsight — then ran the season forward and compared it to what actually happened at Lane in November. Both genders, four points in each season, <b>197 team-seasons</b> scored.</p>
-      <div class="stats">
-        <div class="stat"><b>81%</b><i>of teams that qualified were in the board's top group</i></div>
-        <div class="stat"><b>197</b><i>team-seasons scored against the real result</i></div>
-        <div class="stat"><b>96%</b><i>of teams shown above 90% did qualify</i></div>
-        <div class="stat"><b>5%</b><i>of teams shown below 10% did anyway</i></div>
-      </div>
-      <p>The bottom pair is the one that matters. It is easy to sort teams; it is hard to be right about <em>how sure</em> you are. Those two say that when this model claims near-certainty it is nearly always correct, and when it writes a team off it is usually correct too.</p>
-      <p>Picking the <em>winner</em> is a different and much harder question, and we will not dress it up: replaying those four championship races from mid-September, the model's favourite went on to win two of them. Eight weeks out, the eventual champion is genuinely uncertain — and a model that told you otherwise would be lying to you.</p>
-      <p>Where it is still loose is the middle, this early. Teams we put between 70% and 90% in mid-September made it about half the time — honest odds there are wider than they look, and they tighten every week as results come in. We know that because we measured it, which is the whole point. A model nobody has scored is just an opinion with decimals.</p>
+      <p>We rebuilt the 2024 and 2025 seasons exactly as they stood in mid-September — nothing after that date, no hindsight — then ran the season forward and compared it to what actually happened at Lane in November.</p>
+      <p>It is easy to sort teams. It is hard to be right about <em>how sure</em> you are, and that is the part worth checking. The whole scorecard — what we got right, what we got wrong, and where the odds are still too confident — is on the <b>Track record</b> tab above, written straight out of the harness. A model nobody has scored is just an opinion with decimals.</p>
       <p><b>One caveat we would rather state than bury.</b> Those checks were run on 6A, which is where the history is. Every classification runs on the same engine and the same data, and each one's qualifying rules — how many teams a league sends, how many at-large places exist, and for 3A and 2A/1A girls the fact that only four runners score — are taken straight from OSAA. But 2026 is the first year of four-runner scoring, and last season the small-school girls raced as one combined division, so there is no like-for-like history to score those two boards against yet. Treat 6A's numbers as evidence about the method, not as a measured accuracy for every board.</p>
 
       <h3>What-ifs you can trust</h3>
@@ -3756,6 +3776,12 @@ F,Taylor Hill,22:50.40,9,Valor Christian,5000,2A/1A
       <p>The future. Nobody gets injured, nobody has a breakthrough, and the top seven in September are the top seven in November. Real seasons are less tidy, so the further out you are, the more the true spread exceeds what any model shows. Read early-season numbers as a shape, not a promise — they sharpen as the season fills in.</p>
       <p>The committee. At-large selection here is a sensible stand-in for a room full of people who also weigh league strength and head-to-head.</p>
       <p>None of that is hidden in the small print, because the honest version is more useful than the confident one.</p>
+    </div>
+    </div>
+    <div class="view" id="v-record">
+      <h2 class="sec">Track record</h2>
+      <p class="sub2">Every figure on this page is written by the harness that produced it, not typed in. Re-run with <code>node backtest/publish.js</code>.</p>
+      <div class="doc" id="recOut"></div>
     </div>
   </section>
 
@@ -3929,6 +3955,7 @@ const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
 const LONE=0.006;
 /* The day the marks database was last refreshed. Update this whenever the seed
    block is replaced — it is what the header reports to readers. */
+const RECORD={"seasons":[2024,2025],"cutoff":"mid-September","cutoffDates":["2024-09-14","2025-09-13"],"teamSeasons":197,"qualified":72,"found":59,"ofField":72,"champHit":1,"champOf":4,"brier":0.0918,"base":0.2319,"skill":60,"logloss":0.301,"sigma":2.3,"runs":20000,"bands":[{"lo":0,"hi":10,"n":106,"said":1,"was":6},{"lo":10,"hi":30,"n":8,"said":17,"was":25},{"lo":30,"hi":50,"n":9,"said":40,"was":44},{"lo":50,"hi":70,"n":14,"said":60,"was":50},{"lo":70,"hi":90,"n":9,"said":82,"was":56},{"lo":90,"hi":100,"n":51,"said":98,"was":94}],"horizon":[{"weeks":8,"best":4.5,"brier":0.0829,"shipped":0.0919},{"weeks":6,"best":2.6,"brier":0.0569,"shipped":0.0577},{"weeks":4,"best":2.6,"brier":0.0551,"shipped":0.0555},{"weeks":2,"best":2.3,"brier":0.0515,"shipped":0.0515}],"perSeason":[{"year":2024,"g":"M","cutoff":"2024-09-14","field":18,"found":14,"skill":50,"fav":"Lincoln","favP":33,"champ":"Jesuit","hit":false},{"year":2024,"g":"F","cutoff":"2024-09-14","field":18,"found":14,"skill":61,"fav":"Lakeridge","favP":40,"champ":"Lincoln","hit":false},{"year":2025,"g":"M","cutoff":"2025-09-13","field":18,"found":17,"skill":85,"fav":"Jesuit","favP":92,"champ":"Jesuit","hit":true},{"year":2025,"g":"F","cutoff":"2025-09-13","field":18,"found":14,"skill":47,"fav":"Sunset","favP":70,"champ":"Lincoln","hit":false}],"marks":2974,"built":"2026-09-15"};
 const DATA_DATE="2026-09-12";
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
@@ -4911,6 +4938,106 @@ function syncDialSummary(){
 }
 document.getElementById("dsum").onclick=()=>{dialsTouched=true;setDials(!dialsOpen);};
 
+/* The scorecard, drawn from RECORD. Nothing here is a literal: if the model
+   changes, backtest/publish.js rewrites the constant and this page follows. */
+function renderRecord(){
+  const box=document.getElementById("recOut");
+  if(!box||typeof RECORD==="undefined")return;
+  const R=RECORD, pc=v=>Math.round(v)+"%";
+  const yr=R.seasons.join(" and ");
+
+  const tiles=[
+    [R.found+" of "+R.ofField,"teams that qualified were inside the board\u2019s top group"],
+    [R.skill+"%","better than guessing the base rate, measured as Brier skill"],
+    [R.champHit+" of "+R.champOf,"championship races where our favourite went on to win"],
+    [R.brier.toFixed(4),"Brier score \u2014 lower is better, "+R.base.toFixed(4)+" is knowing nothing"],
+  ].map(([b,i])=>'<div class="rec-tile"><b>'+b+'</b><i>'+i+'</i></div>').join("");
+
+  // reliability: what we said against what happened, with the line we want to sit on
+  const X=v=>(30+v/100*166).toFixed(1), Y=v=>(94-v/100*80).toFixed(1);
+  let chart='<svg class="rec-chart" viewBox="0 0 206 112" role="img" '
+    +'aria-label="What the board said against how often it happened">'
+    +'<path class="ideal" d="M'+X(0)+' '+Y(0)+'L'+X(100)+' '+Y(100)+'"/>'
+    +'<path class="ax" d="M'+X(0)+' '+Y(0)+'H'+X(100)+'M'+X(0)+' '+Y(0)+'V'+Y(100)+'"/>';
+  for(const v of [0,50,100]){
+    chart+='<text x="'+X(v)+'" y="106" text-anchor="middle">'+v+'%</text>'
+      +'<text x="24" y="'+(+Y(v)+2)+'" text-anchor="end">'+v+'%</text>';
+  }
+  for(const b of R.bands)
+    chart+='<circle class="pt" cx="'+X(b.said)+'" cy="'+Y(b.was)+'" r="'
+      +(2.2+Math.sqrt(b.n)*0.42).toFixed(1)+'"/>';
+  chart+='</svg>';
+
+  const bandRows=R.bands.map(b=>'<tr><td>'+b.lo+'\u2013'+b.hi+'%</td><td>'+b.n
+    +'</td><td>'+pc(b.said)+'</td><td>'+pc(b.was)+'</td></tr>').join("");
+
+  const seasonRows=R.perSeason.map(s=>'<tr><td>'+s.year+' '+(s.g==="M"?"boys":"girls")
+    +'</td><td>'+s.found+' of '+s.field+'</td><td>'+s.skill+'%</td><td>'+s.fav+' '+s.favP
+    +'%</td><td class="'+(s.hit?"hit":"miss")+'">'+s.champ+(s.hit?" \u2713":"")+'</td></tr>').join("");
+
+  const horiz=R.horizon.map(h=>'<tr><td>'+h.weeks+' weeks out</td><td>'+h.best.toFixed(1)
+    +'%</td><td>'+h.brier.toFixed(4)+'</td><td>'+h.shipped.toFixed(4)+'</td></tr>').join("");
+
+  const worst=R.bands.reduce((a,b)=>(b.said-b.was)>(a.said-a.was)?b:a);
+
+  box.innerHTML=
+    '<h3>What we did</h3>'
+    +'<p>We rebuilt the '+yr+' seasons exactly as they stood in '+R.cutoff
+    +' \u2014 nothing after that date, no hindsight \u2014 then ran each season forward '
+    +R.runs.toLocaleString()+' times and compared the result to what actually happened at Lane '
+    +'in November. <b>'+R.teamSeasons+' team-seasons</b> scored, '+R.qualified+' of which qualified.</p>'
+    +'<div class="rec-tiles">'+tiles+'</div>'
+
+    +'<h3>Are the odds honest?</h3>'
+    +'<p>This is the question worth asking. Anyone can rank teams; the hard part is being right '
+    +'about <em>how sure</em> you are. Group every team by what the board said, then count how '
+    +'often it actually happened. A perfectly honest model sits on the dashed line.</p>'
+    +chart
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>the board said</th>'
+    +'<th>teams</th><th>average call</th><th>what happened</th></tr></thead><tbody>'
+    +bandRows+'</tbody></table></div>'
+    +'<p class="rec-note">Across: what the board said. Up: how often it happened. Each dot is one '
+    +'band and bigger dots hold more teams — above the line we were too cautious, below it too '
+    +'confident.</p>'
+    +'<p>The two ends are where most of the board lives and they hold up: '
+    +'teams shown above 90% qualified '+pc(R.bands[R.bands.length-1].was)+' of the time, and teams '
+    +'written off below 10% got there anyway '+pc(R.bands[0].was)+' of the time. '
+    +'<b>The middle is where we are still too confident</b> \u2014 the '+worst.lo+'\u2013'+worst.hi
+    +'% band averaged a call of '+pc(worst.said)+' and came in at '+pc(worst.was)+'. '
+    +'That is a real miss and it is the next thing to fix.</p>'
+
+    +'<h3>Season by season</h3>'
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>board</th><th>qualifiers found</th>'
+    +'<th>skill</th><th>our favourite</th><th>actual champion</th></tr></thead><tbody>'
+    +seasonRows+'</tbody></table></div>'
+    +'<p>Picking the <em>winner</em> is a different and much harder question, and we will not dress '
+    +'it up: from '+R.cutoff+', our favourite went on to win <b>'+R.champHit+' of '+R.champOf
+    +'</b>. Eight weeks out the eventual champion is genuinely uncertain, and a model that told '
+    +'you otherwise would be lying to you.</p>'
+
+    +'<h3>How far out you are changes the answer</h3>'
+    +'<p>The race-day dial ships at '+R.sigma+'%, which is how much a runner varies from one '
+    +'afternoon to the next. A September projection also has to cover eight weeks of fitness, '
+    +'injury and roster change. Sweeping the dial against the real outcomes at four points in '
+    +'the season shows exactly that:</p>'
+    +'<div class="rec-wrap"><table class="rec-tbl"><thead><tr><th>information set</th>'
+    +'<th>dial that fits best</th><th>error there</th><th>error at '+R.sigma+'%</th>'
+    +'</tr></thead><tbody>'+horiz+'</tbody></table></div>'
+    +'<p>The right dial <b>falls as November approaches</b>. That is the signature of a horizon '
+    +'term the model does not have yet, and it is why early-season odds should be read as a shape '
+    +'rather than a promise. We know the size of the gap because we measured it.</p>'
+
+    +'<h3>What this does not cover</h3>'
+    +'<p>All of the above is <b>6A</b>, which is where the history is. Every classification runs '
+    +'on the same engine and the same data, and each one\u2019s qualifying rules come straight from '
+    +'OSAA \u2014 but 2026 is the first year of four-runner scoring for the small-school girls, and '
+    +'last season they raced as one combined division, so there is no like-for-like history to '
+    +'score those boards against yet. Treat these numbers as evidence about the method, not as a '
+    +'measured accuracy for every board.</p>'
+    +'<p class="rec-note">Last run '+R.built+' \u00b7 '+R.runs.toLocaleString()+' seasons per board '
+    +'\u00b7 dial '+R.sigma+'% \u00b7 log loss '+R.logloss.toFixed(3)+'</p>';
+}
+
 // The leagues view is the only heading that has to move with the board.
 function syncViewText(){
   document.getElementById("lgSub").textContent=
@@ -4918,11 +5045,13 @@ function syncViewText(){
     +AT_LARGE+" more get in at large, and "+FIELD+" line up in November.";
 }
 
+/* One handler for every segmented view switch. It scopes to the switch's own
+   panel, so How can have two views without knowing anything about Odds. */
 document.querySelectorAll(".vsw button").forEach(b=>b.onclick=()=>{
-  VIEW=b.dataset.view;
-  document.querySelectorAll(".vsw button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  document.querySelectorAll("#p-sim .view").forEach(v=>v.classList.toggle("on",v.id===VIEW));
-  refreshView();
+  const sw=b.closest(".vsw"), pane=b.closest(".panel");
+  sw.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  pane.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id===b.dataset.view));
+  if(pane.id==="p-sim"){VIEW=b.dataset.view;refreshView();}
   scrollTo({top:0,behavior:"smooth"});
 });
 
@@ -5546,7 +5675,7 @@ function loadSeed(){
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
 }
-loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();
+loadSeed();syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();
 </script>
 </body>
 </html>
