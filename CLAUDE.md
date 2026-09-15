@@ -91,6 +91,39 @@ its chance of winning, averaged only over the seasons it actually qualified —
 teams that never get there show a dash rather than a fake zero. `blankTally`
 carries `ptsSum`/`ptsN` and `playState` fills them.
 
+**The mark.** Sixteen runners on a staggered four-by-four lattice, nine of them
+the rest of the field at 34% and seven of them a team: five filled, six and
+seven drawn hollow, because five score and two displace. It is the rule the
+simulator runs on, drawn.
+
+Three things about it are load-bearing:
+
+*The lean is the wordmark's.* CHUTE is set in Anton with `skewX(-8deg)`, and the
+lattice carries the same eight degrees so the two read as one object rather than
+an icon beside a word. **The skew is baked into the coordinates, not applied as a
+transform** — skewing a circle turns it into an ellipse. The field leans; the
+runners stay round. If the wordmark's angle ever changes, the sixteen `cx` values
+have to be recomputed, not re-transformed.
+
+*The tab icon is a different drawing.* Sixteen dots at sixteen pixels is a
+speckle, so the favicon carries the seven alone, scaled up to fill the square.
+It is a data URI and therefore cannot use custom properties: the accent is
+hardcoded `#F0455C`, which reads on both a light and a dark tab strip. Change the
+accent and that hex has to change with it.
+
+*The seven surge on tap.* `.pk-team` animates on `body.gunlap-fire`, which is the
+class the flag's ripple used and the draft still sets. A transform on an SVG
+group resolves against the viewBox, so those translate values are user units,
+not pixels.
+
+**The checkered flag is retired**, and with it `--flagK`/`--flagM` and the six
+`c0`–`c5` ripple keyframes. Cross country does not use a checkered flag; it was
+also the same mark half the timing companies in the country use. Two things had
+borrowed those colours and were re-cut rather than left dangling: the overlay's
+top tape is now a moving row of accent dots, and the pace line's finish post
+keeps its stripes — a finish line really is striped — in `--text` and
+`--accent`.
+
 **Crests.** `LOGO` maps display name to a school's mascot image, and `crest()`
 falls back to initials when a name is missing. It covers all 214 schools in the
 seed; before the other classifications shipped it held only the 6A 47, so every
