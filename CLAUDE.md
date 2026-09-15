@@ -911,6 +911,48 @@ once already. Re-measure on resize, after a run finishes, and when a tab that
 was hidden comes back: a hidden panel measures zero, so a board built while the
 reader was elsewhere has a stale step and overlaps.
 
+## The board is a broadcast graphic
+
+**The team card is a lower-third, not a list row.** It used to be five equal
+chips with the headline figure set at the same size as "top 10", which is a
+table pretending to be a card - nothing on it was louder than anything else.
+Now three numbers carry the card at roughly three times the size of everything
+else: **wins state** in the accent, **reaches Lane** in the text colour, and
+**points when there** muted. Auto, at-large, top 10 and top 4 sit under a rule
+as a support strip.
+
+**The left rail is the chance of reaching Lane, read as a height.** `.tcard::before`
+fills from the bottom off a `--q` custom property that `paint` writes every
+frame from the same number the hero chip prints, so the two cannot disagree. It
+is the one fact every visitor came for, and the rail makes it legible without
+reading anything - the eye runs down the left edge and sees where the field
+thins out.
+
+**Qualify moved into the headline but kept its `data-k`.** `paint` finds the
+chips with `el.querySelectorAll(".odd")` and reads `o.dataset.k`, so the hero
+updates for free wherever it sits in the card. Anything given the `odd` class
+**must** carry a `data-k`, or `t[undefined]` silently prints a dash - which is
+why the points figure is `.pnum` and styled separately rather than being a
+sixth `.odd`.
+
+**The hero is exempt from `oddColor`.** That function fades dim toward a pale
+blue as a chip earns its value, which is right for a support number and wrong
+for a headline that should read at full strength from the first frame. `paint`
+skips it for `.hero`.
+
+**`.tcard .tc-big b` is two classes deep on purpose.** It has to beat `.odd b`
+further down the sheet whatever order the two end up in, or a rule meant for the
+small chips silently shrinks the headline figures. Same lesson as the `.wirow`
+override below, learned before it cost anything this time.
+
+**Team names are set in Anton, uppercase** - the wordmark's own face, which is
+what ties the card to the mark at the top of the page.
+
+**Runners and Leagues got the type, not the card.** The individual board is a
+leaderboard of ninety absolutely-positioned rows and every point of row height
+is multiplied by ninety, so it takes the larger condensed numerals and the
+bigger place chip and nothing else. Do not give it a card.
+
 ## Desktop
 
 **It was a 600px column at every width.** On a laptop the site used under half
@@ -932,6 +974,16 @@ also needed it most: a `.drow` is `1fr auto auto`, so every pixel the widening
 added went straight into the gap between a team's name and its two numbers. Two
 columns of ~420px put the numbers back beside the names and halve the scroll.
 **A view can take a second column exactly when nothing measures it.**
+
+**The card turns on its side above 900px, and that made the board shorter.**
+Stacked, the three headline numbers strung themselves across 854px of card with
+nothing between them, reading as three unrelated figures rather than one
+graphic. The desktop rule makes `.tcard` a two-column grid and spans `.tc-big`
+across all three rows, so identity, distribution and the support strip run down
+the left and the numbers sit grouped and vertically centred on the right - a
+real lower-third. The board went from about 7,900px to **5,850px** while the
+numbers went from 31.5px to 38px. Bigger and shorter, which is usually a sign
+the layout was wrong rather than the sizes.
 
 **Prose was the one thing the extra room made worse.** The How tab ran to 131
 characters a line at 880px, about twice a comfortable measure. Only text-level

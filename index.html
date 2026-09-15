@@ -399,35 +399,62 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 
 /* ---- cards ---- */
 #board{position:relative;margin-top:4px}
-.tcard{position:absolute;left:0;right:0;top:0;background:var(--surface);border:1px solid var(--line);
-  border-radius:11px;padding:8px 10px;box-shadow:var(--shadow);
+/* A broadcast lower-third rather than a list row. The two numbers a reader
+   actually came for are set at three times the size of everything else and the
+   rest is support underneath, which is how a race-day graphic is ordered and
+   very much not how the old card was: five equal chips, none of them louder
+   than the others, and the headline figure the same size as "top 10". */
+.tcard{position:absolute;left:0;right:0;top:0;background:var(--surface);
+  border:1px solid var(--line);border-left:0;overflow:hidden;
+  border-radius:9px;padding:9px 11px 10px 14px;box-shadow:var(--shadow);
   transition:transform .45s var(--ease),border-color .35s,box-shadow .35s;will-change:transform}
-.tc-head{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-.rank{flex:none;min-width:31px;height:22px;padding:0 6px;border-radius:5px;display:grid;place-items:center;
+/* The rail is the chance of reaching Lane, read as a height instead of a
+   number. It is the one fact every visitor is here for, so it is also the one
+   thing legible without reading anything - the eye can run down the left edge
+   of the board and see where the field thins out. --q is set every paint. */
+.tcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(to top,var(--accent) calc(var(--q,0) * 100%),var(--line) 0);
+  transition:background .35s}
+.tc-head{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.rank{flex:none;min-width:37px;height:27px;padding:0 7px;border-radius:5px;display:grid;place-items:center;
   background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
   transition:background .4s,border-color .4s}
 .rank u{display:block;transform:skewX(9deg);text-decoration:none;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:-.02em;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;color:var(--muted);transition:color .4s}
 .rank.p1{background:var(--t1);border-color:var(--t1e)}.rank.p1 u{color:#fff}
 .rank.p2{background:var(--t2);border-color:var(--t2e)}.rank.p2 u{color:#1B1D21}
 .rank.p3{background:var(--t3);border-color:var(--t3e)}.rank.p3 u{color:#fff}
 .rank.p4{background:var(--t4);border-color:var(--t4e)}.rank.p4 u{color:#EDEFF2}
-.crest{width:22px;height:22px;border-radius:5px;flex:none;object-fit:contain;background:var(--raised)}
+.crest{width:26px;height:26px;border-radius:5px;flex:none;object-fit:contain;background:var(--raised)}
 .crest.fb,.crest-sm.fb{display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;color:var(--muted);border:1px solid var(--line);letter-spacing:-.02em}
-.crest.fb{font-size:9.5px}
+.crest.fb{font-size:11px}
 .crest-sm.fb{font-size:8px}
-.tc-name{flex:1;min-width:0;display:flex;align-items:baseline;gap:6px}
-.tc-name b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16.5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
-.tc-name i{font-style:normal;color:var(--dim);font-size:10.5px;flex:none}
-.title{flex:none;text-align:right}
-.tnum{display:flex;align-items:center;justify-content:flex-end;gap:3px}
-.tro{width:12px;height:12px;flex:none;color:var(--t1e)}
-.title b{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;line-height:1;
-  font-variant-numeric:tabular-nums}
-.title i{font-style:normal;font-size:8.5px;color:var(--dim);display:block;line-height:1.25}
+.tc-name{flex:1;min-width:0}
+.tc-name b{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:19.5px;
+  text-transform:uppercase;letter-spacing:.004em;display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.08}
+.tc-lg{font-style:normal;color:var(--dim);font-size:9.5px;flex:none;
+  letter-spacing:.1em;text-transform:uppercase}
+
+/* Three numbers across, at the size a scoreboard would set them. The specificity
+   here is deliberate - .tcard .tc-big b beats the .odd b further down the sheet
+   whatever order the two end up in, so the hero figures cannot be silently
+   shrunk by a rule that was only ever meant for the small chips. */
+.tc-big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:9px;align-items:end}
+.tc-big>span{display:block;min-width:0}
+.tcard .tc-big b{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:clamp(27px,8.4vw,34px);line-height:.9;letter-spacing:-.025em;
+  font-variant-numeric:tabular-nums;display:block}
+.tcard .tc-big i{font-style:normal;display:block;font-size:8px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--dim);margin-top:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcard .tc-big .title b{color:var(--accent)}
+.tcard .tc-big .hero b{color:var(--text)}
+.tcard .tc-big .pnum b{color:var(--muted);font-size:clamp(21px,6.4vw,27px)}
+.tnum{display:flex;align-items:center;gap:4px}
+.tro{width:13px;height:13px;flex:none;color:var(--t1e)}
 /* Rows are absolutely positioned and moved with translateY, exactly like the
    team cards, so they pass each other while the board sorts itself out. The
    step height is measured from a rendered row, never assumed.
@@ -451,11 +478,11 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rrow.a2 .rail{background:var(--t2)}
 .rrow.a3 .rail{background:var(--t3)}
 .rrow.a4 .rail{background:var(--line)}
-.rpl{flex:none;min-width:28px;height:20px;padding:0 5px;border-radius:5px;display:grid;
+.rpl{flex:none;min-width:32px;height:23px;padding:0 6px;border-radius:5px;display:grid;
   place-items:center;background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
   transition:background .4s,border-color .4s}
 .rpl u{display:block;transform:skewX(9deg);text-decoration:none;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:-.02em;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14.5px;letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;color:var(--muted);transition:color .4s}
 .rrow.p1 .rpl{background:var(--t1);border-color:var(--t1e)}.rrow.p1 .rpl u{color:#fff}
 .rrow.p2 .rpl{background:var(--t2);border-color:var(--t2e)}.rrow.p2 .rpl u{color:#1B1D21}
@@ -469,12 +496,12 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rlab.a3 i{background:var(--t3)}
 .rnm{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
 .rnt{min-width:0;line-height:1.24}
-.rnt b{display:block;font-weight:500;font-size:12.5px;overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap}
+.rnt b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+  letter-spacing:.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rnm em{display:block;font-style:normal;color:var(--dim);font-size:10.5px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rfig{flex:none;width:44px;text-align:right;font-family:'Barlow Condensed',sans-serif;
-  font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.rfig{flex:none;width:48px;text-align:right;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
 .rfig b{display:block;font-weight:inherit;font-size:inherit}
 .rfig.spin b{color:var(--muted)}
 .rfig i{display:block;font-style:normal;font-size:8px;color:var(--dim);font-weight:400;
@@ -508,9 +535,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .tcard{cursor:default}
 .tcard.tappable{cursor:pointer}
 .tcard.tappable:focus-visible{outline:2px solid var(--t1e);outline-offset:2px}
-.title .pnum{margin-top:3px}
-.title .pnum b{font-size:13px;color:var(--muted)}
-.strip{display:flex;align-items:flex-end;gap:1.5px;height:15px;margin-bottom:6px}
+.strip{display:flex;align-items:flex-end;gap:2px;height:16px;margin-bottom:8px}
 .strip s{flex:1;background:var(--line);border-radius:1px;height:2px;text-decoration:none;
   transition:height .2s var(--ease),background-color .3s,opacity .3s}
 /* while the pack is moving every bar cycles the spectrum, staggered into a wave */
@@ -520,26 +545,29 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   animation:flow 2.2s linear infinite;
   animation-delay:calc(var(--i) * -0.11s)}
 @keyframes flow{to{background-position:0 -800%}}
-.odds{display:flex;gap:3px}
-.odd{flex:1;text-align:center}
-.odd b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:13.5px;display:block;
-  line-height:1.1;font-variant-numeric:tabular-nums}
-.odd i{font-style:normal;font-size:8.5px;color:var(--dim)}
-.odd b{transition:color .35s}
+/* Everything that is not one of the three headline numbers now reads as a
+   support strip under a rule, rather than as five things competing with them. */
+.odds{display:flex;gap:4px;border-top:1px solid var(--line);padding-top:7px}
+.odd{flex:1;text-align:center;min-width:0}
+.odd b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;display:block;
+  line-height:1.05;font-variant-numeric:tabular-nums;transition:color .35s}
+.odd i{font-style:normal;font-size:8px;color:var(--dim);letter-spacing:.07em;
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 
 /* ---- groups ---- */
 .dgroup{margin-bottom:6px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface)}
 .dhead{width:100%;background:none;border:0;color:inherit;font-family:inherit;display:flex;
   justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;cursor:pointer;text-align:left}
 .dhead .ttl{display:flex;align-items:center;gap:8px;min-width:0}
-.dhead h3{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15.5px;margin:0;
+.dhead h3{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:15px;
+  text-transform:uppercase;letter-spacing:.02em;margin:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dhead span{color:var(--dim);font-size:11px;flex:none;text-align:right}
 .dbody{padding:0 11px 8px}
 .drow,.prow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 0;
   border-top:1px solid var(--line);font-size:13.5px}
 .drow .nm,.prow .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:7px}
-.drow .v,.prow .m,.prow .p{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;width:50px;
+.drow .v,.prow .m,.prow .p{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15.5px;width:52px;
   text-align:right;font-variant-numeric:tabular-nums}
 .drow .v.hi{color:var(--accent)}
 .drow .v.lo,.prow .m{color:var(--dim);font-weight:500}
@@ -674,7 +702,28 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   .dials>.dial{flex:1;min-width:0}
 
   /* A wider card can afford the numbers at their real size. */
-  .tcard{padding-left:16px;padding-right:16px}
+  .tcard{padding-left:19px;padding-right:16px}
+
+  /* On a phone the card stacks: identity, then the three numbers, then the
+     support strip. At 854px wide that stack leaves the three numbers strung
+     across a third of a metre of card with nothing between them, which reads as
+     three unrelated figures rather than one graphic. So the card turns on its
+     side into a proper lower-third - everything identifying the team down the
+     left, the numbers grouped and vertically centred on the right - by spanning
+     .tc-big across all three rows of a two-column grid. */
+  .tcard{display:grid;grid-template-columns:minmax(0,1fr) 370px;column-gap:20px;
+    align-items:center}
+  .tc-head,.strip,.odds{grid-column:1}
+  .tc-head{margin-bottom:9px}
+  .strip{margin-bottom:9px;height:20px}
+  .odds{margin-bottom:0}
+  .tc-big{grid-column:2;grid-row:1 / 4;margin:0;gap:12px}
+  .tcard .tc-big b{font-size:38px}
+  .tcard .tc-big .pnum b{font-size:30px}
+  .tc-name b{font-size:24px}
+  .rank{min-width:42px;height:30px}
+  .rank u{font-size:19px}
+  .crest{width:30px;height:30px}
 
   /* Prose does not want the extra room. The How tab ran to 131 characters a
      line at 880px, about twice a comfortable measure, which is the one place
@@ -6361,16 +6410,20 @@ function buildBoard(tally){
       <div class="tc-head">
         <span class="rank"><u>#—</u></span>
         ${crest(t.name,"crest")}
-        <span class="tc-name"><b>${t.name}</b><i>${ABBR[t.league]}</i></span>
-        <span class="title"><span class="tnum"><svg class="tro" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10v6a5 5 0 0 1-10 0V2Z"/><path d="M7 3.5H4v2.2A3.8 3.8 0 0 0 7.2 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M17 3.5h3v2.2A3.8 3.8 0 0 1 16.8 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.6 13h2.8v4.2h-2.8z"/><path d="M7.6 19.6h8.8V22H7.6z"/></svg><b>—</b></span><i>wins state</i><span class="tnum pnum"><b>&mdash;</b></span><i>pts when there</i></span>
+        <span class="tc-name"><b>${t.name}</b></span>
+        <i class="tc-lg">${ABBR[t.league]}</i>
+      </div>
+      <div class="tc-big">
+        <span class="title"><span class="tnum"><svg class="tro" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10v6a5 5 0 0 1-10 0V2Z"/><path d="M7 3.5H4v2.2A3.8 3.8 0 0 0 7.2 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M17 3.5h3v2.2A3.8 3.8 0 0 1 16.8 9.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.6 13h2.8v4.2h-2.8z"/><path d="M7.6 19.6h8.8V22H7.6z"/></svg><b>—</b></span><i>wins state</i></span>
+        <span class="odd hero" data-k="qual"><b>—</b><i>reaches Lane</i></span>
+        <span class="pnum"><b>&mdash;</b><i>pts when there</i></span>
       </div>
       <div class="strip">${Array.from({length:FIELD},(_,k)=>`<s data-p="${k+1}" style="--i:${k}"></s>`).join("")}</div>
       <div class="odds">
-        <span class="odd" data-k="top4"><b>—</b><i>top 4</i></span>
-        <span class="odd" data-k="top10"><b>—</b><i>top 10</i></span>
-        <span class="odd" data-k="qual"><b>—</b><i>state</i></span>
-        <span class="odd" data-k="wild"><b>—</b><i>at-large</i></span>
         <span class="odd" data-k="auto"><b>—</b><i>auto</i></span>
+        <span class="odd" data-k="wild"><b>—</b><i>at-large</i></span>
+        <span class="odd" data-k="top10"><b>—</b><i>top 10</i></span>
+        <span class="odd" data-k="top4"><b>—</b><i>top 4</i></span>
       </div>`;
     el.addEventListener("click",()=>showTeam(t.idx));
     el.addEventListener("keydown",e=>{
@@ -6419,6 +6472,11 @@ function paint(tally,done,full){
       prev.pts=ps;
       el.querySelector(".pnum b").textContent=ps;
     }
+    /* The left rail. Set from the same number the hero chip prints, so the two
+       can never disagree, and written every frame because it is the thing that
+       moves most visibly while a run fills in. */
+    const q=done?t.qual/done:0;
+    if(prev.q!==q){prev.q=q;el.style.setProperty("--q",q.toFixed(3));}
     const thin=done?(t.qual/done<0.25):false;
     if(prev.thin!==thin){
       prev.thin=thin;
@@ -6435,7 +6493,10 @@ function paint(tally,done,full){
       el.querySelectorAll(".odd").forEach(o=>{
         const v=t[o.dataset.k],b=o.querySelector("b");
         b.textContent=pct(v,done);
-        b.style.color=oddColor(v,done);
+        /* The hero keeps its own colour. oddColor fades from dim to a pale blue,
+           which is right for a support chip earning its brightness and wrong for
+           a headline figure that should read at full strength from the start. */
+        if(!o.classList.contains("hero")) b.style.color=oddColor(v,done);
       });
     }
   }
