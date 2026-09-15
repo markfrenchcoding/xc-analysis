@@ -91,6 +91,19 @@ eq(ms.latest, '2026-08-27', 'the floor does not drag the date back');
 // a database with no dates at all must not lose everything
 eq(S.buildSeed(mixed.map(r => ({ ...r, date: '' })), board).rows, 2, 'no dates, no floor');
 
+/* ---------- rubbish marks ---------- */
+// 999999 is how athletic.net stores a scratch, and it parses as a valid time
+const junk = [
+  { g:'M', name:'Sentinel', school:'Jesuit', grade:'11', seconds:999999, dist:5000, date:'2026-09-05' },
+  { g:'M', name:'Miskeyed', school:'Jesuit', grade:'11', seconds:'142:46.66', dist:5000, date:'2026-09-05' },
+  { g:'M', name:'Very Slow', school:'Jesuit', grade:'11', seconds:'51:09.00', dist:5000, date:'2026-09-05' },
+  { g:'M', name:'Too Fast', school:'Jesuit', grade:'11', seconds:'12:30.00', dist:5000, date:'2026-09-05' },
+];
+const jr = S.buildSeed(junk, board);
+eq(jr.dropped.implausible, 3, 'sentinel, mis-entry and impossibly fast are all dropped');
+eq(jr.rows, 1, 'the genuinely slow runner is kept');
+eq(jr.csv.split('\n')[1].split(',')[1], 'Very Slow', 'and it is the right one');
+
 /* ---------- a meet read twice ---------- */
 // an interrupted crawl resumes on the meet it was halfway through
 const twice = [

@@ -91,9 +91,23 @@
      of the month, so mid-August is the line. */
   const SEASON_START = '08-15';
 
+  /* What a 5,000m schoolboy or schoolgirl race can actually be.
+     athletic.net stores a scratch as SortValue 999999, which parses perfectly
+     happily into a mark of 16666:39 and then sorts to the back of a roster -
+     harmless on a deep team, quietly ruinous on a thin one, where it can reach
+     the scoring five. Two more in the same pull were simple mis-entries at
+     142:46 and 1368:48.
+
+     The real distribution has a long smooth tail and then a cliff: the slowest
+     genuine mark in the state is 51:09, and the next value above it is 142:46.
+     An hour is well clear of anything a student can run and well below every
+     piece of rubbish. The floor is the same argument from the other end - the
+     state record is a shade over 14:00, so 13:00 is a mis-entry or a 3k. */
+  const MIN_5K = 13 * 60, MAX_5K = 60 * 60;
+
   function buildSeed(rows, board) {
     const keep = [];
-    const dropped = { dist: 0, unparsed: 0, offBoard: 0, preseason: 0, duplicate: 0 };
+    const dropped = { dist: 0, unparsed: 0, offBoard: 0, preseason: 0, duplicate: 0, implausible: 0 };
     const offBoardNames = new Set();
     let latest = '';
 
@@ -106,6 +120,7 @@
       if (floor && r.date && r.date < floor) { dropped.preseason++; continue; }
       const sec = toSeconds(r.seconds != null ? r.seconds : r.mark);
       if (!sec) { dropped.unparsed++; continue; }
+      if (sec < MIN_5K || sec > MAX_5K) { dropped.implausible++; continue; }
       const b = (board[lookup(r.school)] || {})[r.g];
       // a blank school is an unattached entry, not a school we failed to match,
       // so it is dropped without being reported as one
@@ -205,6 +220,6 @@
   }
 
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
-           patchIndex, patchLogos, SEASON_START,
+           patchIndex, patchLogos, SEASON_START, MIN_5K, MAX_5K,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };
 }));
