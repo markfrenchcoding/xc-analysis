@@ -86,6 +86,8 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 @keyframes glRow{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
   .gl,.gl-card,.pl-fr,.dream,.pk-team,.pl-dot{animation:none}
+  .pl-rain{display:none}
+  .pl-wrap.raining .c-water{animation:none}
   .pk-team{transition:none}
   .gl-tape{animation:none}
 }
@@ -144,7 +146,35 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
   transition:max-height .45s ease,margin .45s ease,opacity .35s ease;max-height:400px}
 .pl-wrap.over{max-height:0;margin-top:0;opacity:0;border-width:0;cursor:default}
 /* ---- the course, isometric ---- */
-.pl-map{position:absolute;inset:0;width:100%;height:100%}
+.pl-map{position:absolute;inset:0;width:100%;height:100%;
+  transition:filter .5s ease}
+/* Two sheets of streaks, each translated exactly along its own stripe direction
+   so the tiling never shows a seam - a gradient's stripes are infinite lines, so
+   sliding parallel to them is a perfect loop at any distance. The near sheet is
+   brighter and quicker than the far one, which is the whole trick to depth. */
+.pl-rain{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3;
+  opacity:0;transition:opacity .55s ease}
+.pl-wrap.raining .pl-rain{opacity:1}
+.pl-rain i{position:absolute;inset:-30% -18%;display:block}
+.pl-rain i:first-child{background-image:repeating-linear-gradient(72deg,
+  color-mix(in srgb,#E2EFFA 30%,transparent) 0 .9px,transparent .9px 5px);
+  animation:rainNear .42s linear infinite}
+.pl-rain i:last-child{background-image:repeating-linear-gradient(72deg,
+  color-mix(in srgb,#E2EFFA 16%,transparent) 0 .7px,transparent .7px 8.5px);
+  animation:rainFar .76s linear infinite}
+@keyframes rainNear{to{transform:translate(12.36px,38.04px)}}
+@keyframes rainFar{to{transform:translate(9.27px,28.53px)}}
+/* the light goes flat, and the water stops sitting still */
+.pl-wrap.raining .pl-map{filter:saturate(.86) brightness(.97)}
+/* wet ground: the trail darkens the way a worn line does in the rain */
+.pl-wrap.raining .c-trail{stroke:color-mix(in srgb,#8A6A45 52%,transparent)}
+.pl-wrap.raining .c-water{animation:ripple 2.8s ease-in-out infinite}
+@keyframes ripple{0%,100%{opacity:1}50%{opacity:.8}}
+.pl-wash{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0;
+  transition:opacity .55s ease;background:linear-gradient(175deg,
+  color-mix(in srgb,#5E7E96 11%,transparent),color-mix(in srgb,#5E7E96 3%,transparent))}
+.pl-wrap.raining .pl-wash{opacity:1}
+.pl-clock,.pl-skip{z-index:4}
 .c-ground{fill:color-mix(in srgb,#5E8F5C 22%,transparent);
   stroke:color-mix(in srgb,#3F6B41 34%,transparent);stroke-width:.5}
 .c-edge{fill:color-mix(in srgb,#3F6B41 34%,transparent)}
@@ -5258,6 +5288,7 @@ function paceLine(model,gi,line,res){
     +'<div class="gl-hd"><h3>Lane, 5,000m</h3><p>'+line.length
     +' on the line &mdash; the sixteen fastest schools in Oregon, a colour each, plus seven who do not exist</p></div>'
     +'<div class="pl-wrap" id="plWrap">'+COURSE
+    +'<span class="pl-wash"></span><span class="pl-rain"><i></i><i></i></span>'
     +'<span class="pl-clock" id="plClock">0:00</span>'
     +'<span class="pl-skip">tap to skip</span></div>'
     +'<p class="pl-note">The real course, from a GPS trace of the state meet &mdash; 5,105m of it, '
@@ -5301,11 +5332,13 @@ function paceLine(model,gi,line,res){
   });
   wrap.appendChild(frag);
   const total=line[line.length-1].t;
-  /* The winner crosses in four and a half seconds - unless the field has a long
-     tail, and a drafted seven can easily include a twenty-eight minute runner.
-     Then the whole race is compressed into seven rather than leaving someone
-     jogging in alone. */
-  const SPEED=Math.max(line[0].t/4.5,total/7);
+  /* The winner crosses in eight seconds, which puts a normal spread at about ten
+     end to end - unless the field has a long tail, and a drafted seven can
+     easily include a twenty-eight minute runner. Then the whole race is
+     compressed into ten and a half rather than leaving someone jogging in alone
+     long after everyone else is done. */
+  wrap.classList.add("raining");     // November in Oregon
+  const SPEED=Math.max(line[0].t/8,total/10.5);
   // the rows worth watching: the first three across, and all seven ghosts
   const show=[];
   line.forEach((r,i)=>{ if(i<3||r.team===gi) show.push({p:i+1,r}); });
@@ -5324,6 +5357,7 @@ function paceLine(model,gi,line,res){
     if(over)return; over=true;
     drFeedStop();
     DR.timers.push(setTimeout(()=>wrap.classList.add("over"),450));
+    wrap.classList.remove("raining");
     wrap.classList.add("done");        // stops the wobble, so everyone lands exactly in the chute
     for(const d of dots) place(d.el,1);
     while(shown<show.length) addRow(show[shown++]);

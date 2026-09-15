@@ -250,6 +250,20 @@ drawn, so leaving it out of the bounding box hangs its corners off the edge.
 building is two pixels of extrusion and the whole thing reads flat. The ground
 is a slab with one visible edge face for the same reason.
 
+**It rains for the length of the race.** Two sheets of streaks, each a
+repeating gradient translated exactly along its own stripe direction - a
+gradient stripe is an infinite line, so sliding parallel to it loops seamlessly
+at any distance. The near sheet is brighter, thicker and quicker than the far
+one, which is the whole trick to depth. Thin and dense reads as rain; thick and
+spaced reads as a barcode, which is what the first attempt looked like. The map
+also desaturates a touch, the water ripples, and the worn trail darkens the way
+it would. It is switched off entirely for reduced motion, because static streaks
+read as scratches on the screen.
+
+**Ten seconds end to end.** The winner crosses at eight, which puts a normal
+spread at about ten, and the whole race is capped at ten and a half for the
+times a drafted seven includes a twenty-eight minute runner.
+
 **The frame is rotated six degrees before projecting.** The site is 834m by
 371m; six degrees is the angle whose two-to-one dimetric projection fills the
 frame best, found by sweeping all of them. Do not hand-tune it - re-run the
