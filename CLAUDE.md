@@ -211,7 +211,9 @@ board behind it still says 3A or 2A/1A; the race is always all of Oregon.
 star drafted away is on the course twice and the results feed will show the same
 name at 3rd and at 43rd. Taking them out of their school would drop it below the
 scoring five and quietly change the field they are being measured against, so
-the duplicate is the lesser distortion. The draft says so in a clause.
+the duplicate is the lesser distortion. **The draft no longer explains this** -
+the clause was cut for being more confusing than useful - so the behaviour is
+recorded here instead. It has not changed.
 
 **Every school on the track has its own hue**, stepped by the golden angle so
 consecutive teams never land near each other and wrapped into 25-335 degrees,
@@ -267,6 +269,14 @@ the runners.
 The drop colour is the `--rain` custom property rather than a `color-mix`,
 because a canvas cannot resolve one. It has a value per theme and is read once
 at the gun.
+
+**The clouds drift, and that has to happen in JS.** A CSS animation would move
+the cloud and leave its rain behind. A pure screen-horizontal shift corresponds
+to a real world direction under this projection, so offsetting the cloud and its
+spawn x by the same `dx` keeps every drop landing directly beneath the cloud it
+came from. All four move the same way at slightly different rates, which reads
+as parallax. The drift runs off the wall clock rather than accumulated frame
+deltas - a slow frame rate should make the weather coarser, not slower.
 
 **Ten seconds end to end.** The winner crosses at eight, which puts a normal
 spread at about ten, and the whole race is capped at ten and a half for the
