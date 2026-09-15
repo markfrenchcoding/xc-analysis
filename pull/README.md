@@ -50,6 +50,10 @@ Worth keeping for three reasons: it works from a machine that has no checkout,
 it shows the crawl happening rather than a log after the fact, and it is the
 fallback if the scheduled run is ever wrong.
 
+**Do not run both at once.** They compete for the same per-endpoint budget and
+rate-limit each other; both back off and recover, but between them they take far
+longer than either alone. If a scheduled run is in progress, wait for it.
+
 ## Why this cannot run in the cloud
 
 It was the obvious design and it does not work. Cloudflare serves athletic.net
