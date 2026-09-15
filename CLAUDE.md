@@ -9,7 +9,7 @@ Repo: github.com/markfrenchcoding/xc-analysis (Vercel project is named `chutexc`
 
 ## Shape of the thing
 
-**One file.** `index.html` at the repo root, ~125KB, no build step, no
+**One file.** `index.html` at the repo root, ~380KB, no build step, no
 dependencies, no backend. Vercel serves it statically. Everything — data, CSS,
 simulation, UI — is in that file.
 
@@ -36,8 +36,8 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
-- 2,974 rows currently across all five classifications: 2,221 athlete-boards,
-  214 schools. Pulled from meet results through Sep 12, 2026
+- 3,645 rows currently across all five classifications: 2,306 athlete-boards,
+  216 schools. Pulled from meet results through Sep 12, 2026 by the refresh page
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
@@ -131,7 +131,7 @@ keeps its stripes — a finish line really is striped — in `--text` and
 `--accent`.
 
 **Crests.** `LOGO` maps display name to a school's mascot image, and `crest()`
-falls back to initials when a name is missing. It covers all 214 schools in the
+falls back to initials when a name is missing. It covers the schools in the
 seed; before the other classifications shipped it held only the 6A 47, so every
 5A-and-below card fell back to initials.
 
@@ -633,9 +633,13 @@ it the same mark twice, quietly eating real mark slots. `buildSeed` also
 deduplicates on day-and-time as a backstop: nobody runs two 5,000m races in one
 afternoon in the same hundredth of a second.
 
-Current coverage: 2,974 marks, 2,221 athlete-boards, 214 schools. The schools
-that do not appear have no 5,000m result yet, the same as any team short of the
-scoring depth. Nearly all are 1A schools that have only raced 3k so far.
+Current coverage: 3,645 marks, 2,306 athlete-boards, 216 schools, from 63 meets.
+That is 671 rows more than the hand-built pull it replaced, which is the crawl
+starting from the full Oregon team list rather than from team ids resolved out of
+meets already pulled - it finds meets the old chicken-and-egg approach could not
+reach. The schools that still do not appear have no 5,000m result yet, the same
+as any team short of the scoring depth. Nearly all are 1A schools that have only
+raced 3k so far. Every one of the ten boards can fill its field.
 
 **`index.html` is untouched by any of this.** `pull/` is maintenance tooling that
 sits beside the app; the app stays one self-contained file that can still be
@@ -651,8 +655,9 @@ marks. Carrying one draw through both would amplify luck instead of averaging it
 
 **Sampling.** Each race draws from an athlete's top three marks at 25/50/25,
 renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 12
-pull: 348 of 1,172 athletes carry two or three marks, so this path is actually
-exercised now rather than collapsing onto a single mark. Read open item 2
+pull: **1,166 of 2,306** athlete-boards carry two or three marks - just over half,
+up from 348 of 1,172 before the automated pull - so this path now carries most of
+the board rather than being a minority case. Read open item 2
 before leaning on it — the two-mark weights are not neutral.
 
 **Noise.** `time = mark × (1 + teamShock + individual)`. 30% of variance is
