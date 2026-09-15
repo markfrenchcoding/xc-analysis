@@ -156,10 +156,23 @@ function main() {
   const html = fs.readFileSync(IDX, 'utf8');
   const { board } = Seed.parseClasses(html);
 
+  /* Resuming is only ever right for a crawl that stopped minutes ago. A state
+     file left behind by last week's failed run holds results from before the
+     weekend's meets, and folding those into a fresh crawl produces a database
+     that is part stale and a DATA_DATE that belongs to neither. The scheduled
+     job never passes --resume for the same reason: a week-old partial is not
+     worth having, and starting over costs a quarter of an hour. */
+  const STALE_HOURS = 12;
   let S = null;
   if (RESUME && fs.existsSync(STATE)) {
-    S = JSON.parse(fs.readFileSync(STATE, 'utf8'));
-    log('resuming: ' + S.mi + ' of ' + S.meets.length + ' meets, ' + S.rows.length + ' results');
+    const age = (Date.now() - fs.statSync(STATE).mtimeMs) / 3600e3;
+    if (age > STALE_HOURS) {
+      log('ignoring a part-finished run from ' + age.toFixed(0) + ' hours ago; starting fresh');
+      fs.unlinkSync(STATE);
+    } else {
+      S = JSON.parse(fs.readFileSync(STATE, 'utf8'));
+      log('resuming: ' + S.mi + ' of ' + S.meets.length + ' meets, ' + S.rows.length + ' results');
+    }
   }
   if (!S) {
     const f = findTeams(board);
