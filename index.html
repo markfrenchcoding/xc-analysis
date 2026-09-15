@@ -65,7 +65,11 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
   padding:18px;background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(7px);
   -webkit-backdrop-filter:blur(7px);animation:glIn .18s ease-out}
 @keyframes glIn{from{opacity:0}to{opacity:1}}
+/* The scrollbar gutter is reserved because the feed grows a scrollbar halfway
+   through the race, and the course is sampled into pixels at the start: without
+   it the track narrows mid-race and the field walks a few pixels off the line. */
 .gl-card{position:relative;width:100%;max-width:390px;max-height:88vh;overflow:auto;
+  scrollbar-gutter:stable;
   background:var(--surface);border:1px solid var(--line);border-radius:16px;
   padding:0 0 15px;box-shadow:0 24px 60px rgba(0,0,0,.38);animation:glUp .26s cubic-bezier(.2,.9,.25,1)}
 @keyframes glUp{from{transform:translateY(14px) scale(.985);opacity:0}to{transform:none;opacity:1}}
@@ -135,28 +139,49 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .gl-again[disabled]{opacity:.4;cursor:default}
 .gl-again[disabled]:hover{border-color:var(--line)}
 /* ---- the pace line: one race, run in front of you ---- */
-.pl-wrap{position:relative;margin:12px 17px 0;height:176px;border-radius:12px;overflow:hidden;
-  background:var(--bg);border:1px solid var(--line);cursor:pointer;
-  transition:height .45s ease,margin .45s ease,opacity .35s ease}
-.pl-wrap.over{height:0;margin-top:0;opacity:0;border-width:0;cursor:default}
-.pl-fin{position:absolute;right:15px;top:0;bottom:0;width:3px;background-size:3px 8px;
-  background-image:linear-gradient(var(--text) 50%,var(--accent) 50%)}
-/* Travel is on the `translate` property and the wobble is on `transform`, which
-   are separate properties that compose. That is what lets a runner surge and
-   fade a pixel either way without the arrival time drifting: the transition
-   still runs the full distance in exactly t/SPEED seconds. */
-.pl-dot{position:absolute;left:0;top:0;width:5px;height:5px;border-radius:50%;
-  margin:-.5px 0 0 -.5px;background:var(--dim);
+.pl-wrap{position:relative;margin:12px 17px 0;aspect-ratio:177/99;border-radius:12px;
+  overflow:hidden;background:var(--bg);border:1px solid var(--line);cursor:pointer;
+  transition:max-height .45s ease,margin .45s ease,opacity .35s ease;max-height:400px}
+.pl-wrap.over{max-height:0;margin-top:0;opacity:0;border-width:0;cursor:default}
+/* ---- the course, isometric ---- */
+.pl-map{position:absolute;inset:0;width:100%;height:100%}
+.c-ground{fill:color-mix(in srgb,var(--dim) 11%,transparent);
+  stroke:color-mix(in srgb,var(--dim) 24%,transparent);stroke-width:.7}
+.c-grass{fill:color-mix(in srgb,#4C9A5E 26%,transparent)}
+.c-water{fill:color-mix(in srgb,#3E86C4 34%,transparent)}
+.c-track{fill:color-mix(in srgb,#B4724A 36%,transparent)}
+.c-infield{fill:color-mix(in srgb,#4C9A5E 30%,transparent)}
+.c-top{fill:color-mix(in srgb,var(--dim) 30%,transparent)}
+.c-wr{fill:color-mix(in srgb,var(--dim) 20%,transparent)}
+.c-wl{fill:color-mix(in srgb,var(--dim) 12%,transparent)}
+.c-route{fill:none;stroke:var(--dim);stroke-width:1.5;stroke-linecap:round;
+  stroke-dasharray:3 3.2;opacity:.75}
+.c-mk circle{fill:var(--surface);stroke:var(--dim);stroke-width:.9}
+.c-mk text{fill:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:5px;text-anchor:middle}
+.c-tag text{fill:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:5.5px;letter-spacing:.08em}
+.c-fin text{fill:var(--accent)}
+/* Travel is on the `translate` property, written each frame from a table of points
+   sampled off the drawn route; the wobble is on `transform`. They are separate
+   properties and they compose, so a runner surges and fades a pixel either way
+   without moving off the line. CSS motion paths would be tidier and were tried
+   first - offset-distance does not interpolate reliably, so the positions are
+   computed instead. */
+.pl-dot{position:absolute;left:0;top:0;width:4.5px;height:4.5px;border-radius:50%;
+  margin:-2.25px 0 0 -2.25px;background:var(--dim);
   animation:bob 1.2s ease-in-out infinite}
+/* The lane offset lives in the keyframes because transform is already spoken
+   for; without it a hundred and nineteen runners share one line exactly. */
 @keyframes bob{
-  0%,100%{transform:translate(0,0)}
-  25%{transform:translate(-1.8px,-.6px)}
-  50%{transform:translate(.2px,.5px)}
-  75%{transform:translate(1.8px,-.6px)}}
+  0%,100%{transform:translate(var(--lx),var(--ly))}
+  25%{transform:translate(calc(var(--lx) - 1.7px),calc(var(--ly) - .6px))}
+  50%{transform:translate(var(--lx),calc(var(--ly) + .5px))}
+  75%{transform:translate(calc(var(--lx) + 1.7px),calc(var(--ly) - .6px))}}
 /* The one team that does not exist is the one in the site's own red - every
    other hue on the track is drawn from a band that excludes it - ringed in the
    ground colour so it punches out of the crowd. */
-.pl-dot.me{width:9px;height:9px;margin:-2.5px 0 0 -2.5px;background:var(--accent);
+.pl-dot.me{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--accent);
   box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px color-mix(in srgb,var(--accent) 45%,transparent);
   z-index:2}
 .pl-wrap.done .pl-dot{animation:none;transform:none}
@@ -164,6 +189,8 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .pl-clock{position:absolute;left:11px;top:8px;font-family:'Barlow Condensed',sans-serif;
   font-weight:700;font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums}
 .pl-skip{position:absolute;right:11px;top:8px;font-size:9.5px;color:var(--dim)}
+.pl-note{margin:7px 17px 0;font-size:9.5px;color:var(--dim);line-height:1.4}
+.pl-wrap.over + .pl-note{display:none}
 .pl-feed{margin:9px 17px 0}
 .pl-fr{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;
   animation:glRow .3s ease-out backwards}
@@ -4985,6 +5012,11 @@ const DREAM_FIELD=16;
    near each other, and wrapped into 25-335 degrees so the band the site's own
    accent sits in stays reserved for the Dream Team. Mid lightness, because the
    same dot has to read on both a near-white and a near-black track. */
+/* The course drawn once, in a 177x99 viewBox. The wrap carries the same aspect
+   ratio, so one scale factor maps viewBox units to pixels and the route lines up
+   with the drawing at any width. */
+const COURSE='<svg class="pl-map" viewBox="0 0 177 99" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><polygon class="c-ground" points="88.5 5 174.5 48 88.5 91 2.5 48"/><polygon class="c-water" points="55.82 35.1 81.62 48 71.3 53.16 45.5 40.26"/><polygon class="c-water" points="40.34 41.12 66.14 54.02 55.82 59.18 30.02 46.28"/><polygon class="c-water" points="24.86 47.14 50.66 60.04 40.34 65.2 14.54 52.3"/><polygon class="c-grass" points="92.8 13.17 108.28 20.91 100.54 24.78 85.06 17.04"/><polygon class="c-grass" points="81.62 18.76 97.1 26.5 89.36 30.37 73.88 22.63"/><polygon class="c-grass" points="102.26 32.52 121.18 41.98 112.58 46.28 93.66 36.82"/><polygon class="c-track" points="122.04 57.89 120.74 58.38 119.15 58.7 117.32 58.85 115.28 58.81 113.09 58.59 110.81 58.19 108.48 57.62 106.17 56.91 103.94 56.06 101.83 55.09 99.9 54.04 98.2 52.92 96.77 51.77 95.64 50.61 94.85 49.46 94.41 48.37 94.33 47.35 94.61 46.44 95.26 45.64 96.24 44.99 97.54 44.5 99.13 44.18 100.96 44.03 103 44.07 105.19 44.29 107.47 44.69 109.8 45.26 112.11 45.97 114.34 46.82 116.45 47.78 118.38 48.84 120.08 49.96 121.51 51.11 122.64 52.27 123.43 53.42 123.87 54.51 123.95 55.53 123.67 56.44 123.02 57.24"/><polygon class="c-infield" points="117.14 55.44 116.33 55.74 115.35 55.94 114.21 56.03 112.95 56.01 111.59 55.87 110.17 55.62 108.73 55.27 107.3 54.83 105.91 54.3 104.61 53.71 103.41 53.05 102.36 52.36 101.47 51.64 100.77 50.92 100.28 50.21 100.01 49.54 99.96 48.91 100.13 48.34 100.53 47.84 101.14 47.44 101.95 47.14 102.93 46.94 104.07 46.85 105.33 46.87 106.69 47.01 108.11 47.26 109.55 47.61 110.98 48.05 112.37 48.58 113.67 49.17 114.87 49.83 115.92 50.52 116.81 51.24 117.51 51.96 118 52.67 118.27 53.34 118.32 53.97 118.15 54.54 117.75 55.04"/><polygon class="c-wr" points="152.14 38.42 145.26 41.86 145.26 48.86 152.14 45.42"/><polygon class="c-wl" points="145.26 41.86 136.66 37.56 136.66 44.56 145.26 48.86"/><polygon class="c-top" points="143.54 34.12 152.14 38.42 145.26 41.86 136.66 37.56"/><polygon class="c-wr" points="157.3 46.44 151.28 49.45 151.28 54.45 157.3 51.44"/><polygon class="c-wl" points="151.28 49.45 144.4 46.01 144.4 51.01 151.28 54.45"/><polygon class="c-top" points="150.42 43 157.3 46.44 151.28 49.45 144.4 46.01"/><polygon class="c-wr" points="138.38 42.86 132.36 45.87 132.36 51.87 138.38 48.86"/><polygon class="c-wl" points="132.36 45.87 125.48 42.43 125.48 48.43 132.36 51.87"/><polygon class="c-top" points="131.5 39.42 138.38 42.86 132.36 45.87 125.48 42.43"/><polygon class="c-wr" points="146.12 51.31 140.96 53.89 140.96 57.89 146.12 55.31"/><polygon class="c-wl" points="140.96 53.89 134.08 50.45 134.08 54.45 140.96 57.89"/><polygon class="c-top" points="139.24 47.87 146.12 51.31 140.96 53.89 134.08 50.45"/><polygon class="c-wr" points="122.9 31.24 116.88 34.25 116.88 37.25 122.9 34.24"/><polygon class="c-wl" points="116.88 34.25 108.28 29.95 108.28 32.95 116.88 37.25"/><polygon class="c-top" points="114.3 26.94 122.9 31.24 116.88 34.25 108.28 29.95"/><path id="plRoute" class="c-route" d="M73.88 27.79C74.60 26.86 76.03 24.13 78.18 22.2C80.33 20.27 83.34 17.04 86.78 16.18C90.22 15.32 94.52 16.04 98.82 17.04C103.12 18.04 109.71 20.48 112.58 22.2C115.45 23.92 116.31 25.50 116.02 27.36C115.73 29.22 113.44 31.80 110.86 33.38C108.28 34.96 104.84 36.10 100.54 36.82C96.24 37.54 90.51 37.82 85.06 37.68C79.61 37.54 73.02 36.25 67.86 35.96C62.70 35.67 57.83 35.24 54.1 35.96C50.37 36.68 45.21 38.40 45.5 40.26C45.79 42.12 50.95 45.28 55.82 47.14C60.69 49.00 70.73 50.87 74.74 51.44C78.75 52.01 78.18 51.73 79.9 50.58C81.62 49.43 83.34 46.57 85.06 44.56C86.78 42.55 87.64 40.12 90.22 38.54C92.80 36.96 97.67 36.53 100.54 35.1C103.41 33.67 106.85 31.95 107.42 29.94C107.99 27.93 106.85 24.78 103.98 23.06C101.11 21.34 95.38 19.62 90.22 19.62C85.06 19.62 78.47 21.48 73.02 23.06C67.57 24.64 62.41 26.93 57.54 29.08C52.67 31.23 48.08 33.81 43.78 35.96C39.48 38.11 34.61 40.26 31.74 41.98C28.87 43.70 26.29 44.42 26.58 46.28C26.87 48.14 29.73 51.30 33.46 53.16C37.19 55.02 43.78 56.89 48.94 57.46C54.10 58.03 59.83 57.46 64.42 56.6C69.01 55.74 72.73 53.88 76.46 52.3C80.19 50.72 83.48 48.50 86.78 47.14C90.08 45.78 94.66 44.63 96.24 44.13"/><g class="c-mk" transform="translate(112.58 22.2)"><circle r="4.6"/><text y="1.9">1K</text></g><g class="c-mk" transform="translate(79.9 50.58)"><circle r="4.6"/><text y="1.9">2K</text></g><g class="c-mk" transform="translate(107.42 29.94)"><circle r="4.6"/><text y="1.9">3K</text></g><g class="c-mk" transform="translate(26.58 44.56)"><circle r="4.6"/><text y="1.9">4K</text></g><g class="c-tag"><text x="65.88" y="37.79">START</text></g><g class="c-tag c-fin"><text x="102.24" y="47.13">FINISH</text></g></svg>';
+
 const teamHue=i=>"hsl("+(((i*137.508)%310)+25).toFixed(1)+",64%,56%)";
 /* timers are the finish-line reveals, which skipping cancels; odds is the
    background season loop, which it must not. */
@@ -5208,28 +5240,46 @@ function paceLine(model,gi,line,res){
     +'<div class="gl-tape"></div>'
     +'<div class="gl-hd"><h3>Lane, 5,000m</h3><p>'+line.length
     +' on the line &mdash; the sixteen fastest schools in Oregon, a colour each, plus seven who do not exist</p></div>'
-    +'<div class="pl-wrap" id="plWrap"><span class="pl-fin"></span>'
+    +'<div class="pl-wrap" id="plWrap">'+COURSE
     +'<span class="pl-clock" id="plClock">0:00</span>'
     +'<span class="pl-skip">tap to skip</span></div>'
+    +'<p class="pl-note">Schematic of the Lane course &mdash; landmarks and the kilometre '
+    +'markers are off the OSAA map, the line between them is drawn, not surveyed.</p>'
     +'<div class="pl-feed" id="plFeed"></div><div id="plOut"></div>'
     +'<button class="gl-again" id="plAgain">Pick a different seven</button>'
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
   document.getElementById("plAgain").onclick=showDraft;
   const wrap=document.getElementById("plWrap"),feed=document.getElementById("plFeed");
-  const W=wrap.clientWidth,H=wrap.clientHeight,x0=6,x1=W-24,ROWS=24,gy=(H-20)/(ROWS-1);
+  /* Sample the route once, evenly by arc length, so a runner's fraction of the
+     race indexes straight into the table. Measured off the path that is actually
+     drawn, scaled from viewBox units to pixels - which is why the dots can never
+     drift off the line the reader can see. */
+  const rp=document.getElementById("plRoute"), k=wrap.clientWidth/177, NS=360;
+  const L=rp.getTotalLength(), pts=new Float64Array((NS+1)*2);
+  for(let i=0;i<=NS;i++){
+    const p=rp.getPointAtLength(i/NS*L);
+    pts[i*2]=p.x*k; pts[i*2+1]=p.y*k;
+  }
+  const place=(el,f)=>{
+    const i=(f<=0?0:f>=1?NS:Math.round(f*NS))*2;
+    el.style.translate=pts[i].toFixed(1)+"px "+pts[i+1].toFixed(1)+"px";
+  };
   const frag=document.createDocumentFragment();
   const dots=line.map((r,i)=>{
     const d=document.createElement("i");
     const me=r.team===gi;
     d.className="pl-dot"+(me?" me":"");
     if(!me) d.style.background=teamHue(r.team);
-    const y=10+((i*7)%ROWS)*gy;
-    d.style.translate=x0+"px "+y+"px";
+    /* A lane offset each, or a hundred and nineteen runners share one line
+       exactly. Taken off the index so a given race always looks the same. */
+    d.style.setProperty("--lx",(((i*11)%7)-3)*1.6+"px");
+    d.style.setProperty("--ly",(((i*5)%5)-2)*1.6+"px");
     // strides out of step with each other, off the index rather than a random
     d.style.animationDuration=(0.9+((i*37)%9)*0.11).toFixed(2)+"s";
     d.style.animationDelay=(-((i*53)%19)*0.09).toFixed(2)+"s";
+    place(d,0);
     frag.appendChild(d);
-    return {el:d,y,t:r.t};
+    return {el:d,t:r.t};
   });
   wrap.appendChild(frag);
   const total=line[line.length-1].t;
@@ -5256,8 +5306,8 @@ function paceLine(model,gi,line,res){
     if(over)return; over=true;
     drFeedStop();
     DR.timers.push(setTimeout(()=>wrap.classList.add("over"),450));
-    wrap.classList.add("done");        // stops the wobble, so everyone lands exactly on the line
-    for(const d of dots){d.el.style.transition="none";d.el.style.translate=x1+"px "+d.y+"px";}
+    wrap.classList.add("done");        // stops the wobble, so everyone lands exactly in the chute
+    for(const d of dots) place(d.el,1);
     while(shown<show.length) addRow(show[shown++]);
     document.getElementById("plClock").textContent=
       Math.floor(total/60)+":"+String(Math.floor(total%60)).padStart(2,"0");
@@ -5274,10 +5324,6 @@ function paceLine(model,gi,line,res){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches)
     return finish();                    // the result, rather than a frozen track
   void wrap.offsetWidth;                // commit the start line before animating
-  for(const d of dots){
-    d.el.style.transition="translate "+(d.t/SPEED)+"s linear";
-    d.el.style.translate=x1+"px "+d.y+"px";
-  }
   for(const s of show)
     DR.timers.push(setTimeout(()=>{ if(!over) addRow(show[shown++]); },s.r.t/SPEED*1000));
   /* The result is on a timer, not on the end of the clock loop. A tab sent to
@@ -5285,9 +5331,10 @@ function paceLine(model,gi,line,res){
      back to a finished race rather than one frozen at 0:00. */
   DR.timers.push(setTimeout(finish,total/SPEED*1000+40));
   const clock=document.getElementById("plClock"),t0=performance.now();
-  nextTick(function tick(ts){            // cosmetic only; finish is on its own timer
+  nextTick(function tick(ts){            // finish is still on its own timer
     if(!DR.live||over)return;
     const e=Math.min((ts-t0)/1000*SPEED,total);
+    for(const d of dots) place(d.el,e/d.t);
     clock.textContent=Math.floor(e/60)+":"+String(Math.floor(e%60)).padStart(2,"0");
     if(e<total)nextTick(tick);
   });

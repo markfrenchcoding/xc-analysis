@@ -222,17 +222,44 @@ colour so they punch out of the crowd - the same logic as the mark, where the
 team is accent among grey. The feed carries each school's hue as a chip beside
 its name.
 
-**The pace line is CSS, not a render loop.** Each dot gets one transition whose
-duration is that runner's own time, so the browser does the animation and the
-finishing order is exact by construction.
+**They run the course, not a lane.** The field moves across an isometric Lane
+built from the OSAA course map: three ponds, the two ball fields, the soccer
+bowl, the track bowl, the campus as extruded boxes, and the four kilometre
+markers where the map puts them. Plan coordinates are projected two-to-one
+(`(X-Y)*0.86`, `(X+Y)*0.43`) so east lands right and south lands bottom, the way
+the printed map reads.
+
+**The route is drawn, not surveyed, and the overlay says so.** Landmarks and the
+K markers come off the map; the line joining them is a reconstruction of a
+two-loop course. Do not let that caption get dropped - it is the difference
+between a schematic and a claim.
+
+**Positions are computed, not transitioned.** CSS motion paths are the obvious
+fit and were tried first: `offset-path` with a per-runner `offset-distance`
+transition. `offset-distance` does not interpolate reliably - it snapped every
+runner to 100% instantly - so the route is sampled instead. `getPointAtLength`
+walks the path that is **actually drawn**, 360 points evenly by arc length,
+scaled from viewBox units to pixels; a runner's fraction of the race indexes
+straight into that table. Sampling the drawn path rather than a parallel copy is
+what makes it impossible for the dots to drift off the line the reader sees.
+
+The clock loop moves them, so it is no longer cosmetic - but `finish` stays on
+its own timer, so a stalled frame callback still ends the race in the right
+place.
 
 **Travel is on `translate`; the wobble is on `transform`.** They are separate
 properties and they compose, which is what lets a runner surge and fade a pixel
-either way without the arrival time drifting - the transition still covers the
-full distance in exactly `t/SPEED` seconds. The wobble is one shared keyframe
-with a per-runner duration and negative delay taken from the index rather than a
-random, so a given race always wobbles the same way. `.pl-wrap.done` kills it at
-the finish, which is what guarantees all of them land exactly on the line. Constant pace also means the field
+either way without leaving the route. The wobble is one shared keyframe with a
+per-runner duration and negative delay taken from the index rather than a
+random, so a given race always wobbles the same way, and it carries each
+runner's lane offset in `--lx`/`--ly` because `transform` is already spoken for.
+`.pl-wrap.done` kills it at the finish, which is what puts all of them on one
+point in the chute.
+
+**`.gl-card` reserves its scrollbar gutter.** The course is sampled into pixels
+when the race starts and the feed grows a scrollbar halfway through; without
+`scrollbar-gutter: stable` the track narrows mid-race and the field walks a few
+pixels off the line. Constant pace also means the field
 starts bunched and strings out as the gaps compound, which is what a race looks
 like from above. The winner crosses in four and a half seconds — `SPEED` takes
 the max of that against a seven-second whole-race cap, because a drafted seven
