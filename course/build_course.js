@@ -65,6 +65,16 @@ const builds = [                                              // x0,y0,x1,y1,hei
   [196, -132, 262, -88, 17], [276, -128, 344, -84, 13], [352, -124, 412, -80, 10],
   [200, -74, 266, -36, 12], [278, -70, 340, -34, 9], [350, -66, 400, -34, 7],
 ];
+/* Four clouds: a ground centre, a half-footprint, and a height. Each carries
+   its projected footprint as data-fp so the rain can pick landing points on the
+   ground under it, and data-h so the drops know how far they have to fall. A
+   drop falls straight down in world space, which in this projection is straight
+   down the screen from the cloud to the point directly beneath it - so the
+   landing y is just the projection of that ground point. */
+const clouds = [
+  [-250, 30, 120, 66, 62], [30, 70, 104, 54, 70],
+  [215, -70, 116, 62, 60], [-95, -150, 96, 56, 66],
+];
 const trees = [
   [-150, 120], [-250, 140], [-330, 150], [-60, 110], [40, 100], [140, 96], [240, 120],
   [-120, -20], [-160, 40], [-240, 60], [-330, 40], [-400, 60], [-150, -120], [-120, -190],
@@ -155,6 +165,22 @@ F.push(ellipse(track.cx, track.cy, track.rx - 7, track.ry - 7, 'c-lane'));
 F.push(ellipse(track.cx, track.cy, track.rx - 13, track.ry - 13, 'c-infield'));
 for (const [x0, y0, x1, y1, h] of builds) F.push(box(x0, y0, x1, y1, h));
 for (const [x, y] of trees) F.push(tree(x, y));
+
+// sky last, so it sits over the model
+for (const [X, Y, hw, hd, H] of clouds) {
+  const fp = [[X - hw, Y - hd], [X + hw, Y - hd], [X + hw, Y + hd], [X - hw, Y + hd]]
+    .map(c => pj(c[0], c[1]).join(',')).join(' ');
+  const g = pj(X, Y), a = pj(X, Y, H);
+  const lift = +(g[1] - a[1]).toFixed(2);
+  const cx = a[0], cy = a[1], S = Math.max(.75, hw / 116);
+  const puff = (dx, dy, rx, ry, o) =>
+    `<ellipse cx="${(cx + dx * S).toFixed(1)}" cy="${(cy + dy * S).toFixed(1)}" `
+    + `rx="${(rx * S).toFixed(1)}" ry="${(ry * S).toFixed(1)}" opacity="${o}"/>`;
+  F.push(`<g class="c-cloud" data-fp="${fp}" data-h="${lift}">`
+    + puff(-13, 2.4, 10, 4.6, .8) + puff(-3, -1.6, 13, 6.4, 1)
+    + puff(9, .8, 10.5, 5.4, .9) + puff(18, 3, 7.5, 3.8, .7)
+    + puff(3, 4.4, 15, 3.6, .85) + '</g>');
+}
 
 // every third trace point is plenty at this scale
 const RP = T.filter((_, i) => i % 3 === 0 || i === T.length - 1).map(p => pj(p[0], p[1]));
