@@ -152,6 +152,12 @@ top tape is now a moving row of accent dots, and the pace line's finish post
 keeps its stripes — a finish line really is striped — in `--text` and
 `--accent`.
 
+**The dials lock while a run is in flight.** They are the inputs to a run, and
+the run has already read them: moving the variance slider mid-run left the strip
+reading a number the simulation was not using, which is worse than not being
+able to move it. `lockDials()` disables both ranges and the preset buttons,
+and is called wherever `body.simming` is set or cleared.
+
 **The top four carry the state trophy, not a rank chip.** OSAA's award is a
 walnut plaque cut to the shape of Oregon with a metallic plate inset on it, so
 that is what ranks one to four show: the state outline in wood, the plate in the
@@ -160,11 +166,25 @@ engraved into it. Four, because OSAA awards four trophies - the same reason the
 bars colour four places and nothing below.
 
 The base is deliberately left off. At forty pixels a stem and foot become two
-grey pixels under the shape and cost the silhouette its readability. The outline
-itself is drawn, not traced: both northern corners high with the Columbia
-sagging between them, the Snake wiggling down the top third of the east side,
-then dead-straight south and east borders. That is the least you can draw and
-still have it read as Oregon at this size.
+grey pixels under the shape and cost the silhouette its readability.
+
+**The outline is computed from real coordinates**, not sketched. The first
+attempt was drawn by eye and read as a torn rectangle. `pull/oregon-path.js`
+carries 65 waypoints - the Columbia from Astoria to Wallula, the straight 46th
+parallel to the Snake, the Snake down the Idaho line, the `-117.03` meridian,
+the 42nd parallel west, and the coast back up past Cape Blanco - and projects
+them with **x scaled by cos(44°)**, because a degree of longitude at Oregon's
+latitude is 0.72 of a degree of latitude on the ground. Without that the state
+comes out at 1.89:1 instead of its real **1.354:1** and nothing else you do will
+make it look right. Cape Blanco is what stops it reading as a box; do not
+simplify it away.
+
+**The wood frame is a stroke, not a second copy of the shape.** It used to be
+the path scaled to 0.8 behind the fill, which is not how a border works - a
+uniform scale about the centre leaves more wood at the ends than across the
+middle, so the plaque was thick at the coast and thin along the top. One path,
+stroked at 4.4 units with `paint-order:stroke` so the wood sits under the
+plate, gives the same thickness the whole way round.
 
 Three things about it. **An SVG gradient cannot read a CSS custom property**, so
 the four plate gradients repeat the `--t1`..`--t4` stops by hand in a
@@ -931,6 +951,61 @@ single 5s step, which strands a greedy search at zero. It falls back through
 softer signals — at-large → makes-state, win → top4 → top10 → makes-state — and
 finally to mean district score, which always moves. Mean league *place* was
 tried first and was too weak: it shifted ~0.02 against a 0.02 threshold.
+
+## Type and colour
+
+**Three faces, and each has one job.** `--disp` is Oswald and names things:
+team names, section headings, league headings. `--num` is Rajdhani and counts
+them: every figure on every board. **Anton is no longer the site's face** - it is
+the logo's, used for the CHUTE wordmark and for the number on the trophy plate,
+and nowhere else. That is deliberate: the award should read as the same object
+as the mark at the top of the page.
+
+Both are tokens, so changing the pairing is two lines rather than thirty-five.
+
+**The accent is gold, and gold is a light colour.** Red could carry white text;
+`#E8A33D` cannot. `--on-accent` exists for that: near-black on the dark
+theme, white on the light one, and every surface that fills with `--accent` -
+the Run button, the solver button, the draft's remove button - takes its ink
+from it rather than hardcoding `#fff`.
+
+Measured rather than eyeballed: dark ink on `#E8A33D` is 8.5:1 and the gold on
+the dark card is 8.3:1. The light theme's gold had to be walked down from
+`#B77A15` to `#A06811` to clear 4.5:1 with white in both directions -
+`#B77A15` was 3.6:1, which is not enough for a button.
+
+**The favicon is a data URI and cannot read a custom property.** Its accent is
+hardcoded twice in that one string. Change `--accent` and change those too.
+
+**Oswald sets wider than Anton at the same size.** Nine team names started
+truncating on a phone the moment the face changed. Two fixes: the name scales
+with the viewport (`clamp(15.5px, 4.5vw, 19px)`) and the league abbreviation
+is hidden below 430px - it is the one thing on that row with a whole view of its
+own, so it is the one that goes. Zero names truncate at 375px or at 1280px now.
+**Re-check this after any type change.**
+
+## Performance
+
+Measured, on the live board: **135µs a season**, so 89 fit in the 12ms visible
+budget and a 5,000-season run needs about 7% of one core. `paint` is 0.12ms
+light and 0.93ms full, `renderLeagues` 1.1ms twice a second. None of that is
+close to a problem.
+
+`buildBoard` is 25ms and is the only real hitch, once per press of Run. It is
+innerHTML parsing for forty-five cards, not insertion - batching them into a
+DocumentFragment first barely moved it. Left alone rather than optimised into
+something harder to read.
+
+**The rule that matters: anything animating continuously on N elements must
+animate `transform` or `opacity`.** Everything else is a repaint per
+element per frame. A board-wide `border-color` pulse was added and removed
+within a day for exactly this - it re-rastered forty-five rounded rectangles,
+each carrying a gradient, an inset highlight and a drop shadow, on every frame
+of a ten-second run. The progress strip and the churning digits already say a
+run is live, and they cost one element between them.
+
+`will-change:transform` stays on the cards, because they really do transform
+while sorting. It stays **off** the ninety runner rows for the same arithmetic.
 
 ## Cancelling a run
 

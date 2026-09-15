@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0D0D0F">
 <title>Chute</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cg%20transform%3D%22translate(16%2016)%20scale(1.45)%20translate(-20.06%20-11.3)%22%20fill%3D%22%23F0455C%22%3E%3Ccircle%20cx%3D%2227.74%22%20cy%3D%227.9%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2221.02%22%20cy%3D%224.5%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2226.78%22%20cy%3D%2214.7%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2220.06%22%20cy%3D%2211.3%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2213.34%22%20cy%3D%227.9%22%20r%3D%221.9%22%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%22translate(16%2016)%20scale(1.45)%20translate(-20.06%20-11.3)%22%20fill%3D%22none%22%20stroke%3D%22%23F0455C%22%20stroke-width%3D%221.5%22%3E%3Ccircle%20cx%3D%2219.11%22%20cy%3D%2218.1%22%20r%3D%221.7%22%2F%3E%3Ccircle%20cx%3D%2212.38%22%20cy%3D%2214.7%22%20r%3D%221.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cg%20transform%3D%22translate(16%2016)%20scale(1.45)%20translate(-20.06%20-11.3)%22%20fill%3D%22%23E8A33D%22%3E%3Ccircle%20cx%3D%2227.74%22%20cy%3D%227.9%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2221.02%22%20cy%3D%224.5%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2226.78%22%20cy%3D%2214.7%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2220.06%22%20cy%3D%2211.3%22%20r%3D%221.9%22%2F%3E%3Ccircle%20cx%3D%2213.34%22%20cy%3D%227.9%22%20r%3D%221.9%22%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%22translate(16%2016)%20scale(1.45)%20translate(-20.06%20-11.3)%22%20fill%3D%22none%22%20stroke%3D%22%23E8A33D%22%20stroke-width%3D%221.5%22%3E%3Ccircle%20cx%3D%2219.11%22%20cy%3D%2218.1%22%20r%3D%221.7%22%2F%3E%3Ccircle%20cx%3D%2212.38%22%20cy%3D%2214.7%22%20r%3D%221.7%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;--glow:rgba(240,69,92,.16);
+  --bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;--glow:rgba(232,163,61,.18);
   --text:#F3F3F4;--muted:#A2A2AB;--dim:#6C6C77;
-  --accent:#F0455C;--accent-2:#C2364A;--accent-3:#7E3444;
+  --accent:#E8A33D;--accent-2:#B87B22;--accent-3:#6E4D18;--on-accent:#1C1405;
   --t1:linear-gradient(180deg,#7BA6FF,#12379E);--t1e:#9CBEFF;
   --t2:linear-gradient(180deg,#FDFEFF,#969DA8);--t2e:#E8ECF2;
   --t3:linear-gradient(180deg,#F0B784,#834C1D);--t3e:#F2C79D;
@@ -21,12 +21,14 @@
   --tmid:#8B909A;--rain:rgba(204,228,248,.7);
   --shadow:0 1px 2px rgba(0,0,0,.4);
   --ease:cubic-bezier(.22,1,.36,1);
+  --disp:'Oswald','Barlow Condensed',sans-serif;
+  --num:'Rajdhani','Barlow Condensed',sans-serif;
   --rain:rgba(80,114,144,.62);
 }
 [data-theme="light"]{
   --bg:#FBFBFC;--surface:#FFFFFF;--raised:#F1F1F4;--line:#E3E3E8;
   --text:#141417;--muted:#5B5B66;--dim:#8C8C97;
-  --accent:#D41A38;--accent-2:#E06A7C;--accent-3:#EFB8C1;
+  --accent:#A06811;--accent-2:#D9A44E;--accent-3:#EFD7A8;--on-accent:#FFFFFF;
   --t1:linear-gradient(180deg,#4C7BEB,#0B2F8F);--t1e:#2C55BE;
   --t2:linear-gradient(180deg,#FFFFFF,#8D949F);--t2e:#B9C0CA;
   --t3:linear-gradient(180deg,#E3A96E,#7A4519);--t3e:#C08A55;
@@ -46,8 +48,8 @@ body{margin:0;padding:0}
    would notice or name. Fixed, so they do not travel with the scroll. */
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
-    radial-gradient(1100px 620px at 12% -8%, rgba(240,69,92,.10), transparent 62%),
-    radial-gradient(900px 560px at 92% 4%, rgba(124,158,255,.075), transparent 60%)}
+    radial-gradient(1100px 620px at 12% -8%, rgba(232,163,61,.085), transparent 62%),
+    radial-gradient(900px 560px at 92% 4%, rgba(124,158,255,.06), transparent 60%)}
 .wrap,.bar,header{position:relative;z-index:1}
 body{background:var(--bg);color:var(--text);font-family:'Barlow',system-ui,sans-serif;
   font-size:15px;line-height:1.45;padding-bottom:calc(64px + env(safe-area-inset-bottom));
@@ -87,7 +89,7 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
   animation:glTape 1.4s linear infinite}
 @keyframes glTape{to{background-position:11px 0,11px 0}}
 .gl-hd{padding:13px 17px 0}
-.gl-hd h3{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.gl-hd h3{margin:0;font-family:var(--num);font-weight:700;
   font-size:22px;letter-spacing:.01em;line-height:1.05}
 .gl-hd p{margin:3px 0 0;font-size:11px;color:var(--dim)}
 .gl-sec{margin:14px 17px 0;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
@@ -146,13 +148,13 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .dr-x{flex:none;width:14px;height:14px;border-radius:50%;display:grid;place-items:center;
   font-size:11px;line-height:1;background:var(--raised);color:var(--dim);
   transition:background .2s,color .2s}
-.dr-slot.full:hover .dr-x,.dr-row.on:hover .dr-x{background:var(--accent);color:#fff}
+.dr-slot.full:hover .dr-x,.dr-row.on:hover .dr-x{background:var(--accent);color:var(--on-accent)}
 .dr-slot .dr-x{margin-left:auto}
 .dr-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dr-nm em{font-style:normal;color:var(--dim);font-size:10px}
 .dr-cls{flex:none;width:34px;text-align:right;font-size:9px;color:var(--dim);letter-spacing:.04em}
 .dr-t{flex:none;width:54px;text-align:right;font-variant-numeric:tabular-nums;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+  font-family:var(--num);font-weight:700;font-size:13px}
 .gl-again[disabled]{opacity:.4;cursor:default}
 .gl-again[disabled]:hover{border-color:var(--line)}
 /* ---- the pace line: one race, run in front of you ---- */
@@ -207,16 +209,16 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .c-route{fill:none;stroke:var(--text);stroke-width:1.1;stroke-linecap:round;
   stroke-linejoin:round;stroke-dasharray:2.4 2.6;opacity:.45}
 .c-mk circle{fill:var(--surface);stroke:var(--dim);stroke-width:.8}
-.c-mk text{fill:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.c-mk text{fill:var(--muted);font-family:var(--num);font-weight:700;
   font-size:4.4px;text-anchor:middle}
-.c-tag text{fill:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.c-tag text{fill:var(--muted);font-family:var(--num);font-weight:700;
   font-size:5px;letter-spacing:.08em}
 .c-fin text{fill:var(--accent)}
 .c-sm text{font-size:4px;opacity:.7}
 .c-mk circle{fill:var(--surface);stroke:var(--dim);stroke-width:.9}
-.c-mk text{fill:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.c-mk text{fill:var(--muted);font-family:var(--num);font-weight:700;
   font-size:5px;text-anchor:middle}
-.c-tag text{fill:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.c-tag text{fill:var(--muted);font-family:var(--num);font-weight:700;
   font-size:5.5px;letter-spacing:.08em}
 .c-fin text{fill:var(--accent)}
 /* Travel is on the `translate` property, written each frame from a table of points
@@ -243,7 +245,7 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
   z-index:2}
 .pl-wrap.done .pl-dot{animation:none;transform:none}
 .pl-chip{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
-.pl-clock{position:absolute;left:11px;top:8px;font-family:'Barlow Condensed',sans-serif;
+.pl-clock{position:absolute;left:11px;top:8px;font-family:var(--num);
   font-weight:700;font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums}
 .pl-skip{position:absolute;right:11px;top:8px;font-size:9.5px;color:var(--dim)}
 .pl-note{margin:7px 17px 0;font-size:9.5px;color:var(--dim);line-height:1.4}
@@ -253,11 +255,11 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 .pl-fr+.pl-fr{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
 .pl-fr.me .pl-nm{font-weight:600}
 .pl-pl{width:22px;flex:none;text-align:right;color:var(--dim);
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+  font-family:var(--num);font-weight:700;font-size:13px}
 .pl-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pl-nm em{font-style:normal;color:var(--dim);font-size:10px}
 .pl-t{flex:none;font-variant-numeric:tabular-nums;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+  font-family:var(--num);font-weight:700;font-size:13px}
 /* the cloth is six vertical strips rising and falling out of phase — pure
    transforms, so it animates on every engine, unlike an SVG path morph */
 header h1{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:26px;margin:0;
@@ -294,18 +296,18 @@ body.nextseason #wiOut::before{content:"Next season \2014  seniors graduated";
   background:var(--raised);color:var(--dim);font-size:12px;letter-spacing:.02em}
 .rec-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;margin:14px 0 4px}
 .rec-tile{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--surface)}
-.rec-tile b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.rec-tile b{display:block;font-family:var(--num);font-weight:700;
   font-size:24px;line-height:1.05;letter-spacing:-.01em}
 .rec-tile i{display:block;font-style:normal;font-size:10.5px;color:var(--dim);margin-top:3px;line-height:1.35}
 .rec-wrap{overflow-x:auto;margin:10px 0 2px}
 .rec-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-.rec-tbl th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:9.5px;
+.rec-tbl th{font-family:var(--num);font-weight:700;font-size:9.5px;
   letter-spacing:.09em;text-transform:uppercase;color:var(--dim);text-align:right;padding:0 0 5px}
 .rec-tbl th:first-child,.rec-tbl td:first-child{text-align:left}
 .rec-tbl td{padding:6px 0;border-top:1px solid var(--line);text-align:right;
   color:var(--muted);font-variant-numeric:tabular-nums}
 .rec-tbl td:first-child{color:var(--text)}
-.rec-chart .axl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:7px;
+.rec-chart .axl{font-family:var(--num);font-weight:700;font-size:7px;
   letter-spacing:.12em;fill:var(--dim)}
 .rec-chart .axn{font-size:6px;fill:var(--dim);opacity:.8;font-style:italic}
 .rec-tbl .hit{color:var(--t1e);font-weight:600}
@@ -319,7 +321,7 @@ body.nextseason #wiOut::before{content:"Next season \2014  seniors graduated";
 .rec-chart .ax{stroke:var(--line);stroke-width:.7}
 .rec-chart .ideal{stroke:var(--dim);stroke-width:.7;stroke-dasharray:2.5 2.5;opacity:.7;fill:none}
 .rec-chart .pt{fill:var(--t1e);fill-opacity:.85}
-.rec-chart text{fill:var(--dim);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:6px}
+.rec-chart text{fill:var(--dim);font-family:var(--num);font-weight:600;font-size:6px}
 .doc code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
   background:var(--raised);padding:1px 5px;border-radius:5px}
 .view{display:none}
@@ -337,20 +339,24 @@ body.nextseason #wiOut::before{content:"Next season \2014  seniors graduated";
   transition:transform .3s var(--ease)}
 .dsum[aria-expanded="false"] i{transform:rotate(45deg) translate(-1px,-1px)}
 .dials{overflow:hidden;max-height:420px;transition:max-height .34s var(--ease),opacity .26s}
+/* Locked while a run is in flight. Disabled inputs already stop keyboard and
+   pointer, so this only has to say so. */
+.dial input[type=range]:disabled,.seg button:disabled{opacity:.42;cursor:not-allowed}
+body.simming .dial{opacity:.72;transition:opacity .25s}
 .dials.fold{max-height:0;opacity:0}
 .clsw button{font-size:12.5px;padding:7px 4px}
 .switch button{flex:1;background:none;border:0;color:var(--muted);font-family:inherit;font-size:13.5px;
   font-weight:500;padding:6px 0;border-radius:7px;cursor:pointer;transition:color .2s,background .2s}
 .switch button[aria-pressed="true"]{background:var(--raised);color:var(--text)}
 
-h2.sec{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:19px;
-  text-transform:uppercase;letter-spacing:.015em;margin:18px 0 3px}
+h2.sec{font-family:var(--disp);font-weight:700;font-size:18.5px;
+  text-transform:uppercase;letter-spacing:.03em;margin:18px 0 3px}
 .sub2{color:var(--dim);font-size:12.5px;margin:0 0 9px;line-height:1.4}
 
 .dial{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin:8px 0 0;box-shadow:var(--shadow)}
 .dial-top{display:flex;align-items:baseline;justify-content:space-between}
 .dial-lab{font-size:13px;color:var(--muted)}
-.dial-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.dial-val{font-family:var(--num);font-weight:700;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
 .dial-note{color:var(--dim);font-size:11.5px;margin:2px 0 9px;line-height:1.35;min-height:30px}
 input[type=range]{width:100%;-webkit-appearance:none;appearance:none;background:transparent;margin:0;display:block}
 input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line);border-radius:3px}
@@ -416,15 +422,23 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    rest is support underneath, which is how a race-day graphic is ordered and
    very much not how the old card was: five equal chips, none of them louder
    than the others, and the headline figure the same size as "top 10". */
-.tcard{position:absolute;left:0;right:0;top:0;background:var(--surface);
-  border:1px solid var(--line);border-left:0;overflow:hidden;
-  border-radius:9px;padding:9px 11px 10px 14px;box-shadow:var(--shadow);
+/* A flat fill on a flat page gives a card nothing to stand on. Three things do
+   the lifting and none of them touch transform: a surface that is very
+   slightly lighter at the top than the bottom, a one-pixel inset highlight
+   along that top edge, and a real drop shadow under it. */
+.tcard{position:absolute;left:0;right:0;top:0;overflow:hidden;
+  background:linear-gradient(176deg,var(--raised) 0%,var(--surface) 52%,var(--surface) 100%);
+  border:1px solid var(--line);border-left:0;border-radius:11px;
+  padding:10px 12px 11px 15px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),
+             0 1px 1px rgba(0,0,0,.35),
+             0 10px 24px -14px rgba(0,0,0,.95);
   transition:transform .45s var(--ease),border-color .35s,box-shadow .35s;will-change:transform}
 /* The rail is the chance of reaching Lane, read as a height instead of a
    number. It is the one fact every visitor is here for, so it is also the one
    thing legible without reading anything - the eye can run down the left edge
    of the board and see where the field thins out. --q is set every paint. */
-.tcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+.tcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
   background:linear-gradient(to top,var(--accent) calc(var(--q,0) * 100%),var(--line) 0);
   transition:background .35s}
 /* Cards fade up the board in order rather than all appearing at once. Opacity
@@ -438,8 +452,9 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    fact the card states outright. Nothing on the board should need a legend it
    does not have. */
 /* Hover cannot move the card, so it lights it instead. */
-.tcard.tappable:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));
-  box-shadow:0 0 0 1px var(--glow),0 8px 30px -12px var(--glow)}
+.tcard.tappable:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+             0 0 0 1px var(--glow),0 12px 34px -14px var(--glow)}
 /* When a card changes position the rank flips. The skew has to be inside the
    keyframe or the chip un-skews for the length of the animation. */
 @keyframes rankPop{
@@ -452,17 +467,21 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
   transition:background .4s,border-color .4s}
 .rank u{display:block;transform:skewX(9deg);text-decoration:none;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:-.02em;
+  font-family:var(--num);font-weight:700;font-size:17px;letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;color:var(--muted);transition:color .4s}
 /* A trophy is an object, not a badge: no chip behind it, no border, and no
    skew. The lean belongs to the wordmark and to things that read as type; a
    leaning plaque just looks like it is falling over. */
 .rank.tr{background:none;border:0;padding:0;transform:none;
-  min-width:0;width:40px;height:30px;place-items:center}
+  min-width:0;width:42px;height:31px;place-items:center}
 .tro-svg{width:100%;height:100%;display:block;overflow:visible;
   filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55))}
-.tro-n{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;
-  text-anchor:middle;font-variant-numeric:tabular-nums}
+.tro-p{stroke-width:4.4;stroke-linejoin:round;paint-order:stroke}
+/* The number is set in Anton, the wordmark's face - the plate should read as
+   the same object as the mark at the top of the page, not as another number
+   from the board. */
+.tro-n{font-family:'Anton',sans-serif;font-weight:400;font-size:46px;
+  text-anchor:middle}
 /* Engraved: the number is cut into the plate, so it takes a dark fill with a
    one-unit light edge below it rather than sitting on top as flat ink. */
 .rank.p1 .tro-n{fill:#0B2A6B;stroke:#9CBEFF;stroke-width:.6;paint-order:stroke}
@@ -474,21 +493,26 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   0%{transform:scale(1)}38%{transform:scale(1.22)}100%{transform:scale(1)}}
 .rank.tr.bump{animation:rankPopFlat .42s var(--ease)}
 .crest{width:26px;height:26px;border-radius:5px;flex:none;object-fit:contain;background:var(--raised)}
-.crest.fb,.crest-sm.fb{display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;
+.crest.fb,.crest-sm.fb{display:grid;place-items:center;font-family:var(--num);
   font-weight:700;color:var(--muted);border:1px solid var(--line);letter-spacing:-.02em}
 .crest.fb{font-size:11px}
 .crest-sm.fb{font-size:8px}
 .tc-name{flex:1;min-width:0}
-.tc-name b{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:19.5px;
+.tc-name b{font-family:var(--disp);font-weight:700;font-size:clamp(15.5px,4.5vw,19px);
   text-transform:uppercase;letter-spacing:.004em;display:block;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.08}
 .tc-lg{font-style:normal;color:var(--dim);font-size:9.5px;flex:none;
   letter-spacing:.1em;text-transform:uppercase;text-align:right}
+/* On a narrow phone the head row is rank, crest, name, league and the coaches
+   chip, and the name loses. The league is the one thing there that has a whole
+   view of its own, so it is the one that goes: six names were being truncated
+   at 375px and none are now. */
+@media (max-width:430px){.tc-lg{display:none}}
 /* The coaches poll rank. Outlined rather than filled so it reads as somebody
    else's opinion sitting on our card, not as one of our own numbers. */
-.poll,.poll-gap{flex:none;width:62px;box-sizing:border-box}
+.poll,.poll-gap{flex:none;width:56px;box-sizing:border-box}
 .poll{display:inline-flex;align-items:baseline;justify-content:flex-end;gap:3px;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
+  font-family:var(--num);font-weight:700;font-size:13px;
   line-height:1;padding:3px 6px 4px;border-radius:5px;
   border:1px solid var(--t1e);color:var(--t1e);font-variant-numeric:tabular-nums}
 .poll u{text-decoration:none;font-size:7px;letter-spacing:.09em;opacity:.75;
@@ -502,7 +526,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    shrunk by a rule that was only ever meant for the small chips. */
 .tc-big{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:9px;align-items:end}
 .tc-big>span{display:block;min-width:0}
-.tcard .tc-big b{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.tcard .tc-big b{font-family:var(--num);font-weight:700;
   font-size:clamp(27px,8.4vw,34px);line-height:.9;letter-spacing:-.025em;
   font-variant-numeric:tabular-nums;display:block}
 .tcard .tc-big i{font-style:normal;display:block;font-size:8px;letter-spacing:.11em;
@@ -542,7 +566,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   place-items:center;background:var(--raised);border:1px solid var(--line);transform:skewX(-9deg);
   transition:background .4s,border-color .4s}
 .rpl u{display:block;transform:skewX(9deg);text-decoration:none;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14.5px;letter-spacing:-.02em;
+  font-family:var(--num);font-weight:700;font-size:14.5px;letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;color:var(--muted);transition:color .4s}
 .rrow.p1 .rpl{background:var(--t1);border-color:var(--t1e)}.rrow.p1 .rpl u{color:#fff}
 .rrow.p2 .rpl{background:var(--t2);border-color:var(--t2e)}.rrow.p2 .rpl u{color:#1B1D21}
@@ -556,11 +580,11 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rlab.a3 i{background:var(--t3)}
 .rnm{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
 .rnt{min-width:0;line-height:1.24}
-.rnt b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+.rnt b{display:block;font-family:var(--num);font-weight:600;font-size:15px;
   letter-spacing:.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rnm em{display:block;font-style:normal;color:var(--dim);font-size:10.5px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rfig{flex:none;width:48px;text-align:right;font-family:'Barlow Condensed',sans-serif;
+.rfig{flex:none;width:48px;text-align:right;font-family:var(--num);
   font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
 .rfig b{display:block;font-weight:inherit;font-size:inherit}
 .rfig.spin b{color:var(--muted)}
@@ -586,23 +610,25 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .td-row+.td-row{border-top:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
 .td-row.out{opacity:.5}
 .td-pl{width:16px;flex:none;text-align:right;color:var(--dim);
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px}
+  font-family:var(--num);font-weight:700;font-size:13px}
 .td-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .td-nm em{font-style:normal;color:var(--dim);font-size:10px}
 .td-t{flex:none;width:52px;text-align:right;font-variant-numeric:tabular-nums;
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13.5px}
+  font-family:var(--num);font-weight:700;font-size:13.5px}
 .td-t.sim{color:var(--t1e)}
 .tcard{cursor:default}
 .tcard.tappable{cursor:pointer}
 .tcard.tappable:focus-visible{outline:2px solid var(--t1e);outline-offset:2px}
 .strip{display:flex;align-items:flex-end;gap:2px;height:16px;margin-bottom:8px}
-/* While seasons are running the whole board breathes very slightly at the
-   edges. It is the only thing on the page that says "this is still going"
-   once the reader has scrolled past the progress strip. */
-#board.running .tcard{animation:cardIn .5s var(--ease) both,liveEdge 2.4s ease-in-out infinite}
-@keyframes liveEdge{
-  0%,100%{border-color:var(--line)}
-  50%{border-color:color-mix(in srgb,var(--accent) 26%,var(--line))}}
+/* There was a border-colour pulse on every card here while a run was going.
+   It is gone. border-color is not a compositor property, so it re-rastered all
+   forty-five rounded rectangles - each carrying a gradient, an inset highlight
+   and a drop shadow - on every frame of a ten-second run. The progress strip
+   and the churning digits already say the run is live, and they cost one
+   element between them rather than forty-five.
+   The rule generalises: anything that animates continuously on N elements must
+   animate transform or opacity. Everything else is a repaint per element per
+   frame. */
 .strip s{flex:1;background:var(--line);border-radius:1px;height:2px;text-decoration:none;
   transition:height .2s var(--ease),background-color .3s,opacity .3s}
 /* while the pack is moving every bar cycles the spectrum, staggered into a wave */
@@ -616,7 +642,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    support strip under a rule, rather than as five things competing with them. */
 .odds{display:flex;gap:4px;border-top:1px solid var(--line);padding-top:7px}
 .odd{flex:1;text-align:center;min-width:0}
-.odd b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;display:block;
+.odd b{font-family:var(--num);font-weight:600;font-size:14px;display:block;
   line-height:1.05;font-variant-numeric:tabular-nums;transition:color .35s}
 .odd i{font-style:normal;font-size:8px;color:var(--dim);letter-spacing:.07em;
   text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
@@ -626,15 +652,15 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .dhead{width:100%;background:none;border:0;color:inherit;font-family:inherit;display:flex;
   justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;cursor:pointer;text-align:left}
 .dhead .ttl{display:flex;align-items:center;gap:8px;min-width:0}
-.dhead h3{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:15px;
-  text-transform:uppercase;letter-spacing:.02em;margin:0;
+.dhead h3{font-family:var(--disp);font-weight:600;font-size:14.5px;
+  text-transform:uppercase;letter-spacing:.04em;margin:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dhead span{color:var(--dim);font-size:11px;flex:none;text-align:right}
 .dbody{padding:0 11px 8px}
 .drow,.prow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 0;
   border-top:1px solid var(--line);font-size:13.5px}
 .drow .nm,.prow .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:7px}
-.drow .v,.prow .m,.prow .p{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15.5px;width:52px;
+.drow .v,.prow .m,.prow .p{font-family:var(--num);font-weight:600;font-size:15.5px;width:52px;
   text-align:right;font-variant-numeric:tabular-nums}
 .drow .v.hi{color:var(--accent)}
 .drow .v.lo,.prow .m{color:var(--dim);font-weight:500}
@@ -654,7 +680,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .tabs button{background:none;border:0;color:var(--dim);font-family:inherit;font-size:12px;padding:7px 8px;
   border-radius:7px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap}
 .tabs button[aria-pressed="true"]{background:var(--raised);color:var(--text)}
-.go{flex:1;min-width:78px;background:var(--accent);color:#fff;border:0;font-family:'Barlow Condensed',sans-serif;
+.go{flex:1;min-width:78px;background:var(--accent);color:var(--on-accent);border:0;font-family:var(--num);
   font-weight:700;font-size:15px;border-radius:9px;cursor:pointer;transition:transform .18s var(--ease),opacity .2s}
 .go:active{transform:scale(.97)}
 .go.running{background:var(--raised);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
@@ -688,21 +714,21 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   background:var(--raised);color:var(--text);font-family:inherit;font-size:15px;
   line-height:1;cursor:pointer;padding:0}
 .step button:active{transform:scale(.9)}
-.step span{width:44px;text-align:center;font-family:'Barlow Condensed',sans-serif;
+.step span{width:44px;text-align:center;font-family:var(--num);
   font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
 .step span.on{color:var(--accent)}
 .cmp{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:7px 0;
   border-top:1px solid var(--line);font-size:13.5px;align-items:baseline}
-.cmp b{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+.cmp b{font-family:var(--num);font-weight:600;font-size:15px;
   width:52px;text-align:right;font-variant-numeric:tabular-nums;display:block}
-.cmp .d{width:56px;text-align:right;font-family:'Barlow Condensed',sans-serif;
+.cmp .d{width:56px;text-align:right;font-family:var(--num);
   font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
 .cmp .d.up{color:#3FB37F}.cmp .d.dn{color:var(--accent)}.cmp .d.flat{color:var(--dim)}
 .cmphead{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;font-size:9.5px;
   color:var(--dim);padding-bottom:2px}
 .cmphead span:not(:first-child){width:52px;text-align:right}
 .cmphead span:last-child{width:56px}
-.solve{background:var(--accent);color:#fff;border:0;font-family:'Barlow Condensed',sans-serif;
+.solve{background:var(--accent);color:var(--on-accent);border:0;font-family:var(--num);
   font-weight:700;font-size:14px;padding:0 16px;border-radius:9px;cursor:pointer;
   transition:transform .18s var(--ease)}
 .solve:active{transform:scale(.96)}
@@ -712,9 +738,9 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .ibar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
 .ibar i{display:block;height:100%;background:var(--accent);border-radius:3px;
   transition:width .5s var(--ease)}
-.ival{text-align:right;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.ival{text-align:right;font-family:var(--num);font-weight:700;
   font-size:14px;font-variant-numeric:tabular-nums;color:var(--accent)}
-.doc h3{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:15px;
+.doc h3{font-family:var(--num);font-weight:600;font-size:15px;
   margin:16px 0 3px;color:var(--text)}
 .doc p{font-size:13px;color:var(--muted);margin:0 0 7px;line-height:1.5}
 .doc table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 10px}
@@ -725,7 +751,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .doc td:not(:first-child),.doc th:not(:first-child){text-align:right}
 .doc .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:7px;margin:11px 0 13px}
 .doc .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
-.doc .stat b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+.doc .stat b{display:block;font-family:var(--num);font-weight:700;
   font-size:21px;line-height:1.05;color:var(--text);font-variant-numeric:tabular-nums}
 .doc .stat i{font-style:normal;display:block;font-size:9.5px;color:var(--dim);
   line-height:1.3;margin-top:2px}
@@ -734,7 +760,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .doc figure svg{width:100%;height:auto;display:block;overflow:visible}
 .doc figcaption{font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.45}
 .dg-lbl{font-size:8px;fill:var(--dim);font-family:inherit}
-.dg-key{font-size:8.5px;fill:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:600}
+.dg-key{font-size:8.5px;fill:var(--text);font-family:var(--num);font-weight:600}
 .dg-box{fill:var(--surface);stroke:var(--line)}
 .dg-line{stroke:var(--line);fill:none}
 .doc code{background:var(--raised);padding:1px 5px;border-radius:3px;font-size:11.5px;
@@ -6486,18 +6512,16 @@ function paintBar(s,p,count){
    Only about twelve teams a board are ranked; everyone else gets nothing,
    because "unranked" is what the poll actually says about them. */
 /* Oregon, at the only size this is ever drawn. */
-const OR_PATH="M2.5 9L8 12L14 15L20 17L26 18L32 17.5L38 18.5L44 17L50 16L56 15L62 13.5L68 12L74 10.5L80 9L86 7.5L90 6L92 11L90 16L92 22L90 27L91 32L89.5 36L89 40L89 72L2 72L1.6 65L2.8 58L1.4 51L2.6 44L1.2 37L2.6 30L1.4 23L2.8 16Z";
+const OR_PATH="M6.5 0L10.6 1.6L14.3 1.9L17.3 2.2L20.8 3.5L22 5.5L22.5 7.4L23.8 9.3L25.7 10.9L28.9 12.4L33 10.9L35.7 9.9L39.2 9.9L42.2 9.3L45.4 10.9L48.8 9.2L50.9 9.9L54.4 8.6L58.3 7.4L61.8 6.1L65.3 5.9L68.9 5.4L69.5 4.7L79.2 4.7L89.2 4.7L95.1 4.7L96.9 7.4L97.6 9.9L96 11.6L96.9 14.4L98.4 16.4L99.8 18.5L100 20.2L97.9 22.3L96.1 24.6L95 26.5L94.5 28.9L93.4 30.6L91.4 32.3L91.4 34.4L93.5 35.8L95.4 36.7L94.4 37.9L93.8 40.1L93.8 53.1L93.8 66.9L93.8 73.8L79.2 73.8L64.3 73.8L49.4 73.8L34.5 73.8L19.5 73.8L4.5 73.8L2.1 66.6L0.6 61.7L0 59.3L1.5 54.5L3.1 49.6L4.4 44.4L5.6 38.9L6.2 32.3L6.5 25.4L7 18.5L7.5 11.6L7.8 5.5Z";
 /* Top four get the plaque; everyone else keeps the plain chip. Four because
    OSAA awards four trophies, which is the same reason the distribution bars
    colour the first four places and nothing below. */
 function rankMark(i){
   const n=i+1;
   if(i>=4)return '<u>#'+n+'</u>';
-  return '<svg class="tro-svg" viewBox="0 0 100 76" aria-hidden="true">'
-    +'<path fill="url(#trgw)" d="'+OR_PATH+'"/>'
-    +'<path fill="url(#trg'+n+')" d="'+OR_PATH+'"'
-    +' transform="translate(50 39) scale(.8) translate(-50 -39)"/>'
-    +'<text class="tro-n" x="50" y="53">'+n+'</text></svg>';
+  return '<svg class="tro-svg" viewBox="-3 -3 106 79.83" aria-hidden="true">'
+    +'<path class="tro-p" fill="url(#trg'+n+')" stroke="url(#trgw)" d="'+OR_PATH+'"/>'
+    +'<text class="tro-n" x="50" y="53.2">'+n+'</text></svg>';
 }
 
 function pollChip(name){
@@ -6522,6 +6546,7 @@ function buildBoard(tally){
       ${FIELD>10?`<span><i style="background:var(--line)"></i>11–${FIELD}</span>`:""}
     </div><div id="board"></div>`;
   const board=document.getElementById("board");
+  const frag=document.createDocumentFragment();
   cards=tally.map((t,ci)=>{
     const el=document.createElement("div");
     el.className="tcard";
@@ -6552,9 +6577,12 @@ function buildBoard(tally){
     el.addEventListener("click",()=>showTeam(t.idx));
     el.addEventListener("keydown",e=>{
       if(e.key==="Enter"||e.key===" "){e.preventDefault();showTeam(t.idx);}});
-    board.appendChild(el);
+    frag.appendChild(el);
     return {el,t,pos:-1,prev:{}};
   });
+  /* One insertion rather than forty-five. The cards are only reachable through
+     `cards` afterwards, so nothing needs them in the document while the loop runs. */
+  board.appendChild(frag);
   measure();
 }
 
@@ -6806,7 +6834,7 @@ function runWorlds(model,worlds,seasons,label,onEnd){
   go.textContent="…";go.classList.add("running");
   const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
         pk=document.getElementById("pack");
-  rb.classList.add("on");document.body.classList.add("simming");
+  rb.classList.add("on");document.body.classList.add("simming");lockDials(true);
   const times=new Float64Array(model.runners.length);
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
@@ -6824,7 +6852,7 @@ function runWorlds(model,worlds,seasons,label,onEnd){
     lab.textContent=label+" "+done.toLocaleString()+"/"+seasons.toLocaleString();
     if(done<seasons)nextTick(step);
     else{
-      rb.classList.remove("on");document.body.classList.remove("simming");
+      rb.classList.remove("on");document.body.classList.remove("simming");lockDials(false);
       lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
       onEnd(done);
     }
@@ -6900,7 +6928,7 @@ function solveGoal(){
         pk=document.getElementById("pack");
   running=true;
   const go=document.getElementById("go");go.textContent="…";go.classList.add("running");
-  rb.classList.add("on");document.body.classList.add("simming");
+  rb.classList.add("on");document.body.classList.add("simming");lockDials(true);
   out.innerHTML="";
 
   const EV=420;                                   // paired, so this is plenty
@@ -6949,7 +6977,7 @@ function solveGoal(){
   let best=p0;
 
   const done=(msg)=>{
-    rb.classList.remove("on");document.body.classList.remove("simming");
+    rb.classList.remove("on");document.body.classList.remove("simming");lockDials(false);
     lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
     document.getElementById("wiOut").innerHTML=`<div class="note">${msg}</div>`;
   };
@@ -6968,7 +6996,7 @@ function solveGoal(){
   }
 
   const stop=(b,total,stalled)=>{
-    rb.classList.remove("on");document.body.classList.remove("simming");
+    rb.classList.remove("on");document.body.classList.remove("simming");lockDials(false);
     lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
     finishSolve(cur,key,label,p0,b,total,stalled);
   };
@@ -7162,7 +7190,7 @@ function run(){
     return;
   }
   running=true;skip=false;
-  document.body.classList.add("simming");
+  document.body.classList.add("simming");lockDials(true);
   const go=document.getElementById("go");
   go.textContent="Finish";go.classList.add("running");
   const T=blankTally(model), tally=T.list;
@@ -7210,7 +7238,7 @@ function run(){
       lab.textContent=`±${sigmaPct.toFixed(1)}%`;
       go.textContent="Run again";go.classList.remove("running");
       running=false;
-      document.body.classList.remove("simming");
+      document.body.classList.remove("simming");lockDials(false);
       nextTick(refreshView);
     }
   });
@@ -7568,7 +7596,13 @@ function syncVar(){
 /* Stop whatever is in flight and put the controls back. Called by clearOut, so
    every switch that invalidates the model gets this for free rather than each
    handler having to remember. */
+function lockDials(on){
+  document.querySelectorAll('.dial input[type=range], .seg button[data-v]')
+    .forEach(el=>{el.disabled=on;});
+}
+
 function cancelRun(){
+  lockDials(false);
   runGen++;
   running=false;skip=false;
   document.body.classList.remove("simming");
