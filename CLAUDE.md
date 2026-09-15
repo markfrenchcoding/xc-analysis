@@ -206,11 +206,20 @@ That is large, not cosmetic: 6A boys goes from 45 teams able to field five to
 that reason, and it carries the live count, because how much of the board
 survives changes with the classification and the gender.
 
-**The fix, if it is ever wanted, is one line and a re-pull.**
-`ATHLETES_PER_TEAM` in `pull/seed.js` is 7. Raising it changes nothing about this
-season - `buildModel` already slices to the top seven - but it would let next
-season pick its seven from the runners who actually return instead of from
-whatever the cap happened to leave. It costs seed size and nothing else.
+**The cap is twelve, not seven, and that is why.** `ATHLETES_PER_TEAM` in
+`pull/seed.js` was seven because seven is what a team races - right for this
+season's board and wrong for any question about a roster that is not this one.
+Twelve gives the returning seven somewhere to come from.
+
+It changes nothing about this season: `buildModel` slices to the top seven
+regardless, so the board is built from the same runners it always was. The only
+cost is seed size. Do not "tidy" it back to seven.
+
+One subtlety worth knowing: the seed ranks by raw best mark, `buildModel` ranks
+by `sb`, and `sb` carries the lone-mark regression. Under a seven cap those two
+orderings could disagree at the boundary, so an eighth-fastest athlete with two
+marks could outrank a seventh with one and never get the chance. A deeper cap
+removes that quietly as well.
 
 **The flag: your Oregon Dream Team.** Tapping the checkered flag opens a
 draft. Pick any seven athletes in the state — any school, any classification —
@@ -241,6 +250,16 @@ every one of the two thousand runnings is the same seventeen teams.
 
 **The classification switcher does not reach the draft**, deliberately. The
 board behind it still says 3A or 2A/1A; the race is always all of Oregon.
+
+**The gender switcher does not reach it either, but the draft has its own.**
+`DR.g` starts from the board so the first open is never arbitrary, and after
+that the switch in the draft header owns it - `draftPool` and `stateModel` both
+read `DR.g` rather than `gender`. Before this, seeing the girls' Dream Team
+meant closing the draft, changing the board and opening it again, which is three
+steps to answer a question nobody was asking about the board.
+
+Switching sides clears the picks and cancels any race in flight, because it has
+to: a boys' seven cannot line up against the girls' sixteen.
 
 **Drafted runners are ghosts.** Their own school still lines up with them, so a
 star drafted away is on the course twice and the results feed will show the same

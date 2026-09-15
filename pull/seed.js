@@ -138,10 +138,19 @@
 
   /* ---------- the build ----------
      rows: {g, name, school, grade, seconds, dist, date}
-     Trim to three marks an athlete and seven athletes a team, which is what the
-     model uses and keeps the file a third of the size it would be raw. */
+     Trim to three marks an athlete and a dozen athletes a team. Three is what
+     the model samples; twelve is deeper than it scores, on purpose - see the
+     cap below. */
   const MARKS_PER_ATHLETE = 3;
-  const ATHLETES_PER_TEAM = 7;
+  /* Seven is what a team races and five is what scores, so seven was the
+     obvious cap - and it is wrong for any question about a roster that is not
+     this one. Next season is this season minus its seniors, and a squad losing
+     four of its seven showed three returners when the real team has a dozen more
+     runners nobody had recorded. Twelve gives the returning seven somewhere to
+     come from.
+     It changes nothing about this season: buildModel slices to the top seven
+     anyway. The only cost is seed size. */
+  const ATHLETES_PER_TEAM = 12;
 
   /* Summer does not count. athletic.net carries July running-camp time trials
      under the same season - "5,000 Meters Week 1" at Steens Mountain - and they

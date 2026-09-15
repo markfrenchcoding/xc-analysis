@@ -109,6 +109,8 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 @keyframes dreamRun{to{background-position:280% 0}}
 .gl-hd h3 .dream{letter-spacing:0}
 .pl-nm .dream{font-size:10px}
+.dr-gsw{margin:10px 0 0;width:100%}
+.dr-gsw button{flex:1}
 .dr-slots{display:flex;flex-wrap:wrap;gap:5px;margin:12px 17px 0}
 .dr-slot{flex:1 1 calc(25% - 4px);min-width:88px;display:flex;align-items:center;gap:5px;
   min-height:32px;padding:4px 6px;border-radius:9px;background:var(--bg);
@@ -6059,12 +6061,17 @@ function showDraft(){
   drCancel();
   document.body.classList.add("gunlap-fire");
   setTimeout(()=>document.body.classList.remove("gunlap-fire"),1500);
-  if(DR.g!==gender){DR.g=gender;DR.pool=draftPool(gender);DR.pick=[];DR.q="";}
+  if(!DR.g){DR.g=gender;}
+  if(!DR.pool.length||DR.poolG!==DR.g){DR.poolG=DR.g;DR.pool=draftPool(DR.g);DR.pick=[];DR.q="";}
   const el=overlay();
   el.innerHTML='<div class="gl-card gl-wide" role="dialog" aria-label="Your Oregon Dream Team">'
     +'<div class="gl-tape"></div>'
     +'<div class="gl-hd"><h3>Who Makes Your Oregon <span class="dream">Dream Team</span>?</h3>'
-    +'<p>Seven runners of your choosing, toeing the line at State as a Dream Team.</p></div>'
+    +'<p>Seven runners of your choosing, toeing the line at State as a Dream Team.</p>'
+    +'<div class="switch dr-gsw" role="group" aria-label="Race">'
+    +'<button data-dg="M"'+(DR.g==="M"?' aria-pressed="true"':' aria-pressed="false"')+'>Boys</button>'
+    +'<button data-dg="F"'+(DR.g==="F"?' aria-pressed="true"':' aria-pressed="false"')+'>Girls</button>'
+    +'</div></div>'
     +'<div class="dr-slots" id="drSlots"></div>'
     +'<div class="dr-meta" id="drMeta"></div>'
     +'<div class="dr-tools">'
@@ -6074,6 +6081,15 @@ function showDraft(){
     +'<div class="dr-list" id="drList"></div>'
     +'<button class="gl-again" id="drGo">Race them</button>'
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  /* Switching sides throws the picks away, because it has to: a boys' seven
+     cannot line up against the girls' sixteen. Any race already running is
+     cancelled for the same reason. */
+  el.querySelectorAll(".dr-gsw button").forEach(b=>b.onclick=()=>{
+    if(b.dataset.dg===DR.g)return;
+    drCancel();
+    DR.g=b.dataset.dg;DR.poolG=DR.g;DR.pool=draftPool(DR.g);DR.pick=[];DR.q="";
+    showDraft();
+  });
   const q=document.getElementById("drQ");
   q.value=DR.q;
   q.oninput=()=>{DR.q=q.value;drList();};
@@ -6156,7 +6172,7 @@ function drList(){
 function drRace(){
   drCancel();
   DR.live=true;DR.oddsHTML="";
-  const model=stateModel(gender);
+  const model=stateModel(DR.g);
   if(model.teams.length<2)return;
   const gi=addGuest(model,DR.pick);
   const sigma=sigmaPct/100;

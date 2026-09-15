@@ -64,19 +64,23 @@ for (const r of after) {
   perTeam.get(t).add(r.name);
 }
 eq(Math.max(...perAthlete.values()), S.MARKS_PER_ATHLETE, 'at most three marks an athlete');
-eq(Math.max(...[...perTeam.values()].map(s => s.size)), S.ATHLETES_PER_TEAM, 'at most seven a team');
+// the shipped seed was built under whatever cap was current, so this is a
+// ceiling rather than an equality - raising the cap must not fail the round trip
+ok(Math.max(...[...perTeam.values()].map(s => s.size)) <= S.ATHLETES_PER_TEAM,
+   'no team is over the cap of ' + S.ATHLETES_PER_TEAM);
 ok(after.every(r => !/[,"]/.test(r.name)), 'no commas or quotes in a name');
 
 /* ---------- trimming actually happens ----------
    An eighth athlete and a fourth mark have to be discarded, or the round trip
    above is passing because nothing was ever over the cap. */
+const OVER = S.ATHLETES_PER_TEAM + 2;
 const fake = [];
-for (let i = 0; i < 9; i++) for (let m = 0; m < 4; m++)
+for (let i = 0; i < OVER; i++) for (let m = 0; m < S.MARKS_PER_ATHLETE + 1; m++)
   fake.push({ g: 'M', name: 'Runner ' + i, school: 'Jesuit', grade: '11',
               seconds: (900 + i * 10 + m).toString(), dist: 5000, date: '2026-09-01' });
 const cut = S.buildSeed(fake, board);
-eq(cut.athletes, 7, 'an eighth athlete is cut');
-eq(cut.rows, 21, 'a fourth mark is cut');
+eq(cut.athletes, S.ATHLETES_PER_TEAM, 'the athlete past the cap is cut');
+eq(cut.rows, S.ATHLETES_PER_TEAM * S.MARKS_PER_ATHLETE, 'the mark past the cap is cut');
 eq(cut.latest, '2026-09-01', 'the latest date comes back for DATA_DATE');
 
 /* ---------- summer is not the season ---------- */

@@ -230,7 +230,7 @@ function main() {
   /* ---------- build and report ---------- */
   const b = Seed.buildSeed(S.rows, board);
   const date = b.latest || new Date().toISOString().slice(0, 10);
-  const wasRows = (html.match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
+  const wasRows = (fs.readFileSync(IDX, 'utf8').match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
     .trim().split(/\r?\n/).length - 1;
 
   log('');
@@ -258,7 +258,13 @@ function main() {
     log('\n  nothing changed'); process.exitCode = 3; return;
   }
 
-  let out = Seed.patchIndex(html, b.csv, date);
+  /* Re-read rather than patching the copy taken twenty minutes ago. The crawl
+     holds index.html open for the length of a run, and anything edited in that
+     window - by hand, or by a publish - would be silently reverted by writing
+     the stale snapshot back. Only the seed and the crest map are ours to
+     change; everything else in the file belongs to whoever touched it last. */
+  const fresh = fs.readFileSync(IDX, 'utf8');
+  let out = Seed.patchIndex(fresh, b.csv, date);
   out = Seed.patchLogos(out, S.logos);
   fs.writeFileSync(IDX, out);
 
