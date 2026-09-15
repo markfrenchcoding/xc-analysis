@@ -188,6 +188,30 @@ The runner tally counts `win`, `top21` and `placeSum`/`n`. It used to count
 top-5/10/20, which matched nothing the board marks; twenty-one is the all-state
 line, so that is what is counted and what the column shows.
 
+**Next season, which is this season minus its seniors.** A switch in `#ctl`
+beside Boys/Girls sets `NEXT_SEASON`, and `buildModel` drops every grade-12 row.
+It lives there rather than in its own view because it changes the *input* to all
+three Odds boards at once, which is the same reason the classification and
+gender switches live there: one run, three readings.
+
+**It is a returning-runners board, not a forecast, and the difference is the
+roster cap.** The seed keeps each team's fastest seven and nothing below, so a
+squad losing four seniors shows three returners when the real team has a dozen
+more runners the database has never heard of. Nobody arrives either - no
+incoming freshmen, no year of improvement - so every team is understated, and
+the senior-heavy ones are understated worst.
+
+That is large, not cosmetic: 6A boys goes from 45 teams able to field five to
+**26**. The note under the switch is generated rather than written for exactly
+that reason, and it carries the live count, because how much of the board
+survives changes with the classification and the gender.
+
+**The fix, if it is ever wanted, is one line and a re-pull.**
+`ATHLETES_PER_TEAM` in `pull/seed.js` is 7. Raising it changes nothing about this
+season - `buildModel` already slices to the top seven - but it would let next
+season pick its seven from the runners who actually return instead of from
+whatever the cap happened to leave. It costs seed size and nothing else.
+
 **The flag: your Oregon Dream Team.** Tapping the checkered flag opens a
 draft. Pick any seven athletes in the state — any school, any classification —
 and they race **the sixteen fastest schools in Oregon**, 6A through 1A, once in
@@ -788,6 +812,22 @@ finally to mean district score, which always moves. Mean league *place* was
 tried first and was too weak: it shifted ~0.02 against a 0.02 threshold.
 
 ## Timers
+
+**Three ways in, not two.** `nextTick` schedules a frame, a timer, and a
+visibilitychange listener, and the first to arrive wins. The third matters
+because a hidden tab’s timers are clamped to about once a second and, after a
+few minutes hidden, to once a minute - so the timer is a promise of an eventual
+tick, not a prompt one. Waking on the return to the tab is what stops coming
+back from feeling like the page has seized.
+
+**And no tick may block.** Both season loops pace against the wall clock: each
+tick works out how far along the run should be and catches up. Leave the tab for
+a minute and the target on return is the whole remaining run, which the old code
+did in one synchronous batch - a dead page at the moment somebody is looking at
+it again. `catchUp` caps the work by time instead, 12ms visible and 250ms hidden,
+checking the clock every sixteenth season. Falling behind costs a run that ends
+a little after its nominal ten seconds, which nobody notices; blocking costs a
+page that appears hung, which everybody does.
 
 `nextTick` schedules **both** a frame and a timer and lets the first to arrive
 win: the frame while the page is painting, the timer at 150ms when it is not.

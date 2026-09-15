@@ -16,6 +16,9 @@ const lines = src.split(/\r?\n/);
 const WANT = [
   'CLASSES', 'CLS', 'LEAGUES', 'AUTO', 'autoFor', 'autoTotal', 'TEAM_LEAGUE', 'setClass',
   'CAL', 'MARK_W', 'LONE', 'TEAM_SHARE', 'SIG_T',
+  // buildModel reads this, so the headless copy needs it declared or it throws
+  // the moment the function runs rather than when the file loads
+  'NEXT_SEASON',
   'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'buildModel', 'scoreMeet',
   'SK_HI', 'SK_MEAN', 'SK_SD',
   'playDistricts', 'playState', 'skew', 'spare', 'gauss', 'pickMark', 'draw', 'shift',

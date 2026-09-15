@@ -117,6 +117,8 @@ const TEAM_SHARE=0.30;
 
 const SIG_T=Math.sqrt(TEAM_SHARE), SIG_I=Math.sqrt(1-TEAM_SHARE);
 
+let NEXT_SEASON=false;
+
 function splitCSVLine(l){
   const o=[];let c="",q=false;
   for(let i=0;i<l.length;i++){const ch=l[i];
@@ -156,6 +158,7 @@ function buildModel(g,dist){
   const byTeam=new Map();
   for(const r of DATA){
     if(r.g!==g||r.dist!==dist||r.cls!==CLS)continue;
+    if(NEXT_SEASON&&String(r.grade).trim()==="12")continue;   // graduated
     if(!byTeam.has(r.team))byTeam.set(r.team,new Map());
     const t=byTeam.get(r.team);
     if(!t.has(r.name)) t.set(r.name,{name:r.name,grade:r.grade,marks:[]});

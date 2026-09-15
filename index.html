@@ -267,6 +267,14 @@ header .asof{color:var(--muted);font-size:10.5px}
    set, so it is the only one that hides them. */
 .ctl.off{display:none}
 .vsw{margin:10px 0 11px}
+.ns-note{margin:8px 2px 0;font-size:12.5px;line-height:1.45;color:var(--dim)}
+.ns-note em{font-style:normal;color:var(--text)}
+/* a quiet standing reminder that the board is not this year's */
+/* two spaces after the escape on purpose: a CSS escape sequence eats the space
+   that terminates it, so one is consumed and one survives into the text */
+body.nextseason #board::before{content:"Next season \2014  seniors graduated";
+  display:block;margin:0 0 9px;padding:5px 9px;border-radius:6px;
+  background:var(--raised);color:var(--dim);font-size:12px;letter-spacing:.02em}
 .rec-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;margin:14px 0 4px}
 .rec-tile{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--surface)}
 .rec-tile b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;
@@ -4298,6 +4306,11 @@ M,Malachi Dyer,26:52.14,10,Yoncalla,5000,2A/1A
       <button data-g="M" aria-pressed="true">Boys</button>
       <button data-g="F" aria-pressed="false">Girls</button>
     </div>
+    <div class="switch" role="group" aria-label="Season">
+      <button data-ns="0" aria-pressed="true">This season</button>
+      <button data-ns="1" aria-pressed="false">Next season</button>
+    </div>
+    <p class="ns-note" id="nsNote" hidden></p>
     <button class="dsum" id="dsum" aria-expanded="true" aria-controls="dials">
       <span id="dsumT">Hide settings</span><i></i>
     </button>
@@ -4692,10 +4705,17 @@ function parseCSV(text){
 }
 
 /* ---------- model ---------- */
+/* Next season, to a first approximation, is this season minus its seniors.
+   That is a real thing the database can answer and a forecast is not: every
+   returning runner is held at the marks they actually ran, nobody is invented,
+   and no improvement curve is applied. It therefore understates every team, and
+   understates the young ones least - which is the whole point of looking. */
+let NEXT_SEASON=false;
 function buildModel(g,dist){
   const byTeam=new Map();
   for(const r of DATA){
     if(r.g!==g||r.dist!==dist||r.cls!==CLS)continue;
+    if(NEXT_SEASON&&String(r.grade).trim()==="12")continue;   // graduated
     if(!byTeam.has(r.team))byTeam.set(r.team,new Map());
     const t=byTeam.get(r.team);
     if(!t.has(r.name)) t.set(r.name,{name:r.name,grade:r.grade,marks:[]});
@@ -5113,12 +5133,47 @@ const MIN_GAIN=0.004;               // ignore a candidate that sits inside the n
    which is a frame late - a tab backgrounded after that check leaves the
    callback pending and strands the run half-finished, with no way back. This
    also means a run started and then left alone still finishes. */
+/* A third way in: coming back to the tab. A hidden tab's timers are clamped to
+   about once a second, and after a few minutes hidden Chrome drops that to once
+   a minute, so the timer above is not a promise of a prompt tick - it is a
+   promise of an eventual one. Waking on visibilitychange means returning to the
+   tab resumes the run on the spot rather than whenever the throttle next fires,
+   which is what made coming back feel like the page had seized up. */
 const nextTick=fn=>{
   let go=true;
-  const once=ts=>{ if(!go)return; go=false; fn(ts||performance.now()); };
+  const once=ts=>{
+    if(!go)return; go=false;
+    document.removeEventListener("visibilitychange",wake);
+    fn(ts||performance.now());
+  };
+  const wake=()=>{ if(!document.hidden) once(); };
   if(!document.hidden) requestAnimationFrame(once);
   setTimeout(once,document.hidden?16:150);
+  document.addEventListener("visibilitychange",wake);
 };
+
+/* Both season loops are paced against the wall clock: each tick works out how
+   far along the run *should* be by now and catches up to it. That is right
+   while the ticks keep coming, and wrong the moment they stop. Leave the tab
+   for a minute and the target on return is the whole remaining run, which the
+   old code would do in one synchronous batch - a dead page at precisely the
+   moment somebody is looking at it again.
+   So cap the work in a tick by time rather than by count. Falling behind costs
+   a run that ends a little after its nominal ten seconds, which nobody notices;
+   blocking costs a page that appears to have hung, which everybody does. The
+   clock is checked every sixteenth season, which is often enough to bound the
+   overshoot and rare enough not to matter.
+   A hidden tab gets a much larger budget: nothing is being painted, so the only
+   thing a long batch can hurt there is nothing at all. */
+function catchUp(done,target,one){
+  const budget=document.hidden?250:12, t=performance.now();
+  let n=0;
+  while(done<target){
+    one(); done++;
+    if((++n&15)===0&&performance.now()-t>budget) break;
+  }
+  return done;
+}
 
 function wiTeamNow(){
   const model=buildModel(gender,DIST);
@@ -5192,7 +5247,7 @@ function runWorlds(model,worlds,seasons,label,onEnd){
   nextTick(function step(ts){
     if(!t0)t0=ts;
     const target=Math.max(done+1,Math.min(seasons,Math.floor(seasons*(ts-t0)/dur)));
-    while(done<target){oneSeason(model,worlds,sigma,times,shock,tmp);done++;}
+    done=catchUp(done,target,()=>oneSeason(model,worlds,sigma,times,shock,tmp));
     pk.style.left=(done/seasons*100)+"%";
     rb.querySelector(".track i").style.width=(done/seasons*100)+"%";
     lab.textContent=label+" "+done.toLocaleString()+"/"+seasons.toLocaleString();
@@ -5560,7 +5615,7 @@ function run(){
   nextTick(function step(ts){
     if(!t0)t0=ts;
     const target=skip?nSims:Math.max(done+1,Math.min(nSims,Math.floor(nSims*(ts-t0)/durMs())));
-    while(done<target) oneSeason(model,worlds,sigma,times,shock,tmp), done++;
+    done=catchUp(done,target,()=>oneSeason(model,worlds,sigma,times,shock,tmp));
     const frac=done/nSims;
     rb.querySelector(".track i").style.width=(frac*100)+"%";
     pack.style.left=(frac*100)+"%";
@@ -6344,11 +6399,44 @@ document.querySelectorAll(".switch button[data-g]").forEach(b=>b.onclick=()=>{
   gender=b.dataset.g;
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
   setClass(CLS,gender);syncHead();syncViewText();
+  if(NEXT_SEASON) syncNextNote();
   clearOut();wiAdj={};renderWhatIf();});
+document.querySelectorAll(".switch button[data-ns]").forEach(b=>b.onclick=()=>{
+  const on=b.dataset.ns==="1";
+  if(on===NEXT_SEASON)return;
+  NEXT_SEASON=on;
+  document.querySelectorAll(".switch button[data-ns]").forEach(x=>
+    x.setAttribute("aria-pressed",(x.dataset.ns==="1")===NEXT_SEASON));
+  document.getElementById("nsNote").hidden=!NEXT_SEASON;
+  if(NEXT_SEASON) syncNextNote();
+  document.body.classList.toggle("nextseason",NEXT_SEASON);
+  // the roster changed, so everything downstream of it is now stale
+  syncHead();syncViewText();clearOut();wiAdj={};renderWhatIf();});
+/* What the database can and cannot see about next season.
+   It keeps each team's fastest seven and nothing below, so a squad that loses
+   four seniors shows two or three returners when the real team has a dozen more
+   runners nobody here has ever heard of. The board therefore thins out, and
+   thins out unevenly - a team with a senior-heavy seven looks destroyed when it
+   may only be reloading. Saying how many teams still field five is the
+   shortest honest way to put a size on that. */
+function syncNextNote(){
+  const el=document.getElementById("nsNote");
+  if(!el)return;
+  const m=buildModel(gender,DIST);
+  const live=m.teams.filter(t=>!t.short).length, all=m.teams.length;
+  el.innerHTML='Seniors have graduated and everyone else is back on the marks they ran '
+    +'this year. Nobody arrives: no incoming freshmen, no year of improvement. '
+    +'<b>'+live+' of '+all+' teams can still field five</b> \u2014 the database only keeps '
+    +'each team\u2019s fastest seven, so a squad that loses four seniors looks thinner here '
+    +'than it will be in August. Read it as <em>who returns strongest</em>, not as a forecast.';
+}
+
 document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
   setClass(b.dataset.c,gender);
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
-  syncHead();syncViewText();clearOut();wiAdj={};renderWhatIf();});
+  syncHead();syncViewText();
+  if(NEXT_SEASON) syncNextNote();
+  clearOut();wiAdj={};renderWhatIf();});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
