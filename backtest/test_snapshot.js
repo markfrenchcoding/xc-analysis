@@ -40,6 +40,11 @@ const run = (dir, args) => {
 };
 const decls = dir =>
   (fs.readFileSync(path.join(dir, 'index.html'), 'utf8').match(/const SNAPSHOTS=/g) || []).length;
+const readList = dir => {
+  const m = fs.readFileSync(path.join(dir, 'index.html'), 'utf8')
+    .match(/\r?\nconst SNAPSHOTS=(\[[\s\S]*?\]);\r?\n/);
+  try { return m ? JSON.parse(m[1]) : []; } catch (e) { return []; }
+};
 
 /* The shipped file already holds today's entry, so a plain run must refuse.
    Both line endings, because the bug was only ever visible in one of them. */
@@ -47,6 +52,8 @@ for (const [name, eol] of [['CRLF', '\r\n'], ['LF', '\n']]) {
   const dir = sandbox(eol);
   const before = decls(dir);
   ok(before === 1, name + ': fixture starts with exactly one SNAPSHOTS');
+  const entriesBefore = readList(dir).length;
+  ok(entriesBefore >= 1, name + ': and at least one archived entry');
 
   const plain = run(dir, ['200']);
   ok(plain.code === 2, name + ': a second entry for the same day exits 2');
@@ -70,13 +77,21 @@ for (const [name, eol] of [['CRLF', '\r\n'], ['LF', '\n']]) {
   ok(!!m, name + ': the written archive is findable by the same regex');
   let list = null;
   try { list = JSON.parse(m[1]); } catch (e) { /* reported below */ }
-  ok(Array.isArray(list) && list.length === 1, name + ': one entry, not two');
-  ok(list && list[0].forced && list[0].forced.why === 'test',
-     name + ': the rewrite reason is stamped onto the entry');
-  ok(list && list[0].runs === 200, name + ': the season count is the number, not the flag');
+  /* Today's entry, not the first one. The archive already holds every earlier
+     week, and the oldest is the one list[0] happens to be. */
+  const today = new Date().toISOString().slice(0, 10);
+  const mine = list && list.find(s => s.taken === today);
+  ok(Array.isArray(list) && list.length === entriesBefore,
+     name + ': a forced rewrite replaces an entry rather than adding one');
+  ok(!!mine, name + ": today's entry is in the archive");
+  ok(mine && mine.forced && mine.forced.why === 'test',
+     name + ': the rewrite reason is stamped onto it');
+  ok(mine && mine.runs === 200, name + ': the season count is the number, not the flag');
+  ok(list && list.every((s, i) => i === 0 || list[i - 1].taken <= s.taken),
+     name + ': entries stay in date order');
   ok(list && list[0].boards && Object.keys(list[0].boards).length === 10,
      name + ': all ten boards archived');
-  const b = list && list[0].boards['6A|M'];
+  const b = mine && mine.boards['6A|M'];
   ok(b && b.t && Array.isArray(b.r), name + ': a board carries both teams and runners');
   ok(b && b.t && b.t['Grant'] && b.t['Grant'].length === 4, name + ': a team row is four numbers');
   ok(b && Array.isArray(b.r) && b.r.length > 0 && b.r[0].length === 5, name + ': a runner row is name, team and three');

@@ -53,6 +53,28 @@ function toLines(html) {
     .split('\n').map(s => s.trim()).filter(Boolean);
 }
 
+/* When the poll was PUBLISHED, not when we pulled it. Those are different
+   facts and only the first one is any use to a reader: on the day this was
+   written the site was showing results through September 17 next to a poll
+   voted in preseason, three weeks earlier, and said nothing about the gap.
+   The byline line reads "August 26, 2026    by John Tawa, OSAAtoday". */
+const MONTHS = ['January','February','March','April','May','June','July',
+                'August','September','October','November','December'];
+function published(html) {
+  const txt = html.replace(/<script[\s\S]*?<\/script>/g, '')
+    .replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
+  const m = txt.match(new RegExp('(' + MONTHS.join('|') + ')\\s+(\\d{1,2}),\\s*(\\d{4})'));
+  if (!m) return null;
+  const mm = String(MONTHS.indexOf(m[1]) + 1).padStart(2, '0');
+  return m[3] + '-' + mm + '-' + String(m[2]).padStart(2, '0');
+}
+/* "Preseason" is part of the headline when it is one, and it matters: a
+   preseason poll is a guess about a season nobody has raced yet. */
+function label(html) {
+  const m = html.match(/<title>([^<]*)<\/title>/i);
+  return m && /preseason/i.test(m[1]) ? 'preseason' : '';
+}
+
 const CLASS_LINE = /^(6A|5A|4A|3A|2A\/1A)$/;
 const RANK_LINE = /^(\d{1,2})\.$/;
 
@@ -127,8 +149,15 @@ for (const cls of Object.keys(CLASSES)) {
 const POLL = {};
 const missed = [];
 let matched = 0, rv = 0;
+const meta = { date: null, label: '' };
 for (const [g, id] of [['M', BOYS], ['F', GIRLS]]) {
-  const raw = parse(get(id));
+  const html = get(id);
+  const d = published(html);
+  /* Take the older of the two if they ever differ: the pair is published
+     together, and claiming the newer would overstate the poll's freshness. */
+  if (d && (!meta.date || d < meta.date)) meta.date = d;
+  if (!meta.label) meta.label = label(html);
+  const raw = parse(html);
   for (const cls of Object.keys(raw)) {
     const key = cls + '|' + g;
     POLL[key] = {};
@@ -160,8 +189,9 @@ if (DRY) { console.log('\n--dry: nothing written'); process.exit(0); }
 
 const NL = html.includes('\r\n') ? '\r\n' : '\n';
 const line = NL + 'const POLL=' + JSON.stringify(POLL) + ';'
-  + NL + 'const POLL_DATE="' + new Date().toISOString().slice(0, 10) + '";' + NL;
-const RE = /\r?\nconst POLL=\{[\s\S]*?\};\r?\nconst POLL_DATE="[\d-]*";\r?\n/;
+  + NL + 'const POLL_DATE="' + (meta.date || '') + '";'
+  + NL + 'const POLL_KIND="' + meta.label + '";' + NL;
+const RE = /\r?\nconst POLL=\{[\s\S]*?\};\r?\nconst POLL_DATE="[\d-]*";(\r?\nconst POLL_KIND="[^"]*";)?\r?\n/;
 let out;
 if (RE.test(html)) out = html.replace(RE, line);
 else {
@@ -171,5 +201,7 @@ else {
   out = html.slice(0, i) + line.slice(NL.length) + html.slice(i);
 }
 fs.writeFileSync(IDX, out);
-console.log('\nwrote POLL into index.html ('
+console.log('\npoll published ' + (meta.date || 'date not found')
+  + (meta.label ? ' (' + meta.label + ')' : ''));
+console.log('wrote POLL into index.html ('
   + (JSON.stringify(POLL).length / 1024).toFixed(1) + 'KB)');
