@@ -11168,6 +11168,12 @@ function vdot(s){
 }
 
 /* ---------- the data ---------- */
+/* No carriage-return strip needed, which is worth saying because this file is
+   checked out CRLF on Windows and every other reader in the repo does strip
+   them. The HTML parser normalises line endings before textContent ever sees
+   them, so a CRLF copy of this page parses identically - checked, not assumed.
+   pull/build_dash.js and pull/test_roster.js read the CSVs through fs and do
+   still need their own. */
 const lines=id=>document.getElementById(id).textContent.trim().split('\n').filter(Boolean);
 const ENTRY=['observed','late-entry','unknown-gap','ungraded'];
 
