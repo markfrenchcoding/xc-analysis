@@ -1,0 +1,15 @@
+# Kept out of the public deployment on purpose.
+#
+# Everything in roster.html is already public on athletic.net under a full
+# name, but a page that gathers one named teenager's whole arc - their
+# plateau, their attrition, the season they got slower - into a single screen
+# is a different object from a results database, and chutexc.vercel.app is a
+# guessable address.
+#
+# So it ships in the repo and not on the site. Open it locally, or serve it
+# somewhere behind a login. Deleting the two lines below publishes it, which
+# is a decision about people rather than about code and is not one to make by
+# accident. Current athletes are initialled either way - SHOW_CURRENT in the
+# page itself.
+roster.html
+pull/roster/

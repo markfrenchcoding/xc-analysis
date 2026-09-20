@@ -1031,6 +1031,106 @@ would drift the first time one changed, and only one of the copies has
 rule — the same way `test_crawl.js` lifts the guard rule by text rather than
 restating it.
 
+## The roster dashboard
+
+`roster.html` is the second page, built from `pull/roster/` by
+`node pull/build_dash.js 284`. Same shape as the app: one self-contained file,
+data in a `<script type="text/plain">` block that a script rewrites, no build
+step and no fetch. 280KB on disk, **92KB gzipped**, which is half the app.
+
+It inherits the app's CSP without a change — inline script, Google fonts,
+`connect-src none`, no images, nothing to relax.
+
+**It is kept out of the deployment**, by `.vercelignore`. Everything on it is
+already public on athletic.net under a full name, but a page that gathers one
+named teenager's whole arc — their plateau, their attrition, the season they
+got slower — onto a single screen is a different object from a results
+database, and `chutexc.vercel.app` is a guessable address. Deleting two lines
+publishes it. Do it deliberately or not at all. Current athletes are initialled
+either way; `SHOW_CURRENT` in the page controls that.
+
+### The rule the whole page is built on
+
+**A statistic takes a population as a parameter. It never chooses one.**
+
+`V.everyone`, `V.top`, `V.fourYear` return people. `devCurve`, `cohorts`,
+`rosterSize` and `depth` each take a list of people and know nothing about how
+it was chosen. That is not tidiness. It is the only reason the development
+panel can run one calculation over three groups and print the difference,
+which is the finding:
+
+| | boys | girls |
+|---|---|---|
+| top 100 | +6.26 | +1.56 |
+| all four years | +4.54 | +1.49 |
+| everyone | +4.48 | +1.31 |
+
+The board is the front door because it is what anybody actually wants to open.
+It is never the population a number is computed over unless the page says so,
+and it carries a note at the top saying exactly that.
+
+### Best race is a residual, not a time
+
+`log(time) = the athlete's form that season + what the meet did to everybody`,
+fitted by alternating least squares over the squad's own 5,000m results with
+thin meets shrunk toward no effect. The largest positive residual is the best
+race.
+
+**The meet term is not a course rating and must never be shown as one.** Course,
+weather and where the race fell in the season are hopelessly confounded in data
+where each meet happens on exactly one day — the same wall `course_value.js`
+hit. What the term is good for is the residual, and there the confound does not
+matter, because it is shared by everyone on the line.
+
+The worked example is the one that sold it. Mark French's best race is 16:07.9
+at Canby in September 2015, thirty-eight seconds slower than his PR. Forty-eight
+Tualatin runners were at that meet and the squad averaged **9.0% off their own
+season form**; he was about 3% off his. His actual PR at Sandelie rates
+*negative*, because Sandelie was a fast day for everybody. That is the thing the
+sport cannot currently say to a runner, and it is the reason to build any of
+this.
+
+`MIN_AT_MEET` is 5. The squad turns out 42 deep at a median meet, but a state
+meet is seven to fourteen and a year where only individuals qualified is two.
+Five keeps every real championship and drops the two-runner ones.
+
+### Two things that had to be fixed to make the page and the puller agree
+
+**A cohort counts the derived grade, not the grade a result carried.** Somebody
+can race their whole senior autumn with the grade field blank on every row.
+Counting the raw field files them as having left. That is the whole point of
+voting on `classOf` — once it is settled it beats any single row — and it is
+worth exactly one athlete in Tualatin's boys, which is the difference between
+42% and 43%. `cohorts` takes the seasons table for this and there is a test.
+
+**A cohort is counted once its senior autumn is over.** The latest school year
+in the data is in progress, so including it understates that class. Both the
+page and `roster.js` now use "strictly before the latest school year", and both
+print the same number. Two places computing the same statistic differently is
+how a dashboard ends up disagreeing with its own source.
+
+### Charts carry the shape, tables carry the numbers
+
+Three series in a grouped bar leaves about fifteen viewBox units a bar, and
+`+2.76` at a size anybody can read on a phone is wider than that. They
+collided. The values moved to a table under the chart with the sample size
+beside each one, which is better on a desktop too. Bars keep `<title>`
+tooltips.
+
+Same 200-unit viewBox lesson as the How tab's diagrams: a label written at 6
+units renders at about 10px on a 375px column, which is too small. `--axt` is
+6.5 and `--lbl` is 7.
+
+### What it says
+
+Boys and girls diverge more than expected. Four-year completion is **43% boys,
+44% girls** — close. But **34% of the boys joined after grade 9 against 48% of
+the girls**, and the girls' senior year is **negative** across every population.
+The girls' programme takes half its athletes from later grades and then loses
+fitness in the final year. Neither of those is visible on any board, in any
+poll, or in any result athletic.net publishes.
+
+
 ## How the simulation works
 
 One "season" is: draw times → score seven league meets → allocate 14 automatic
@@ -1747,6 +1847,7 @@ node extract_model.js        # regenerate model.js after any signature change
 node audit2.js               # 93 checks, 1 deliberate failure
 node pull/test_seed.js       # 64 checks on the seed builder, no network
 node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
+node pull/test_roster.js     # 67 checks on the roster builder, no network
 node backtest/test_snapshot.js   # 38 checks that the archive REFUSES, both line endings
 ```
 

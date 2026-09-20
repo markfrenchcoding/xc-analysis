@@ -112,11 +112,23 @@ rows = [mk(1, 2012, 9), mk(1, 2015, 12), mk(2, 2012, 9), mk(3, 2013, 10), mk(3, 
 // filler so 2012 counts as a season the school posted freshmen in; a different
 // gender so it lands in a different cohort than the one being asserted
 rows.push(...fresh(2012, 12).map(r => ({ ...r, gender: 'F' })));
-let C = R.cohorts(R.entryOf(R.buildAthletes(rows), rows));
+let ath2 = R.entryOf(R.buildAthletes(rows), rows);
+let C = R.cohorts(ath2, R.buildSeasons(rows, ath2));
 const c16 = C.get('2016|M');
 eq(c16.entered, 2, 'a late entry is not in the freshman cohort');
 eq(c16.g12, 1, 'one of the two was still there as a senior');
 eq(Math.round(c16.completion * 100), 50, 'which is 50% completion');
+
+/* The grade a cohort counts is the derived one, off the athlete-season, not
+   the grade a result happened to carry. Somebody can race their whole senior
+   autumn with the grade field left blank on every row, and counting the raw
+   field would file them as having left. It is worth one athlete in Tualatin's
+   boys, which is the difference between 42% and 43%. */
+rows = [mk(1, 2012, 9), mk(1, 2015, null), mk(2, 2012, 9)];
+rows.push(...fresh(2012, 12).map(r => ({ ...r, gender: 'F' })));
+ath2 = R.entryOf(R.buildAthletes(rows), rows);
+C = R.cohorts(ath2, R.buildSeasons(rows, ath2));
+eq(C.get('2016|M').g12, 1, 'a senior season with no grade on it still counts as a senior season');
 
 /* ---------- the committed pull ---------- */
 const DIR = path.join(__dirname, 'roster');

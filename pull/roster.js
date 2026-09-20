@@ -257,18 +257,32 @@ function buildSeasons(rows, athletes) {
 /* Freshman-entry cohorts only. Somebody who joined in grade 11 is not a
    dropout from the class they graduate with, and folding them in is how a
    retention figure becomes meaningless. unknown-gap is excluded from both
-   halves of the fraction rather than guessed at. */
-function cohorts(athletes) {
+   halves of the fraction rather than guessed at.
+
+   The grade counted is the DERIVED one off the athlete-season, not the grade
+   a result happened to carry. That is the whole point of voting on classOf:
+   once it is settled it is better evidence than any single row, and mixing
+   the two gives two different answers to the same question. It is worth one
+   athlete in Tualatin's boys - somebody whose senior season is in the record
+   with the grade field left blank. */
+function cohorts(athletes, seasons) {
+  const raced = new Map();               // athleteId -> the grades they raced in
+  for (const s of seasons.values()) {
+    if (!s.grade) continue;
+    if (!raced.has(s.athleteId)) raced.set(s.athleteId, new Set());
+    raced.get(s.athleteId).add(s.grade);
+  }
   const out = new Map();
   for (const a of athletes.values()) {
     if (a.entry !== 'observed' || !a.classOf) continue;
     const k = a.classOf + '|' + a.gender;
     let c = out.get(k);
     if (!c) { c = { classOf: a.classOf, gender: a.gender, entered: 0, g10: 0, g11: 0, g12: 0 }; out.set(k, c); }
+    const g = raced.get(a.athleteId) || new Set();
     c.entered++;
-    if (a.grades.has(10)) c.g10++;
-    if (a.grades.has(11)) c.g11++;
-    if (a.grades.has(12)) c.g12++;
+    if (g.has(10)) c.g10++;
+    if (g.has(11)) c.g11++;
+    if (g.has(12)) c.g12++;
   }
   for (const c of out.values()) c.completion = c.entered ? c.g12 / c.entered : 0;
   return out;
@@ -328,7 +342,7 @@ function main() {
 
   const athletes = entryOf(buildAthletes(rows), rows);
   const seasons = buildSeasons(rows, athletes);
-  const coh = cohorts(athletes);
+  const coh = cohorts(athletes, seasons);
   const conflict = [...athletes.values()].filter(a => a.classOfConflict);
 
   /* ---------- the guards ----------
@@ -371,7 +385,10 @@ function main() {
     emptySeasons: empty, meets,
   }, null, 2));
 
-  const done = [...coh.values()].filter(c => c.classOf <= to);
+  /* a cohort counts once its senior autumn is over. The latest school year in
+     the data is in progress, so its seniors would be understated. */
+  const latest = Math.max(...[...seasons.values()].map(s => s.schoolYear));
+  const done = [...coh.values()].filter(c => c.classOf < latest);
   const sum = g => {
     const c = done.filter(x => x.gender === g);
     const e = c.reduce((s, x) => s + x.entered, 0), f = c.reduce((s, x) => s + x.g12, 0);
