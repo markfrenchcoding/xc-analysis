@@ -888,6 +888,149 @@ raced 3k so far. Every one of the ten boards can fill its field.
 sits beside the app; the app stays one self-contained file that can still be
 uploaded by drag-and-drop on its own.
 
+## One school's whole history
+
+`pull/roster.js` answers a different question from the seed. The seed says how
+fast a team is now: each school's fastest twelve this season. This says what
+happens to somebody who joins one, which needs the opposite shape — every
+athlete who ever appeared, including the ones who left.
+
+```
+node pull/roster.js 284 --name Tualatin     # 2004-2026, about twenty seconds
+node pull/test_roster.js                    # 66 checks, no network
+```
+
+Tualatin is team 284. The pull writes four artifacts to `pull/roster/`:
+8,835 results, 596 athletes, 1,258 athlete-seasons, 222 meets. 432KB raw and
+**88KB gzipped**, of which the seasons table that drives every statistic is 12KB.
+
+**One request a season.** `TeamHome/GetResultsGrid?teamId=N&seasonId=YYYY`
+returns a team's entire season — every result, not just bests — with the athlete
+id on each row and a `meets[]` array carrying the dates. It is a plain GET on a
+different budget from the results POST, so it paces at `GAP_GET` rather than at
+two seconds. Twenty-two seasons is twenty-two requests.
+
+**The athlete id is the spine, and the name is not.** The seed keys on
+`athlete` as a string, which is right for a season board and would quietly
+destroy a longitudinal one: Matt becomes Matthew, somebody transfers in, two
+brothers share a surname, somebody changes their name. Meghan Peyton ran here as
+Meghan Armstrong. `NAME_BY_ID` maps id to display name and `alsoKnownAs` keeps
+whatever athletic.net said, so a search on either spelling finds her. Map id to
+name, never name to name — the same rule the poll and the seed alias tables both
+had to learn, one level harder.
+
+### The school year, which is the off-by-one
+
+A cross country season labelled 2015 is the **autumn of 2015-16**, so its seniors
+are the class of 2016. A track season labelled 2016 is the **spring of that same
+school year**, and its seniors are also the class of 2016. So
+`schoolYear = year + (sport === 'xc' ? 1 : 0)` and `classOf = schoolYear + (12 - grade)`.
+
+Get it wrong and every cohort is off by one, which does not look like anything.
+It has its own named test.
+
+### `classOf` is inferred, never read
+
+The per-result grade field is patchy enough that one odd row would move somebody
+into the wrong cohort. Every graded result votes, the modal answer wins, and
+disagreement is **recorded rather than resolved** — `classOfConflict` and the
+full vote tally ride along on the athlete. On Tualatin's 22 seasons, 591 of 596
+athletes have one unambiguous answer.
+
+Never silently pick a winner here. A cohort quietly off by one is exactly the
+kind of wrong number that looks completely fine.
+
+### Entry grade has to be reconciled against the team
+
+The obvious rule — entry grade is the grade they first appear in — is wrong
+often enough to poison the denominator, because **a missing freshman year and a
+genuine late entry look identical from one athlete's own rows**.
+
+So if somebody first appears in grade 10 or later, ask whether the school posted
+any freshman results the season before. If it did, they really did join late. If
+it did not, that season's freshmen are simply absent and the entry grade is
+`unknown-gap`, which is neither and is excluded from both halves of every
+fraction rather than guessed into one.
+
+This is not hypothetical. Mark French and Kaitlyn Gearin both first appear in
+grade 10. Tualatin posted 79 freshman results in 2012 and 128 in 2016, so both
+are real late entries — which also means the freshman marks in the hand-built
+four-year table came from somewhere this data does not reach.
+
+### What it found
+
+**Forty percent of everyone who has ever raced for Tualatin joined after their
+freshman year**: 306 observed freshman entries against 239 confirmed late ones,
+47 unknown-gap and 4 ungraded. That was not expected and it changes how the
+completion rate reads — the figure below is completion among freshman entrants,
+and there is a second, larger population it says nothing about.
+
+**Four-year completion: boys 64/152 = 42%, girls 42/96 = 44%.** As far as I can
+tell nobody has published this for any program in the sport. Five things it is
+not: it counts athletes who *raced a recorded 5k* as a freshman rather than
+everyone who joined the team, so it is a lower bound; per-year cohorts run 1 to
+14 and the 100% entries are n=1; the 2020 season has 125 results against a normal
+400, so cohorts 2021-2023 are distorted; and it cannot yet tell "left the sport"
+from "transferred out", which needs the statewide seed.
+
+**The hand-picked sample overstates development badly.** Same source, same
+method, three populations — mean VDOT change over four years:
+
+| population | boys | girls |
+|---|---|---|
+| the 18 in TRUST Plan Data | +7.03 | +4.88 |
+| everyone with all four years | +4.66 | +1.49 |
+| everyone who ever raced | +4.60 | +1.31 |
+
+The girls' senior year is **negative** across the program, −0.61 for four-year
+athletes, where the hand-picked eight showed +0.98. Not a rounding difference —
+the opposite sign. This is the whole argument for the roster-and-views split:
+the top hundred is the front door and never the population a number is computed
+over unless the page says so.
+
+The freshman-to-sophomore step being the largest survives in every population.
+
+### The horizon
+
+athletic.net's Tualatin coverage stops before 2004 and thins before about 2008.
+`FIRST_SEASON` records it and it is written into `t284_meets.json`, because an
+"all-time" board that is silently a "since 2005" board is the same failure as a
+stale `DATA_DATE`. The 47 unknown-gap entries cluster at the front of the record,
+which is the horizon showing up honestly rather than being papered over.
+
+Meghan Peyton is outside it under either name. That is a test, so a later pull
+reaching further back fails here rather than surprising somebody.
+
+### Track is not in there yet
+
+`GetResultsGrid` **ignores its sport parameter** — `?sport=tfo` returns the
+identical cross country payload. Two things found while looking, worth not
+rediscovering:
+
+- the valid codes are `tfo` and `tfi`, not `tf` or `track`
+- **division ids are per sport.** `87377` is Oregon in cross country and
+  *Northern Ohio* in track, so `Seed.OREGON_DIV` must not be reused across
+  sports. It fails silently, with a full and plausible answer.
+
+The track roster does come back from `TeamHome/GetAthletes?seasonId=YYYY` given
+the team's `jwtTeamHome` for `sport=tfo` — note `seasonId`, not `season`.
+Results appear to be per athlete rather than per team, which would be about 150
+requests a season instead of one.
+
+Worth finishing, because track is the **clean ruler**: a flat oval at a standard
+distance every spring, no course problem at all. Measure development in track
+and racing in cross country, and the `VDOT` table bridges them.
+
+### The sanitiser is shared, deliberately
+
+`cleanName` was inline in `buildSeed` and is now exported from `seed.js`, because
+`roster.js` ingests the same names from the same site. Restated in two places it
+would drift the first time one changed, and only one of the copies has
+`test_seed.js` firing real payloads at it. `test_roster.js` asserts that
+`roster.js` calls the shared function and does **not** keep its own copy of the
+rule — the same way `test_crawl.js` lifts the guard rule by text rather than
+restating it.
+
 ## How the simulation works
 
 One "season" is: draw times → score seven league meets → allocate 14 automatic

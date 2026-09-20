@@ -173,6 +173,32 @@
      state record is a shade over 14:00, so 13:00 is a mis-entry or a 3k. */
   const MIN_5K = 13 * 60, MAX_5K = 60 * 60;
 
+  /* ---------- the one untrusted input ----------
+     Athlete names come from athletic.net and end up interpolated into
+     innerHTML on five different boards, so anything that could be read as
+     markup is removed here, at ingest, rather than trusted to be escaped
+     correctly at twenty render sites. One choke point the tests can aim at.
+
+     Commas break the seed's columns and quotes break worse: the seed is
+     written unquoted and the reader toggles quote mode on any " it meets, so
+     a single stray one swallows the rest of the line - mark, grade, team and
+     class all folded into the name, silently. athletic.net carries nicknames
+     that way, so this is not hypothetical: Benjamin "Finley" Crowell and
+     Abigail "Abbie" Hamilton both arrived with the deeper roster cap.
+
+     Apostrophes stay. O'Brien and St Mary's are real, and an apostrophe
+     cannot escape a double-quoted attribute or a text node.
+
+     Exported because roster.js ingests the same names from the same site.
+     Restated there it would drift the first time this one changed. */
+  function cleanName(v) {
+    return String(v || '').replace(/[",<>&]/g, ' ')
+      /* tab, newline and return are whitespace and are left for the collapse
+         below; only the unprintable rest is dropped. */
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+      .replace(/\s+/g, ' ').trim();
+  }
+
   function buildSeed(rows, board) {
     const keep = [];
     const dropped = { dist: 0, unparsed: 0, offBoard: 0, preseason: 0, duplicate: 0, implausible: 0 };
@@ -209,11 +235,7 @@
          ampersands would break the page. Apostrophes stay - O'Brien and St
          Mary's are real, and an apostrophe cannot escape a double-quoted
          attribute or a text node. */
-      keep.push({ g: r.g, name: String(r.name || '').replace(/[",<>&]/g, ' ')
-                    /* tab, newline and return are whitespace and are left for the
-                       collapse below; only the unprintable rest is dropped. */
-                    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
-                    .replace(/\s+/g, ' ').trim(),
+      keep.push({ g: r.g, name: cleanName(r.name),
                   sec, date: r.date || '', grade: String(r.grade || '').replace(/\D/g, ''),
                   team: b.name, cls: b.cls });
     }
@@ -307,6 +329,7 @@
   }
 
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
+           cleanName,
            patchIndex, patchLogos, SEASON_START, MIN_5K, MAX_5K,
            OREGON_DIV, divMetres, resultRow, teamsFromTree,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };

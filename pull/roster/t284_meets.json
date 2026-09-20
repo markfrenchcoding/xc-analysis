@@ -1,0 +1,899 @@
+{
+  "teamId": 284,
+  "label": "Tualatin",
+  "from": 2004,
+  "to": 2026,
+  "horizon": 2004,
+  "pulled": "2026-09-20",
+  "emptySeasons": [],
+  "meets": {
+    "3": {
+      "date": "2005-11-05",
+      "name": "OSAA 4A State Championship"
+    },
+    "15": {
+      "date": "2005-09-24",
+      "name": "Northwest Classic"
+    },
+    "24": {
+      "date": "2005-09-17",
+      "name": "New Balance Festival of Champions"
+    },
+    "28": {
+      "date": "2005-10-15",
+      "name": "Adidas Classic 2005"
+    },
+    "56": {
+      "date": "2005-09-07",
+      "name": "Tualatin Invitational"
+    },
+    "113": {
+      "date": "2005-09-21",
+      "name": "McMinnville, Silverton, Tualatin"
+    },
+    "114": {
+      "date": "2005-10-05",
+      "name": "Canby, Tualatin, Tigard"
+    },
+    "115": {
+      "date": "2005-10-12",
+      "name": "Woodburn, Tualatin, Dallas"
+    },
+    "116": {
+      "date": "2005-10-19",
+      "name": "Forest Grove, Tualatin, Newberg"
+    },
+    "117": {
+      "date": "2005-10-27",
+      "name": "PAC-9 District Meet"
+    },
+    "312": {
+      "date": "2006-09-16",
+      "name": "New Balance Festival of Champions"
+    },
+    "381": {
+      "date": "2006-09-30",
+      "name": "Bryant Park Challenge"
+    },
+    "426": {
+      "date": "2006-11-04",
+      "name": "OSAA 6A State Championships"
+    },
+    "519": {
+      "date": "2006-09-27",
+      "name": "Lakeridge, Tualatin, McMinnville @ West Linn"
+    },
+    "1081": {
+      "date": "2006-09-06",
+      "name": "Tualatin Cross Country Invite"
+    },
+    "1082": {
+      "date": "2006-09-20",
+      "name": "Lake Oswego, Clackamas, Tigard, Tualatin"
+    },
+    "1083": {
+      "date": "2006-10-11",
+      "name": "Putnam, Clack., Lakeridge, Milwaukie, F. Grove, Newb. Tual."
+    },
+    "1084": {
+      "date": "2006-10-18",
+      "name": "Lake Oswego, Lakeridge, Milwaukie, Canby, Tualatin"
+    },
+    "1085": {
+      "date": "2006-10-26",
+      "name": "Pacific Conferance District Meet"
+    },
+    "2841": {
+      "date": "2006-08-30",
+      "name": "Time trial"
+    },
+    "3935": {
+      "date": "2007-09-15",
+      "name": "New Balance Festival of Champions"
+    },
+    "4160": {
+      "date": "2007-10-06",
+      "name": "Brooks Harrier Classic at Bryant Park"
+    },
+    "4244": {
+      "date": "2007-11-03",
+      "name": "OSAA 6A State Championships"
+    },
+    "4262": {
+      "date": "2007-10-03",
+      "name": "Lake Oswego, West Linn, Milwaukie, Newberg at Tualatin"
+    },
+    "4475": {
+      "date": "2004-11-06",
+      "name": "OSAA 4A State Championships"
+    },
+    "4596": {
+      "date": "2007-09-05",
+      "name": "Tualatin Invite"
+    },
+    "4598": {
+      "date": "2007-09-19",
+      "name": "Lake Oswego, Clackamas, Tualatin@ McMinnville"
+    },
+    "4599": {
+      "date": "2007-10-10",
+      "name": "Tualatin@Forest Grove"
+    },
+    "4600": {
+      "date": "2007-10-17",
+      "name": "Canby, Tigard@Tualatin"
+    },
+    "4601": {
+      "date": "2007-10-25",
+      "name": "Pacific Conference District Meet"
+    },
+    "7052": {
+      "date": "2007-09-12",
+      "name": "Lakeridge McIver Park Invite"
+    },
+    "9007": {
+      "date": "2008-09-13",
+      "name": "New Balance Festival of Champions"
+    },
+    "9780": {
+      "date": "2008-11-01",
+      "name": "OSAA 6A State Championships"
+    },
+    "9784": {
+      "date": "2008-09-03",
+      "name": "Tualatin Invite"
+    },
+    "10022": {
+      "date": "2008-08-28",
+      "name": "Night Meet"
+    },
+    "10391": {
+      "date": "2008-10-04",
+      "name": "Brooks Harrier Classic at Bryant Park"
+    },
+    "11096": {
+      "date": "2008-09-17",
+      "name": "TRL meet AT Lake Oswego"
+    },
+    "11265": {
+      "date": "2008-10-23",
+      "name": "Pacific District Conference Championship"
+    },
+    "11473": {
+      "date": "2008-10-08",
+      "name": "McMinnville vs. Tualatin"
+    },
+    "11474": {
+      "date": "2008-10-15",
+      "name": "Canby, Tualatin vs. Tigard"
+    },
+    "12537": {
+      "date": "2008-10-01",
+      "name": "Clackamas/Tualatin/Newberg/Putnam"
+    },
+    "18346": {
+      "date": "2009-09-19",
+      "name": "New Balance Festival of Champions"
+    },
+    "18602": {
+      "date": "2009-09-23",
+      "name": "Rex Putnam, Forest Grove, Tualatin at Oregon City "
+    },
+    "18712": {
+      "date": "2009-11-07",
+      "name": "OSAA 6A State Championships"
+    },
+    "18746": {
+      "date": "2009-10-03",
+      "name": "Harrier Classic at Bryant Park"
+    },
+    "19407": {
+      "date": "2009-09-09",
+      "name": "Tualatin Invite"
+    },
+    "19408": {
+      "date": "2009-10-07",
+      "name": "Lakeridge, Milwaukie, Rex Putnam, Tualatin at Newberg"
+    },
+    "19409": {
+      "date": "2009-10-14",
+      "name": "McMinnville at Tualatin"
+    },
+    "19410": {
+      "date": "2009-10-21",
+      "name": "Tualatin, Tigard at Canby"
+    },
+    "19411": {
+      "date": "2009-10-29",
+      "name": "Pacific District at Clackamas CC"
+    },
+    "27081": {
+      "date": "2010-09-18",
+      "name": "New Balance Festival of Champions"
+    },
+    "31671": {
+      "date": "2010-09-08",
+      "name": "Tualatin Invite"
+    },
+    "31672": {
+      "date": "2010-09-22",
+      "name": "Glencoe/Tualatin at Hillsboro"
+    },
+    "31673": {
+      "date": "2010-09-29",
+      "name": "McMinnville/Tualatin at Forest Grove"
+    },
+    "31674": {
+      "date": "2010-10-13",
+      "name": "Newberg/Tualatin at Century"
+    },
+    "31675": {
+      "date": "2010-10-20",
+      "name": "Tigard,Central Catholic,David Douglas at Tualatin"
+    },
+    "31676": {
+      "date": "2010-10-28",
+      "name": "Pacific District at Clackamas CC"
+    },
+    "31677": {
+      "date": "2010-10-02",
+      "name": "Brooks Harrier Classic"
+    },
+    "32567": {
+      "date": "2010-11-06",
+      "name": "OSAA 6A State Championships"
+    },
+    "44252": {
+      "date": "2011-11-05",
+      "name": "OSAA 6A State Championships"
+    },
+    "44365": {
+      "date": "2011-09-17",
+      "name": "New Balance Festival of Champions"
+    },
+    "45060": {
+      "date": "2011-10-01",
+      "name": "8th Annual Harrier Classic"
+    },
+    "45329": {
+      "date": "2011-09-07",
+      "name": "Tualatin Invite"
+    },
+    "45591": {
+      "date": "2011-09-21",
+      "name": "Tigard, Hillsboro at Tualatin"
+    },
+    "45592": {
+      "date": "2011-10-12",
+      "name": "Newberg at Tualatin"
+    },
+    "45593": {
+      "date": "2011-09-28",
+      "name": "McMinnville/Tualatin at Glencoe"
+    },
+    "45594": {
+      "date": "2011-10-19",
+      "name": "Tualatin/Century at Forest Grove"
+    },
+    "45595": {
+      "date": "2011-10-27",
+      "name": "Pacific Conference District Meet"
+    },
+    "49215": {
+      "date": "2011-08-31",
+      "name": "Team time trial"
+    },
+    "56502": {
+      "date": "2012-09-15",
+      "name": "Festival of Champions"
+    },
+    "56720": {
+      "date": "2012-11-03",
+      "name": "OSAA 6A State Championships"
+    },
+    "56998": {
+      "date": "2012-10-06",
+      "name": "Mizuno Harrier Classic"
+    },
+    "57147": {
+      "date": "2012-09-05",
+      "name": "Tualatin Invite"
+    },
+    "57703": {
+      "date": "2012-09-18",
+      "name": "Hillsboro, McMinnville at Tualatin"
+    },
+    "57708": {
+      "date": "2012-10-25",
+      "name": "Pacific Conference Championships"
+    },
+    "57809": {
+      "date": "2012-10-17",
+      "name": "Tigard/Tualatin @Century"
+    },
+    "57826": {
+      "date": "2012-09-26",
+      "name": "Glencoe/Newberg/Horizon Christian at TuHs"
+    },
+    "57827": {
+      "date": "2012-10-10",
+      "name": "Forest Grove/Westside&Country Christian at Tualatin"
+    },
+    "60710": {
+      "date": "2012-08-29",
+      "name": "Team time trial"
+    },
+    "65293": {
+      "date": "2013-09-14",
+      "name": "14th Annual Festival of Champions"
+    },
+    "78097": {
+      "date": "2013-09-04",
+      "name": "Tualatin Invite"
+    },
+    "78101": {
+      "date": "2013-09-18",
+      "name": "Tualatin/Century at Hillsboro"
+    },
+    "78125": {
+      "date": "2013-09-25",
+      "name": "Tualatin at McMinnville"
+    },
+    "78126": {
+      "date": "2013-10-09",
+      "name": "Tualatin/Forest Grove at Glencoe"
+    },
+    "78127": {
+      "date": "2013-10-16",
+      "name": "Tig/Newb/Horizon/W. Christian at Tualatin"
+    },
+    "78128": {
+      "date": "2013-10-24",
+      "name": "Pacific Conference District Meet"
+    },
+    "78129": {
+      "date": "2013-11-02",
+      "name": "OSAA 6A State Championships"
+    },
+    "78130": {
+      "date": "2013-10-05",
+      "name": "Harrier Classic"
+    },
+    "79096": {
+      "date": "2013-10-11",
+      "name": "Sandelie Golf Course XC Classic"
+    },
+    "83446": {
+      "date": "2013-08-28",
+      "name": "Tualatin Team Time Trial"
+    },
+    "89940": {
+      "date": "2014-09-27",
+      "name": "Nike Pre Nationals"
+    },
+    "90750": {
+      "date": "2014-10-04",
+      "name": "Harrier Classic"
+    },
+    "91406": {
+      "date": "2014-11-01",
+      "name": "OSAA 6A State Championships"
+    },
+    "91436": {
+      "date": "2014-10-10",
+      "name": "Sandelie Golf Course XC Classic"
+    },
+    "91488": {
+      "date": "2014-09-03",
+      "name": "Tualatin Invite"
+    },
+    "91615": {
+      "date": "2014-09-10",
+      "name": "Lakeridge, Tualatin at Lake Oswego"
+    },
+    "91616": {
+      "date": "2014-09-17",
+      "name": "Tualatin, Newberg at West Linn"
+    },
+    "91617": {
+      "date": "2014-09-24",
+      "name": "Canby, Tigard at Tualatin"
+    },
+    "94090": {
+      "date": "2014-10-22",
+      "name": "6A-4 Three Rivers League Championship"
+    },
+    "103367": {
+      "date": "2015-10-31",
+      "name": "OSAA 6A State Championships"
+    },
+    "104791": {
+      "date": "2015-10-03",
+      "name": "Harrier Classic"
+    },
+    "104970": {
+      "date": "2015-09-12",
+      "name": "Tualatin Invite"
+    },
+    "105022": {
+      "date": "2015-10-21",
+      "name": "6A-4 Three Rivers League Championship"
+    },
+    "105430": {
+      "date": "2015-10-09",
+      "name": "Sandelie - West Nine Golf Course - XC Classic"
+    },
+    "105478": {
+      "date": "2015-09-03",
+      "name": "Bill Chapman Invitational"
+    },
+    "105683": {
+      "date": "2015-09-30",
+      "name": "Newberg, West Linn at Tualatin"
+    },
+    "106066": {
+      "date": "2015-09-16",
+      "name": "Lake Oswego, Lakeridge at Tualatin"
+    },
+    "106372": {
+      "date": "2015-10-14",
+      "name": "Sherwood, Tualatin @ Tigard"
+    },
+    "106617": {
+      "date": "2015-09-09",
+      "name": "Tualatin & St. Mary's @ Canby"
+    },
+    "108856": {
+      "date": "2015-11-22",
+      "name": "Nike BorderClash 17"
+    },
+    "113575": {
+      "date": "2016-09-01",
+      "name": "Nike Bill Chapman Invitational"
+    },
+    "114663": {
+      "date": "2016-09-10",
+      "name": "12th Annual Tualatin Invite"
+    },
+    "116277": {
+      "date": "2016-09-14",
+      "name": "St. Mary’s, Tualatin @ Tigard"
+    },
+    "116358": {
+      "date": "2016-09-23",
+      "name": "Meriwether National Cross Country Classic"
+    },
+    "117098": {
+      "date": "2016-11-05",
+      "name": "OSAA 6A State Championships"
+    },
+    "117495": {
+      "date": "2016-10-12",
+      "name": "Tualatin & Sherwood @ Lakeridge"
+    },
+    "117496": {
+      "date": "2016-10-26",
+      "name": "6A-4 Three Rivers League Championship"
+    },
+    "117989": {
+      "date": "2016-10-01",
+      "name": "43rd Stanford Cross Country Invitational (High School)"
+    },
+    "118023": {
+      "date": "2016-09-28",
+      "name": "Lake Oswego, Tualatin @ West Linn"
+    },
+    "118704": {
+      "date": "2016-10-07",
+      "name": "The Flat and Fast Invite"
+    },
+    "119282": {
+      "date": "2016-09-20",
+      "name": "Canby, Newberg @ Tualatin"
+    },
+    "124961": {
+      "date": "2017-09-09",
+      "name": "13th Annual Tualatin Invite"
+    },
+    "127020": {
+      "date": "2017-09-22",
+      "name": "Meriwether National Cross Country Classic"
+    },
+    "127084": {
+      "date": "2017-10-25",
+      "name": "6A-4 Three Rivers League Championship"
+    },
+    "128452": {
+      "date": "2017-08-31",
+      "name": "Nike Bill Chapman Invitational"
+    },
+    "128454": {
+      "date": "2016-11-12",
+      "name": "NXR Northwest"
+    },
+    "129676": {
+      "date": "2017-11-04",
+      "name": "OSAA 6A State Championships"
+    },
+    "130158": {
+      "date": "2017-09-13",
+      "name": "Tigard, West Linn @ Tualatin"
+    },
+    "130159": {
+      "date": "2017-10-11",
+      "name": "Lakeridge, Lake Oswego, The Dalles, Westside Christian @ Tualatin"
+    },
+    "130501": {
+      "date": "2017-09-23",
+      "name": "Bob Firman Invitational XC"
+    },
+    "130564": {
+      "date": "2017-11-11",
+      "name": "NXR Northwest Regional Championships"
+    },
+    "131015": {
+      "date": "2017-09-27",
+      "name": "Tualatin, St. Mary's @ Newberg"
+    },
+    "131904": {
+      "date": "2017-09-20",
+      "name": "Tualatin & Canby @ Sherwood"
+    },
+    "132204": {
+      "date": "2017-10-14",
+      "name": "George Fox XC Classic"
+    },
+    "138966": {
+      "date": "2018-09-08",
+      "name": "14th Annual Tualatin Invite"
+    },
+    "143986": {
+      "date": "2018-10-13",
+      "name": "Warner Pacific XC Classic"
+    },
+    "144050": {
+      "date": "2018-10-06",
+      "name": "Bowmen Raceway Invitational at PIR"
+    },
+    "144223": {
+      "date": "2018-09-29",
+      "name": "NIKE -- 12th ANNUAL TWILIGHT XC INVITATIONAL"
+    },
+    "144232": {
+      "date": "2018-10-24",
+      "name": "6A-5 Three Rivers League Championship"
+    },
+    "144294": {
+      "date": "2018-09-19",
+      "name": "TRL Preview"
+    },
+    "144348": {
+      "date": "2018-10-10",
+      "name": "Canby, Lake Oswego & Tualatin @ West Linn"
+    },
+    "144641": {
+      "date": "2018-09-12",
+      "name": "Lakeridge, Tualatin, West Linn @ St. Mary's Academy"
+    },
+    "144805": {
+      "date": "2018-11-03",
+      "name": "OSAA 6A State Championship"
+    },
+    "145637": {
+      "date": "2018-10-03",
+      "name": "Rivalry Meet Tualatin @ Tigard "
+    },
+    "146187": {
+      "date": "2018-11-10",
+      "name": "NXR Northwest Regional Championships"
+    },
+    "150692": {
+      "date": "2018-08-30",
+      "name": "Tualatin Time Trial at Bush Park"
+    },
+    "154117": {
+      "date": "2019-09-28",
+      "name": "Nike Portland XC"
+    },
+    "155525": {
+      "date": "2019-09-20",
+      "name": "Meriwether Cross Country Classic"
+    },
+    "156142": {
+      "date": "2019-11-09",
+      "name": "OSAA 6A State Championship"
+    },
+    "156409": {
+      "date": "2019-08-30",
+      "name": "Night Meet"
+    },
+    "156438": {
+      "date": "2019-09-25",
+      "name": "Tigard/Tualatin/SMA @ West Linn"
+    },
+    "156551": {
+      "date": "2019-10-05",
+      "name": "24th John Payne/Curtis XC Invitational"
+    },
+    "156554": {
+      "date": "2019-09-07",
+      "name": "15th Annual Tualatin Invite"
+    },
+    "156830": {
+      "date": "2019-09-11",
+      "name": "Three Rivers League Preview"
+    },
+    "156831": {
+      "date": "2019-10-30",
+      "name": "6A-5 Three Rivers League Championship"
+    },
+    "156834": {
+      "date": "2019-10-16",
+      "name": "Lakeridge, Oregon City, West Linn @ Tualatin"
+    },
+    "157367": {
+      "date": "2019-11-16",
+      "name": "NXR Northwest Regional Championships"
+    },
+    "157409": {
+      "date": "2019-10-08",
+      "name": "Newberg & Forest Grove & Tualatin @ Sherwood"
+    },
+    "157589": {
+      "date": "2019-10-04",
+      "name": "Flat & Fast Invitational"
+    },
+    "187734": {
+      "date": "2021-03-17",
+      "name": "TRL @ Oregon City"
+    },
+    "187923": {
+      "date": "2021-04-10",
+      "name": "Spring XC 2021- 3200m"
+    },
+    "188866": {
+      "date": "2021-03-03",
+      "name": "Tigard, Lake Oswego, Lakeridge @ Tualatin"
+    },
+    "188868": {
+      "date": "2021-03-10",
+      "name": "St. Mary's, Tigard, Canby @ Tualatin"
+    },
+    "190703": {
+      "date": "2021-03-31",
+      "name": "Three Rivers League Championship"
+    },
+    "190757": {
+      "date": "2021-04-10",
+      "name": "Rose City Championship Invite"
+    },
+    "191337": {
+      "date": "2021-08-27",
+      "name": "Night Meet"
+    },
+    "191855": {
+      "date": "2021-09-25",
+      "name": "Nike Portland XC"
+    },
+    "192319": {
+      "date": "2021-09-11",
+      "name": "Ash Creek XC Festival"
+    },
+    "192332": {
+      "date": "2021-09-17",
+      "name": "Meriwether CC  Classic"
+    },
+    "192504": {
+      "date": "2021-10-08",
+      "name": "Champoeg Invitational "
+    },
+    "192557": {
+      "date": "2021-10-13",
+      "name": "Newberg @ Sherwood"
+    },
+    "192920": {
+      "date": "2021-09-22",
+      "name": "Canby, Tigard, & St. Mary's @ Tualatin"
+    },
+    "193259": {
+      "date": "2021-10-27",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "194143": {
+      "date": "2021-07-23",
+      "name": "Steens Mountain Running Camp Jan Yriarte Uphill 5K"
+    },
+    "195798": {
+      "date": "2021-10-06",
+      "name": "SMA/Tualatin/WL/Lakeridge at Westmoreland"
+    },
+    "196250": {
+      "date": "2021-09-08",
+      "name": "TRL Preview"
+    },
+    "196796": {
+      "date": "2021-11-06",
+      "name": "OSAA 6A State Championships"
+    },
+    "203657": {
+      "date": "2022-10-01",
+      "name": "The Harrier Classic "
+    },
+    "205691": {
+      "date": "2021-12-11",
+      "name": "Eastbay National Cross Country Championships"
+    },
+    "206414": {
+      "date": "2022-10-26",
+      "name": "6A-5  Three Rivers League Championships"
+    },
+    "206753": {
+      "date": "2022-09-24",
+      "name": "Nike Portland XC"
+    },
+    "207138": {
+      "date": "2022-08-26",
+      "name": "Night Meet"
+    },
+    "207777": {
+      "date": "2022-10-14",
+      "name": "2nd Annual Rose City Championship Invitational"
+    },
+    "207826": {
+      "date": "2022-09-16",
+      "name": "Meriwether CC Classic "
+    },
+    "207921": {
+      "date": "2022-09-07",
+      "name": "Three Rivers League Preview"
+    },
+    "207922": {
+      "date": "2022-09-28",
+      "name": "Three Rivers League Meet"
+    },
+    "208281": {
+      "date": "2022-11-05",
+      "name": "OSAA 6A State Championships"
+    },
+    "208345": {
+      "date": "2022-10-04",
+      "name": "Tigard Vs. Tualatin"
+    },
+    "221088": {
+      "date": "2023-09-02",
+      "name": "Ultimook Race"
+    },
+    "221388": {
+      "date": "2023-09-23",
+      "name": "Northwest Classic 2023"
+    },
+    "221507": {
+      "date": "2023-09-15",
+      "name": "Meriwether CC Classic "
+    },
+    "221673": {
+      "date": "2023-10-13",
+      "name": "3rd Annual Rose City Championship Invitational"
+    },
+    "221773": {
+      "date": "2023-10-25",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "221811": {
+      "date": "2023-09-27",
+      "name": "Three Rivers League/Pacific Conference meet"
+    },
+    "222037": {
+      "date": "2023-08-31",
+      "name": "Oregon City, Tualatin @ Tigard"
+    },
+    "223130": {
+      "date": "2023-09-09",
+      "name": "Saxon Invite "
+    },
+    "223259": {
+      "date": "2023-10-03",
+      "name": "Tigard Vs. Tualatin"
+    },
+    "226732": {
+      "date": "2023-11-04",
+      "name": "OSAA 6A State Championships"
+    },
+    "233115": {
+      "date": "2024-09-28",
+      "name": "Nike Portland XC"
+    },
+    "235847": {
+      "date": "2024-10-30",
+      "name": "6A-5 Three Rivers League Championship"
+    },
+    "235871": {
+      "date": "2024-08-30",
+      "name": "Night Meet"
+    },
+    "236325": {
+      "date": "2024-09-13",
+      "name": "Meriwether CC Classic"
+    },
+    "237896": {
+      "date": "2024-11-09",
+      "name": "OSAA 6A State Championships"
+    },
+    "238209": {
+      "date": "2024-09-09",
+      "name": "Three Rivers League Preview Meet"
+    },
+    "238303": {
+      "date": "2024-10-02",
+      "name": "Tualatin @ Tigard"
+    },
+    "240079": {
+      "date": "2024-10-17",
+      "name": "Pacific/Three Rivers Crossover"
+    },
+    "250513": {
+      "date": "2024-10-09",
+      "name": "Tualatin XC Senior Night Intersquad"
+    },
+    "253247": {
+      "date": "2025-10-18",
+      "name": "Stumptown Showdown"
+    },
+    "253250": {
+      "date": "2025-10-01",
+      "name": "TRL/PAC Crossover"
+    },
+    "253251": {
+      "date": "2025-10-29",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "253256": {
+      "date": "2025-09-26",
+      "name": "2025 Nike Portland XC"
+    },
+    "253280": {
+      "date": "2025-10-10",
+      "name": "5th Annual Rose City Championship Invite"
+    },
+    "253287": {
+      "date": "2025-08-29",
+      "name": "Night Meet"
+    },
+    "254501": {
+      "date": "2025-09-12",
+      "name": "Meriwether Cross Country Classic "
+    },
+    "257966": {
+      "date": "2025-09-17",
+      "name": "The Coaches’ Cup - Tigard vs. Tualatin"
+    },
+    "258075": {
+      "date": "2025-07-18",
+      "name": "Steens Mountain Running Camp Jan Yriarte Uphill 5K "
+    },
+    "258447": {
+      "date": "2025-11-08",
+      "name": "OSAA State XC Championships"
+    },
+    "270629": {
+      "date": "2026-08-28",
+      "name": "The Opener "
+    },
+    "271186": {
+      "date": "2026-09-12",
+      "name": "Oregon City XC Invitational "
+    },
+    "271536": {
+      "date": "2026-09-19",
+      "name": "The Mook XC Invitational"
+    },
+    "272266": {
+      "date": "2026-09-16",
+      "name": "Silver Falls Oktoberfest Invitational"
+    },
+    "276158": {
+      "date": "2026-07-17",
+      "name": "Steens Mountain Running Camp Jan Yriarte Uphill 5K"
+    }
+  }
+}
