@@ -9,7 +9,7 @@ Repo: github.com/markfrenchcoding/xc-analysis (Vercel project is named `chutexc`
 
 ## Shape of the thing
 
-**One file.** `index.html` at the repo root, ~580KB, no build step, no
+**One file.** `index.html` at the repo root, ~700KB, no build step, no
 dependencies, no backend. Vercel serves it statically. Everything — data, CSS,
 simulation, UI — is in that file.
 
@@ -36,8 +36,8 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
-- 5,379 rows currently across all five classifications: 3,238 athlete-boards,
-  219 schools, up to twelve deep a team. Pulled through Sep 17, 2026 by the refresh
+- 7,473 rows currently across all five classifications: 3,495 athlete-boards,
+  222 schools, up to twelve deep a team. Pulled through Sep 19, 2026 by the refresh
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
@@ -876,7 +876,7 @@ it the same mark twice, quietly eating real mark slots. `buildSeed` also
 deduplicates on day-and-time as a backstop: nobody runs two 5,000m races in one
 afternoon in the same hundredth of a second.
 
-Current coverage: 5,379 marks, 3,238 athlete-boards, 219 schools, from 71 meets.
+Current coverage: 7,473 marks, 3,495 athlete-boards, 222 schools, from 83 meets.
 That is 671 rows more than the hand-built pull it replaced, which is the crawl
 starting from the full Oregon team list rather than from team ids resolved out of
 meets already pulled - it finds meets the old chicken-and-egg approach could not
@@ -897,10 +897,12 @@ The redraw matters. A team that got hot at districts starts again from its
 marks. Carrying one draw through both would amplify luck instead of averaging it.
 
 **Sampling.** Each race draws from an athlete's top three marks at 25/50/25,
-renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 17
-pull: **1,728 of 3,238** athlete-boards carry two or three marks, 53%, up from
-348 of 1,172 before the automated pull - so this path now carries most of the
-board rather than being a minority case. Read open item 2
+renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 19
+pull: **2,674 of 3,495** athlete-boards carry two or three marks, **77%**, up
+from 53% a fortnight earlier and 348 of 1,172 before the automated pull. This is
+now the ordinary case rather than the exception, which also means the `MARK_W`
+unfairness below is biting less: it only hurts when *some* teams have raced
+twice and others have not, and by late September most have. Read open item 2
 before leaning on it — the two-mark weights are not neutral.
 
 **Noise.** `time = mark × (1 + teamShock + individual)`. 30% of variance is
@@ -973,11 +975,17 @@ chance of winning falls from 44% to 24%, qualifying comes off the ceiling
 five is more robust to noise than Grant's. That is the calibration fix the
 backtest asked for, worth about 9% off the error at this range with no new data.
 
-**It narrows on its own, and the first weekly refresh after shipping it proved
-that.** Sep 12 data was 8.01 weeks out: drift 5.54%, total 6.00%. Sep 17 data is
-7.29 weeks out: drift 4.01%, total 4.62%. Nobody touched a constant. If a refresh
-ever leaves the total unchanged, the horizon is not being read - check
-`DATA_DATE` and `STATE_DATE` before believing the board.
+**It narrows on its own, and three refreshes running have shown it.** Nobody has
+touched a constant:
+
+| data through | weeks to Lane | drift | total |
+|---|---|---|---|
+| Sep 12 | 8.01 | 5.54% | 6.00% |
+| Sep 17 | 7.29 | 4.01% | 4.62% |
+| Sep 19 | 7.01 | 3.39% | 4.10% |
+
+If a refresh ever leaves the total unchanged, the horizon is not being read -
+check `DATA_DATE` and `STATE_DATE` before believing the board.
 
 **The Dream Team does not get drift**, deliberately. It is a race today between
 a squad that does not exist and the sixteen fastest schools in the state. There
@@ -1122,13 +1130,18 @@ something harder to read.
 | | |
 |---|---|
 | `domInteractive` | ~70ms |
-| seed parse, 4,923 rows | 6ms |
-| `buildModel` | 0.3ms |
+| seed parse, 7,473 rows | 7ms |
+| `buildModel` | 0.45ms |
 | `buildBoard`, 45 cards | 25ms, once per press of Run |
 | `fitNames` | 0.3ms typical, 9ms on the one board with long names |
-| one simulated season | ~150µs, so 80 fit in a 12ms frame |
+| one simulated season | ~90µs, so 135 fit in a 12ms frame |
 | `paint` full | 0.8ms |
-| page, gzipped | 158KB of a 526KB file |
+| page, gzipped | 191KB of a 696KB file |
+
+The seed has grown by half again since those first numbers and the per-season
+cost went **down**, not up: more marks per athlete means `pickMark` picks from
+a longer list, but the race itself is still the same 315 runners. What scales
+with the seed is the parse, once, at 7ms.
 
 Nothing here is close to a problem. `buildBoard` is the only hitch and it is
 one frame at the moment of a button press, before a ten-second animation.
@@ -1436,12 +1449,15 @@ the file go stale by design. Pass the new pair: `node pull/poll.js 5100 5101`
 (boys, girls). `--dry` parses and reports without writing.
 
 **Find the ids by title, never by guessing the number.** `osaa.org/today` lists
-recent articles; failing that, walk the id range and read each `<title>`. On
-Sep 17 that search found football and volleyball polls for the week and **no
-in-season cross country poll at all** - only a notebook piece. So the preseason
-poll of Aug 26 was still the current one and was left alone. **A poll that has
-not been re-published is not stale data, it is the data.** Do not invent a
-refresh to make the page look current.
+recent articles; failing that, walk the id range and read each `<title>`.
+
+Checked on Sep 17 and again on Sep 19: football and volleyball have weekly
+polls, and **cross country has had none since the preseason one on Aug 26**,
+three weeks into the season. So that poll is still the current one and has been
+left alone both times. **A poll that has not been re-published is not stale
+data, it is the data.** Do not invent a refresh to make the page look current -
+the chip says when it was voted, which is the honest way to carry an old
+opinion.
 
 **The page says when the poll was voted, because it is often much older than the
 board beside it.** `POLL_DATE` is the article's own byline date and `POLL_KIND`
@@ -1630,9 +1646,25 @@ tenths of a percent as integers. At-large is deliberately *not* stored, because
 derives from the two rather than taking a column of its own. Points is the same
 conditional mean the card shows.
 
-**It costs about 20KB a snapshot**, so a weekly season adds roughly 250KB to a
-380KB file. That is the one thing to watch. If it gets uncomfortable the answer
-is a shared name table, not fewer columns - the names are most of the bytes.
+**It costs about 21KB a snapshot.** Three entries are 63KB of a 696KB file, and
+a full season of weekly pulls would add roughly 250KB. That is the one thing to
+watch, and it is now the second-fastest-growing part of the file after the seed
+itself. If it gets uncomfortable the answer is a shared name table, not fewer
+columns - the names are most of the bytes.
+
+**`taken` is the LOCAL date, not UTC.** `toISOString` labelled a Saturday
+evening in Oregon as Sunday, because Oregon is seven hours behind it. Every
+other date here is local - the meet dates, `DATA_DATE`, OSAA's own calendar -
+and an archive keyed on the wrong day is worse than one keyed on no day. The
+entry written under the UTC date was never pushed, so it was restored from HEAD
+and rewritten rather than amended.
+
+The test had the same bug one level up: it worked out "today" with
+`toISOString` and then looked for an entry snapshot.js had stamped locally.
+**Two places deciding separately what day it is will disagree eventually**, so
+the test now finds the entry this run wrote by its own `--why` stamp, and
+separately asserts the stamp equals the local date. For seventeen hours a day
+UTC and Oregon agree, which is exactly how a bug like this hides.
 
 **Called it carries its own classification and gender.** `#ctl` owns both
 everywhere else and is hidden on the How tab, so without `FWD_CLS`/`FWD_G` the

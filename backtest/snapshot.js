@@ -83,7 +83,15 @@ const marks = parsed.rows.length;
 /* Today, not the data date. The two differ on purpose: `taken` is when the
    claim was made and `through` is what it was made from, and a reader checking
    the archive needs both to see that nothing after `taken` informed it. */
-const taken = new Date().toISOString().slice(0, 10);
+const taken = (() => {
+  /* Local, not UTC. toISOString would label a Saturday evening in Oregon as
+     Sunday, because Oregon is seven hours behind it. Every other date in this
+     system - the meet dates, DATA_DATE, OSAA's calendar - is local, and an
+     archive keyed on the wrong day is worse than one keyed on no day. */
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+    + '-' + String(d.getDate()).padStart(2, '0');
+})();
 
 /* The class list comes from the file itself rather than a hardcoded five, via
    the parser pull/seed.js already owns and tests. model.js carries its own copy

@@ -40,6 +40,13 @@ const run = (dir, args) => {
 };
 const decls = dir =>
   (fs.readFileSync(path.join(dir, 'index.html'), 'utf8').match(/const SNAPSHOTS=/g) || []).length;
+/* The same rule snapshot.js uses. Stated once here, checked against what the
+   script actually wrote. */
+const localToday = (() => {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+    + '-' + String(d.getDate()).padStart(2, '0');
+})();
 const readList = dir => {
   const m = fs.readFileSync(path.join(dir, 'index.html'), 'utf8')
     .match(/\r?\nconst SNAPSHOTS=(\[[\s\S]*?\]);\r?\n/);
@@ -77,10 +84,13 @@ for (const [name, eol] of [['CRLF', '\r\n'], ['LF', '\n']]) {
   ok(!!m, name + ': the written archive is findable by the same regex');
   let list = null;
   try { list = JSON.parse(m[1]); } catch (e) { /* reported below */ }
-  /* Today's entry, not the first one. The archive already holds every earlier
-     week, and the oldest is the one list[0] happens to be. */
-  const today = new Date().toISOString().slice(0, 10);
-  const mine = list && list.find(s => s.taken === today);
+  /* The entry THIS RUN wrote, found by its own stamp rather than by a date the
+     test works out for itself. The first version computed today with
+     toISOString, which is UTC, while snapshot.js stamps the local date - so on
+     a Saturday evening in Oregon the test looked for an entry labelled Sunday
+     and failed against perfectly good output. Two places deciding separately
+     what day it is will disagree eventually; only one of them should decide. */
+  const mine = list && list.find(s => s.forced && s.forced.why === 'test');
   ok(Array.isArray(list) && list.length === entriesBefore,
      name + ': a forced rewrite replaces an entry rather than adding one');
   ok(!!mine, name + ": today's entry is in the archive");
@@ -89,6 +99,10 @@ for (const [name, eol] of [['CRLF', '\r\n'], ['LF', '\n']]) {
   ok(mine && mine.runs === 200, name + ': the season count is the number, not the flag');
   ok(list && list.every((s, i) => i === 0 || list[i - 1].taken <= s.taken),
      name + ': entries stay in date order');
+  /* And pin the local-date rule itself, so the UTC bug cannot come back
+     quietly. Oregon is seven hours behind UTC, so for seventeen hours a day
+     the two agree and a regression would hide. */
+  ok(mine && mine.taken === localToday, name + ': stamped with the local date, not UTC');
   ok(list && list[0].boards && Object.keys(list[0].boards).length === 10,
      name + ': all ten boards archived');
   const b = mine && mine.boards['6A|M'];
