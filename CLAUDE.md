@@ -952,10 +952,22 @@ it did not, that season's freshmen are simply absent and the entry grade is
 `unknown-gap`, which is neither and is excluded from both halves of every
 fraction rather than guessed into one.
 
-This is not hypothetical. Mark French and Kaitlyn Gearin both first appear in
-grade 10. Tualatin posted 79 freshman results in 2012 and 128 in 2016, so both
-are real late entries — which also means the freshman marks in the hand-built
-four-year table came from somewhere this data does not reach.
+This is not hypothetical, and the worked example turned out to be a lesson in
+both directions. Mark French and Kaitlyn Gearin both first appear in grade 10 of
+the **cross country** record. Tualatin posted 79 freshman results in 2012 and 128
+in 2016, so the reconciliation correctly called them late entries rather than
+gaps — on the evidence it had.
+
+**It had the wrong evidence.** Both ran their freshman *spring*. Adding track
+moved them to `observed` with an entry grade of 9: they had simply skipped one
+autumn. The hand-built four-year table in TRUST Plan Data was right about them
+all along, and the freshman marks it carried came from track rather than from
+nowhere.
+
+So the reconciliation was sound and the *universe* was too small. A cohort built
+on one season a year gets entry wrong for anybody who starts in the other one.
+`test_roster.js` asserts the corrected answer, which is the argument for pulling
+both sports stated as an assertion.
 
 ### What it found
 
@@ -965,9 +977,10 @@ freshman year**: 306 observed freshman entries against 239 confirmed late ones,
 completion rate reads — the figure below is completion among freshman entrants,
 and there is a second, larger population it says nothing about.
 
-**Four-year completion: boys 64/152 = 42%, girls 42/96 = 44%.** As far as I can
-tell nobody has published this for any program in the sport. Five things it is
-not: it counts athletes who *raced a recorded 5k* as a freshman rather than
+**Four-year completion, distance athletes: boys 46%, girls 44%.** It was 42%
+and 44% on cross country alone; track lifts the boys by finding freshman years
+that were springs. As far as I can tell nobody has published this for any
+program in the sport. Five things it is not: it counts athletes who *raced a recorded 5k* as a freshman rather than
 everyone who joined the team, so it is a lower bound; per-year cohorts run 1 to
 14 and the 100% entries are n=1; the 2020 season has 125 results against a normal
 400, so cohorts 2021-2023 are distorted; and it cannot yet tell "left the sport"
@@ -1001,25 +1014,74 @@ which is the horizon showing up honestly rather than being papered over.
 Meghan Peyton is outside it under either name. That is a test, so a later pull
 reaching further back fails here rather than surprising somebody.
 
-### Track is not in there yet
+### Track, through a different door
 
 `GetResultsGrid` **ignores its sport parameter** — `?sport=tfo` returns the
-identical cross country payload. Two things found while looking, worth not
-rediscovering:
+identical cross country payload, so track is not reachable that way at all. It
+is reachable, and just as cheaply:
 
-- the valid codes are `tfo` and `tfi`, not `tf` or `track`
+```
+TeamHome/GetTeamAthleteRecords?teamId=N&seasonId=YYYY
+```
+
+One GET a season, **no token**, back to 2005. It returns each athlete's season
+best per event rather than every race, which is the right shape here: the point
+of track is a clean ruler, and a season best on a flat oval at a standard
+distance is exactly that. Each row carries `GradeID`, `GenderID`, `Event`,
+`SortInt`, `IDMeet`, `MeetName` and `EndDate`, so nothing the cohort work needs
+is lost.
+
+Three things found while looking, worth not rediscovering:
+
+- the valid sport codes are `tfo` and `tfi`, not `tf` or `track`
 - **division ids are per sport.** `87377` is Oregon in cross country and
   *Northern Ohio* in track, so `Seed.OREGON_DIV` must not be reused across
   sports. It fails silently, with a full and plausible answer.
+- `TeamHome/GetAthletes` takes **`seasonId`**, not `season`, and needs the
+  team's `jwtTeamHome`. It returns the roster, and is not used: the records call
+  already carries everybody who actually raced, and a roster entry with no mark
+  on it says nothing this file can use.
 
-The track roster does come back from `TeamHome/GetAthletes?seasonId=YYYY` given
-the team's `jwtTeamHome` for `sport=tfo` — note `seasonId`, not `season`.
-Results appear to be per athlete rather than per team, which would be about 150
-requests a season instead of one.
+**`SortInt` is milliseconds for a timed event and a distance for a field one.**
+`Type` is `T` or `F`, and a shot put read as a time puts a twelve-metre throw on
+the board as a twelve-second race. `recordRow` keeps `Type === 'T'` with a flat
+running distance; hurdles and relays go too, because a 300m hurdles time is not
+on the same ruler as a 300m run. 2,687 field marks are skipped and the report
+says so.
 
-Worth finishing, because track is the **clean ruler**: a flat oval at a standard
-distance every spring, no course problem at all. Measure development in track
-and racing in cross country, and the `VDOT` table bridges them.
+**One pace bound cannot serve both ends of a track programme.** Loose enough for
+a ten-second 100m is loose enough for a nine-minute 5,000m, which is two minutes
+inside the world record. `paceBounds` is two regimes: under 800m it is
+0.090–0.450 s/m, at 800m and up it is 0.140–0.720.
+
+### What track changed
+
+**It found people cross country could not.** The roster goes from 596 athletes
+to 1,566, and 153 of the distance athletes had never run a cross country season.
+Meghan Peyton — the one of the nineteen in TRUST Plan Data that cross country
+could not find under any spelling — is in the track record, class of 2004, two
+marks in the spring of the first season athletic.net has for this school.
+
+**It fixed entry for anybody who started in a spring.** See the correction
+above.
+
+**It is a different ruler, and the difference is measured.** Same athlete, same
+school year, both sports, boys:
+
+| | mean | median | athlete-seasons |
+|---|---|---|---|
+| track 1,500m VDOT − XC 5,000m VDOT | **+3.63** | +3.56 | 264 |
+| track 3,000m VDOT − XC 5,000m VDOT | **+2.03** | +2.16 | 169 |
+
+So a VDOT from track and a VDOT from cross country **never share an axis**. The
+page has a panel saying exactly this. The *change* between two years is
+comparable across rulers, because the offset cancels in a difference; the level
+is not.
+
+**And the two rulers disagree about the senior year.** On cross country the
+boys' 11→12 step is +0.50. On track 3,000m it is **−0.56**. Small n on the track
+side (16 four-year careers against 66), so this is a flag rather than a finding,
+but it is exactly the kind of thing a course-free ruler exists to show.
 
 ### The sanitiser is shared, deliberately
 
@@ -1036,7 +1098,17 @@ restating it.
 `roster.html` is the second page, built from `pull/roster/` by
 `node pull/build_dash.js 284`. Same shape as the app: one self-contained file,
 data in a `<script type="text/plain">` block that a script rewrites, no build
-step and no fetch. 280KB on disk, **92KB gzipped**, which is half the app.
+step and no fetch. 426KB on disk, **127KB gzipped**, still smaller than the app.
+
+**The page is narrower than the archive, on purpose.** `roster.js` keeps the
+whole running programme because a roster that quietly drops people is what this
+project keeps arguing against. The dashboard takes the 749 athletes with a mark
+at 800m or longer and leaves the 817 sprint-only ones in the CSVs, because
+nothing here reads them: VDOT does not take a 100m, a development curve over
+that group is noise wearing a number, and a retention figure mixing two
+programmes describes neither. Their own sprints stay in — a distance runner's
+400m is worth seeing. It is about a fifth of the bytes, and the bytes are not
+the reason.
 
 It inherits the app's CSP without a change — inline script, Google fonts,
 `connect-src none`, no images, nothing to relax.
@@ -1069,12 +1141,33 @@ The board is the front door because it is what anybody actually wants to open.
 It is never the population a number is computed over unless the page says so,
 and it carries a note at the top saying exactly that.
 
+### Three rulers, and they do not share an axis
+
+A cross country 5,000m is what the sport scores on. A track 1,500m or 3,000m is
+the same fitness measured on a flat oval at a known distance, which is the only
+clean ruler a season produces. The board and the development curve both take a
+ruler, so the same athletes can be looked at three ways.
+
+**Levels are not comparable between them and the page says so in its own panel**
+— boys run +3.63 VDOT higher on a track 1,500m than on cross country, +2.03 on a
+3,000m. Changes are comparable, because the offset cancels in a difference.
+
+**On a thin ruler the top hundred IS everybody**, and two identical columns read
+as a result rather than as an empty comparison. Fewer than a hundred athletes
+have two consecutive 3,000m seasons, so the caption detects that and says which
+it is rather than printing the same number twice and letting it look meaningful.
+
 ### Best race is a residual, not a time
 
 `log(time) = the athlete's form that season + what the meet did to everybody`,
 fitted by alternating least squares over the squad's own 5,000m results with
 thin meets shrunk toward no effect. The largest positive residual is the best
 race.
+
+**Cross country only, and not for want of trying.** athletic.net serves track as
+season bests rather than as every race, so there is one mark per athlete per
+event per season and nothing to take a residual against. A best is already the
+best day. The page says this where the panel would otherwise look missing.
 
 **The meet term is not a course rating and must never be shown as one.** Course,
 weather and where the race fell in the season are hopelessly confounded in data
@@ -1123,12 +1216,15 @@ units renders at about 10px on a 375px column, which is too small. `--axt` is
 
 ### What it says
 
-Boys and girls diverge more than expected. Four-year completion is **43% boys,
-44% girls** — close. But **34% of the boys joined after grade 9 against 48% of
-the girls**, and the girls' senior year is **negative** across every population.
-The girls' programme takes half its athletes from later grades and then loses
-fitness in the final year. Neither of those is visible on any board, in any
-poll, or in any result athletic.net publishes.
+Over distance athletes, four-year completion is **46% boys, 44% girls**, and
+**28% of the boys joined after grade 9**. The girls' senior year is **negative**
+across every population on the cross country ruler, and the boys' turns negative
+too once you switch to the track 3,000m. None of that is visible on any board,
+in any poll, or in any result athletic.net publishes.
+
+The freshman-to-sophomore step being the largest survives on every ruler and in
+every population, which is the one finding here that has not moved under any
+amount of re-cutting.
 
 
 ## How the simulation works
@@ -1847,7 +1943,7 @@ node extract_model.js        # regenerate model.js after any signature change
 node audit2.js               # 93 checks, 1 deliberate failure
 node pull/test_seed.js       # 64 checks on the seed builder, no network
 node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
-node pull/test_roster.js     # 67 checks on the roster builder, no network
+node pull/test_roster.js     # 93 checks on the roster builder, no network
 node backtest/test_snapshot.js   # 38 checks that the archive REFUSES, both line endings
 ```
 

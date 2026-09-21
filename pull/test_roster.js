@@ -55,6 +55,9 @@ ok(!row({ Distance: 0 }), 'a row with no distance is dropped');
 ok(row({ Distance: 3000, SortValue: 560 }), 'a 3,000m race is kept, not filtered away');
 ok(!row({ Distance: 5000, SortValue: 600 }), 'a 5,000m in ten minutes is implausible');
 ok(!row({ Distance: 5000, SortValue: 3700 }), 'and so is one in over an hour');
+
+// one pace bound cannot serve both ends; the rec() cases are below, with rec
+ok(R.paceBounds(100)[0] < R.paceBounds(5000)[0], 'a sprint is allowed to be faster per metre');
 eq(row({ ShortDesc: '' }).grade, null, 'a blank grade survives as null');
 
 /* The one untrusted input. roster.js must not restate the rule - it has to
@@ -68,6 +71,43 @@ const src = fs.readFileSync(path.join(__dirname, 'roster.js'), 'utf8');
 ok(/Seed\.cleanName/.test(src), 'roster.js calls the shared sanitiser');
 ok(!/\[",<>&\]/.test(src), 'and does not keep its own copy of the rule');
 ok(typeof Seed.cleanName === 'function', 'which seed.js exports');
+
+/* ---------- track ----------
+   A different endpoint with a different shape: season bests per athlete per
+   event, SortInt in milliseconds, and field marks in the same array. */
+eq(R.eventMetres('1500 Meters'), 1500, 'a flat running event gives its distance');
+eq(R.eventMetres('3,000 Meters'), 3000, 'and survives a thousands comma');
+eq(R.eventMetres('300m Hurdles'), 0, 'hurdles are not on the same ruler as a flat run');
+eq(R.eventMetres('Shot Put'), 0, 'and a throw is not a run at all');
+eq(R.eventMetres('4x400 Relay'), 0, 'nor is a relay leg');
+
+const rec = (o) => R.recordRow(Object.assign({
+  IDAthlete: 5, FirstName: 'A', LastName: 'B', GenderID: 'M', GradeID: 10,
+  Event: '1500 Meters', Type: 'T', SortInt: 259540, IDMeet: 9,
+  MeetName: 'District', EndDate: '2014-05-16T00:00:00',
+}, o), 2014);
+ok(rec({}), 'a track mark survives');
+eq(rec({}).seconds, 259.54, 'SortInt is milliseconds, not seconds');
+eq(rec({}).dist, 1500, 'the distance comes out of the event name');
+eq(rec({}).date, '2014-05-16', 'and the date off EndDate');
+eq(rec({}).sport, 'tfo', 'tagged as outdoor track');
+ok(!rec({ Type: 'F', Event: 'Shot Put', SortInt: 12000 }),
+  'a field mark is dropped — SortInt there is a distance, and 12 metres would '
+  + 'otherwise land on the board as a 12 second race');
+ok(!rec({ Event: '300m Hurdles', SortInt: 42000 }), 'so are hurdles');
+eq(rec({ GradeID: 99 }).grade, null, 'grade 99 means unknown, not year 99');
+eq(rec({}).place, null, 'a season best has no finishing place');
+
+/* Loose enough for a ten second 100m is loose enough for a nine minute
+   5,000m, which is two minutes inside the world record - hence two regimes. */
+ok(!rec({ Event: '5,000 Meters', SortInt: 600000 }), 'a nine minute 5,000m is refused');
+ok(rec({ Event: '100 Meters', SortInt: 11200 }), 'while an 11.2 second 100m is fine');
+ok(!rec({ Event: '100 Meters', SortInt: 8000 }), 'and an eight second one is not');
+
+/* Both sports have to agree about who graduates together, or a track season
+   and a cross country season file the same athlete in two cohorts. */
+eq(R.classOf(2013, 'tfo', 9), 2016, 'a freshman in spring 2013 is class of 2016');
+eq(R.classOf(2013, 'xc', 10), 2016, 'and so is a sophomore that autumn');
 
 /* ---------- the class-year vote ---------- */
 const mk = (id, season, grade, extra) => Object.assign({
@@ -145,8 +185,11 @@ const seasons = read('t284_seasons.csv');
 const meta = JSON.parse(fs.readFileSync(path.join(DIR, 't284_meets.json'), 'utf8'));
 
 // non-vacuous: none of what follows means anything against an empty file
-ok(athletes.length > 500, 'the committed pull holds a real roster — ' + athletes.length + ' athletes');
-ok(seasons.length > 1000, 'and real athlete-seasons — ' + seasons.length);
+ok(athletes.length > 1400, 'the committed pull holds a real roster — ' + athletes.length + ' athletes');
+ok(seasons.length > 3000, 'and real athlete-seasons — ' + seasons.length);
+ok(seasons.some(s => s.sport === 'xc') && seasons.some(s => s.sport === 'tfo'),
+  'from both sports');
+ok(seasons.some(s => s.best1500), 'with track distances of their own');
 eq(meta.horizon, R.FIRST_SEASON, 'the horizon is recorded beside the data');
 
 const disputed = athletes.filter(a => a.classOfConflict === '1');
@@ -155,11 +198,11 @@ ok(disputed.length / athletes.length < 0.02,
   + ' of ' + athletes.length + ' disputed');
 
 const byName = new Map(athletes.map(a => [(a.first + ' ' + a.last).toLowerCase(), a]));
-const best = new Map();                       // athleteId -> grade -> best 5k
+const best = new Map();                   // athleteId -> grade -> best cross country 5k
 for (const s of seasons) {
-  if (!s.best5k || !s.grade) continue;
+  if (s.sport !== 'xc' || !s.best5000 || !s.grade) continue;
   if (!best.has(s.athleteId)) best.set(s.athleteId, {});
-  best.get(s.athleteId)[s.grade] = +s.best5k;
+  best.get(s.athleteId)[s.grade] = +s.best5000;
 }
 const mmss = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 
@@ -197,22 +240,43 @@ for (const [name, times] of TRUST) {
    the same rule the poll and the seed both had to learn. */
 ok(!byName.has('melissa arndofer'), 'the sheet\'s spelling is not what the database holds');
 
-/* Meghan Peyton, who ran as Meghan Armstrong, is in neither, and that is the
-   horizon rather than a bug: she predates athletic.net's Tualatin coverage.
-   Recorded as a test so that a later pull reaching further back shows up as a
-   failure here rather than as a surprise. */
-ok(!byName.has('meghan peyton') && !byName.has('meghan armstrong'),
-  'Meghan Peyton is outside the horizon under either name');
+/* Meghan Peyton was the one athlete of the nineteen cross country could not
+   find at all, and adding track found her: two marks in the spring of 2004,
+   which is the first season athletic.net has for this school. She is
+   unknown-gap rather than observed, correctly - 2004 carries almost no
+   freshman results, so there is no evidence either way about how she started.
 
-/* ---------- the two athletes who joined late ----------
-   Both first appear in grade 10 and both are real late entries rather than
-   holes, which is only knowable from the team around them. If this ever flips
-   to unknown-gap the reconciliation has broken. */
+   This is the horizon working rather than a bug, and it is the argument for
+   both sports in one sentence: a record built on autumns alone is missing
+   every athlete whose season was a spring. */
+const mp = byName.get('meghan peyton');
+ok(mp, 'Meghan Peyton is in the pull once track is included');
+eq(mp.classOf, '2004', 'class of 2004, at the very edge of coverage');
+eq(mp.entry, 'unknown-gap', 'and her entry is unknown rather than guessed');
+
+/* ---------- the two who looked like late entries, and were not ----------
+   With cross country alone both first appear in grade 10, and the
+   reconciliation correctly called them late entries: the school had posted
+   freshmen in the season they would have been one.
+
+   Adding track moved them. Both ran their freshman spring, so they entered in
+   grade 9 after all and had simply skipped one autumn. The hand-built
+   four-year table in TRUST Plan Data was right about them all along, and the
+   freshman marks it carried came from track rather than from nowhere.
+
+   Worth a test because it is the argument for pulling both sports stated as an
+   assertion: a cohort built on one season a year gets entry wrong for anybody
+   who starts in the other one. */
 for (const n of ['Mark French', 'Kaitlyn Gearin']) {
   const a = byName.get(n.toLowerCase());
-  eq(a.entryGrade, '10', n + ' first raced as a sophomore');
-  eq(a.entry, 'late-entry', n + ' joined late rather than falling in a gap');
+  eq(a.entryGrade, '9', n + ' entered in grade 9 once track is in');
+  eq(a.entry, 'observed', n + ' was observed as a freshman, not inferred as a late entry');
 }
+const frTf = seasons.filter(s => s.athleteId === byName.get('mark french').athleteId
+  && s.sport === 'tfo' && s.grade === '9');
+eq(frTf.length, 1, 'and the freshman year that was missing is a track season');
+ok(+frTf[0].best1500 > 0 && +frTf[0].best3000 > 0,
+  'carrying a 1500 and a 3000 on a flat oval, which is the clean ruler');
 eq(byName.get('caleb lakeman').classOf, '2022', 'a four-year athlete graduates when he did');
 eq(byName.get('mark french').classOf, '2016', 'and a senior in autumn 2015 is class of 2016');
 

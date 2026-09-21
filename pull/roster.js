@@ -22,20 +22,32 @@
 // It goes through curl for the reason set out in pull/crawl.js: from this
 // address Node's own fetch is challenged and curl is served.
 //
-// CROSS COUNTRY ONLY, FOR NOW
+// AND TRACK, THROUGH A DIFFERENT DOOR
 //
 // The grid ignores its sport parameter - ?sport=tfo returns the identical
-// cross country payload - so track needs a different route and is not here
-// yet. Two things found while looking, worth not rediscovering:
+// cross country payload - so track is not reachable that way at all. It is
+// reachable, and just as cheaply:
 //
-//   - the valid codes are tfo and tfi, not tf or track
+//   TeamHome/GetTeamAthleteRecords?teamId=N&seasonId=YYYY
+//
+// One GET a season, no token, back to 2005. It returns each athlete's season
+// best per event rather than every race, which is the right shape here: the
+// point of track is a clean ruler, and a season best on a flat oval at a
+// standard distance is exactly that. Each row carries the grade, the gender,
+// the event, the meet and its date, so nothing is lost that the cohort work
+// needs.
+//
+// Two things found while looking, worth not rediscovering:
+//
+//   - the valid sport codes are tfo and tfi, not tf or track
 //   - division ids are PER SPORT. 87377 is Oregon in cross country and
 //     Northern Ohio in track, so Seed.OREGON_DIV must not be reused across
 //     sports. That fails silently, with a full plausible answer.
 //
-// The track roster does come back from TeamHome/GetAthletes?seasonId=YYYY
-// given the team's jwtTeamHome for sport=tfo. Results appear to be per
-// athlete rather than per team, which would be ~150 requests a season.
+// TeamHome/GetAthletes?seasonId=YYYY returns the track roster given the
+// team's jwtTeamHome for sport=tfo. It is not used - the records call already
+// carries everybody who actually raced, and a roster entry with no mark on it
+// says nothing this file can use.
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
@@ -52,12 +64,23 @@ const GAP_GET = 700, TRIES = 4;
 // meets file and belongs on any page built from this.
 const FIRST_SEASON = 2004;
 
-/* Pace bounds as seconds per metre, so one rule covers 3,000m, 3,400m and
-   5,000m alike. The 999999 scratch sentinel that lives in SortValue is what
-   the upper bound is really for; the lower one would catch a mis-keyed
-   distance. 0.140 s/m is 11:40 for 5,000m, comfortably under any high school
-   result; 0.720 is 60:00. */
-const MIN_PACE = 0.140, MAX_PACE = 0.720;
+/* Plausible pace, in seconds per metre.
+
+   One bound cannot serve both ends. A pace loose enough to admit a 10-second
+   100m accepts a nine-minute 5,000m, which is two minutes inside the world
+   record - so the bounds are per regime. Sprints are faster per metre and
+   their slow end is much slower in relative terms, because a 100m is where a
+   non-runner turns up.
+
+   Under 800m:  0.090 s/m is 9.0s for 100m; 0.450 is 45s.
+   800m and up: 0.140 s/m is 11:40 for 5,000m and 1:52 for 800m; 0.720 is
+                60:00 for 5,000m.
+
+   The upper bound is what catches the 999999 scratch sentinel in SortValue.
+   The lower one catches a mis-keyed distance, or a field mark read as a time. */
+function paceBounds(dist) {
+  return dist < 800 ? [0.090, 0.450] : [0.140, 0.720];
+}
 
 /* ---------- names ----------
    Keyed on the athlete id, never on the name, because names are not unique
@@ -119,13 +142,55 @@ function gradeOf(v) {
 const schoolYear = (year, sport) => +year + (sport === 'xc' ? 1 : 0);
 const classOf = (year, sport, grade) => schoolYear(year, sport) + (12 - grade);
 
+/* "1500 Meters" -> 1500. Only flat running events come back with a distance;
+   hurdles, relays and everything in the field return 0 and are dropped.
+
+   That is deliberate rather than lazy. A 300m hurdles time is not on the same
+   ruler as a 300m run and cannot be read by the VDOT table, and a shot put is
+   not a time at all - SortInt for a field event is a distance, so treating it
+   as milliseconds would put a 12-metre throw on the board as a 12-second race.
+   The count of what was skipped is in the report, the same way divMetres
+   dropping the imperial cross country divisions is. */
+function eventMetres(name) {
+  const m = String(name || '').match(/^([\d,]+)\s*Meters$/i);
+  return m ? +m[1].replace(/,/g, '') : 0;
+}
+
+/* One row of GetTeamAthleteRecords -> the same shape a cross country result
+   has. SortInt is MILLISECONDS for a timed event: 156061 is 2:36.07. */
+function recordRow(r, season) {
+  if (String(r.Type || '').toUpperCase() !== 'T') return null;   // a field mark is not a time
+  const dist = eventMetres(r.Event);
+  if (!dist) return null;
+  const sec = +r.SortInt / 1000;
+  if (!(sec > 0)) return null;
+  const [lo, hi] = paceBounds(dist);
+  const pace = sec / dist;
+  if (pace < lo || pace > hi) return null;
+  return {
+    athleteId: +r.IDAthlete || 0,
+    first: Seed.cleanName(r.FirstName),
+    last: Seed.cleanName(r.LastName),
+    gender: r.GenderID || '',
+    grade: gradeOf(r.GradeID),
+    place: null,                       // a season best is not a finishing place
+    dist, seconds: sec,
+    event: r.Event || '',
+    meetId: String(r.IDMeet || ''),
+    meetName: r.MeetName || '',
+    date: String(r.EndDate || '').slice(0, 10),
+    season: +season, sport: 'tfo',
+  };
+}
+
 function gridRow(r, season, sport) {
   if (!(+r.SortValue > 0)) return null;
   const dist = +r.Distance || 0;
   if (!dist) return null;
   const sec = +r.SortValue;
+  const [lo, hi] = paceBounds(dist);
   const pace = sec / dist;
-  if (pace < MIN_PACE || pace > MAX_PACE) return null;
+  if (pace < lo || pace > hi) return null;
   return {
     athleteId: +r.IDAthlete || +r.AthleteID || 0,
     first: Seed.cleanName(r.FirstName),
@@ -134,6 +199,7 @@ function gridRow(r, season, sport) {
     grade: gradeOf(r.ShortDesc != null ? r.ShortDesc : r.Grade),
     place: +r.Place || null,
     dist, seconds: sec,
+    event: '',                         // cross country has one event; track names its own
     meetId: String(r.MeetID || r.IDMeet || ''),
     season: +season, sport,
   };
@@ -248,7 +314,8 @@ function buildSeasons(rows, athletes) {
     if (b == null || r.seconds < b) s.best[r.dist] = r.seconds;
   }
   for (const s of by.values()) {
-    s.best5k = s.best[5000] == null ? null : s.best[5000];
+    for (const d of [800, 1500, 3000, 5000]) s['best' + d] = s.best[d] == null ? null : s.best[d];
+    s.best5k = s.best5000;                                  // the name the page grew up with
     s.bestAny = Math.min(...Object.values(s.best));
   }
   return by;
@@ -325,6 +392,30 @@ function pull(teamId, from, to) {
   return { rows, meets, empty };
 }
 
+/* Track: one GET a season, no token. Season bests per athlete per event. */
+function pullTrack(teamId, from, to) {
+  const rows = [], meets = {}, empty = [];
+  let field = 0;
+  for (let y = from; y <= to; y++) {
+    let j;
+    try {
+      j = ask(API + 'TeamHome/GetTeamAthleteRecords?teamId=' + teamId + '&seasonId=' + y);
+    } catch (e) { log('  ' + y + ': ' + e.message); empty.push(y); sleep(GAP_GET); continue; }
+    const all = j.athleteRecords || [];
+    let n = 0;
+    for (const raw of all) {
+      const r = recordRow(raw, y);
+      if (!r) { if (String(raw.Type || '').toUpperCase() === 'F') field++; continue; }
+      if (r.meetId && !meets[r.meetId]) meets[r.meetId] = { date: r.date, name: r.meetName };
+      rows.push(r); n++;
+    }
+    log('  ' + y + '  ' + String(n).padStart(4) + ' marks of ' + all.length + ' records');
+    if (!n) empty.push(y);
+    sleep(GAP_GET);
+  }
+  return { rows, meets, empty, field };
+}
+
 function main() {
   const args = process.argv.slice(2);
   const flag = (f, d) => { const i = args.indexOf(f); return i < 0 ? d : args[i + 1]; };
@@ -338,7 +429,17 @@ function main() {
   const stem = path.join(OUT, 't' + teamId + '_');
 
   log('pulling ' + label + ' (team ' + teamId + '), ' + from + '-' + to);
-  const { rows, meets, empty } = pull(teamId, from, to);
+  log('  cross country, every race:');
+  const xc = pull(teamId, from, to);
+  log('  track, each athlete\'s season best per event:');
+  const tf = pullTrack(teamId, from, to);
+
+  /* One results table, both sports. classOf votes from track as well as cross
+     country, which is strictly more evidence for the same inference - an
+     athlete who ran one autumn and three springs now resolves. */
+  const rows = [...xc.rows, ...tf.rows];
+  const meets = { ...xc.meets, ...tf.meets };
+  const empty = xc.empty;
 
   const athletes = entryOf(buildAthletes(rows), rows);
   const seasons = buildSeasons(rows, athletes);
@@ -366,8 +467,9 @@ function main() {
   }
 
   fs.writeFileSync(stem + 'results.csv', csv(
-    ['athleteId', 'season', 'sport', 'date', 'dist', 'seconds', 'place', 'grade', 'meetId'],
-    rows.map(r => ({ ...r, grade: r.grade || '' }))));
+    ['athleteId', 'season', 'sport', 'event', 'date', 'dist', 'seconds', 'place',
+      'grade', 'meetId'],
+    rows.map(r => ({ ...r, grade: r.grade || '', place: r.place || '' }))));
 
   fs.writeFileSync(stem + 'athletes.csv', csv(
     ['athleteId', 'first', 'last', 'alsoKnownAs', 'gender', 'classOf', 'classOfConflict',
@@ -376,12 +478,15 @@ function main() {
       .map(a => ({ ...a, classOfConflict: a.classOfConflict ? 1 : 0, nResults: a.n }))));
 
   fs.writeFileSync(stem + 'seasons.csv', csv(
-    ['athleteId', 'schoolYear', 'sport', 'grade', 'nRaces', 'best5k', 'bestAny'],
+    ['athleteId', 'schoolYear', 'sport', 'grade', 'nRaces',
+      'best800', 'best1500', 'best3000', 'best5000', 'bestAny'],
     [...seasons.values()].sort((a, b) => a.athleteId - b.athleteId || a.schoolYear - b.schoolYear)));
 
   fs.writeFileSync(stem + 'meets.json', JSON.stringify({
     teamId, label, from, to, horizon: FIRST_SEASON,
     pulled: new Date().toISOString().slice(0, 10),
+    sports: { xc: xc.rows.length, tfo: tf.rows.length },
+    fieldMarksSkipped: tf.field,
     emptySeasons: empty, meets,
   }, null, 2));
 
@@ -394,8 +499,10 @@ function main() {
     const e = c.reduce((s, x) => s + x.entered, 0), f = c.reduce((s, x) => s + x.g12, 0);
     return e ? f + '/' + e + ' = ' + Math.round(f / e * 100) + '%' : 'none';
   };
-  log('\n  ' + rows.length + ' results, ' + athletes.size + ' athletes, '
+  log('\n  ' + rows.length + ' results (' + xc.rows.length + ' cross country, '
+    + tf.rows.length + ' track), ' + athletes.size + ' athletes, '
     + seasons.size + ' athlete-seasons, ' + Object.keys(meets).length + ' meets');
+  log('  ' + tf.field + ' field marks skipped, which are distances rather than times');
   log('  class year disputed for ' + conflict.length + ' athlete'
     + (conflict.length === 1 ? '' : 's'));
   log('  entry: ' + ['observed', 'late-entry', 'unknown-gap', 'ungraded']
@@ -406,8 +513,9 @@ function main() {
 }
 
 module.exports = {
-  gradeOf, schoolYear, classOf, gridRow, buildAthletes, entryOf, buildSeasons,
-  cohorts, csv, NAME_BY_ID, MIN_PACE, MAX_PACE, FIRST_SEASON,
+  gradeOf, schoolYear, classOf, gridRow, eventMetres, recordRow,
+  buildAthletes, entryOf, buildSeasons,
+  cohorts, csv, NAME_BY_ID, paceBounds, FIRST_SEASON,
 };
 
 if (require.main === module) main();

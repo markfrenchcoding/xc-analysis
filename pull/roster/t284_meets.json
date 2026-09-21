@@ -4,7 +4,12 @@
   "from": 2004,
   "to": 2026,
   "horizon": 2004,
-  "pulled": "2026-09-20",
+  "pulled": "2026-09-21",
+  "sports": {
+    "xc": 8835,
+    "tfo": 5144
+  },
+  "fieldMarksSkipped": 2687,
   "emptySeasons": [],
   "meets": {
     "3": {
@@ -59,9 +64,25 @@
       "date": "2006-11-04",
       "name": "OSAA 6A State Championships"
     },
+    "428": {
+      "date": "2004-05-29",
+      "name": "OSAA 4A State Championships Day 2"
+    },
     "519": {
       "date": "2006-09-27",
       "name": "Lakeridge, Tualatin, McMinnville @ West Linn"
+    },
+    "802": {
+      "date": "2004-05-01",
+      "name": "XO Invite"
+    },
+    "937": {
+      "date": "2004-04-21",
+      "name": "Woodburn vs. Tualatin"
+    },
+    "939": {
+      "date": "2004-04-28",
+      "name": "Dallas at Tualatin"
     },
     "1081": {
       "date": "2006-09-06",
@@ -83,13 +104,41 @@
       "date": "2006-10-26",
       "name": "Pacific Conferance District Meet"
     },
+    "1512": {
+      "date": "2004-05-14",
+      "name": "Novice Districts "
+    },
+    "1781": {
+      "date": "2004-04-24",
+      "name": "40th Annual Centennial Invitational"
+    },
+    "2416": {
+      "date": "2004-05-11",
+      "name": "Dual w/Tualatin"
+    },
+    "2419": {
+      "date": "2004-05-21",
+      "name": "Varsity District Meet"
+    },
+    "2526": {
+      "date": "2004-05-07",
+      "name": "Jesuit Twilight Relays"
+    },
     "2841": {
       "date": "2006-08-30",
       "name": "Time trial"
     },
+    "3900": {
+      "date": "2005-05-21",
+      "name": "OSAA 4A State Championships Day 2"
+    },
     "3935": {
       "date": "2007-09-15",
       "name": "New Balance Festival of Champions"
+    },
+    "4055": {
+      "date": "2005-04-16",
+      "name": "Willamette Falls Invitational"
     },
     "4160": {
       "date": "2007-10-06",
@@ -106,6 +155,18 @@
     "4475": {
       "date": "2004-11-06",
       "name": "OSAA 4A State Championships"
+    },
+    "4534": {
+      "date": "2005-04-13",
+      "name": "Silverton, Tualatin, Woodburn"
+    },
+    "4546": {
+      "date": "2005-03-31",
+      "name": "vs. Canby"
+    },
+    "4549": {
+      "date": "2005-04-20",
+      "name": "Vs. Tigard"
     },
     "4596": {
       "date": "2007-09-05",
@@ -127,13 +188,85 @@
       "date": "2007-10-25",
       "name": "Pacific Conference District Meet"
     },
+    "5017": {
+      "date": "2005-04-27",
+      "name": "Tualatin/Dallas Dual"
+    },
+    "5018": {
+      "date": "2005-05-06",
+      "name": "PAC-9 JV District Meet"
+    },
+    "5019": {
+      "date": "2005-05-12",
+      "name": "Pac 9 District Meet"
+    },
+    "5021": {
+      "date": "2005-05-13",
+      "name": "Pac 9 District Meet "
+    },
+    "5138": {
+      "date": "2005-03-17",
+      "name": "Grizzly Bear Open"
+    },
+    "5637": {
+      "date": "2005-04-08",
+      "name": "Lake Oswego Invite"
+    },
+    "5907": {
+      "date": "2005-04-23",
+      "name": "Centennial Invitational"
+    },
+    "6348": {
+      "date": "2005-05-03",
+      "name": "Tualatin"
+    },
+    "6475": {
+      "date": "2005-04-29",
+      "name": "Jesuit Twilight Relays"
+    },
     "7052": {
       "date": "2007-09-12",
       "name": "Lakeridge McIver Park Invite"
     },
+    "7801": {
+      "date": "2006-05-26",
+      "name": "OSAA 4A State Championships Day 1"
+    },
+    "9003": {
+      "date": "2006-03-15",
+      "name": "Barlow, Lake Oswego, Tualatin"
+    },
+    "9004": {
+      "date": "2006-03-22",
+      "name": "Dallas vs. Tualatin"
+    },
+    "9005": {
+      "date": "2006-04-05",
+      "name": "Tualatin vs. Silverton"
+    },
     "9007": {
       "date": "2008-09-13",
       "name": "New Balance Festival of Champions"
+    },
+    "9010": {
+      "date": "2006-05-03",
+      "name": "Tigard vs. Tualatin"
+    },
+    "9012": {
+      "date": "2006-05-09",
+      "name": "Forest Grove vs. Tualatin"
+    },
+    "9014": {
+      "date": "2006-05-19",
+      "name": "PAC 9 District"
+    },
+    "9015": {
+      "date": "2006-05-18",
+      "name": "PAC 9 District"
+    },
+    "9300": {
+      "date": "2006-04-26",
+      "name": "Tualatin vs. McMinnville"
     },
     "9780": {
       "date": "2008-11-01",
@@ -171,6 +304,18 @@
       "date": "2008-10-01",
       "name": "Clackamas/Tualatin/Newberg/Putnam"
     },
+    "13266": {
+      "date": "2006-04-07",
+      "name": "Laker Invite"
+    },
+    "16945": {
+      "date": "2006-04-11",
+      "name": "Canby Invite"
+    },
+    "17037": {
+      "date": "2006-05-12",
+      "name": "PAC 9 JV Districts"
+    },
     "18346": {
       "date": "2009-09-19",
       "name": "New Balance Festival of Champions"
@@ -207,13 +352,61 @@
       "date": "2009-10-29",
       "name": "Pacific District at Clackamas CC"
     },
+    "19473": {
+      "date": "2006-04-13",
+      "name": "Newberg vs Tualatin "
+    },
     "27081": {
       "date": "2010-09-18",
       "name": "New Balance Festival of Champions"
     },
+    "27780": {
+      "date": "2007-05-19",
+      "name": "OSAA 6A State Championships"
+    },
+    "28299": {
+      "date": "2007-04-27",
+      "name": "Jesuit Twilight Relays"
+    },
+    "29377": {
+      "date": "2007-03-14",
+      "name": "Barlow, Lake Oswego, Reynolds"
+    },
+    "29378": {
+      "date": "2007-03-21",
+      "name": "Centennial vs. Tualatin"
+    },
+    "29379": {
+      "date": "2007-04-04",
+      "name": "Tualatin Vs. Canby"
+    },
+    "29382": {
+      "date": "2007-04-18",
+      "name": "Forest Grove @ Tualatin"
+    },
+    "29383": {
+      "date": "2007-04-25",
+      "name": "McMinnville @ Tualatin"
+    },
+    "29386": {
+      "date": "2007-05-04",
+      "name": "Pacific JV District"
+    },
+    "29387": {
+      "date": "2007-05-10",
+      "name": "Pacific District Meet"
+    },
+    "29573": {
+      "date": "2007-04-06",
+      "name": "Laker Classic Invitational"
+    },
+    "31075": {
+      "date": "2007-05-01",
+      "name": "Tualatin @ Tigard"
+    },
     "31671": {
-      "date": "2010-09-08",
-      "name": "Tualatin Invite"
+      "date": "2007-04-11",
+      "name": "Newberg vs Tualatin"
     },
     "31672": {
       "date": "2010-09-22",
@@ -242,6 +435,66 @@
     "32567": {
       "date": "2010-11-06",
       "name": "OSAA 6A State Championships"
+    },
+    "38891": {
+      "date": "2007-05-09",
+      "name": "Pacific District Meet at Linfield"
+    },
+    "40328": {
+      "date": "2008-05-24",
+      "name": "OSAA 6A State Championships Day 2"
+    },
+    "40887": {
+      "date": "2008-05-02",
+      "name": "Jesuit Twilight Relays"
+    },
+    "41474": {
+      "date": "2008-04-26",
+      "name": "44th Centennial Invitational"
+    },
+    "41960": {
+      "date": "2008-04-02",
+      "name": "Tualatin vs. Forest Grove"
+    },
+    "41961": {
+      "date": "2008-04-04",
+      "name": "*Laker Classic Invitational"
+    },
+    "41962": {
+      "date": "2008-04-09",
+      "name": "Canby vs. Tualatin"
+    },
+    "41963": {
+      "date": "2008-04-16",
+      "name": "Newberg vs. Tualatin"
+    },
+    "41964": {
+      "date": "2008-04-30",
+      "name": "McMinnville vs Tualatin"
+    },
+    "41965": {
+      "date": "2008-05-07",
+      "name": "Tigard vs. Tualatin"
+    },
+    "41966": {
+      "date": "2008-05-09",
+      "name": "Pacific Conference JV District"
+    },
+    "41967": {
+      "date": "2008-05-15",
+      "name": "Pacific Conference Meet"
+    },
+    "41968": {
+      "date": "2008-05-16",
+      "name": "Pacific Conference District Meet"
+    },
+    "41970": {
+      "date": "2008-03-12",
+      "name": "Rex Putnam, Barlow, Wilsonville vs. Tualatin"
+    },
+    "41982": {
+      "date": "2008-03-19",
+      "name": "Tualatin, Aloha vs Centennial"
     },
     "44252": {
       "date": "2011-11-05",
@@ -323,9 +576,65 @@
       "date": "2012-08-29",
       "name": "Team time trial"
     },
+    "61044": {
+      "date": "2009-04-25",
+      "name": "Oregon Relays"
+    },
+    "61046": {
+      "date": "2009-05-01",
+      "name": "Jesuit Twilight Relays"
+    },
+    "61297": {
+      "date": "2009-05-23",
+      "name": "OSAA 6A State Championships Day 2"
+    },
+    "61790": {
+      "date": "2009-04-25",
+      "name": "45th Centennial Invitational"
+    },
+    "62005": {
+      "date": "2009-05-05",
+      "name": "Tualatin @ Tigard"
+    },
+    "62007": {
+      "date": "2009-05-14",
+      "name": "2009 Pacific District Meet "
+    },
+    "62008": {
+      "date": "2009-05-15",
+      "name": "2009 Pacific District Meet "
+    },
+    "63316": {
+      "date": "2009-03-18",
+      "name": "Centennial at Tualatin"
+    },
+    "63317": {
+      "date": "2009-04-01",
+      "name": "McMinnville at Tualatin"
+    },
+    "63318": {
+      "date": "2009-04-03",
+      "name": "Laker Classic Invitational"
+    },
+    "63319": {
+      "date": "2009-04-09",
+      "name": "Forest Grove at Tualatin"
+    },
+    "63320": {
+      "date": "2009-04-16",
+      "name": "Tualatin @ Canby "
+    },
+    "63322": {
+      "date": "2009-05-08",
+      "name": "Pacific JV District Meet"
+    },
     "65293": {
       "date": "2013-09-14",
       "name": "14th Annual Festival of Champions"
+    },
+    "67913": {
+      "date": "2009-04-30",
+      "name": "Tualatin @ Newberg"
     },
     "78097": {
       "date": "2013-09-04",
@@ -367,6 +676,54 @@
       "date": "2013-08-28",
       "name": "Tualatin Team Time Trial"
     },
+    "85708": {
+      "date": "2010-05-01",
+      "name": "Oregon Relays "
+    },
+    "85740": {
+      "date": "2010-05-28",
+      "name": "OSAA 6A State Championships Day 1"
+    },
+    "85741": {
+      "date": "2010-05-29",
+      "name": "OSAA 6A State Championships Day 2"
+    },
+    "87549": {
+      "date": "2010-05-07",
+      "name": "Jesuit Twilight Relays"
+    },
+    "87789": {
+      "date": "2010-05-11",
+      "name": "Tualatin at McMinnville"
+    },
+    "87790": {
+      "date": "2010-05-14",
+      "name": "Pacific Conference Novice Meet"
+    },
+    "87791": {
+      "date": "2010-05-20",
+      "name": "Pacific Conference Championships Day 1"
+    },
+    "88191": {
+      "date": "2010-04-09",
+      "name": "Laker Classic Invitational"
+    },
+    "89895": {
+      "date": "2010-03-17",
+      "name": "Benson/Tualatin at Centennial"
+    },
+    "89896": {
+      "date": "2010-04-15",
+      "name": "Canby at Tualatin"
+    },
+    "89897": {
+      "date": "2010-04-29",
+      "name": "Newberg at Tualatin"
+    },
+    "89898": {
+      "date": "2010-05-05",
+      "name": "Tigard at Tualatin"
+    },
     "89940": {
       "date": "2014-09-27",
       "name": "Nike Pre Nationals"
@@ -374,6 +731,10 @@
     "90750": {
       "date": "2014-10-04",
       "name": "Harrier Classic"
+    },
+    "91044": {
+      "date": "2010-04-07",
+      "name": "Tualatin at Forest Grove"
     },
     "91406": {
       "date": "2014-11-01",
@@ -447,13 +808,45 @@
       "date": "2015-11-22",
       "name": "Nike BorderClash 17"
     },
+    "113157": {
+      "date": "2010-06-12",
+      "name": "Portland Track Fesival"
+    },
     "113575": {
       "date": "2016-09-01",
       "name": "Nike Bill Chapman Invitational"
     },
+    "113762": {
+      "date": "2011-04-13",
+      "name": "Newberg at Tualatin"
+    },
     "114663": {
       "date": "2016-09-10",
       "name": "12th Annual Tualatin Invite"
+    },
+    "115125": {
+      "date": "2011-05-20",
+      "name": "OSAA 5A State Championships Day 1"
+    },
+    "115142": {
+      "date": "2011-05-20",
+      "name": "OSAA 6A State Championships Day 1"
+    },
+    "115320": {
+      "date": "2011-04-29",
+      "name": "Jesuit Twilight Invitational"
+    },
+    "115420": {
+      "date": "2011-04-23",
+      "name": "Oregon Relays Day 2"
+    },
+    "115435": {
+      "date": "2011-05-12",
+      "name": "Pacific Conference Championships Day 1"
+    },
+    "115814": {
+      "date": "2011-04-01",
+      "name": "Laker Classic invitational"
     },
     "116277": {
       "date": "2016-09-14",
@@ -463,9 +856,25 @@
       "date": "2016-09-23",
       "name": "Meriwether National Cross Country Classic"
     },
+    "116505": {
+      "date": "2011-05-06",
+      "name": "Pacific Conference JV District Meet"
+    },
+    "116634": {
+      "date": "2011-04-20",
+      "name": "Tualatin at McMinnville"
+    },
+    "117011": {
+      "date": "2011-04-27",
+      "name": "Tigard at Tualatin"
+    },
     "117098": {
       "date": "2016-11-05",
       "name": "OSAA 6A State Championships"
+    },
+    "117371": {
+      "date": "2011-03-16",
+      "name": "West Linn/Horizon Christian at Tualatin"
     },
     "117495": {
       "date": "2016-10-12",
@@ -474,6 +883,10 @@
     "117496": {
       "date": "2016-10-26",
       "name": "6A-4 Three Rivers League Championship"
+    },
+    "117528": {
+      "date": "2011-04-06",
+      "name": "Tualatin @ Hillsboro"
     },
     "117989": {
       "date": "2016-10-01",
@@ -490,6 +903,10 @@
     "119282": {
       "date": "2016-09-20",
       "name": "Canby, Newberg @ Tualatin"
+    },
+    "122600": {
+      "date": "2011-05-04",
+      "name": "Cent/FG/Glencoe at Tual. (Varsity only)"
     },
     "124961": {
       "date": "2017-09-09",
@@ -547,6 +964,58 @@
       "date": "2018-09-08",
       "name": "14th Annual Tualatin Invite"
     },
+    "139150": {
+      "date": "2012-05-26",
+      "name": "OSAA 6A State Championships - Day 2"
+    },
+    "139152": {
+      "date": "2012-04-28",
+      "name": "48th Centennial Invitational"
+    },
+    "141964": {
+      "date": "2012-05-17",
+      "name": "Pacific District Meet Day 1"
+    },
+    "141965": {
+      "date": "2012-05-18",
+      "name": "Pacific District Meet Day 2"
+    },
+    "142024": {
+      "date": "2012-04-18",
+      "name": "McMinnville at Tualatin"
+    },
+    "142841": {
+      "date": "2012-05-11",
+      "name": "Pacific Conference Novice Meet"
+    },
+    "142842": {
+      "date": "2012-05-09",
+      "name": "Tualatin, Century, F.G. at Glencoe"
+    },
+    "142843": {
+      "date": "2012-04-20",
+      "name": "Canby Invitational"
+    },
+    "142894": {
+      "date": "2012-04-13",
+      "name": "Laker Classic Invitational"
+    },
+    "142929": {
+      "date": "2012-04-11",
+      "name": "Tualatin at Newberg"
+    },
+    "142930": {
+      "date": "2012-04-04",
+      "name": "Hillsboro at Tualatin"
+    },
+    "143602": {
+      "date": "2012-03-14",
+      "name": "West Linn/Horizon Christian at Tualatin "
+    },
+    "143953": {
+      "date": "2012-03-21",
+      "name": "Sherwood Coed Relays"
+    },
     "143986": {
       "date": "2018-10-13",
       "name": "Warner Pacific XC Classic"
@@ -587,9 +1056,17 @@
       "date": "2018-11-10",
       "name": "NXR Northwest Regional Championships"
     },
+    "146615": {
+      "date": "2012-04-25",
+      "name": "JV only Tualatin @ Century"
+    },
     "150692": {
       "date": "2018-08-30",
       "name": "Tualatin Time Trial at Bush Park"
+    },
+    "153127": {
+      "date": "2012-05-02",
+      "name": "Tualatin at Tigard"
     },
     "154117": {
       "date": "2019-09-28",
@@ -642,6 +1119,58 @@
     "157589": {
       "date": "2019-10-04",
       "name": "Flat & Fast Invitational"
+    },
+    "168248": {
+      "date": "2013-05-25",
+      "name": "OSAA 6A State Championships - Day 2"
+    },
+    "168291": {
+      "date": "2013-04-24",
+      "name": "JV- McMinnville, Tualatin, Glencoe, at Hillsboro"
+    },
+    "168292": {
+      "date": "2013-05-10",
+      "name": "Pacific Conference JV District Meet"
+    },
+    "168295": {
+      "date": "2013-05-16",
+      "name": "Pacific Conference District Meet - Day 1"
+    },
+    "168432": {
+      "date": "2013-04-17",
+      "name": "Century vs. Tualatin"
+    },
+    "168716": {
+      "date": "2013-04-10",
+      "name": "Tualatin @ Tigard"
+    },
+    "168775": {
+      "date": "2013-03-20",
+      "name": "Tualatin, Portland Christian vs Centennial"
+    },
+    "169010": {
+      "date": "2013-05-08",
+      "name": "Hillsboro, Tualatin, McMinnville @ Glencoe"
+    },
+    "169126": {
+      "date": "2013-04-12",
+      "name": "Canby Invitational"
+    },
+    "169127": {
+      "date": "2013-04-05",
+      "name": "Laker Classic Invitational"
+    },
+    "171570": {
+      "date": "2013-05-01",
+      "name": "Newberg @ Tualatin"
+    },
+    "172221": {
+      "date": "2013-04-03",
+      "name": "Forest Grove at Tualatin"
+    },
+    "172906": {
+      "date": "2013-03-13",
+      "name": "Tualatin,Horizon Christian at West Linn"
     },
     "187734": {
       "date": "2021-03-17",
@@ -714,6 +1243,58 @@
     "196796": {
       "date": "2021-11-06",
       "name": "OSAA 6A State Championships"
+    },
+    "199037": {
+      "date": "2014-04-09",
+      "name": "Tigard @ Tualatin"
+    },
+    "199044": {
+      "date": "2014-05-09",
+      "name": "Pacific Conference JV District Meet"
+    },
+    "199045": {
+      "date": "2014-05-15",
+      "name": "6A-4 Pacific Conference District Meet Day 1"
+    },
+    "199046": {
+      "date": "2014-05-16",
+      "name": "6A-4 Pacific Conference District Meet Day 2"
+    },
+    "199741": {
+      "date": "2014-03-19",
+      "name": "Centennial at Tualatin"
+    },
+    "199839": {
+      "date": "2014-04-02",
+      "name": "Tualatin at Forest Grove"
+    },
+    "199840": {
+      "date": "2014-04-16",
+      "name": "Century at Tualatin"
+    },
+    "199841": {
+      "date": "2014-04-23",
+      "name": "JV-Glencoe, Tualatin,McMinnville @ Hilhi"
+    },
+    "199842": {
+      "date": "2014-04-30",
+      "name": "Tualatin at Newberg"
+    },
+    "199843": {
+      "date": "2014-05-07",
+      "name": "Glencoe,Hillsboro, Tual at McMinnville"
+    },
+    "199862": {
+      "date": "2014-05-02",
+      "name": "Nike / Jesuit Twilight Relays"
+    },
+    "200569": {
+      "date": "2014-04-04",
+      "name": "Laker Classic Invitational"
+    },
+    "201467": {
+      "date": "2014-04-18",
+      "name": "Canby Invite"
     },
     "203657": {
       "date": "2022-10-01",
@@ -799,9 +1380,65 @@
       "date": "2023-11-04",
       "name": "OSAA 6A State Championships"
     },
+    "226983": {
+      "date": "2015-05-15",
+      "name": "6A-4 Three Rivers District Meet Day 2"
+    },
+    "226984": {
+      "date": "2015-05-13",
+      "name": "6A-4 Three Rivers District Meet Day 1"
+    },
+    "227047": {
+      "date": "2015-05-01",
+      "name": "Nike / Jesuit Twilight Relays"
+    },
+    "227562": {
+      "date": "2015-04-22",
+      "name": "TRL JV Meet@Sherwood"
+    },
+    "227563": {
+      "date": "2015-05-08",
+      "name": "TRL Novice District"
+    },
+    "227580": {
+      "date": "2015-05-02",
+      "name": "39th Annual Lake Washington Girls Invite"
+    },
+    "227589": {
+      "date": "2015-05-06",
+      "name": "Tig, Tual, Sher, St. M @ Lakeridge"
+    },
+    "227859": {
+      "date": "2015-04-29",
+      "name": "Tualatin at Canby"
+    },
+    "227965": {
+      "date": "2015-04-08",
+      "name": "Lake Oswego @ Tualatin"
+    },
+    "227966": {
+      "date": "2015-04-15",
+      "name": "Newberg @ Tualatin"
+    },
+    "228360": {
+      "date": "2015-04-24",
+      "name": "McMinnville Invitational"
+    },
+    "230879": {
+      "date": "2015-04-03",
+      "name": "Laker Invitational "
+    },
+    "232025": {
+      "date": "2015-04-18",
+      "name": "Viking Relays"
+    },
     "233115": {
       "date": "2024-09-28",
       "name": "Nike Portland XC"
+    },
+    "233661": {
+      "date": "2015-04-01",
+      "name": "Tualatin, West Linn @ SMA"
     },
     "235847": {
       "date": "2024-10-30",
@@ -831,9 +1468,41 @@
       "date": "2024-10-17",
       "name": "Pacific/Three Rivers Crossover"
     },
+    "241732": {
+      "date": "2015-03-18",
+      "name": "Wolfpack Intra Squad Meet"
+    },
+    "246825": {
+      "date": "2016-04-09",
+      "name": "Aloha Preview"
+    },
+    "246942": {
+      "date": "2016-04-02",
+      "name": "Franzke Invitational"
+    },
+    "247894": {
+      "date": "2016-04-16",
+      "name": "Wilsonville Invitational"
+    },
     "250513": {
       "date": "2024-10-09",
       "name": "Tualatin XC Senior Night Intersquad"
+    },
+    "251100": {
+      "date": "2016-04-29",
+      "name": "Nike / Jesuit Twilight Relays"
+    },
+    "251665": {
+      "date": "2016-04-20",
+      "name": "Canby, Lakeridge at Tualatin"
+    },
+    "251667": {
+      "date": "2016-05-13",
+      "name": "6A-4 TRL District Championship Day 2"
+    },
+    "251668": {
+      "date": "2016-05-06",
+      "name": "TRL Novice District Championship"
     },
     "253247": {
       "date": "2025-10-18",
@@ -859,9 +1528,29 @@
       "date": "2025-08-29",
       "name": "Night Meet"
     },
+    "253703": {
+      "date": "2016-05-21",
+      "name": "OSAA 6A State Championships"
+    },
+    "253956": {
+      "date": "2016-04-09",
+      "name": "The Willamette Falls Invitational"
+    },
+    "254491": {
+      "date": "2016-05-04",
+      "name": "Tualatin and Sherwood @ Newberg"
+    },
     "254501": {
       "date": "2025-09-12",
       "name": "Meriwether Cross Country Classic "
+    },
+    "255124": {
+      "date": "2016-04-01",
+      "name": "Laker Invitational"
+    },
+    "255463": {
+      "date": "2016-04-15",
+      "name": "Viking Relays: Twilight Invitational"
     },
     "257966": {
       "date": "2025-09-17",
@@ -875,9 +1564,25 @@
       "date": "2025-11-08",
       "name": "OSAA State XC Championships"
     },
+    "259865": {
+      "date": "2016-04-13",
+      "name": "West Linn and St. Mary's @ Tualatin"
+    },
+    "261274": {
+      "date": "2016-04-06",
+      "name": "Tigard & Tualatin @ Lake Oswego"
+    },
+    "261838": {
+      "date": "2016-04-27",
+      "name": "Newberg @Tualatin (JV only)"
+    },
     "270629": {
       "date": "2026-08-28",
       "name": "The Opener "
+    },
+    "270712": {
+      "date": "2016-03-15",
+      "name": "Whitney vs Moen Intra Squad Meet"
     },
     "271186": {
       "date": "2026-09-12",
@@ -894,6 +1599,494 @@
     "276158": {
       "date": "2026-07-17",
       "name": "Steens Mountain Running Camp Jan Yriarte Uphill 5K"
+    },
+    "277227": {
+      "date": "2017-04-08",
+      "name": "Aloha Preview"
+    },
+    "278860": {
+      "date": "2017-04-14",
+      "name": "Viking Relays"
+    },
+    "283198": {
+      "date": "2017-04-22",
+      "name": "Wilsonville Invitational"
+    },
+    "284328": {
+      "date": "2017-05-12",
+      "name": "6A-4 TRL District Championship Day 2"
+    },
+    "285561": {
+      "date": "2017-04-28",
+      "name": "Stayton Twilight"
+    },
+    "285943": {
+      "date": "2017-04-28",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "286218": {
+      "date": "2017-05-02",
+      "name": "Tigard/West Linn/Tualatin @ Lakeridge"
+    },
+    "286224": {
+      "date": "2017-04-19",
+      "name": "Tualatin @ Canby"
+    },
+    "286247": {
+      "date": "2017-05-20",
+      "name": "OSAA 6A State Championships"
+    },
+    "286260": {
+      "date": "2017-03-22",
+      "name": "Tualatin @ Sherwood w/ SWC"
+    },
+    "286392": {
+      "date": "2017-04-15",
+      "name": "The Willamette Falls Invitational"
+    },
+    "286539": {
+      "date": "2017-04-05",
+      "name": "Tualatin/St. Mary's @ Lake Oswego"
+    },
+    "294722": {
+      "date": "2017-04-21",
+      "name": "Cotton Invitational"
+    },
+    "298675": {
+      "date": "2017-05-05",
+      "name": "TRL JV District Meet"
+    },
+    "298773": {
+      "date": "2017-04-11",
+      "name": "Newberg @ Tualatin"
+    },
+    "299363": {
+      "date": "2017-04-27",
+      "name": "Tualatin, Tigard, SMA @ Tigard HS SMA Host Team (JV Only)"
+    },
+    "316561": {
+      "date": "2018-04-13",
+      "name": "Viking Relays"
+    },
+    "317609": {
+      "date": "2018-04-27",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "317652": {
+      "date": "2018-04-21",
+      "name": "Wilsonville Invitational"
+    },
+    "317743": {
+      "date": "2018-04-14",
+      "name": "The Willamette Falls Invitational"
+    },
+    "317810": {
+      "date": "2018-04-11",
+      "name": "Lakeridge, West Linn, at Tualatin"
+    },
+    "318036": {
+      "date": "2018-04-04",
+      "name": "Canby & Tual @ Tigard "
+    },
+    "318038": {
+      "date": "2018-05-09",
+      "name": "6A-4 TRL District Championship Day 1"
+    },
+    "318299": {
+      "date": "2018-05-19",
+      "name": "OSAA 6A State Championships"
+    },
+    "318734": {
+      "date": "2018-04-27",
+      "name": "Stayton Twilight"
+    },
+    "319589": {
+      "date": "2018-05-02",
+      "name": "Newberg, Tualatin @ Lake Oswego"
+    },
+    "320974": {
+      "date": "2018-04-18",
+      "name": "SMA, Tualatin @ Sherwood"
+    },
+    "321978": {
+      "date": "2018-04-20",
+      "name": "Canby Invitational"
+    },
+    "330108": {
+      "date": "2018-03-22",
+      "name": "Wolfpack Small School Invite"
+    },
+    "344974": {
+      "date": "2018-05-04",
+      "name": "TRL JV District Meet at Tualatin HS"
+    },
+    "349162": {
+      "date": "2019-04-13",
+      "name": "The Willamette Falls Invitational"
+    },
+    "349462": {
+      "date": "2019-04-20",
+      "name": "Wilsonville Invitational"
+    },
+    "350528": {
+      "date": "2019-05-25",
+      "name": "OSAA 6A State Championships"
+    },
+    "350847": {
+      "date": "2019-04-05",
+      "name": "Chehalem Field and Track Classic"
+    },
+    "351157": {
+      "date": "2019-04-26",
+      "name": "Stayton Twilight"
+    },
+    "351522": {
+      "date": "2019-04-30",
+      "name": "Canby & Tualatin @ Tigard"
+    },
+    "351548": {
+      "date": "2019-04-19",
+      "name": "Wear Blue: Run To Remember JV Invitational @ Tigard"
+    },
+    "351616": {
+      "date": "2019-03-21",
+      "name": "Wolfpack Small School Invite"
+    },
+    "351627": {
+      "date": "2019-04-10",
+      "name": "Lakeridge, SMA @Tualatin"
+    },
+    "351639": {
+      "date": "2019-04-24",
+      "name": "West Linn, Oregon City @Tualatin"
+    },
+    "352023": {
+      "date": "2019-05-03",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "352211": {
+      "date": "2019-04-03",
+      "name": "Tualatin @ Lake Oswego"
+    },
+    "352490": {
+      "date": "2019-05-10",
+      "name": "Three Rivers League JV District"
+    },
+    "352734": {
+      "date": "2019-05-17",
+      "name": "6A-5 Three Rivers League Championship Meet"
+    },
+    "404624": {
+      "date": "2020-05-17",
+      "name": "TWILIGHT TRIALS #2"
+    },
+    "419973": {
+      "date": "2021-04-21",
+      "name": "Tualatin at Lakeridge"
+    },
+    "421964": {
+      "date": "2021-05-08",
+      "name": "Sherwood Great Marks Festival"
+    },
+    "422048": {
+      "date": "2021-04-28",
+      "name": "Lake Oswego @Tualatin"
+    },
+    "422057": {
+      "date": "2021-05-05",
+      "name": "Tigard @Tualatin"
+    },
+    "422850": {
+      "date": "2021-05-22",
+      "name": "2021 Oregon 6A Track and Field State Championships"
+    },
+    "423287": {
+      "date": "2021-04-14",
+      "name": "Tualatin @ Oregon City"
+    },
+    "425424": {
+      "date": "2021-05-07",
+      "name": "Friday Night Lights @ Newberg"
+    },
+    "430821": {
+      "date": "2021-05-14",
+      "name": "TRL JV Championships"
+    },
+    "430951": {
+      "date": "2021-05-15",
+      "name": "TRL District Championships"
+    },
+    "440410": {
+      "date": "2022-04-29",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "441783": {
+      "date": "2022-04-01",
+      "name": "Laker Classic Invitational"
+    },
+    "441992": {
+      "date": "2022-04-15",
+      "name": "Chehalem Field and Track Classic"
+    },
+    "442408": {
+      "date": "2022-04-23",
+      "name": "The Willamette Falls Invitational"
+    },
+    "442669": {
+      "date": "2022-04-23",
+      "name": "Oregon Relays presented by AthleticNET"
+    },
+    "442722": {
+      "date": "2022-04-26",
+      "name": "JV Quad - SMA/TUAL/WL at Lakeridge"
+    },
+    "443080": {
+      "date": "2022-04-19",
+      "name": "Tualatin @ Tigard"
+    },
+    "444173": {
+      "date": "2022-05-13",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "446389": {
+      "date": "2022-05-06",
+      "name": "TRL JV District"
+    },
+    "448461": {
+      "date": "2022-05-21",
+      "name": "OSAA 6A State Championships"
+    },
+    "449809": {
+      "date": "2022-04-13",
+      "name": "Canby at Tualatin"
+    },
+    "451001": {
+      "date": "2022-03-30",
+      "name": "Oregon City @ Tualatin"
+    },
+    "451477": {
+      "date": "2022-04-06",
+      "name": "Lake Oswego @Tualatin"
+    },
+    "470820": {
+      "date": "2022-05-02",
+      "name": " TRL Varsity Quad Meet - Lakeridge, SMA, Tualatin and West Linn"
+    },
+    "473088": {
+      "date": "2023-04-22",
+      "name": "Oregon Relays presented by AthleticNET"
+    },
+    "473241": {
+      "date": "2023-04-28",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "475442": {
+      "date": "2023-04-15",
+      "name": "Wilsonville Invitational"
+    },
+    "479281": {
+      "date": "2023-05-05",
+      "name": "Dean Nice Invitational"
+    },
+    "479292": {
+      "date": "2023-04-07",
+      "name": "Therapeutic Associates Chehalem Classic"
+    },
+    "481810": {
+      "date": "2023-04-18",
+      "name": "Tualatin at Lakeridge "
+    },
+    "481813": {
+      "date": "2023-04-06",
+      "name": "West Linn/ St Mary’s @Tualatin"
+    },
+    "481814": {
+      "date": "2023-05-02",
+      "name": "Tigard @Tualatin"
+    },
+    "485126": {
+      "date": "2023-04-25",
+      "name": "Tualatin @ Lake Oswego HS"
+    },
+    "485823": {
+      "date": "2023-04-12",
+      "name": "St. Mary's & Tualatin @ Oregon City"
+    },
+    "487460": {
+      "date": "2023-05-27",
+      "name": "OSAA 6A State Championships"
+    },
+    "489022": {
+      "date": "2023-05-19",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "490032": {
+      "date": "2023-05-12",
+      "name": "TRL JV Districts"
+    },
+    "516658": {
+      "date": "2024-04-13",
+      "name": "Wilsonville Invitational"
+    },
+    "516718": {
+      "date": "2024-04-20",
+      "name": "Oregon Relays presented by AthleticNET"
+    },
+    "520151": {
+      "date": "2024-05-18",
+      "name": " OSAA 6A State Championships"
+    },
+    "520346": {
+      "date": "2024-04-23",
+      "name": "Tualatin vs Tigard"
+    },
+    "520347": {
+      "date": "2024-04-05",
+      "name": "Sunset Team Challenge Sponsored by Asics"
+    },
+    "521690": {
+      "date": "2024-04-27",
+      "name": "Oregon Freshman Championship"
+    },
+    "523444": {
+      "date": "2024-05-03",
+      "name": "TRL JV Districts"
+    },
+    "524809": {
+      "date": "2024-03-19",
+      "name": "Tualatin/St Mary's @ West Linn"
+    },
+    "528496": {
+      "date": "2024-04-03",
+      "name": "Tualatin and SMA @ Oregon City"
+    },
+    "528583": {
+      "date": "2024-05-10",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "528607": {
+      "date": "2024-04-09",
+      "name": "Lakeridge @ Tualatin"
+    },
+    "531860": {
+      "date": "2024-04-16",
+      "name": "Lake Oswego @ Tualatin"
+    },
+    "563240": {
+      "date": "2025-04-25",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "563510": {
+      "date": "2025-04-12",
+      "name": "T Smith Need For Speed Invitational "
+    },
+    "563859": {
+      "date": "2025-05-02",
+      "name": "Cardinal Varsity Invite"
+    },
+    "563961": {
+      "date": "2025-05-09",
+      "name": "Dean Nice Invitational Sponsored by MEWA"
+    },
+    "564321": {
+      "date": "2025-04-18",
+      "name": "Sunset Team Challenge Sponsored by Asics"
+    },
+    "570191": {
+      "date": "2025-04-08",
+      "name": "Tualatin @ Tigard"
+    },
+    "570194": {
+      "date": "2025-05-16",
+      "name": "TRL JV District Championships"
+    },
+    "570242": {
+      "date": "2025-04-29",
+      "name": "Lakeridge at Tualatin"
+    },
+    "570597": {
+      "date": "2025-04-11",
+      "name": "Southridge JV Invite"
+    },
+    "571707": {
+      "date": "2025-04-15",
+      "name": "Lake Oswego @ Tualatin"
+    },
+    "571843": {
+      "date": "2025-05-07",
+      "name": "Tualatin @ Oregon City"
+    },
+    "573129": {
+      "date": "2025-05-23",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "573241": {
+      "date": "2025-05-13",
+      "name": "Tualatin/St Mary's @ West Linn"
+    },
+    "578564": {
+      "date": "2025-04-22",
+      "name": "Tigard JV Meet"
+    },
+    "615709": {
+      "date": "2026-05-30",
+      "name": "OSAA State Track & Field Championships"
+    },
+    "617557": {
+      "date": "2026-04-11",
+      "name": "Wilsonville Invitational"
+    },
+    "619126": {
+      "date": "2026-05-08",
+      "name": "41st Dean Nice Invitational Sponsored by MEWA"
+    },
+    "619554": {
+      "date": "2026-04-24",
+      "name": "Nike/Jesuit Twilight Relays"
+    },
+    "619842": {
+      "date": "2026-04-04",
+      "name": "Oregon Relays presented by AthleticNET"
+    },
+    "620788": {
+      "date": "2026-04-10",
+      "name": "McKay Frosh-Soph Twilight"
+    },
+    "621953": {
+      "date": "2026-04-28",
+      "name": "Tualatin @ Lakeridge"
+    },
+    "622059": {
+      "date": "2026-04-07",
+      "name": "TRL-Tigard @ Tualatin"
+    },
+    "624242": {
+      "date": "2026-05-05",
+      "name": "TRL - Oregon City @ Tualatin"
+    },
+    "624244": {
+      "date": "2026-05-15",
+      "name": "2026 TRL JV District Championships"
+    },
+    "624445": {
+      "date": "2026-04-14",
+      "name": "TRL - St. Marys, Tualatin @ Lake Oswego"
+    },
+    "625222": {
+      "date": "2026-03-19",
+      "name": "Tualatin vs Tigard Icebreaker"
+    },
+    "628298": {
+      "date": "2026-05-12",
+      "name": "West Linn, St Mary’s @ Tualatin"
+    },
+    "628951": {
+      "date": "2026-05-22",
+      "name": "6A-5 Three Rivers League Championships"
+    },
+    "629067": {
+      "date": "2026-04-17",
+      "name": "Southridge JV Invite"
     }
   }
 }
