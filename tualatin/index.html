@@ -246,6 +246,14 @@ figure{margin:0}
 .wall h2{margin:0 0 10px}
 .wall canvas{display:block;width:100%;touch-action:manipulation;cursor:pointer}
 .wall figcaption{margin-top:10px}
+
+/* every race on one ruler, and the brush over it */
+.er svg{display:block;width:100%;touch-action:pan-y}
+.er .er-hit{cursor:col-resize}
+.er-note{color:var(--dim);font-size:12.5px;margin:9px 0 0;max-width:66ch}
+.er:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+.spag svg{display:block;width:100%}
+.sp-seg{margin:0 0 12px}
 /* The list end of the link. Background and an inset rule only - nothing
    that changes a row's size, or hovering the wall would reflow the list
    under the reader's hand. */
@@ -17764,8 +17772,7 @@ function animate(scope){
 }
 
 /* ---------- SVG helpers ---------- */
-const W=200;
-const svg=(h,body)=>'<svg viewBox="0 0 '+W+' '+h+'" role="img">'+body+'</svg>';
+const svg=(h,body)=>'<svg viewBox="0 0 '+CH.W+' '+h+'" role="img">'+body+'</svg>';
 const T=(x,y,s,cls,anchor)=>'<text x="'+x+'" y="'+y+'" class="'+(cls||'axt')+'"'
   +(anchor?' text-anchor="'+anchor+'"':'')+'>'+esc(s)+'</text>';
 
@@ -17792,7 +17799,26 @@ const T=(x,y,s,cls,anchor)=>'<text x="'+x+'" y="'+y+'" class="'+(cls||'axt')+'"'
      - one tooltip - TIP - on hover, on focus and on tap
      - a data table underneath, so none of the above is the only way in */
 const CH=(()=>{
-  const W=200;
+  /* ---------- the viewBox is not a constant, and this is the single most
+     visible fault on the page ----------
+
+     Every chart here was drawn on a 200-unit viewBox at width:100%. That is
+     right on a phone, where a 340px column scales it by 1.7 and a label
+     written at 6.5 units lands at about 11px. On a 1,008px desktop card the
+     same drawing is scaled by 5.0 and the same label renders at THIRTY-ONE
+     PIXELS - bigger than the page's own headings. Measured, not guessed: the
+     career chart came out 970 wide by 1,019 tall with 40px axis type.
+
+     So the viewBox width tracks the column and the scale stays at about 1.85
+     wherever the chart is. Charts keep their heights in units, which means a
+     wide column gets a wide flat chart instead of a square one - which is
+     what a time series wanted in the first place.
+
+     setW is called by each renderer before it builds anything, and again on
+     resize. Every chart reads W through the getter, so none of them has to
+     know. */
+  let W=200;
+  const setW=px=>{W=Math.max(170,Math.min(560,Math.round((px||340)/1.85)));};
 
   /* Ticks a person would have chosen: 1, 2, 2.5 or 5 times a power of ten.
      Asking for four is asking for about four - the count moves so the VALUES
@@ -17902,7 +17928,9 @@ const CH=(()=>{
         .join('')+'</tr>').join('')+'</table></details>';
   }
 
-  return {W:W,ticks:ticks,timeTicks:timeTicks,lin:lin,padded:padded,frame:frame,
+  // a getter, so every existing CH.W keeps working and now moves with the page
+  return {get W(){return W;},setW:setW,
+    ticks:ticks,timeTicks:timeTicks,lin:lin,padded:padded,frame:frame,
     gridY:gridY,gridX:gridX,unitY:unitY,unitX:unitX,tip:tip,open:open,table:table};
 })();
 
@@ -18607,6 +18635,7 @@ function careerChart(i){
   const vs=races.map(r=>r.v);
   let lo=Math.min(...vs)-1.5,hi=Math.max(...vs)+1.5;
   if(hi-lo<6){const mid=(hi+lo)/2;lo=mid-3;hi=mid+3;}
+  const W=CH.W;
   const X=d=>L+(new Date(d).getTime()-t0)/span*(W-L-Rr);
   const Y=v=>Tp+(hi-v)/(hi-lo)*(H-Tp-B);
 
@@ -18663,6 +18692,267 @@ function careerChart(i){
   });
 
   return '<svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+}
+
+/* ---------- four years, as every race that made them ----------
+   Four points and a line said an athlete had four seasons. They had
+   thirty-one races, and the four points were the best one from each - so the
+   chart showed the top of every year and hid the year.
+
+   This is every mark on the chosen ruler against the calendar, with the
+   season best joined as a step, the cohort's middle half behind it, and the
+   championship races drawn as a different shape rather than a different
+   colour. Faster is up, which the axis says.
+
+   Two things are deliberate:
+
+   THE BAND IS DRAWN PER SEASON, NOT ACROSS THE CAREER. The cohort quartiles
+   are a fact about a grade, so each grade's band spans exactly the dates that
+   athlete raced in that grade and stops. Interpolating it across the summer
+   would draw a claim about July that nobody measured.
+
+   A DIAMOND IS A CHAMPIONSHIP, AND IT IS A SHAPE. Colour is already carrying
+   the era on the board and the sport on the career chart; a third meaning on
+   the same channel is how a page ends up needing a legend for its legend. */
+function everyRace(i,K){
+  const ru=RULERS[K],o=byA[i];
+  const races=R.filter(r=>r.a===i&&r.sport===ru.sport&&r.dist===ru.dist&&r.date)
+    .sort((x,y)=>x.date.localeCompare(y.date));
+  if(races.length<3)return '';
+
+  const syOf=d=>+d.slice(0,4)+(+d.slice(5,7)>=7?1:0);
+  const gradeOf=new Map();
+  for(const sn of o.seasons)if(sn.grade)gradeOf.set(sn.y+'|'+sn.sport,sn.grade);
+  const gOf=r=>gradeOf.get(syOf(r.date)+'|'+r.sport)||null;
+
+  const H=200,f=CH.frame(H,{l:38,r:10,t:16,b:26});
+  const t0=new Date(races[0].date).getTime();
+  const t1=new Date(races[races.length-1].date).getTime();
+  const secsOf=r=>r.sec;
+  const lows=races.map(secsOf);
+
+  // the cohort's middle half, per grade, from the same population the old
+  // four-point chart used
+  const pop=V.everyone(A[i].g,'dist');
+  const band={};
+  for(const g of [9,10,11,12]){
+    const v=pop.map(x=>(byA[x.i].grade[K]||{})[g]).filter(Boolean).sort((a,b)=>a-b);
+    if(v.length>6)band[g]={lo:v[Math.floor(v.length*.25)],
+      mid:v[Math.floor(v.length*.5)],hi:v[Math.floor(v.length*.75)]};
+  }
+  // each grade's own date window, taken from the races the athlete ran in it
+  const win={};
+  for(const r of races){
+    const g=gOf(r);if(!g)continue;
+    const t=new Date(r.date).getTime();
+    if(!win[g])win[g]={a:t,b:t};
+    win[g].a=Math.min(win[g].a,t);win[g].b=Math.max(win[g].b,t);
+  }
+
+  const bandVals=Object.keys(win).flatMap(g=>band[g]?[band[g].lo,band[g].hi]:[]);
+  const [ylo,yhi]=CH.padded(Math.min(...lows,...bandVals),
+                            Math.max(...lows,...bandVals),4,true);
+  const x=CH.lin(t0,t1||t0+1,f.x0,f.x1);
+  const y=CH.lin(ylo,yhi,f.y0,f.y1);    // faster is a smaller number, so up
+
+  let g='<g class="er-band">';
+  for(const gr of Object.keys(win)){
+    const b=band[gr];if(!b)continue;
+    const a0=x(win[gr].a),a1=Math.max(x(win[gr].b),a0+1.5);
+    g+='<rect x="'+a0.toFixed(1)+'" y="'+y(b.hi).toFixed(1)+'" width="'
+      +(a1-a0).toFixed(1)+'" height="'+Math.abs(y(b.lo)-y(b.hi)).toFixed(1)
+      +'" fill="var(--raised)"'
+      +CH.tip('grade '+gr+': the middle half of every '+(A[i].g==='M'?'boy':'girl')
+        +' here ran '+secs(b.lo)+' to '+secs(b.hi)+', median '+secs(b.mid))+'/>';
+    g+='<line x1="'+a0.toFixed(1)+'" x2="'+a1.toFixed(1)+'" y1="'+y(b.mid).toFixed(1)
+      +'" y2="'+y(b.mid).toFixed(1)+'" stroke="var(--dim)" stroke-width=".7" '
+      +'stroke-dasharray="2 1.5"/>';
+  }
+  g+='</g>';
+
+  g+='<g class="er-ax">'+CH.gridY(f,y,CH.timeTicks(ylo,yhi,4),secs)
+    +CH.unitY(f,ru.label+' \u00b7 up is faster')+'</g>';
+
+  // one tick a school year, on the September of it
+  let gx='';
+  for(let yr=new Date(t0).getFullYear();yr<=new Date(t1).getFullYear();yr++){
+    const px=x(new Date(yr+'-09-01').getTime());
+    if(px<f.x0-1||px>f.x1)continue;
+    gx+='<line class="ax" x1="'+px.toFixed(1)+'" x2="'+px.toFixed(1)+'" y1="'+f.y0
+      +'" y2="'+f.y1+'" stroke-dasharray="1.5 2.5"/>'
+      +'<text x="'+px.toFixed(1)+'" y="'+(H-6)+'" class="axt" text-anchor="middle">'
+      +yr+'</text>';
+  }
+  g+='<g class="er-ax2">'+gx+'</g>';
+
+  // the season best, as a step: it holds until a faster one replaces it
+  const best=new Map();
+  for(const r of races){
+    const k=syOf(r.date);
+    if(!best.has(k)||r.sec<best.get(k).sec)best.set(k,r);
+  }
+  const bs=[...best.values()].sort((a,b)=>a.date.localeCompare(b.date));
+  if(bs.length>1){
+    let d='';
+    bs.forEach((r,n)=>{
+      const px=x(new Date(r.date).getTime()),py=y(r.sec);
+      d+=n?' L'+px.toFixed(1)+' '+(y(bs[n-1].sec)).toFixed(1)
+          +' L'+px.toFixed(1)+' '+py.toFixed(1)
+        :'M'+px.toFixed(1)+' '+py.toFixed(1);
+    });
+    g+='<path class="er-step" data-draw="1100" d="'+d+'" fill="none" '
+      +'stroke="url(#arcInk)" stroke-width="1.8" stroke-linejoin="round"/>';
+  }
+
+  g+='<g class="er-pts">';
+  for(const r of races){
+    const px=x(new Date(r.date).getTime()),py=y(r.sec);
+    const nm=(MEETS[r.m]||{}).name||'';
+    const champ=STATE_RE.test(nm)||DIST_RE.test(nm);
+    const gr=gOf(r);
+    const t=r.date+' \u00b7 '+secs(r.sec)+(r.place?' \u00b7 '+ord(r.place):'')
+      +(gr?' \u00b7 grade '+gr:'')+(nm?' \u00b7 '+nm:'');
+    g+=champ
+      ? '<path d="M'+px.toFixed(1)+' '+(py-3.1).toFixed(1)+'l3.1 3.1l-3.1 3.1l-3.1 -3.1Z" '
+        +'fill="var(--accent)" stroke="var(--bg)" stroke-width=".5"'+CH.tip(t)+'/>'
+      : '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="2" '
+        +'fill="var(--steel)" opacity=".9"'+CH.tip(t)+'/>';
+  }
+  g+='</g>';
+
+  // the brush lives on top and is the only thing that takes the pointer
+  g+='<rect class="er-hit" x="'+f.x0+'" y="'+f.y0+'" width="'+(f.x1-f.x0)
+    +'" height="'+(f.y1-f.y0)+'" fill="transparent"/>'
+    +'<rect class="er-sel" x="0" y="'+f.y0+'" width="0" height="'+(f.y1-f.y0)
+    +'" fill="var(--accent)" opacity=".16" pointer-events="none"/>';
+
+  const nCh=races.filter(r=>{const nm=(MEETS[r.m]||{}).name||'';
+    return STATE_RE.test(nm)||DIST_RE.test(nm);}).length;
+
+  return '<div class="er" data-i="'+i+'" data-k="'+K+'" data-t0="'+t0+'" data-t1="'+t1+'">'
+    +'<svg viewBox="0 0 '+CH.W+' '+H+'" role="img" aria-label="'
+    +esc('Every '+ru.label+' raced, against the calendar')+'"><defs>'
+    +'<linearGradient id="arcInk" x1="0" y1="0" x2="1" y2="0">'
+    +'<stop offset="0" stop-color="#880000"/><stop offset="1" stop-color="#EE5566"/>'
+    +'</linearGradient></defs>'+g+'</svg>'
+    +'<p class="er-note">Drag across to zoom in on a stretch of the career. '
+    +'Double-click, or press Escape, to come back out.'
+    +(nCh?' The '+nCh+' diamond'+(nCh===1?' is a':'s are')+' district and State '
+      +'championship race'+(nCh===1?'':'s')+'.':'')+'</p></div>'
+    +CH.table('Every '+ru.label+' as a table',['Date','Meet','Time','Place'],
+      races.slice().reverse().map(r=>[r.date,(MEETS[r.m]||{}).name||'\u2014',
+        secs(r.sec),r.place||'\u2014']));
+}
+
+/* Brushing redraws nothing. The chart is already complete in the DOM, so a
+   zoom is a viewBox change plus a counter-scale on the two things that must
+   not stretch - the axis type and the dots - which is one attribute and two
+   transforms rather than a re-render. That also means a zoomed chart is the
+   same chart: nothing can be recomputed differently on the way in. */
+function wireBrush(scope){
+  for(const box of (scope||document).querySelectorAll('.er')){
+    if(box.dataset.wired)continue;
+    box.dataset.wired='1';
+    const svg=box.querySelector('svg'),sel=box.querySelector('.er-sel');
+    const hit=box.querySelector('.er-hit');
+    const full=[0,CH.W];
+    let a=null;
+    const view=(x0,x1)=>{
+      const k=CH.W/(x1-x0);
+      svg.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+svg.viewBox.baseVal.height);
+      for(const el of svg.querySelectorAll('.er-pts>*,.er-ax>text,.er-ax2>text'))
+        el.setAttribute('transform','translate('+el.dataset.cx0+' 0) scale('
+          +(1/k)+' 1) translate('+(-el.dataset.cx0)+' 0)');
+    };
+    // remember each mark's own x, so the counter-scale pivots on it
+    for(const el of svg.querySelectorAll('.er-pts>*,.er-ax>text,.er-ax2>text')){
+      const b=el.getBBox?el.getBBox():null;
+      el.dataset.cx0=b?(b.x+b.width/2).toFixed(2):'0';
+    }
+    const at=ev=>{
+      const r=svg.getBoundingClientRect();
+      const vb=svg.viewBox.baseVal;
+      return vb.x+(ev.clientX-r.left)/r.width*vb.width;
+    };
+    hit.addEventListener('pointerdown',ev=>{
+      a=at(ev);hit.setPointerCapture(ev.pointerId);
+      sel.setAttribute('width','0');
+    });
+    hit.addEventListener('pointermove',ev=>{
+      if(a==null)return;
+      const b=at(ev);
+      sel.setAttribute('x',Math.min(a,b));
+      sel.setAttribute('width',Math.abs(b-a));
+    });
+    const end=ev=>{
+      if(a==null)return;
+      const b=at(ev);
+      const lo=Math.min(a,b),hi=Math.max(a,b);
+      a=null;sel.setAttribute('width','0');
+      if(hi-lo<6)return;                 // a click is not a brush
+      view(lo,hi);
+    };
+    hit.addEventListener('pointerup',end);
+    hit.addEventListener('pointercancel',()=>{a=null;sel.setAttribute('width','0');});
+    const reset=()=>view(full[0],full[1]);
+    box.addEventListener('dblclick',reset);
+    box.addEventListener('keydown',ev=>{if(ev.key==='Escape')reset();});
+    box.tabIndex=0;
+  }
+}
+
+/* ---------- everybody's four years, with one of them lit ----------
+   The Program tab says in words that ranking on performance makes development
+   look larger than it is. This is the same claim as a picture: every career
+   the programme has on this ruler, drawn as a faint line from grade nine to
+   grade twelve, with the athlete whose page this is on top of them.
+
+   The toggle is the whole point. "Everyone who raced grade 9" and "only those
+   who finished grade 12" are the same drawing over two populations, and the
+   difference between them is survivorship - the lines that stop are the
+   athletes the second view cannot see. */
+function spaghetti(i,K,finishers){
+  const ru=RULERS[K],me=A[i];
+  const pop=V.everyone(me.g,'dist');
+  const paths=[];
+  for(const a of pop){
+    const b=byA[a.i].grade[K]||{};
+    const gs=[9,10,11,12].filter(q=>b[q]);
+    if(gs.length<2||gs[0]!==9)continue;
+    if(finishers&&!b[12])continue;
+    paths.push({i:a.i,gs:gs,b:b,mine:a.i===i});
+  }
+  if(paths.length<6)return '';
+  const H=170,f=CH.frame(H,{l:38,r:10,t:14,b:22});
+  const all=paths.flatMap(p=>p.gs.map(q=>p.b[q]));
+  const [lo,hi]=CH.padded(Math.min(...all),Math.max(...all),4,true);
+  const x=CH.lin(9,12,f.x0,f.x1);
+  const y=CH.lin(lo,hi,f.y0,f.y1);
+  const d=p=>p.gs.map((q,n)=>(n?'L':'M')+x(q).toFixed(1)+' '+y(p.b[q]).toFixed(1)).join(' ');
+
+  let g=CH.gridY(f,y,CH.timeTicks(lo,hi,4),secs)+CH.unitY(f,ru.label+' \u00b7 up is faster');
+  for(const q of [9,10,11,12])
+    g+='<text x="'+x(q).toFixed(1)+'" y="'+(H-6)+'" class="lbl" text-anchor="middle">gr '
+      +q+'</text>';
+  for(const p of paths){
+    if(p.mine)continue;
+    g+='<path d="'+d(p)+'" fill="none" stroke="var(--steel)" stroke-width=".6" '
+      +'opacity=".22" stroke-linejoin="round"/>';
+  }
+  const mine=paths.find(p=>p.mine);
+  if(mine)g+='<path d="'+d(mine)+'" fill="none" stroke="var(--accent)" '
+    +'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" '
+    +'data-draw="1000"/>'
+    +mine.gs.map(q=>'<circle cx="'+x(q).toFixed(1)+'" cy="'+y(mine.b[q]).toFixed(1)
+      +'" r="2.2" fill="var(--accent)"'+CH.tip('grade '+q+': '+secs(mine.b[q]))+'/>').join('');
+
+  const stops=paths.filter(p=>!p.b[12]).length;
+  return '<div class="spag">'+CH.open(H,'Every career on this ruler, grade 9 to 12',g)
+    +'<p class="er-note">'+paths.length+' '+(me.g==='M'?'boys':'girls')
+    +' who raced '+ru.label+' as a freshman'
+    +(finishers?' AND were still racing as seniors'
+      :', of whom '+stops+' stopped before grade 12')
+    +(mine?'. '+esc(nameOf(me))+' is the lit one.':'.')+'</p></div>';
 }
 
 /* ---------- the best true thing ----------
@@ -19008,7 +19298,16 @@ const WALL=(()=>{
   return {render:render};
 })();
 
+/* The column a chart will live in, measured from the panel it is going into.
+   Called before anything is built, because the width is baked into the
+   strings. */
+function sizeCharts(id){
+  const el=document.getElementById(id);
+  if(el&&el.clientWidth)CH.setW(el.clientWidth);
+}
+
 function drawBoard(){
+  sizeCharts('p-board');
   if(bN===-1)return drawGrowth();
   const pop=V.top(bG,'dist',bR,bN||0);
   const q=bQ.trim().toLowerCase();
@@ -19057,6 +19356,7 @@ function drawGrowth(){
 /* ---------- program ---------- */
 let pG='M',pP='dist',pR='xc5000';
 function drawProgram(){
+  sizeCharts('p-program');
   const every=V.everyone(pG,pP),four=V.fourYear(pG,pP,pR),top=V.top(pG,pP,pR,100);
   const co=cohorts(every).filter(c=>c.classOf<NOW);
   const ent=co.reduce((s,c)=>s+c.entered,0),fin=co.reduce((s,c)=>s+c.g12,0);
@@ -19259,6 +19559,7 @@ function drawProgram(){
 
 /* ---------- one athlete ---------- */
 function drawAthlete(i){
+  sizeCharts('p-athlete');
   const a=A[i],el=document.getElementById('ath');
   if(!a){el.innerHTML=athleteWelcome();animate(el);return;}
   const o=byA[i];
@@ -19283,51 +19584,27 @@ function drawAthlete(i){
   const career=careerChart(i);
   let arc='';
   if(K){
-    const d=RULERS[K].dist,mine=o.grade[K];
-    const pop=V.everyone(a.g,'dist');
-    const band={};
-    for(const g of [9,10,11,12]){
-      const v=pop.map(x=>(byA[x.i].grade[K]||{})[g]).filter(Boolean).sort((p,q)=>p-q);
-      if(v.length>6)band[g]={lo:v[Math.floor(v.length*.25)],
-        mid:v[Math.floor(v.length*.5)],hi:v[Math.floor(v.length*.75)]};
-    }
-    const gs=[9,10,11,12].filter(g=>mine[g]);
-    const h=76,L=24,Rr=6,Tp=8,B=18;
-    const all=[...Object.values(band).flatMap(b=>[b.lo,b.hi]),...gs.map(g=>mine[g])];
-    const hi=Math.max(...all),lo=Math.min(...all),span=(hi-lo)||1;
-    const X=g=>L+(g-9)/3*(W-L-Rr);
-    const Y=v=>Tp+(v-lo)/span*(h-Tp-B);
-    let s='';
-    const bg=[9,10,11,12].filter(g=>band[g]);
-    if(bg.length>1){
-      s+='<path d="'+bg.map((g,q)=>(q?'L':'M')+X(g)+' '+Y(band[g].lo)).join(' ')
-        +' '+bg.slice().reverse().map(g=>'L'+X(g)+' '+Y(band[g].hi)).join(' ')
-        +'Z" fill="var(--raised)"/>';
-      s+='<path d="'+bg.map((g,q)=>(q?'L':'M')+X(g)+' '+Y(band[g].mid)).join(' ')
-        +'" fill="none" stroke="var(--dim)" stroke-width=".8" stroke-dasharray="2 1.5"/>';
-    }
-    /* The line draws rather than appears. A career is a thing that happened
-       over four years and the drawing says so; the path is complete in the
-       DOM either way, so nothing depends on the animation running. */
-    s+='<path data-draw="1100" d="'+gs.map((g,q)=>(q?'L':'M')+X(g)+' '+Y(mine[g])).join(' ')
-      +'" fill="none" stroke="url(#arcInk)" stroke-width="2"'
-      +' stroke-linecap="round" stroke-linejoin="round"/>';
-    gs.forEach((g,z)=>{
-      s+='<circle cx="'+X(g)+'" cy="'+Y(mine[g])+'" r="2" fill="var(--accent)"'
-        +' opacity="0"><animate attributeName="opacity" to="1" dur="260ms"'
-        +' begin="'+(340+z*240)+'ms" fill="freeze"/>'
-        +'<animate attributeName="r" from="0" to="2" dur="380ms" begin="'
-        +(340+z*240)+'ms" fill="freeze"/></circle>';
-      s+='<text x="'+X(g)+'" y="'+(Y(mine[g])-4)+'" class="axt" text-anchor="middle"'
-        +' opacity="0"><animate attributeName="opacity" to="1" dur="300ms" begin="'
-        +(460+z*240)+'ms" fill="freeze"/>'+esc(secs(mine[g]))+'</text>';
-    });
-    for(const g of [9,10,11,12])s+=T(X(g),h-5,'gr '+g,'lbl','middle');
-    /* An SVG gradient cannot read a custom property, so the two stops repeat
-       --maroon and --accent by hand. Change one and change the other. */
-    s='<defs><linearGradient id="arcInk" x1="0" y1="0" x2="1" y2="0">'
-      +'<stop offset="0" stop-color="#880000"/><stop offset="1" stop-color="#EE5566"/>'
-      +'</linearGradient></defs>'+s;
+    /* K is the ruler this athlete is best DESCRIBED by - the one they have
+       most seasons on - and it is the right choice for the rank and the
+       headline. It is the wrong choice for a chart called "every race".
+
+       athletic.net serves track as one season best per event, so a track
+       ruler has four marks in a four-year career however many times somebody
+       raced. Mark French came out on the 3,000m with four points, under a
+       heading promising every race and a sentence complaining that four
+       points hide the year. The chart picks the ruler it can actually fill:
+       the one with the most races on it. */
+    const raceN=k=>R.filter(r=>r.a===i&&r.sport===RULERS[k].sport
+      &&r.dist===RULERS[k].dist).length;
+    const EK=RKEYS.slice().sort((x,y)=>raceN(y)-raceN(x))[0];
+    const ever=raceN(EK)>=3?everyRace(i,EK):'';
+    /* The four-point arc that used to sit here is gone. Everything it drew -
+       the athlete's four season bests and the cohort's middle half behind
+       them - is in the chart below at every race rather than at four of them,
+       so keeping both meant printing the same claim twice and printing the
+       smaller version first. What survives it is one gradient, because an SVG
+       gradient cannot read a custom property and everyRace's step line uses
+       this one. Change --maroon or --accent and change these two stops. */
     arc='<div class="card reveal"><h2>Every race, in order</h2>'
       +'<p class="why">The whole career on one axis. Height is VDOT, the one number '
       +'that puts a 1,500m and a 5,000m at comparable heights; across is the calendar. '
@@ -19338,12 +19615,27 @@ function drawAthlete(i){
       +'did not happen. Within a sport the season bests are joined, because that '
       +'comparison is honest. Hover any dot for the race.</p>'
       +'<figure><div>'+career+'</div><figcaption>It plays forward: the dots arrive in '
-      +'the order the races were run. The band below is the same four years against '
-      +'everyone else who has raced here.</figcaption></figure>'
-      +'<div style="margin-top:18px">'+svg(h,s)+'</div>'
-      +'<p class="why" style="margin:10px 0 0">Shaded band is the middle half of every '
-      +(a.g==='M'?'boy':'girl')+' at that grade on '+RULERS[K].label+', dashed line their '
-      +'median. Faster is higher.</p></div>';
+      +'the order the races were run.</figcaption></figure>'
+      +'</div>'
+      +(ever?'<div class="card reveal"><h2>Every '+RULERS[EK].label+' they ever ran</h2>'
+        +'<p class="why">Four points and a line said this athlete had four seasons. They had '
+        +raceN(EK)+' races on this ruler, and each of those points was the best one from a '
+        +'year \u2014 so the old chart showed the top of every season and hid the season. '
+        +'This is all of them. The thick line is the season best as it stood; the shaded '
+        +'block behind each season is the middle half of every '
+        +(a.g==='M'?'boy':'girl')+' at that grade, with their median dashed through it.'
+        +(RULERS[EK].sport==='tfo'?' Track is thinner than it looks here: athletic.net '
+          +'serves it as one season best per event, so these are the bests rather than '
+          +'every race.':'')+'</p><figure>'+ever+'</figure></div>':'')
+      +'<div class="card reveal"><h2>Everybody\u2019s four years</h2>'
+        +'<p class="why">Every career this programme has on '+RULERS[K].label+', from grade '
+        +'nine to grade twelve, with '+esc(nameOf(a))+' on top. The faint lines that stop '
+        +'early are athletes who stopped early \u2014 switch the view and they vanish, which '
+        +'is exactly what a board made of finishers does to them.</p>'
+        +'<div class="seg sp-seg" id="sp-seg" role="group" aria-label="Which careers to draw">'
+        +'<button aria-pressed="true" data-f="0">Everyone who started</button>'
+        +'<button aria-pressed="false" data-f="1">Only those who finished</button></div>'
+        +'<div id="sp-out">'+spaghetti(i,K,false)+'</div></div>';
   }
 
   const fy=(K&&o.grade[K][9]&&o.grade[K][12])
@@ -19526,6 +19818,15 @@ function drawAthlete(i){
     +'athletic.net serves for it. A dash in the last column means either that, or a race with '
     +'too few team-mates on the line to say what the day was worth.</p></div>';
   animate(el);
+  wireBrush(el);
+  const sp=document.getElementById('sp-seg');
+  if(sp&&K)sp.addEventListener('click',ev=>{
+    const b=ev.target.closest('button');if(!b)return;
+    for(const q of sp.children)q.setAttribute('aria-pressed',String(q===b));
+    const out=document.getElementById('sp-out');
+    out.innerHTML=spaghetti(i,K,b.dataset.f==='1');
+    runDraws(out);
+  });
 }
 
 /* ---------- the pack ----------
@@ -19658,6 +19959,7 @@ function drawPack(cv,rows,fifth){
 /* ---------- January, rendered ---------- */
 let jG='M',jR='xc5000';
 function drawJanuary(){
+  sizeCharts('p-january');
   const R1=attention(jG,jR),rulerName=RULERS[jR].label;
   const el=document.getElementById('jan');
   document.getElementById('jan-why').innerHTML='A team scores five, so the question '
@@ -20183,6 +20485,23 @@ document.getElementById('foot').innerHTML='Built by <code>pull/roster.js</code> 
 
 /* Boot from whatever the address bar says, and keep listening. Back and
    forward are just hashchange, so they cost nothing extra. */
+/* A chart's scale is baked into its viewBox, so a window that changes width
+   leaves every SVG on the page drawn for the old one. The canvases handle
+   this themselves through CV; these cannot, so the panel on screen is rebuilt
+   - debounced, and only the one being looked at. */
+let sizeTimer=null,lastW=innerWidth;
+addEventListener('resize',()=>{
+  if(Math.abs(innerWidth-lastW)<40)return;
+  lastW=innerWidth;
+  clearTimeout(sizeTimer);
+  sizeTimer=setTimeout(()=>{
+    if(CUR_TAB==='program')drawProgram();
+    else if(CUR_TAB==='january')drawJanuary();
+    else if(CUR_TAB==='athlete'){if(CUR_ATH!=null)drawAthlete(CUR_ATH);}
+    else drawBoard();
+  },220);
+});
+
 addEventListener('hashchange',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
 addEventListener('popstate',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
 applyRoute(parseRoute(location.hash));
