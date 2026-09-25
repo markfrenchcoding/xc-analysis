@@ -1265,6 +1265,60 @@ It renders as `.truth`, the first thing on an athlete's page, above every table.
 It animates because the sentence *arriving* reads as a finding where one that is
 simply present reads as a lookup. `transform` and `opacity` only.
 
+### January, which is the tab a coach actually opens
+
+Not "who is fastest" — the board answers that and nobody needed a page for it.
+"Where do I spend my attention", which has an arithmetic answer this roster can
+give.
+
+**A team scores five, so the objective is the scoring-five average.** An
+athlete's *worth* is how much that average moves if they have the year the
+programme's own history says somebody in their grade typically has. The
+**median** year, not the best imaginable one, and measured over everyone on the
+ruler rather than over the athletes who turned out well.
+
+That makes it honest in both directions. An athlete already in the five is
+worth a fifth of whatever they gain. A sixth runner thirty seconds back is
+worth nothing until they pass the fifth and then a great deal at once. The
+second is the one a board sorted by time hides completely.
+
+**The finding, on the September boys:** Benjamin F. is **one second outside the
+scoring five**, and a median year for a grade 10 here is worth seventeen. He is
+the highest-leverage athlete on the team and he is sixth on the board.
+
+**Two kinds of athlete, two numbers, and the first version got this wrong.**
+Ranking everybody on worth printed "0.0s" beside the fourth and fifth names,
+which is useless and is exactly what this page exists not to do. So an athlete
+whose median year does not move the five is shown on **how much of the gap it
+closes** instead — "38% of the gap, 49s outside becomes 30s" — which is a real
+number about real progress and happens to be the sentence a coach would say to
+them anyway.
+
+**The list stops at five. It does not continue downward.** Nobody is ranked
+below them, and the footnote says so in those words.
+
+**Speed or strength** compares a 1,500m against a 3,000m and nothing else. Both
+are track, so both sit on the same ruler; putting a cross country 5,000m in
+would measure the terrain instead, which is why the two rulers never share an
+axis anywhere on this page. It reads against **the squad's own median** rather
+than against zero, because the two VDOT columns need not agree in the middle
+and an offset everybody shares says nothing about anybody. So the labels are
+relative to this team and the caption says so: Theodore A.'s 1,500m is stronger
+than his 3,000m in absolute terms and still reads "strength" here, because his
+team-mates lean further that way than he does.
+
+**Who already races together** takes every pair of team-mates with four or more
+shared start lines and ranks them on the **median** gap at the finish — median,
+because one race where somebody was ill should not dissolve a partnership that
+holds the rest of the time. These groups exist whether anybody planned them or
+not, and Kamron S. and Tyler W. have finished within 13 seconds of each other
+six times.
+
+**`mmss` could not carry, and it had been wrong since it was written.**
+Formatting the minutes and the tenths independently means the tenths can round
+to 10 beside a seconds field that has already been floored: 625.96s printed as
+**"10:25.10"**, and 59.97s as "0:59.10". Round to tenths first, then split.
+
 ### The growth board
 
 `Most improved` ranks on VDOT gained between an athlete's first and last graded

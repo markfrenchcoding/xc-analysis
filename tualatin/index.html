@@ -142,6 +142,33 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 @keyframes riseSkew{from{opacity:0;transform:skewX(-8deg) translateY(16px)}
   to{opacity:1;transform:skewX(-8deg)}}
 
+/* ---------- January ---------- */
+.jan{display:flex;flex-direction:column;gap:12px}
+.jc{position:relative;display:grid;grid-template-columns:38px 1fr auto;gap:14px;
+  align-items:center;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:15px 17px;overflow:hidden;
+  animation:rise .5s cubic-bezier(.22,1,.36,1) both}
+.jc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--accent);transform:scaleY(var(--w,1));transform-origin:bottom}
+.jc .no{font-family:'Anton',var(--disp);font-size:26px;line-height:1;
+  color:var(--dim);transform:skewX(-8deg)}
+.jc .who{font:600 18px/1.2 var(--disp);letter-spacing:.01em}
+.jc .why2{color:var(--muted);font-size:13.5px;margin-top:5px;max-width:62ch}
+.jc .why2 b{color:var(--text)}
+.jc .amt{text-align:right}
+.jc .amt .v{font:700 25px/1 var(--num);color:var(--accent);font-variant-numeric:tabular-nums}
+.jc .amt .u{font:600 9.5px/1.3 var(--disp);letter-spacing:.11em;text-transform:uppercase;
+  color:var(--dim);margin-top:4px}
+@media(max-width:620px){.jc{grid-template-columns:30px 1fr}.jc .amt{grid-column:2;text-align:left}
+  .jc .amt .v{font-size:21px}}
+
+.lean{display:flex;align-items:center;gap:10px}
+.lean .bar{position:relative;flex:1;height:6px;border-radius:3px;background:var(--raised)}
+.lean .bar::before{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;
+  background:var(--line)}
+.lean .bar i{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--accent);
+  animation:sweep .7s cubic-bezier(.22,1,.36,1) both}
+
 /* ---------- honours ---------- */
 .hon{display:flex;flex-wrap:wrap;gap:10px;margin:0}
 .hon .h{flex:1 1 210px;background:var(--raised);border-radius:10px;padding:13px 15px;
@@ -15231,6 +15258,7 @@ footer{color:var(--dim);font-size:12.5px;border-top:1px solid var(--line);paddin
     <button role="tab" id="t-board"   aria-selected="true"  aria-controls="p-board">Board</button>
     <button role="tab" id="t-program" aria-selected="false" aria-controls="p-program">Program</button>
     <button role="tab" id="t-athlete" aria-selected="false" aria-controls="p-athlete">Athlete</button>
+    <button role="tab" id="t-january" aria-selected="false" aria-controls="p-january">January</button>
   </nav>
 </header>
 
@@ -15332,6 +15360,37 @@ footer{color:var(--dim);font-size:12.5px;border-top:1px solid var(--line);paddin
     <datalist id="names"></datalist>
   </div>
   <div id="ath"></div>
+</section>
+
+<section id="p-january" role="tabpanel" hidden>
+  <div class="ctl">
+    <div class="seg" id="g-jan"><button aria-pressed="true" data-g="M">Boys</button><button aria-pressed="false" data-g="F">Girls</button></div>
+    <div class="seg" id="r-jan"></div>
+  </div>
+
+  <div class="card">
+    <h2>Where the seconds are worth most</h2>
+    <p class="why" id="jan-why"></p>
+    <div class="jan" id="jan"></div>
+    <p class="why" id="jan-foot" style="margin:16px 0 0"></p>
+  </div>
+
+  <div class="card">
+    <h2>Speed or strength</h2>
+    <p class="why">A 1,500m against a 3,000m, both on the track, so the comparison
+    is clean. Read against the squad's own middle rather than against zero, because
+    an offset everybody shares says nothing about anybody. This is a question about
+    what somebody is built for, not about who is better.</p>
+    <div id="fit"></div>
+  </div>
+
+  <div class="card">
+    <h2>Who already races together</h2>
+    <p class="why">Every pair of team-mates who have been on the same start line
+    four times or more, by how close they finish. These groups exist whether
+    anybody planned them or not.</p>
+    <table id="pack"></table>
+  </div>
 </section>
 
 <footer id="foot"></footer>
@@ -15445,8 +15504,15 @@ const current=a=>a.classOf!=null&&a.classOf>=NOW;
 const nameOf=a=>(!SHOW_CURRENT&&current(a))?a.first+' '+(a.last[0]||'')+'.':a.first+' '+a.last;
 const fullKey=a=>(a.first+' '+a.last+' '+a.aka).toLowerCase();
 
-const mmss=s=>s==null?'—':Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')
-  +'.'+Math.round(s*10%10);
+/* Round to tenths FIRST, then split. Formatting the minutes and the tenths
+   independently cannot carry: 625.96s came out as "10:25.10", because the
+   tenths rounded to 10 and were printed as two digits beside a seconds field
+   that had already been floored. */
+const mmss=s=>{
+  if(s==null)return '—';
+  const t=Math.round(s*10)/10,m=Math.floor(t/60),r=t-m*60;
+  return m+':'+(r<10?'0':'')+r.toFixed(1);
+};
 const ms=s=>s==null?'—':Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
 /* A sprint is quoted in hundredths and a distance race in tenths, which is how
    both sports write them. ms() rounds to the whole second and is for axis
@@ -15726,6 +15792,190 @@ function twoLines(rows,h,a,b,ca,cb,fmt){
     if(i%3===0)s+=T(X(i),h-5,String(r.y).slice(2),'axt','middle');
   });
   return svg(h,s);
+}
+
+/* ---------- January ----------
+   The coach's question is not "who is fastest", which the board already
+   answers and which nobody needed a page for. It is "where do I spend my
+   attention", and that has an arithmetic answer this roster can give.
+
+   A cross country team scores five. So the objective is the team's
+   scoring-five average, and an athlete's WORTH is how much that average moves
+   if they have the year the programme's own history says an athlete of their
+   grade typically has. Not their best imaginable year - the median one.
+
+   That makes the answer honest in both directions. A fast athlete already in
+   the five is worth a fifth of whatever they gain. A sixth runner thirty
+   seconds back is worth nothing until they pass the fifth, and then a great
+   deal at once. Neither of those is obvious from a board sorted by time, and
+   the second is the one coaches get wrong.
+
+   NOBODY IS RANKED LAST HERE. The panel names five athletes and stops. An
+   athlete outside the five is absent from it, not at the bottom of it, and
+   every one of them still has their own page saying something true. */
+
+const CUR_YEAR=NOW;                       // the school year in progress
+
+// inverse of vdot(): what would this VDOT be worth in seconds at this distance
+function secondsForVdot(v,dist){
+  const c=VCOL[dist];
+  if(!c||v==null)return null;
+  if(v<=VD[0][0])return VD[0][c];
+  if(v>=VD[VD.length-1][0])return VD[VD.length-1][c];
+  for(let i=1;i<VD.length;i++){
+    if(v<=VD[i][0]){
+      const a=VD[i-1],b=VD[i];
+      return a[c]+(b[c]-a[c])*(v-a[0])/(b[0]-a[0]);
+    }
+  }
+  return null;
+}
+
+/* What a year is typically worth to somebody in this grade, HERE. The median
+   rather than the mean, because one athlete who found two minutes should not
+   set the expectation for the rest, and because a median survives the seasons
+   where somebody was hurt. Measured over everyone on the ruler - the honest
+   population - rather than over the athletes who turned out well. */
+function plausibleStep(g,grade,k){
+  const d=RULERS[k].dist,gains=[];
+  for(const a of A){
+    if(a.g!==g)continue;
+    const b=byA[a.i].grade[k]||{};
+    if(!b[grade]||!b[grade+1])continue;
+    const v0=vdot(b[grade],d),v1=vdot(b[grade+1],d);
+    if(v0!=null&&v1!=null)gains.push(v1-v0);
+  }
+  if(gains.length<4)return null;
+  gains.sort((x,y)=>x-y);
+  return {med:gains[gains.length>>1],n:gains.length};
+}
+
+const fiveAvg=ts=>{
+  const v=ts.slice().sort((a,b)=>a-b).slice(0,5);
+  return v.length<5?null:v.reduce((s,x)=>s+x,0)/v.length;
+};
+
+/* The five names. Everybody on the team now, with a mark on the chosen ruler
+   this season and a year of eligibility left, scored on how much the team's
+   scoring five would improve if they had a median year for their grade. */
+function attention(g,k){
+  const d=RULERS[k].dist,col=RULERS[k].col,sport=RULERS[k].sport;
+  const here=[];
+  for(const sn of S){
+    if(sn.y!==CUR_YEAR||sn.sport!==sport||!sn[col])continue;
+    const a=A[sn.a];
+    if(!a||a.g!==g)continue;
+    here.push({i:sn.a,a,t:sn[col],grade:sn.grade});
+  }
+  if(here.length<5)return {rows:[],n:here.length};
+  const base=fiveAvg(here.map(x=>x.t));
+  const fifth=here.map(x=>x.t).sort((p,q)=>p-q)[4];
+
+  const rows=[];
+  for(const x of here){
+    if(!x.grade||!a_returns(x.a))continue;
+    const step=plausibleStep(g,x.grade,k);
+    if(!step||step.med<=0)continue;
+    const v=vdot(x.t,d);
+    const after=secondsForVdot(v+step.med,d);
+    if(after==null)continue;
+    const gain=x.t-after;
+    if(gain<=0)continue;
+    const moved=fiveAvg(here.map(y=>y.i===x.i?after:y.t));
+    rows.push({...x,step,gain,after,worth:base-moved,
+      inFive:x.t<=fifth,gapToFive:x.t-fifth});
+  }
+  /* Two kinds of athlete and they are not comparable on one number.
+
+     Somebody who is in the five, or whose median year puts them in it, has a
+     WORTH: the seconds their year takes off the team average. Somebody thirty
+     seconds back has a worth of exactly nought this season, and printing
+     "0.0s" beside their name is both useless and the sort of thing this page
+     exists not to do.
+
+     So they are ranked separately and shown differently. The second group is
+     measured on how much of the gap a median year closes, which is a real
+     number about real progress and happens to be the thing a coach would
+     actually say to them. */
+  for(const r of rows){
+    r.moves=r.worth>0.05;
+    r.closes=r.gapToFive>0?Math.min(1,r.gain/r.gapToFive):1;
+  }
+  rows.sort((p,q)=>(q.moves-p.moves)||(q.worth-p.worth)||(q.closes-p.closes));
+  return {rows,base,fifth,n:here.length};
+}
+const a_returns=a=>a.classOf!=null&&a.classOf>CUR_YEAR;
+
+/* ---------- event fit ----------
+   1,500m against 3,000m, and nothing else. Both are track, so both sit on the
+   same ruler and the comparison is clean; putting a cross country 5,000m into
+   it would measure the terrain instead, which is the whole reason the two
+   rulers never share an axis on this page.
+
+   Read against the squad's own median rather than against zero, because the
+   two VDOT columns need not agree in the middle and an offset shared by
+   everybody says nothing about anybody. */
+function eventFit(g){
+  const rows=[];
+  for(const a of A){
+    if(a.g!==g)continue;
+    const o=byA[a.i];
+    let b15=null,b30=null;
+    for(const sn of o.seasons){
+      if(sn.sport!=='tfo')continue;
+      if(sn.b1500&&(b15==null||sn.b1500<b15))b15=sn.b1500;
+      if(sn.b3000&&(b30==null||sn.b3000<b30))b30=sn.b3000;
+    }
+    if(!b15||!b30)continue;
+    const v15=vdot(b15,1500),v30=vdot(b30,3000);
+    if(v15==null||v30==null)continue;
+    rows.push({a,b15,b30,diff:v15-v30,
+      now:o.seasons.some(sn=>sn.y===CUR_YEAR)});
+  }
+  if(rows.length<6)return {rows:[],med:0};
+  const d=rows.map(r=>r.diff).sort((x,y)=>x-y);
+  const med=d[d.length>>1];
+  for(const r of rows)r.lean=r.diff-med;
+  rows.sort((x,y)=>y.lean-x.lean);
+  return {rows,med,n:rows.length};
+}
+
+/* ---------- who races with whom ----------
+   Every pair of team-mates who have been on the same start line, scored on how
+   close together they finish. A pair that keeps finishing within a few seconds
+   over many races is a training group that already exists, and it is worth
+   knowing which ones do rather than guessing.
+
+   Median gap rather than mean: one race where somebody was ill should not
+   dissolve a partnership that holds the rest of the time. */
+function packs(g){
+  const byMeet=new Map();
+  for(const r of R){
+    if(r.sport!=='xc'||r.dist!==5000)continue;
+    if(A[r.a].g!==g)continue;
+    if(!byMeet.has(r.m))byMeet.set(r.m,[]);
+    byMeet.get(r.m).push(r);
+  }
+  const pair=new Map();
+  for(const rs of byMeet.values()){
+    for(let x=0;x<rs.length;x++)for(let y=x+1;y<rs.length;y++){
+      const lo=Math.min(rs[x].a,rs[y].a),hi=Math.max(rs[x].a,rs[y].a);
+      const k=lo+'|'+hi;
+      if(!pair.has(k))pair.set(k,{lo,hi,gaps:[]});
+      pair.get(k).gaps.push(Math.abs(rs[x].sec-rs[y].sec));
+    }
+  }
+  const out=[];
+  for(const v of pair.values()){
+    if(v.gaps.length<4)continue;
+    v.gaps.sort((a,b)=>a-b);
+    const med=v.gaps[v.gaps.length>>1];
+    const bothNow=byA[v.lo].seasons.some(s=>s.y===CUR_YEAR)
+      &&byA[v.hi].seasons.some(s=>s.y===CUR_YEAR);
+    out.push({lo:v.lo,hi:v.hi,n:v.gaps.length,med,bothNow});
+  }
+  out.sort((a,b)=>a.med-b.med||b.n-a.n);
+  return out;
 }
 
 /* ---------- the best true thing ----------
@@ -16159,6 +16409,111 @@ function drawAthlete(i){
     +'too few team-mates on the line to say what the day was worth.</p></div>';
 }
 
+/* ---------- January, rendered ---------- */
+let jG='M',jR='xc5000';
+function drawJanuary(){
+  const R1=attention(jG,jR),rulerName=RULERS[jR].label;
+  const el=document.getElementById('jan');
+  document.getElementById('jan-why').innerHTML='A team scores five, so the question '
+    +'is what moves the scoring-five average. Each athlete below is shown with the '
+    +'year the programme\u2019s own history says somebody in their grade typically '
+    +'has \u2014 the median one, not the best imaginable \u2014 and what that year '
+    +'would be worth to the team on '+rulerName+'.';
+
+  if(!R1.rows.length){
+    el.innerHTML='<p class="empty">Not enough of this squad has raced '+rulerName
+      +' this season yet.</p>';
+    document.getElementById('jan-foot').textContent='';
+  }else{
+    const five=R1.rows.slice(0,5),top=five[0].worth||1;
+    el.innerHTML=five.map((r,n)=>{
+      const cross=!r.inFive&&r.after<=R1.fifth;
+      const why=r.inFive
+        ?'Already in the scoring five. Every second they take off comes straight '
+          +'off the team average, a fifth of it at a time.'
+        :cross
+          ?'<b>A normal year puts them in the scoring five.</b> They are '
+            +Math.round(r.gapToFive)+'s outside it and a typical year here is worth '
+            +Math.round(r.gain)+'s to somebody in grade '+r.grade+'.'
+          :'<b>Closing.</b> A median year for grade '+r.grade+' here is worth '
+            +Math.round(r.gain)+'s, which takes '+Math.round(r.gapToFive)+'s outside the '
+            +'five down to '+Math.round(r.gapToFive-r.gain)+'s.';
+      /* Worth for the ones it applies to; for the rest, how much of the gap a
+         median year closes - a real number about real progress rather than a
+         nought beside somebody's name. */
+      const amt=r.moves
+        ?'<div class="v">'+r.worth.toFixed(1)+'s</div><div class="u">off the five</div>'
+        :'<div class="v">'+Math.round(r.closes*100)+'%</div><div class="u">of the gap</div>';
+      return '<div class="jc" style="--w:'+(r.moves?Math.max(.12,r.worth/top):0.12).toFixed(2)
+        +';animation-delay:'+(n*80)+'ms" data-i="'+r.i+'">'
+        +'<div class="no">'+(n+1)+'</div>'
+        +'<div><div class="who">'+esc(nameOf(r.a))+'<span class="dimv" '
+          +'style="font:500 12px var(--num);margin-left:8px">grade '+r.grade+' \u00b7 '
+          +secs(r.t)+' \u2192 '+secs(r.after)+'</span></div>'
+        +'<div class="why2">'+why+'</div></div>'
+        +'<div class="amt">'+amt+'</div></div>';
+    }).join('');
+    const st=five[0].step;
+    const nMove=R1.rows.filter(r=>r.moves).length;
+    document.getElementById('jan-foot').innerHTML='Seconds are the drop in the team\u2019s '
+      +'scoring-five average if that one athlete has a median year. A percentage is how '
+      +'much of the gap to the five a median year closes, for the athletes whose year '
+      +'does not change the five yet. '
+      +R1.n+' '+(jG==='M'?'boys':'girls')+' have raced '+rulerName+' this season and '
+      +R1.rows.length+' have a year of eligibility left, of whom '+nMove+' would move the '
+      +'scoring five. <b>Nobody is ranked below these five \u2014 the list stops at five, '
+      +'it does not continue downward.</b>';
+  }
+
+  // --- speed or strength
+  const F=eventFit(jG);
+  const fe=document.getElementById('fit');
+  if(!F.rows.length){fe.innerHTML='<p class="empty">Not enough athletes have run both '
+    +'a 1,500m and a 3,000m.</p>';}
+  else{
+    const cur=F.rows.filter(r=>r.now);
+    const show=(cur.length>=4?cur:F.rows);
+    const mx=Math.max(1,...show.map(r=>Math.abs(r.lean)));
+    fe.innerHTML='<table><tr><th>Athlete</th><th>1,500m</th><th>3,000m</th>'
+      +'<th style="width:38%">Leans</th></tr>'
+      +show.map(r=>{
+        const pct=Math.abs(r.lean)/mx*50;
+        const left=r.lean>=0?50:50-pct;
+        return '<tr><td class="name" style="text-align:left">'+esc(nameOf(r.a))+'</td>'
+          +'<td>'+secs(r.b15)+'</td><td>'+secs(r.b30)+'</td>'
+          +'<td><div class="lean"><div class="bar"><i style="left:'+left.toFixed(1)
+          +'%;width:'+Math.max(1.5,pct).toFixed(1)+'%"></i></div>'
+          +'<span class="dimv" style="font-size:11.5px;min-width:74px">'
+          +(Math.abs(r.lean)<0.8?'balanced':(r.lean>0?'speed':'strength'))
+          +'</span></div></td></tr>';
+      }).join('')+'</table>'
+      +'<p class="why" style="margin:12px 0 0">Bars right of centre are athletes whose '
+      +'1,500m is stronger than their 3,000m relative to this squad; bars left are the '
+      +'other way. '+(cur.length>=4?'Current squad only.':'Everyone on record, because '
+      +'too few of this season\u2019s athletes have both marks yet.')
+      +' A lean is a hint about what to train, not a verdict about an event.</p>';
+  }
+
+  // --- who races together
+  const P=packs(jG),now=P.filter(x=>x.bothNow).slice(0,8),
+    use=now.length>=3?now:P.slice(0,8);
+  document.getElementById('pack').innerHTML=use.length
+    ?'<tr><th>Pair</th><th>Races together</th><th>Typical gap</th></tr>'
+      +use.map(x=>'<tr><td class="name" style="text-align:left">'+esc(nameOf(A[x.lo]))
+        +' <span class="dimv" style="font-weight:400">and</span> '+esc(nameOf(A[x.hi]))
+        +'</td><td>'+x.n+'</td><td>'+(x.med<60?x.med.toFixed(1)+'s'
+        :Math.floor(x.med/60)+':'+String(Math.round(x.med%60)).padStart(2,'0'))
+        +'</td></tr>').join('')
+    :'<tr><td class="dimv">No pair has four races together yet.</td></tr>';
+}
+
+document.getElementById('jan').addEventListener('click',e=>{
+  const c=e.target.closest('.jc');if(!c)return;
+  tab('athlete');
+  document.getElementById('q-ath').value=nameOf(A[+c.dataset.i]);
+  drawAthlete(+c.dataset.i);
+});
+
 /* ---------- wiring ---------- */
 function seg(id,items,cur,fn){
   const el=document.getElementById(id);
@@ -16173,6 +16528,7 @@ function seg(id,items,cur,fn){
 const rulerItems=RKEYS.map(k=>[k,RULERS[k].short]);
 seg('r-board',rulerItems,bR,k=>{bR=k;drawBoard();});
 seg('r-dev',rulerItems,pR,k=>{pR=k;drawProgram();});
+seg('r-jan',rulerItems,jR,k=>{jR=k;drawJanuary();});
 
 function segStatic(id,fn){
   document.getElementById(id).addEventListener('click',e=>{
@@ -16195,16 +16551,18 @@ segStatic('n-board',d=>{bN=+d.n;
   drawBoard();});
 segStatic('g-prog',d=>{pG=d.g;drawProgram();});
 segStatic('p-prog',d=>{pP=d.p;drawProgram();});
+segStatic('g-jan',d=>{jG=d.g;drawJanuary();});
 document.getElementById('q-board').addEventListener('input',e=>{bQ=e.target.value;drawBoard();});
 
 function tab(which){
-  for(const k of ['board','program','athlete']){
+  for(const k of ['board','program','athlete','january']){
     document.getElementById('t-'+k).setAttribute('aria-selected',String(k===which));
     document.getElementById('p-'+k).hidden=k!==which;
   }
   if(which==='program')drawProgram();
+  if(which==='january')drawJanuary();
 }
-for(const k of ['board','program','athlete'])
+for(const k of ['board','program','athlete','january'])
   document.getElementById('t-'+k).addEventListener('click',()=>tab(k));
 
 document.getElementById('board').addEventListener('click',e=>{
