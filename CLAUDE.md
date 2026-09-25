@@ -1105,10 +1105,10 @@ restating it.
 
 ## The roster dashboard
 
-`roster.html` is the second page, built from `pull/roster/` by
+`tualatin/index.html` is the second page, built from `pull/roster/` by
 `node pull/build_dash.js 284`. Same shape as the app: one self-contained file,
 data in a `<script type="text/plain">` block that a script rewrites, no build
-step and no fetch. 426KB on disk, **127KB gzipped**, still smaller than the app.
+step and no fetch. 427KB on disk, **130KB gzipped**, still smaller than the app.
 
 **The page is narrower than the archive, on purpose.** `roster.js` keeps the
 whole running programme because a roster that quietly drops people is what this
@@ -1120,16 +1120,39 @@ programmes describes neither. Their own sprints stay in — a distance runner's
 400m is worth seeing. It is about a fifth of the bytes, and the bytes are not
 the reason.
 
-It inherits the app's CSP without a change — inline script, Google fonts,
-`connect-src none`, no images, nothing to relax.
+### It is its own site, and that is the point
 
-**It is kept out of the deployment**, by `.vercelignore`. Everything on it is
-already public on athletic.net under a full name, but a page that gathers one
-named teenager's whole arc — their plateau, their attrition, the season they
-got slower — onto a single screen is a different object from a results
-database, and `chutexc.vercel.app` is a guessable address. Deleting two lines
-publishes it. Do it deliberately or not at all. Current athletes are initialled
-either way; `SHOW_CURRENT` in the page controls that.
+Live at **tualatinxctf.vercel.app**. It was published on chutexc for about an
+hour and moved, which was the right correction: `chutexc.vercel.app` is the
+statewide projections product that strangers visit for the odds, and a page
+about 749 named local kids should not be one guessed URL away from it. Two
+audiences, two products, two domains.
+
+**A second Vercel project, root directory `tualatin/`.** Same repo, same
+commits, same push. The root `.vercelignore` excludes `tualatin/` from chutexc,
+and the second project cannot see anything above its own root — so the seed,
+the archive and the backtest are out of its reach **by construction** rather
+than by a rule somebody has to keep maintaining. Both projects must keep
+framework preset **Other**.
+
+`tualatin/vercel.json` carries its own headers rather than borrowing the app's,
+because a separate project gets no inheritance. Same CSP shape —
+`default-src none`, fonts from gstatic, `connect-src none`, verified against
+what the page actually asks for: three Google Fonts urls and zero fetches. Two
+differences from the app's: no `googleusercontent` in `img-src`, because there
+are no crests here, and an added **`X-Robots-Tag: noindex, nofollow,
+noarchive`** header to back up the meta tag in the page.
+
+**Two guards, each one line to reverse.** `SHOW_CURRENT` is false, so anybody
+still enrolled shows as an initial and only alumni are named. And the page is
+`noindex` at both the meta and header level: publishing a link and publishing
+to a search index are different decisions, and only the first was made.
+
+**The raw archive is not served.** `pull/roster/` stays in the root
+`.vercelignore` and is outside the second project's root twice over. The page
+embeds everything it needs; serving the CSVs as well would widen what is public
+without making anything work. They stay in the repo, which is where the tests
+read them from.
 
 ### The rule the whole page is built on
 

@@ -1,11 +1,11 @@
 // node pull/build_dash.js [teamId]
 //
-// Fills roster.html's data blocks from pull/roster/t<id>_*.csv.
+// Fills tualatin/index.html's data blocks from pull/roster/t<id>_*.csv.
 //
 // Same shape as Seed.patchIndex: the page is the artifact and is editable by
 // hand, the data is a block inside it that a script rewrites. One file, no
-// build step, no fetch - which also means roster.html inherits the app's
-// connect-src none rather than needing its own CSP entry.
+// build step, no fetch. It carries its own tualatin/vercel.json rather than
+// borrowing the app's, because it is a separate Vercel project.
 //
 // Ids are re-indexed on the way in. An athlete id is eight digits and a meet
 // id six, repeated across fourteen thousand result rows; as indices into their
@@ -21,7 +21,13 @@ const path = require('path');
 
 const teamId = +(process.argv[2] || 284);
 const DIR = path.join(__dirname, 'roster');
-const PAGE = path.join(__dirname, '..', 'roster.html');
+/* tualatin/index.html rather than roster.html at the root, because it is its
+   own Vercel project: chutexc serves the statewide projections and this is a
+   Tualatin programme tool, and one deployment carrying both would put a page
+   about 749 named local kids on the same domain strangers visit for the odds.
+   A second project with its root directory set to tualatin/ serves this at
+   tualatinxctf.vercel.app and cannot see anything above it. */
+const PAGE = path.join(__dirname, '..', 'tualatin', 'index.html');
 const stem = path.join(DIR, 't' + teamId + '_');
 
 const readCsv = (f) => {
@@ -124,7 +130,7 @@ const info = {
 let html = fs.readFileSync(PAGE, 'utf8');
 const put = (id, body) => {
   const re = new RegExp('(<script id="' + id + '"[^>]*>)[\\s\\S]*?(</script>)');
-  if (!re.test(html)) throw new Error('no block for ' + id + ' in roster.html');
+  if (!re.test(html)) throw new Error('no block for ' + id + ' in the page');
   html = html.replace(re, (_, a, b) => a + body + b);
 };
 put('d-athletes', aBlock);
@@ -134,14 +140,14 @@ put('d-meets', mBlock);
 put('d-events', eBlock);
 
 const ire = /const INFO=\{[\s\S]*?\};/;
-if (!ire.test(html)) throw new Error('no INFO constant in roster.html');
+if (!ire.test(html)) throw new Error('no INFO constant in the page');
 html = html.replace(ire, 'const INFO=' + JSON.stringify(info) + ';');
 
 fs.writeFileSync(PAGE, html);
 const kb = (n) => (n / 1024).toFixed(0) + 'KB';
 console.log('  ' + (allAthletes.length - athletes.length) + ' sprint-only athletes left in '
   + 'the CSVs and out of the page');
-console.log('roster.html: ' + athletes.length + ' athletes, ' + seasons.length
+console.log('tualatin/index.html: ' + athletes.length + ' athletes, ' + seasons.length
   + ' athlete-seasons, ' + (rBlock.split('\n').length - 2) + ' results, '
   + meetIds.length + ' meets, ' + events.length + ' track events');
 console.log('  ' + kb(Buffer.byteLength(html)) + ' on disk');

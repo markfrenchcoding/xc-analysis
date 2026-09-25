@@ -1,24 +1,18 @@
-# What does not go to the deployment.
+# What the CHUTEXC deployment does not serve.
 #
-# roster.html DOES go, by the owner's decision on 25 Sep 2026. It is served at
-# /roster.html and nothing in index.html links to it, so it is a link you send
-# rather than a page anyone lands on from the board.
+# chutexc.vercel.app is the statewide projections site. The Tualatin roster
+# dashboard is a different product for a different audience - one school, 749
+# named local athletes - and it gets its own Vercel project rather than a path
+# on this one. Strangers come to chutexc for the odds and should not be one
+# guessed URL away from a page about somebody's kid.
 #
-# Two guards ride with it and each is one line to reverse:
+# So tualatin/ is excluded here and is the ROOT DIRECTORY of a second Vercel
+# project, which serves it at tualatinxctf.vercel.app with its own
+# tualatin/vercel.json carrying its own headers. That project cannot see
+# anything above its root, so the seed, the archive and the backtest are all
+# out of its reach by construction rather than by a rule somebody has to keep
+# maintaining.
 #
-#   - SHOW_CURRENT in the page is false, so anybody still enrolled shows as
-#     "Jayden A." rather than by name. Alumni are named.
-#   - the page carries <meta name="robots" content="noindex,nofollow">, so the
-#     link works when you send it without 749 named teenagers' career pages
-#     entering a search index. Publishing a link and publishing to search are
-#     different decisions and only the first has been made.
-#
-# No vercel.json change was needed. roster.html sits at the root, so it matches
-# the /((?!pull).*) rule and takes the app's own CSP: default-src none, fonts
-# from gstatic, connect-src none. The page makes no requests of its own - three
-# external references, all Google Fonts, and zero fetches.
-#
-# The raw archive stays out. The page embeds everything it needs, so serving
-# the CSVs as well would widen what is public without making anything work.
-# They remain in the repo, which is where the tests read them from.
+# Both projects must keep framework preset "Other". See CLAUDE.md.
+tualatin/
 pull/roster/
