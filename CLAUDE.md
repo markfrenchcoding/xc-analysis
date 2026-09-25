@@ -1064,6 +1064,89 @@ a ten-second 100m is loose enough for a nine-minute 5,000m, which is two minutes
 inside the world record. `paceBounds` is two regimes: under 800m it is
 0.090–0.450 s/m, at 800m and up it is 0.140–0.720.
 
+### Every race, not every season best
+
+**`GetTeamAthleteRecords` serves one season best per event, and this file used
+to call that "the right shape here". It was wrong.** A senior with twenty-two
+track races showed four marks — one per event — and the page was missing five
+sixths of its track. Mark French: four rows in the old pull, **seventy-three
+races** across four years and **twenty-two in his senior season alone**. The
+owner noticed, which is the only reason it was caught.
+
+```
+AthleteBio/GetAthleteBioData?athleteId=N&sport=tf&level=4
+```
+
+One unauthenticated GET an athlete returns **every** track result they have
+ever had, all seasons, with the place, the round, the division, the meet and
+the date on each. It costs one request per athlete rather than one per season —
+about twenty-two minutes for fifteen hundred — which is why it was not the
+first choice, and the answer is worth the minutes.
+
+**The sport code is `tf` here.** It is `tfo` for `GetTeamCore` and
+`GetTeamAthleteRecords`, `tf` for `GetMeetData`, and this endpoint **400s on
+`tfo`** and **404s with no sport at all**. Four endpoints, three spellings, no
+rule to infer — only the record of which one wants which. A 400 rather than a
+404 is the tell that an endpoint exists and the parameters are wrong.
+
+**A relay leg is spelled exactly like the open event.** `EventID` 3 is
+`"400 Meters"` with `Description: "Relay Split"`, so the description has to be
+read or a split lands on the board as a solo 400. Whole relays, the distance
+medley, hurdles, the steeplechase and the field go for the reasons
+`eventMetres` already gives.
+
+**DNS carries a sentinel, not a blank:** `SortInt` is `20000001`. The pace
+bound catches it at thirteen seconds a metre, but a sentinel read as a time is
+the kind of thing that survives until somebody sees a five-hour 1500m, so it is
+refused by name.
+
+**Indoor seasons are numbered +10000** — 12016 is the 2016 indoor season. They
+are real races at this school and they are kept, filed under their own school
+year with an `indoor` flag.
+
+**`SchoolID` on the result row is what keeps a college career out.** French has
+seasons at school 21244; the filter is on the row, not on the athlete.
+
+**The response carries its own meet table**, keyed by id, with the name and the
+date. Taking only `MeetID` off the result row and leaving the name blank is how
+the page ended up with unnamed meets once before — a race at "" is a race
+nobody can place. The merge prefers a named meet either way round.
+
+**`GetTeamAthleteRecords` is still called**, for the roster rather than the
+results: it is the cheapest way to learn who ever scored a track mark here, and
+it carries the gender the bio rows do not. Its results are thrown away, because
+every one of them is inside the race list and keeping both would double-count
+the best race of every season.
+
+**The run refuses to write if more than one athlete in fifty fails.** Half a
+track record is worse than none: a missing race looks exactly like a season
+somebody did not run.
+
+**The pace is 300ms and was measured, not guessed.** 25 for 25 clean at 300ms;
+**10 of 25 refused at 120ms**.
+
+### eventMetres refused three names it should not have
+
+Scrubbed every track row athletic.net holds for this team — 8,515 — and grouped
+what the parser threw away. 2,687 field marks and 554 hurdles, both correctly.
+Then **119 that were simply wrong**:
+
+- insisting on the plural `Meters` dropped every **"60 Meter"**, which is how
+  the indoor sprint is spelled — 66 marks
+- **"1 Mile"** and **"2 Miles"** went for not being metric — 53 marks, on a page
+  built for distance runners
+
+A mile is recorded as **1609 metres** and nothing is converted to a 1500
+equivalent, because nothing here is ever converted between distances. What
+stays out stays out: a barrier race is on its own ruler, a relay leg is not a
+solo run, and "40 Yard Dash" is a combine test rather than a track event.
+
+**Indoor is not separately reachable, and that is measured rather than
+assumed.** `GetTeamAthleteRecords` ignores its sport parameter entirely and
+returns the same 686 rows for `tfi`, `tfo` and nothing at all. The 60m marks
+are the indoor ones already folded in. So is `GetResultsGrid`: it returns the
+identical cross country payload for `tf`, `tfo` and no sport.
+
 ### What track changed
 
 **It found people cross country could not.** The roster goes from 596 athletes
@@ -1757,6 +1840,25 @@ itself is the stop. Left and right walk its marks, Home and End jump to the ends
 Escape puts the tooltip away. The `aria-label` says how many marks there are and
 that the arrows work. Program went to 26 stops, Plan to 9, Athlete to 13. The
 Board keeps 109, and should: a hundred of those are real links to real people.
+
+### Metres, and a phone that fills
+
+**"1500m", never "1.5k".** Nobody at a track meet says "the 1.5k" and nobody
+writes it on a results sheet. `drawAthlete` had a local formatter that got this
+right and two charts that did not; there is one `DIST` now.
+
+**On a phone the card is the edge of the screen.** A 16px gutter each side
+costs 32 of 440 on a Pro Max, and then every card spends another 14 inside its
+own border — so the charts, the board rows and the Wall were drawing in 408px
+while the reader was looking at 440 and seeing a margin down both sides. The
+bordered surfaces pull out to the glass and keep their own padding, so text
+still sits 14px in; what gains the width is everything that was measured
+against the card. The side borders and the corner radius go with them, because
+a rounded box against the edge of a screen reads as a mistake. `env()` so a
+landscape notch still gets its inset.
+
+**Drag-to-zoom on the every-race chart is gone.** It did not work well enough
+to keep.
 
 ### Charts carry the shape, tables carry the numbers
 

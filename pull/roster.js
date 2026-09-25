@@ -57,11 +57,17 @@ const API = 'https://www.athletic.net/api/v1/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
   + '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 const GAP_GET = 700, TRIES = 4;
-/* The bio endpoint has its own budget and it is generous: measured, 25 for 25
-   clean at 300ms and 10 of 25 refused at 120ms. Fifteen hundred athletes at
-   this pace is about twenty-two minutes, which is the price of a complete
-   track record and is worth paying. */
-const GAP_BIO = 300;
+/* THE BIO ENDPOINT'S BUDGET IS A BUCKET, AND A SHORT PROBE CANNOT SEE IT.
+   Twenty-five requests at 300ms came back 25 for 25, so 300ms looked like the
+   pace. Sustained, it 429s within the first hundred: the bucket drains faster
+   than it fills and a burst that fits inside it proves nothing about the rest
+   of the run. Measured the way the app's own crawl had to learn it.
+
+   So: a gentle floor, and a gap that goes UP and stays up the moment the
+   server refuses, because the alternative is discovering the limit again
+   every hundred athletes. It comes back down slowly after a clean run. */
+let GAP_BIO = 900;
+const GAP_BIO_MIN = 900, GAP_BIO_MAX = 6000;
 
 // athletic.net's Tualatin coverage thins out before this and stops entirely
 // before 2004. An "all-time" board that is silently a "since 2005" board is
@@ -524,16 +530,43 @@ function pullTrack(teamId, from, to) {
    the caller checks `failed` and does not write. Half a track record is worse
    than none, because the gaps are invisible: a missing race just looks like a
    season somebody did not run. */
-function pullRaces(teamId, ids) {
+function pullRaces(teamId, ids, cacheFile) {
   const rows = [], meets = {}, failed = [];
-  let n = 0, seen = 0;
+  let n = 0, seen = 0, fromCache = 0;
   const t0 = Date.now();
+
+  /* A forty-minute pull that loses everything to one dropped connection is a
+     pull nobody will run twice. Each athlete's parsed races are appended as a
+     line of JSON the moment they arrive, and a re-run skips whatever is
+     already there. Delete the file to force a clean pull. */
+  const done = new Map();
+  if (cacheFile && fs.existsSync(cacheFile)) {
+    for (const line of fs.readFileSync(cacheFile, 'utf8').split('\n')) {
+      if (!line.trim()) continue;
+      try { const o = JSON.parse(line); done.set(+o.id, o); } catch (e) { /* half a line */ }
+    }
+    if (done.size) log('    resuming: ' + done.size + ' athletes already read');
+  }
+
+  const take = (o) => {
+    for (const [mid, m] of Object.entries(o.meets || {}))
+      if (!meets[mid] || !meets[mid].name) meets[mid] = m;
+    for (const r of o.rows || []) rows.push(r);
+    seen += o.seen || 0;
+  };
+
   for (const id of ids) {
     n++;
+    if (done.has(id)) { take(done.get(id)); fromCache++; continue; }
     let j = null;
     try { j = ask(API + BIO + id); }
-    catch (e) { failed.push(id); sleep(GAP_BIO); continue; }
-    if (!j || !Array.isArray(j.resultsTF)) { failed.push(id); sleep(GAP_BIO); continue; }
+    catch (e) { failed.push(id); GAP_BIO = Math.min(GAP_BIO_MAX, GAP_BIO + 300); sleep(GAP_BIO); continue; }
+    if (!j || !Array.isArray(j.resultsTF)) {
+      failed.push(id);
+      GAP_BIO = Math.min(GAP_BIO_MAX, GAP_BIO + 300);
+      sleep(GAP_BIO); continue;
+    }
+    if (GAP_BIO > GAP_BIO_MIN) GAP_BIO -= 20;      // ease back down after a clean one
     const evById = {};
     for (const e of j.eventsTF || []) evById[e.IDEvent] = e;
     /* The response carries its own meet table, keyed by id, with the name and
@@ -544,17 +577,23 @@ function pullRaces(teamId, ids) {
       if (meets[mid] && meets[mid].name) continue;
       meets[mid] = { date: String(m.EndDate || '').slice(0, 10), name: m.MeetName || '' };
     }
+    const mine = { id: id, seen: j.resultsTF.length, rows: [], meets: {} };
+    for (const [mid, m] of Object.entries(j.meets || {}))
+      mine.meets[mid] = { date: String(m.EndDate || '').slice(0, 10), name: m.MeetName || '' };
     for (const raw of j.resultsTF) {
-      seen++;
       const r = bioRow(raw, evById, j.grades, teamId);
       if (!r) continue;
-      r.meetName = (meets[r.meetId] || {}).name || '';
-      rows.push(r);
+      r.meetName = (mine.meets[r.meetId] || {}).name || '';
+      mine.rows.push(r);
     }
-    if (n % 200 === 0 || n === ids.length) {
-      const per = (Date.now() - t0) / n / 1000;
+    if (cacheFile) fs.appendFileSync(cacheFile, JSON.stringify(mine) + '\n');
+    take(mine);
+    if (n % 100 === 0 || n === ids.length) {
+      const live = n - fromCache;
+      const per = live ? (Date.now() - t0) / live / 1000 : 1;
       log('    ' + String(n).padStart(4) + '/' + ids.length + '  ' + rows.length
-        + ' races so far, ' + ((ids.length - n) * per / 60).toFixed(1) + ' min left');
+        + ' races, ' + failed.length + ' failed, gap ' + GAP_BIO + 'ms, '
+        + ((ids.length - n) * per / 60).toFixed(1) + ' min left');
     }
     sleep(GAP_BIO);
   }
@@ -585,7 +624,7 @@ function main() {
   const ids = [...new Set([...xc.rows, ...tf.rows].map(r => r.athleteId).filter(Boolean))]
     .sort((a, b) => a - b);
   log('  track, every race, one request an athlete (' + ids.length + '):');
-  const races = pullRaces(teamId, ids);
+  const races = pullRaces(teamId, ids, path.join(OUT, 't' + teamId + '_bio.jsonl'));
   log('    ' + races.rows.length + ' races kept of ' + races.seen + ' results read'
     + (races.failed.length ? ', ' + races.failed.length + ' athletes failed' : ''));
 

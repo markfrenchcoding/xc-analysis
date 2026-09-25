@@ -16,3 +16,6 @@ pull/whoswho/raw/
 
 # local preview server, per-machine
 .claude/launch.json
+
+# the bio cache is a resume file, not data
+pull/roster/*_bio.jsonl

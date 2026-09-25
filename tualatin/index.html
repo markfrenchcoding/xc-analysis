@@ -17694,10 +17694,12 @@ byA.forEach(o=>o.seasons.sort((x,y)=>x.y-y.y||x.sport.localeCompare(y.sport)));
    everybody. Fitted by alternating least squares over the team's own cross
    country 5,000m results, thin meets shrunk toward no effect.
 
-   CROSS COUNTRY ONLY, and not for want of trying: athletic.net serves track as
-   season bests rather than as every race, so there is one mark per athlete per
-   event per season and nothing to take a residual against. A best is already
-   the best day.
+   CROSS COUNTRY ONLY. The reason used to be that athletic.net served track as
+   season bests, so there was nothing to take a residual against. That reason
+   is gone - the bio endpoint gives every track race - and the fit has not
+   followed yet, because moving it is a change to a published number and wants
+   its own measurement rather than a free ride on a data fix. Until then this
+   is what it says on the tin: cross country.
 
    The meet term is NOT a course rating and must not be read as one. Course,
    weather and where the race fell in the season are hopelessly confounded in
@@ -20260,9 +20262,8 @@ function drawAthlete(i){
         +'season best as it stood; the shaded block behind each year is the middle half '
         +'of every '
         +(a.g==='M'?'boy':'girl')+' at that grade, with their median dashed through it.'
-        +(RULERS[EK].sport==='tfo'?' Track is thinner than it looks here: athletic.net '
-          +'serves it as one season best per event, so these are the bests rather than '
-          +'every race.':'')+'</p><figure>'+ever+'</figure></div>':'')
+        +(RULERS[EK].sport==='tfo'?' Track counts heats and finals separately, because '
+          +'both are races.':'')+'</p><figure>'+ever+'</figure></div>':'')
       +'<div class="card reveal"><h2>Everybody\u2019s four years</h2>'
         +'<p class="why">Every career this programme has on '+RULERS[K].label+', from grade '
         +'nine to grade twelve, with '+esc(nameOf(a))+' on top. The faint lines that stop '
@@ -20471,10 +20472,10 @@ function drawAthlete(i){
     +'athlete\u2019s form and that afternoon predicted, fitted from the whole '
     +'squad\u2019s results at that meet \u2014 see Best race above. <b>Beat it by</b> '
     +'is how far inside that they ran, and a negative number is a day that went the '
-    +'other way. Cross country is every race, so it can be measured against the day. '
-    +'Track is each season\u2019s best per event, which is what athletic.net serves '
-    +'for it, so it has no expectation here. A dash also means a race with too few '
-    +'team-mates on the line to say what the day was worth.</p></div>';
+    +'other way. Both sports are every race, but the expectation is fitted on cross '
+    +'country only, so a track row has no expectation beside it yet. A dash also means '
+    +'a race with too few team-mates on the line to say what the day was worth.</p>'
+    +'</div>';
   animate(el);
   wireCopy();
   const sp=document.getElementById('sp-seg');
@@ -21332,9 +21333,9 @@ document.getElementById('themer').addEventListener('click',e=>{
 document.getElementById('hdr').textContent=INFO.horizon+'–'+INFO.to+' · '
   +A.length+' athletes · '+R.length.toLocaleString()+' marks';
 document.getElementById('foot').innerHTML='Built by <code>pull/roster.js</code> from '
-  +'athletic.net, pulled '+INFO.pulled+'. Cross country is every race ('
-  +(INFO.sports.xc||0).toLocaleString()+' of them); track is each athlete’s season best '
-  +'per event ('+(INFO.sports.tfo||0).toLocaleString()+'), which is what the site serves. '
+  +'athletic.net, pulled '+INFO.pulled+'. Every race in both sports: '
+  +(INFO.sports.xc||0).toLocaleString()+' cross country and '
+  +(INFO.sports.tfo||0).toLocaleString()+' on the track, including indoor. '
   +(INFO.fieldMarksSkipped||0).toLocaleString()+' field marks are left out: a throw is a '
   +'distance, not a time. The record starts in '+INFO.horizon+' because that is where '
   +'athletic.net’s coverage of this school starts, not because nobody ran before then. '
