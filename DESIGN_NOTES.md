@@ -93,10 +93,24 @@ ones did.
 **Phase 3, wow.** Ghost race, linked brushing, scroll-told intro, hero card.
 
 Phase 2 item 5 asks for an annotation on the 2021 depth outlier. Confirmed from
-the data rather than assumed: school year **2021 is entirely March and April**
-— 125 races over 6 meets, no autumn at all — against 591 races over 13 meets in
-2020 and 404 over 13 in 2022. That is the COVID spring makeup season, and the
-annotation can say exactly that.
+the data rather than assumed: school year **2021 ran entirely in March, April
+and May** — 15 meets, and **no autumn season at all**. That is the COVID spring
+makeup year, and the annotation says the derived half of it (which months, how
+many meets, no autumn) without naming a cause the data cannot show.
+
+**The first count here was wrong and the reason is worth keeping.** I wrote 6
+meets in March and April, because I filed each race by sport: cross country is
+the autumn half, so its school year is `year + 1`. That rule holds for
+twenty-one of these twenty-two seasons and is exactly wrong for the one it was
+being used to find — 2020-21 ran its cross country season in **March 2021**, 116
+races. The shortcut pushed all of them into 2022 and described the wrong months
+on the wrong season. `thinSeason` derives the school year from the calendar
+instead (July boundary), which is the actual definition rather than a
+convenience.
+
+It also does not look for a *low meet count*, which finds nothing: 2021 has 15
+meets against a median of 23, nowhere near an outlier. It looks for a **missing
+half**. That is the thing that is actually true about it.
 
 ## Budget
 

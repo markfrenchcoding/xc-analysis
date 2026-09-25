@@ -220,6 +220,25 @@ tr:last-child td{border-bottom:0}
 .dimv{color:var(--dim)}
 
 figure{margin:0}
+/* Every chart's accessible fallback, and on a phone often the thing somebody
+   actually wanted. Closed by default so the picture stays the first read. */
+.dtab{margin-top:10px}
+.dtab>summary{cursor:pointer;color:var(--dim);font:500 12px var(--num);
+  padding:4px 0;list-style:none}
+.dtab>summary::-webkit-details-marker{display:none}
+.dtab>summary::before{content:'\u25B8 ';display:inline-block;transition:transform .15s}
+.dtab[open]>summary::before{transform:rotate(90deg)}
+.dtab>summary:hover{color:var(--text)}
+.dtab table{margin-top:6px}
+/* Three copies of one chart, side by side. Small multiples only work if the
+   copies are identical in everything but their data, which is why they call
+   the same function rather than a shrunken variant of it. */
+.smalls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;margin:8px 0 16px}
+.smalls .sm{background:var(--raised);border:1px solid var(--line);border-radius:9px;
+  padding:8px 6px 2px}
+.smalls figcaption{margin:0 0 2px 6px;color:var(--muted);
+  font:600 10.5px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
 figcaption{color:var(--dim);font-size:12.5px;margin-top:9px;max-width:66ch}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .ax{stroke:var(--line);stroke-width:.5}
@@ -17140,6 +17159,7 @@ Three Rivers League JV District
       <p class="why" style="margin:12px 0 10px">Identical arithmetic, three
       populations. The gap between them is why this page never lets a statistic
       choose its own sample.</p>
+      <div class="smalls" id="dev-small"></div>
       <table id="dev-tab"></table>
       <p class="why" id="dev-gap" style="margin:12px 0 0"></p>
     </details>
@@ -17641,13 +17661,23 @@ const REDUCED=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function countTo(el,to,fmt,ms){
   if(REDUCED||!el){if(el)el.textContent=fmt(to);return;}
   const t0=performance.now(),dur=ms||780;
+  let settled=false;
+  const land=()=>{if(!settled){settled=true;el.textContent=fmt(to);}};
   const step=now=>{
+    if(settled)return;
     const f=Math.min(1,(now-t0)/dur);
     el.textContent=fmt(to*(1-Math.pow(1-f,3)));
-    if(f<1)requestAnimationFrame(step);
+    if(f<1)requestAnimationFrame(step); else land();
   };
   el.textContent=fmt(0);
   requestAnimationFrame(step);
+  /* A frame callback is not a promise. A tab in the background, a window
+     behind another one, or an engine that has stopped painting delivers no
+     frames at all - and this animation starts by writing NOUGHT, so a run
+     that never gets its second frame leaves a tile reading "0 athletes on
+     record". A missing animation is a cosmetic loss; a wrong number is not.
+     The timer lands the real value whatever the frames do. */
+  setTimeout(land,dur+400);
 }
 
 /* The format is NAMED rather than inferred, because "16:49.5" and "46%" and
@@ -17723,129 +17753,490 @@ const svg=(h,body)=>'<svg viewBox="0 0 '+W+' '+h+'" role="img">'+body+'</svg>';
 const T=(x,y,s,cls,anchor)=>'<text x="'+x+'" y="'+y+'" class="'+(cls||'axt')+'"'
   +(anchor?' text-anchor="'+anchor+'"':'')+'>'+esc(s)+'</text>';
 
-/* One population, seconds, and an axis that says what it is.
 
-   The old chart put three populations of grouped bars on an unlabelled VDOT
-   axis and asked the reader to stare. The comparison it was making is real and
-   is kept - it is the whole argument for the roster-and-views split - but it
-   belongs in a sentence and a small table underneath, not competing with the
-   first read. */
-function barsSeconds(groups,h,unit){
-  const L=34,Rr=6,Tp=14,B=22,pw=(W-L-Rr)/groups.length;
-  const vals=groups.map(g=>g.v).filter(v=>v!=null);
-  if(!vals.length)return '<p class="empty">Nothing to measure on this ruler.</p>';
-  const hi=Math.max(0,...vals),lo=Math.min(0,...vals),span=(hi-lo)||1;
-  const Y=v=>Tp+(hi-v)/span*(h-Tp-B);
-  let s='';
-  // gridlines with their values written on them, which is the whole fix
-  const ticks=[hi,(hi+lo)/2,lo].filter((v,i,a)=>a.indexOf(v)===i);
-  for(const t of ticks){
-    s+='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(t).toFixed(1)+'" y2="'+Y(t).toFixed(1)
-      +'"'+(Math.abs(t)<1e-9?'':' stroke-dasharray="1.5 2"')+'/>';
-    s+=T(L-4,Y(t)+2,(t>0?'+':'')+Math.round(t)+unit,'axt','end');
+/* ---------- one chart module ----------
+   Seven charts were written one at a time and disagreed about everything that
+   matters: how many ticks an axis gets, whether it is labelled at all, what
+   hover does, and whether any of it survives a theme switch. These are the
+   parts they all take now.
+
+   Two halves, because the page has two kinds of chart. CH builds SVG strings,
+   which is right for anything up to a few hundred marks and is what every
+   existing panel is. CV owns the canvases, which is what eleven thousand
+   marks needs, and it exists mostly to hold the three things a canvas always
+   forgets: device pixel ratio, resize, and that the palette can change
+   underneath it while the page is open.
+
+   The rules, once, here, instead of in seven places:
+
+     - an axis gets about four labelled ticks, not a minimum and a maximum
+     - every axis says its unit AND its direction, because "faster is up" is
+       not guessable and half these charts invert to get it
+     - direct labels beat a legend
+     - one tooltip - TIP - on hover, on focus and on tap
+     - a data table underneath, so none of the above is the only way in */
+const CH=(()=>{
+  const W=200;
+
+  /* Ticks a person would have chosen: 1, 2, 2.5 or 5 times a power of ten.
+     Asking for four is asking for about four - the count moves so the VALUES
+     stay round, which is the right way round. */
+  function stepFor(span,n){
+    const raw=Math.abs(span)/Math.max(1,n||4);
+    if(!(raw>0))return 1;
+    const mag=Math.pow(10,Math.floor(Math.log10(raw))),u=raw/mag;
+    return (u<1.5?1:u<3?2:u<4.5?2.5:u<7?5:10)*mag;
   }
-  groups.forEach((g,i)=>{
-    if(g.v==null)return;
-    const x=L+i*pw+pw*.2,bw=pw*.6,y0=Y(0),y1=Y(g.v);
-    s+='<rect x="'+x.toFixed(1)+'" y="'+Math.min(y0,y1).toFixed(1)+'" width="'+bw.toFixed(1)
-      +'" height="'+(Math.abs(y1-y0)||.6).toFixed(1)+'" rx="1.2" fill="url(#barInk)">'
-      +'<title>'+esc(g.label+': '+(g.v>0?'+':'')+Math.round(g.v)+unit+' over '+g.n+' athletes')
-      +'</title></rect>';
-    s+=T(x+bw/2,(g.v>=0?y1-3:y1+7),(g.v>0?'+':'')+Math.round(g.v)+unit,'axv','middle');
-    s+=T(L+i*pw+pw/2,h-6,g.label,'lbl','middle');
+  function ticks(lo,hi,n){
+    const st=stepFor(hi-lo,n),out=[];
+    for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)out.push(+v.toFixed(6));
+    return out.length?out:[lo,hi];
+  }
+  /* Time is not decimal, and ticking it decimally puts 17:46.7 on a gridline.
+     Seconds snap to something a stopwatch would say. */
+  const TSTEP=[1,2,5,10,15,20,30,60,120,180,300,600,900,1800];
+  function timeTicks(lo,hi,n){
+    const want=(hi-lo)/Math.max(1,n||4);
+    let st=TSTEP[TSTEP.length-1];
+    for(const c of TSTEP){if(c>=want){st=c;break;}}
+    const out=[];
+    for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)out.push(v);
+    return out.length>1?out:[lo,hi];
+  }
+
+  /* A scale is a function with an inverse, which is all a brush needs. */
+  function lin(d0,d1,r0,r1){
+    const f=v=>d1===d0?(r0+r1)/2:r0+(v-d0)/(d1-d0)*(r1-r0);
+    f.inv=q=>r1===r0?d0:d0+(q-r0)/(r1-r0)*(d1-d0);
+    f.dom=[d0,d1];f.rng=[r0,r1];
+    return f;
+  }
+  // widen a domain out to its own ticks, so the top gridline is not clipped
+  function padded(lo,hi,n,time){
+    if(hi===lo){hi=lo+1;lo=lo-1;}
+    const t=(time?timeTicks:ticks)(lo,hi,n);
+    return [Math.min(lo,t[0]),Math.max(hi,t[t.length-1])];
+  }
+
+  function frame(h,p){
+    p=p||{};
+    const L=p.l==null?30:p.l,R=p.r==null?8:p.r,
+          T=p.t==null?12:p.t,B=p.b==null?22:p.b;
+    return {W:W,H:h,L:L,R:R,T:T,B:B,x0:L,x1:W-R,y0:T,y1:h-B};
+  }
+
+  /* Horizontal gridlines with their values on them. The zero line draws solid
+     and everything else dashed, because a baseline is a fact and a gridline
+     is a guide. */
+  function gridY(f,y,vals,fmt,o){
+    o=o||{};
+    return vals.map(v=>{
+      const q=y(v).toFixed(1),z=o.zeroAt!=null&&Math.abs(v-o.zeroAt)<1e-9;
+      return '<line class="ax" x1="'+f.x0+'" x2="'+f.x1+'" y1="'+q+'" y2="'+q+'"'
+        +(z?'':' stroke-dasharray="1.5 2.5"')+'/>'
+        +'<text x="'+(f.x0-3)+'" y="'+(y(v)+2).toFixed(1)+'" class="axt" '
+        +'text-anchor="end">'+esc(fmt?fmt(v):v)+'</text>';
+    }).join('');
+  }
+  function gridX(f,x,vals,fmt,o){
+    o=o||{};
+    return vals.map(v=>{
+      const q=x(v).toFixed(1);
+      return (o.lines===false?'':'<line class="ax" x1="'+q+'" x2="'+q+'" y1="'+f.y0
+          +'" y2="'+f.y1+'" stroke-dasharray="1.5 2.5"/>')
+        +'<text x="'+q+'" y="'+(f.H-5)+'" class="axt" text-anchor="middle">'
+        +esc(fmt?fmt(v):v)+'</text>';
+    }).join('');
+  }
+
+  /* The unit and the direction, set small down the left edge. Every chart on
+     this page inverts something - faster is a smaller number - and a reader
+     should never have to work out which way is good. */
+  function unitY(f,text){
+    return '<text transform="translate('+(f.L-19)+','+((f.y0+f.y1)/2)
+      +') rotate(-90)" class="lbl" text-anchor="middle" '
+      +'style="font-size:6.2px">'+esc(text)+'</text>';
+  }
+  function unitX(f,text){
+    return '<text x="'+f.x1+'" y="'+(f.H-5)+'" class="lbl" text-anchor="end" '
+      +'style="font-size:6.2px">'+esc(text)+'</text>';
+  }
+
+  /* Anything hoverable is also focusable and tappable, which is the whole
+     point of routing every explanation through TIP. */
+  function tip(text){
+    return ' data-tip="'+esc(text)+'" tabindex="0" role="img" aria-label="'
+      +esc(text)+'"';
+  }
+
+  function open(h,label,body){
+    return '<svg viewBox="0 0 '+W+' '+h+'" role="img" aria-label="'+esc(label||'')
+      +'">'+body+'</svg>';
+  }
+
+  /* The accessible fallback, and it is not only that: on a phone a table of
+     four numbers is often the thing somebody actually wanted. Closed by
+     default, so it costs nothing to the reader who wanted the picture. */
+  function table(summary,head,rows){
+    if(!rows||!rows.length)return '';
+    return '<details class="dtab"><summary>'+esc(summary)+'</summary><table>'
+      +'<tr>'+head.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>'
+      +rows.map(r=>'<tr>'+r.map((c,n)=>'<td'+(n?'':' class="name" '
+        +'style="text-align:left"')+'>'+esc(c==null?'\u2014':String(c))+'</td>')
+        .join('')+'</tr>').join('')+'</table></details>';
+  }
+
+  return {W:W,ticks:ticks,timeTicks:timeTicks,lin:lin,padded:padded,frame:frame,
+    gridY:gridY,gridX:gridX,unitY:unitY,unitX:unitX,tip:tip,open:open,table:table};
+})();
+
+/* ---------- the canvases ----------
+   One registry, so every canvas on the page gets device-pixel sharpness, a
+   redraw on resize and a redraw when the theme changes, without each one
+   having to remember. The pack chart had none of the three: it was drawn once
+   at whatever width it happened to have, and switching to the light theme
+   left maroon dots on a white ground with grey labels nobody could read.
+
+   A draw function takes (g, w, h, C) and nothing else. It has to be willing
+   to run again at any moment, which is also the right shape for a resize and
+   for the Wall's re-flow. */
+const CV=(()=>{
+  const reg=new Map();
+  function colors(){
+    const c=getComputedStyle(document.documentElement);
+    const g=(k,d)=>c.getPropertyValue(k).trim()||d;
+    return {bg:g('--bg','#0B0A0C'),surface:g('--surface','#151217'),
+      raised:g('--raised','#1E1922'),line:g('--line','#2E2732'),
+      text:g('--text','#F4F1F3'),muted:g('--muted','#B3AAB1'),
+      dim:g('--dim','#A0959D'),faint:g('--faint','#867B83'),
+      maroon:g('--maroon','#880000'),lift:g('--maroon-lift','#B31B2C'),
+      deep:g('--maroon-deep','#4A0008'),accent:g('--accent','#EE5566'),
+      steel:g('--steel','#9A9199')};
+  }
+  function paint(cv){
+    const e=reg.get(cv);if(!e)return;
+    const w=cv.clientWidth||0;
+    if(!w)return;
+    const h=typeof e.h==='function'?e.h(w):e.h;
+    const dpr=Math.min(2,devicePixelRatio||1);
+    cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+    cv.style.height=h+'px';
+    const g=cv.getContext('2d');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,w,h);
+    e.w=w;e.hh=h;
+    e.draw(g,w,h,colors());
+  }
+  const RO=('ResizeObserver' in window)?new ResizeObserver(es=>{
+    for(const e of es)if(reg.has(e.target))paint(e.target);
+  }):null;
+  // the theme toggle rewrites one attribute; every canvas has to hear it
+  new MutationObserver(()=>{for(const cv of reg.keys())paint(cv);})
+    .observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  if(!RO)addEventListener('resize',()=>{for(const cv of reg.keys())paint(cv);});
+
+  function add(cv,h,draw){
+    if(!cv)return null;
+    reg.set(cv,{h:h,draw:draw});
+    if(RO)RO.observe(cv);
+    paint(cv);
+    return {repaint:()=>paint(cv)};
+  }
+  function drop(cv){if(cv){reg.delete(cv);if(RO)RO.unobserve(cv);}}
+  return {add:add,drop:drop,paint:paint,colors:colors};
+})();
+
+/* ---------- what a year is worth, as a waterfall ----------
+   Four independent bars put the whole-four total on the same scale as its
+   three parts, so the eye read it as a fourth year rather than as the sum of
+   the other three. A waterfall says what it is: each step starts where the
+   last one finished.
+
+   THE STEPS DO NOT ADD UP TO THE TOTAL, AND THE CHART HAS TO SAY SO. Each
+   step is averaged over the athletes who raced both of ITS two years, and the
+   four-year figure over the athletes who raced grade 9 and grade 12 - three
+   different samples, so the sum and the measured total are two different
+   numbers about two different groups. Drawing the steps landing neatly on the
+   total would be a lie in the shape of a chart. So the stack lands where it
+   lands, the measured total is its own bar beside it, and when they disagree
+   by more than a couple of seconds a dashed rule carries the sum across so
+   the difference is the thing you see. */
+function waterfall(c,h,opt){
+  opt=opt||{};
+  const steps=[['grade 9 \u2192 10','s9','c9'],['10 \u2192 11','s10','c10'],
+               ['11 \u2192 12','s11','c11']];
+  if(steps.every(([,k])=>c[k]==null)&&c.four==null)
+    return '<p class="empty">Nothing to measure on this ruler.</p>';
+
+  const cum=[];let acc=0;
+  for(const [lab,k,nk] of steps){
+    const v=c[k];
+    cum.push({lab:lab,v:v,n:c[nk],from:acc,to:acc+(v||0)});
+    acc+=(v||0);
+  }
+  const sum=acc,meas=c.four;
+  const small=!!opt.small;
+  const f=CH.frame(h,{l:small?20:32,r:small?4:6,t:small?10:16,b:small?16:24});
+  const [lo,hi]=CH.padded(Math.min(0,sum,meas==null?0:meas),
+                          Math.max(0,sum,meas==null?0:meas),small?3:4);
+  const y=CH.lin(lo,hi,f.y1,f.y0);
+  const cols=4,pw=(f.x1-f.x0)/cols;
+  const bw=pw*(small?.64:.54);
+  const cx=i=>f.x0+i*pw+pw/2;
+  const s0=v=>(v>0?'+':v<0?'\u2212':'')+Math.abs(Math.round(v))+'s';
+
+  let g=CH.gridY(f,y,CH.ticks(lo,hi,small?3:4),v=>Math.round(v)+'s',{zeroAt:0});
+  if(!small)g+=CH.unitY(f,'seconds taken off \u00b7 up is faster');
+
+  // the three steps, each starting where the last one finished
+  cum.forEach((st,i)=>{
+    if(st.v==null)return;
+    const x=cx(i)-bw/2,ya=y(st.from),yb=y(st.to);
+    g+='<rect x="'+x.toFixed(1)+'" y="'+Math.min(ya,yb).toFixed(1)+'" width="'
+      +bw.toFixed(1)+'" height="'+Math.max(.6,Math.abs(yb-ya)).toFixed(1)
+      +'" rx="1.2" fill="url(#wfInk)"'
+      +CH.tip(st.lab+': '+s0(st.v)+' over '+st.n+' athletes who raced both years')
+      +'/>';
+    // the connector, which is the part that makes it a waterfall
+    if(i<cum.length-1&&cum[i+1].v!=null)
+      g+='<line x1="'+(x+bw).toFixed(1)+'" x2="'+(cx(i+1)-bw/2).toFixed(1)
+        +'" y1="'+y(st.to).toFixed(1)+'" y2="'+y(st.to).toFixed(1)
+        +'" stroke="var(--dim)" stroke-width=".5" stroke-dasharray="1.5 1.5"/>';
+    if(!small)g+='<text x="'+cx(i)+'" y="'+(Math.min(ya,yb)-3).toFixed(1)
+      +'" class="axv" text-anchor="middle">'+s0(st.v)+'</text>';
   });
-  return '<svg viewBox="0 0 '+W+' '+h+'" role="img"><defs>'
-    +'<linearGradient id="barInk" x1="0" y1="0" x2="0" y2="1">'
+
+  // the measured four-year total, from nought, because that is what it is
+  if(meas!=null){
+    const x=cx(3)-bw/2,y0=y(0),y1=y(meas);
+    g+='<rect x="'+x.toFixed(1)+'" y="'+Math.min(y0,y1).toFixed(1)+'" width="'
+      +bw.toFixed(1)+'" height="'+Math.max(.6,Math.abs(y1-y0)).toFixed(1)
+      +'" rx="1.2" fill="none" stroke="var(--accent)" stroke-width="1.1"'
+      +' stroke-dasharray="2.6 1.4"'
+      +CH.tip('the whole four: '+s0(meas)+' over '+c.cf
+        +' athletes who raced grade 9 and grade 12')+'/>';
+    if(!small)g+='<text x="'+cx(3)+'" y="'+(Math.min(y0,y1)-3).toFixed(1)
+      +'" class="axv" text-anchor="middle">'+s0(meas)+'</text>';
+    // carry the sum across only when it genuinely differs
+    if(Math.abs(sum-meas)>2)
+      g+='<line x1="'+(cx(2)+bw/2).toFixed(1)+'" x2="'+(cx(3)+bw/2).toFixed(1)
+        +'" y1="'+y(sum).toFixed(1)+'" y2="'+y(sum).toFixed(1)
+        +'" stroke="var(--steel)" stroke-width=".6" stroke-dasharray="2 2"/>'
+        +(small?'':'<text x="'+(cx(3)+bw/2)+'" y="'+(y(sum)-2.5).toFixed(1)
+          +'" class="axt" text-anchor="end">steps sum to '+s0(sum)+'</text>');
+  }
+
+  const labs=[...cum.map(x=>x.lab),'the whole four'];
+  labs.forEach((l,i)=>{
+    g+='<text x="'+cx(i)+'" y="'+(f.H-(small?4:6))+'" class="'+(small?'axt':'lbl')
+      +'" text-anchor="middle">'+esc(small?l.replace('grade ','').replace('the whole ','all ')
+      :l)+'</text>';
+  });
+
+  /* An SVG gradient cannot read a custom property, so these two stops repeat
+     --maroon and --accent by hand. Change one and change the other. */
+  return '<svg viewBox="0 0 '+CH.W+' '+h+'" role="img" aria-label="'
+    +esc(opt.label||'What a year here is worth, in seconds')+'"><defs>'
+    +'<linearGradient id="wfInk" x1="0" y1="0" x2="0" y2="1">'
     +'<stop offset="0" stop-color="#EE5566"/><stop offset="1" stop-color="#880000"/>'
-    +'</linearGradient></defs>'+s+'</svg>';
+    +'</linearGradient></defs>'+g+'</svg>';
 }
 
-function barsGrouped(groups,series,h){
-  const L=20,Rr=4,Tp=8,B=18,pw=(W-L-Rr)/groups.length;
-  const all=groups.flatMap(g=>g.values).filter(v=>v!=null);
-  if(!all.length)return '<p class="empty">Nothing to measure on this ruler.</p>';
-  const hi=Math.max(0,...all),lo=Math.min(0,...all),span=(hi-lo)||1;
-  const Y=v=>Tp+(hi-v)/span*(h-Tp-B);
-  let s='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(0)+'" y2="'+Y(0)+'"/>';
-  s+=T(L-3,Y(hi)+2,hi.toFixed(1),'axt','end');
-  if(lo<0)s+=T(L-3,Y(lo)+2,lo.toFixed(1),'axt','end');
-  groups.forEach((g,gi)=>{
-    const bw=(pw-8)/series.length;
-    g.values.forEach((v,si)=>{
-      if(v==null)return;
-      const x=L+gi*pw+4+si*bw,y0=Y(0),y1=Y(v);
-      /* No text on the bars. Three series in a group leaves about 15 viewBox
-         units a bar, and "+2.76" at a size anybody can read on a phone is
-         wider than that - they collided. The chart carries the shape and the
-         table underneath carries the numbers. */
-      s+='<rect x="'+x.toFixed(1)+'" y="'+Math.min(y0,y1).toFixed(1)
-        +'" width="'+(bw-1.2).toFixed(1)+'" height="'+(Math.abs(y1-y0)||.4).toFixed(1)
-        +'" rx="0.8" fill="'+series[si].color+'"><title>'+esc(series[si].label+' '+g.label
-        +': '+sg(v))+'</title></rect>';
-    });
-    s+=T(L+gi*pw+pw/2,h-5,g.label,'lbl','middle');
-  });
-  return svg(h,s);
-}
-
+/* ---------- who stays ----------
+   A cohort of two athletes and a cohort of fourteen are not the same claim,
+   and fading the small ones only made them look like the same claim printed
+   fainter. They are hatched now - a different KIND of mark, readable at a
+   glance and in a photocopy - and the chart says on itself what the hatching
+   means rather than leaving it to a caption nobody reads twice. */
 function barsSimple(rows,h,opt){
-  const L=20,Rr=4,Tp=8,B=18,pw=(W-L-Rr)/Math.max(rows.length,1);
+  opt=opt||{};
   if(!rows.length)return '<p class="empty">No cohorts yet.</p>';
+  const f=CH.frame(h,{l:26,r:6,t:14,b:20});
   const hi=opt.max!=null?opt.max:Math.max(...rows.map(r=>r.v),0)||1;
-  const Y=v=>Tp+(1-v/hi)*(h-Tp-B);
-  let s='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(0)+'" y2="'+Y(0)+'"/>';
-  s+=T(L-3,Y(hi)+2,opt.fmt?opt.fmt(hi):hi,'axt','end');
-  if(opt.mid!=null)s+='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(opt.mid)
-    +'" y2="'+Y(opt.mid)+'" stroke-dasharray="1.5 1.5"/>';
+  const y=CH.lin(0,hi,f.y1,f.y0);
+  const pw=(f.x1-f.x0)/rows.length;
+  let g='<defs><pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse" '
+    +'patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="3" '
+    +'stroke="var(--steel)" stroke-width="1.1"/></pattern></defs>';
+  g+=CH.gridY(f,y,CH.ticks(0,hi,4),opt.fmt||(v=>v),{zeroAt:0});
+  g+=CH.unitY(f,opt.unit||'');
+  if(opt.mid!=null){
+    g+='<line x1="'+f.x0+'" x2="'+f.x1+'" y1="'+y(opt.mid).toFixed(1)+'" y2="'
+      +y(opt.mid).toFixed(1)+'" stroke="var(--accent)" stroke-width=".7" '
+      +'stroke-dasharray="2.5 1.5" opacity=".8"/>'
+      +'<text x="'+f.x1+'" y="'+(y(opt.mid)-2.5).toFixed(1)+'" class="axt" '
+      +'text-anchor="end" style="fill:var(--accent)">'+esc(opt.midLabel||'')+'</text>';
+  }
   rows.forEach((r,i)=>{
-    const x=L+i*pw+pw*.16,bw=pw*.68;
-    s+='<rect x="'+x.toFixed(1)+'" y="'+Y(r.v).toFixed(1)+'" width="'+bw.toFixed(1)
-      +'" height="'+Math.max(.4,Y(0)-Y(r.v)).toFixed(1)+'" rx="0.7" fill="'
-      +(r.color||'var(--accent)')+'"><title>'+esc(r.title||'')+'</title></rect>';
-    if(i%opt.every===0)s+=T(x+bw/2,h-5,r.label,'axt','middle');
+    const x=f.x0+i*pw+pw*.16,bw=pw*.68;
+    g+='<rect x="'+x.toFixed(1)+'" y="'+y(r.v).toFixed(1)+'" width="'+bw.toFixed(1)
+      +'" height="'+Math.max(.5,y(0)-y(r.v)).toFixed(1)+'" rx="0.7" fill="'
+      +(r.thin?'url(#hatch)':(r.color||'var(--accent)'))+'"'
+      +(r.thin?' stroke="var(--steel)" stroke-width=".4"':'')
+      +CH.tip(r.title||'')+'/>';
+    if(i%(opt.every||1)===0||i===rows.length-1)
+      g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
+        +'text-anchor="middle">'+esc(r.label)+'</text>';
   });
-  return svg(h,s);
+  // one direct label on the hatching, rather than a sentence underneath
+  const firstThin=rows.findIndex(r=>r.thin);
+  if(firstThin>=0){
+    const x=f.x0+firstThin*pw+pw*.5,r=rows[firstThin];
+    g+='<text x="'+Math.min(f.x1-1,x+4).toFixed(1)+'" y="'
+      +Math.max(f.y0+5,y(r.v)-4).toFixed(1)+'" class="axt" text-anchor="start" '
+      +'style="fill:var(--steel)">hatched: fewer than four</text>';
+  }
+  return CH.open(h,opt.label||'',g);
 }
 
 function stackCols(rows,h,keys,colors){
-  const L=20,Rr=4,Tp=8,B=18,pw=(W-L-Rr)/Math.max(rows.length,1);
   if(!rows.length)return '<p class="empty">Nothing here.</p>';
-  const hi=Math.max(...rows.map(r=>keys.reduce((s,k)=>s+r[k],0)),1);
-  const Y=v=>Tp+(1-v/hi)*(h-Tp-B);
-  let s='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(0)+'" y2="'+Y(0)+'"/>'
-    +T(L-3,Y(hi)+2,hi,'axt','end');
+  const f=CH.frame(h,{l:22,r:6,t:14,b:20});
+  const hi=Math.max(...rows.map(r=>keys.reduce((q,k)=>q+r[k],0)),1);
+  const y=CH.lin(0,hi,f.y1,f.y0);
+  const pw=(f.x1-f.x0)/rows.length;
+  let g=CH.gridY(f,y,CH.ticks(0,hi,4),v=>Math.round(v),{zeroAt:0});
+  g+=CH.unitY(f,'athletes');
   rows.forEach((r,i)=>{
-    let acc=0;const x=L+i*pw+pw*.16,bw=pw*.68;
+    let acc=0;const x=f.x0+i*pw+pw*.16,bw=pw*.68;
     keys.forEach((k,ki)=>{
       if(!r[k])return;
-      const y0=Y(acc),y1=Y(acc+r[k]);acc+=r[k];
-      s+='<rect x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+bw.toFixed(1)
-        +'" height="'+(y0-y1).toFixed(1)+'" fill="'+colors[ki]
-        +'"><title>'+r.y+' grade '+k+': '+r[k]+'</title></rect>';
+      const y0=y(acc),y1=y(acc+r[k]);acc+=r[k];
+      g+='<rect x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+bw.toFixed(1)
+        +'" height="'+(y0-y1).toFixed(1)+'" fill="'+colors[ki]+'"'
+        +CH.tip(r.y+' \u00b7 grade '+k+': '+r[k]+' of '+r.n)+'/>';
     });
-    if(i%3===0)s+=T(x+bw/2,h-5,String(r.y).slice(2),'axt','middle');
+    if(i%3===0||i===rows.length-1)
+      g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
+        +'text-anchor="middle">'+String(r.y).slice(2)+'</text>';
   });
-  return svg(h,s);
+  // direct labels on the last column, which is what a legend was standing in for
+  const last=rows[rows.length-1];
+  if(last){
+    let acc=0;
+    keys.forEach((k,ki)=>{
+      const v=last[k];const y0=y(acc),y1=y(acc+v);acc+=v;
+      if(v&&Math.abs(y0-y1)>5)
+        g+='<text x="'+(f.x1-1)+'" y="'+((y0+y1)/2+2).toFixed(1)+'" class="axt" '
+          +'text-anchor="end" style="fill:'+colors[ki]+'">gr '+k+'</text>';
+    });
+  }
+  return CH.open(h,'Roster size by school year, freshmen at the bottom',g);
 }
 
-function twoLines(rows,h,a,b,ca,cb,fmt){
-  const L=22,Rr=4,Tp=8,B=18;
+/* The one season on a chart that is not part of the trend, found rather
+   than written down. A year with less than half the median number of meets is
+   not a dip in form and should not be read as one; the annotation says what
+   the record actually holds for it - how many meets, and which months - and
+   stops there. No reason is invented. School year 2021 comes out as six meets
+   in March and April, which is the year with no autumn at all. */
+const MONTH=['','January','February','March','April','May','June','July',
+  'August','September','October','November','December'];
+function thinSeason(rows){
+  if(!rows||rows.length<4)return null;
+  /* A school year starts in July, and that is the rule rather than a
+     shortcut. "Cross country is the autumn half" holds for twenty-one of the
+     twenty-two seasons here and is exactly wrong for the one this function
+     exists to find: 2020-21 had no autumn at all and ran its cross country
+     season in MARCH. Filing races by sport rather than by date pushed 116 of
+     them into the following year and named the wrong months on the wrong
+     season. */
+  const meets=new Map(),months=new Map();
+  for(const r of R){
+    if(!r.date)continue;
+    const sy=+r.date.slice(0,4)+(+r.date.slice(5,7)>=7?1:0);
+    if(!meets.has(sy)){meets.set(sy,new Set());months.set(sy,new Set());}
+    meets.get(sy).add(r.m);
+    months.get(sy).add(+r.date.slice(5,7));
+  }
+  /* What makes a season not part of the trend is a MISSING HALF, not a low
+     meet count. 2021 has fifteen meets, which is two thirds of a normal year
+     and nothing like an outlier; what it has none of is an autumn. Counting
+     meets found nothing, and would have gone on finding nothing.
+
+     NOT the year in progress. It is short every autumn for the ordinary
+     reason that it has not finished, and annotating that as an anomaly would
+     make the chart say something false once a year. */
+  for(const r of rows){
+    if(r.y>=NOW)continue;
+    const mo=[...(months.get(r.y)||[])].sort((a,b)=>a-b);
+    if(!mo.length)continue;
+    const autumn=mo.some(m=>m>=8&&m<=11),spring=mo.some(m=>m>=3&&m<=6);
+    if(autumn&&spring)continue;
+    const span=mo.length===1?MONTH[mo[0]]:MONTH[mo[0]]+'\u2013'+MONTH[mo[mo.length-1]];
+    return {y:r.y,meets:(meets.get(r.y)||new Set()).size,span:span,
+      noAutumn:!autumn,noSpring:!spring,
+      text:!autumn?'no autumn season':'no spring season'};
+  }
+  return null;
+}
+
+/* ---------- front five, and the five behind them ----------
+   The depth story IS the gap, and two lines with a hole between them made the
+   reader measure it by eye off an axis labelled at its two ends. The gap is
+   filled now, the axis carries four real stopwatch ticks, and the one year
+   that does not belong to the trend is annotated with what actually happened
+   rather than left as an outlier for somebody to explain to themselves.
+
+   The annotation is derived, never written down: any season whose meets all
+   fall in one half of the calendar had no autumn, and 2021 is the only one -
+   125 races over six meets, every one of them in March and April. */
+function twoLines(rows,h,a,b,ca,cb,fmt,note){
+  if(!rows.length)return '<p class="empty">Nothing here.</p>';
+  const f=CH.frame(h,{l:34,r:8,t:14,b:22});
   const vals=rows.flatMap(r=>[r[a],r[b]]);
-  const hi=Math.max(...vals),lo=Math.min(...vals),span=(hi-lo)||1;
-  const X=i=>L+(rows.length<2?0:i/(rows.length-1))*(W-L-Rr);
-  const Y=v=>Tp+(v-lo)/span*(h-Tp-B);        // slower is lower on the page
-  const path=k=>rows.map((r,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(r[k]).toFixed(1)).join(' ');
-  let s=T(L-3,Y(lo)+2,fmt(lo),'axt','end')+T(L-3,Y(hi)+2,fmt(hi),'axt','end');
-  s+='<path d="'+path(a)+'" fill="none" stroke="'+ca+'" stroke-width="1.3"/>';
-  s+='<path d="'+path(b)+'" fill="none" stroke="'+cb+'" stroke-width="1.3" stroke-dasharray="2.4 1.6"/>';
+  const [lo,hi]=CH.padded(Math.min(...vals),Math.max(...vals),4,true);
+  const x=CH.lin(0,Math.max(1,rows.length-1),f.x0,f.x1);
+  const y=CH.lin(lo,hi,f.y0,f.y1);     // faster is a smaller number, so up
+  const pt=(k,i)=>x(i).toFixed(1)+' '+y(rows[i][k]).toFixed(1);
+  let g=CH.gridY(f,y,CH.timeTicks(lo,hi,4),fmt);
+  g+=CH.unitY(f,'season-best average \u00b7 up is faster');
+
+  // the gap, shaded, because that is the thing the panel is about
+  g+='<path d="M'+rows.map((r,i)=>pt(a,i)).join(' L')+' L'
+    +rows.map((r,i)=>pt(b,i)).reverse().join(' L')+'Z" fill="var(--maroon-deep)" '
+    +'opacity=".38"/>';
+
+  g+='<path data-draw="1000" d="M'+rows.map((r,i)=>pt(a,i)).join(' L')
+    +'" fill="none" stroke="'+ca+'" stroke-width="1.4" stroke-linejoin="round"/>';
+  g+='<path data-draw="1000" data-delay="150" d="M'+rows.map((r,i)=>pt(b,i)).join(' L')
+    +'" fill="none" stroke="'+cb+'" stroke-width="1.2" stroke-dasharray="2.4 1.6"/>';
+
   rows.forEach((r,i)=>{
-    s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(r[a]).toFixed(1)+'" r="1.15" fill="'+ca+'"><title>'
-      +r.y+' front five '+fmt(r[a])+'</title></circle>';
-    s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(r[b]).toFixed(1)+'" r="1.15" fill="'+cb+'"><title>'
-      +r.y+' sixth to tenth '+fmt(r[b])+'</title></circle>';
-    if(i%3===0)s+=T(X(i),h-5,String(r.y).slice(2),'axt','middle');
+    const gapS=Math.round(r[b]-r[a]);
+    g+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(r[a]).toFixed(1)+'" r="1.3" fill="'+ca+'"'
+      +CH.tip(r.y+' front five '+fmt(r[a])+', sixth to tenth '+fmt(r[b])
+        +' \u2014 '+gapS+'s apart, '+r.n+' athletes on record')+'/>';
+    g+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(r[b]).toFixed(1)+'" r="1.3" fill="'+cb+'"/>';
+    if(i%3===0||i===rows.length-1)
+      g+='<text x="'+x(i).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
+        +'text-anchor="middle">'+String(r.y).slice(2)+'</text>';
   });
-  return svg(h,s);
+
+  // direct labels on the last pair, instead of a legend
+  const n=rows.length-1;
+  g+='<text x="'+(f.x1-1)+'" y="'+(y(rows[n][a])-2.5).toFixed(1)+'" class="axt" '
+    +'text-anchor="end" style="fill:'+ca+'">front five</text>'
+    +'<text x="'+(f.x1-1)+'" y="'+(y(rows[n][b])+5).toFixed(1)+'" class="axt" '
+    +'text-anchor="end" style="fill:'+cb+'">6th\u201310th</text>';
+
+  // the one season that is not a trend
+  if(note){
+    const i=rows.findIndex(r=>r.y===note.y);
+    if(i>=0){
+      const px=x(i),py=y(rows[i][a]);
+      const left=px>CH.W*.6;
+      g+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.2" fill="none" '
+        +'stroke="var(--steel)" stroke-width=".6"/>'
+        +'<line x1="'+px.toFixed(1)+'" x2="'+(px+(left?-7:7)).toFixed(1)+'" y1="'
+        +(py-3.4).toFixed(1)+'" y2="'+(py-8).toFixed(1)+'" stroke="var(--steel)" '
+        +'stroke-width=".5"/>'
+        +'<text x="'+(px+(left?-8:8)).toFixed(1)+'" y="'+(py-8.6).toFixed(1)
+        +'" class="axt" text-anchor="'+(left?'end':'start')+'" '
+        +'style="fill:var(--steel)">'+esc(note.text)+'</text>';
+    }
+  }
+  return CH.open(h,'Front five against sixth to tenth, by season',g);
 }
 
 /* ---------- January ----------
@@ -18457,16 +18848,35 @@ function drawProgram(){
       +'That is measured over every one of the '+cE.cf+' athletes who has raced '
       +'both years, not over the ones who turned out well.';
 
-  document.getElementById('dev').innerHTML=barsSeconds([
-    {label:'grade 9 \u2192 10',v:cE.s9,n:cE.c9},
-    {label:'10 \u2192 11',v:cE.s10,n:cE.c10},
-    {label:'11 \u2192 12',v:cE.s11,n:cE.c11},
-    {label:'the whole four',v:cE.four,n:cE.cf},
-  ],96,'s');
-  document.getElementById('dev-cap').innerHTML='Seconds taken off a '+rl+', averaged '
-    +'over everyone who raced both of the years in question. Hover a bar for how many '
-    +'athletes are behind it. <b>The freshman year is the biggest one</b>, on every '
-    +'ruler and in every group, which is the one finding here that has never moved.';
+  const wfSum=[cE.s9,cE.s10,cE.s11].reduce((q,v)=>q+(v||0),0);
+  document.getElementById('dev').innerHTML=waterfall(cE,112,
+    {label:'Seconds taken off a '+rl+', by year, with the four-year figure beside it'})
+    +CH.table('The same four numbers as a table',
+      ['Step','Seconds off','Athletes'],
+      [['grade 9 \u2192 10',cE.s9==null?null:Math.round(cE.s9)+'s',cE.c9],
+       ['10 \u2192 11',cE.s10==null?null:Math.round(cE.s10)+'s',cE.c10],
+       ['11 \u2192 12',cE.s11==null?null:Math.round(cE.s11)+'s',cE.c11],
+       ['the three steps added up',Math.round(wfSum)+'s','\u2014'],
+       ['measured over four years',cE.four==null?null:Math.round(cE.four)+'s',cE.cf]]);
+  document.getElementById('dev-cap').innerHTML='Each step starts where the last one '
+    +'finished. Hover, tap or tab to a bar for how many athletes are behind it. '
+    +'<b>The freshman year is the biggest one</b>, on every ruler and in every group, '
+    +'which is the one finding here that has never moved.'
+    +(cE.four!=null&&Math.abs(wfSum-cE.four)>2
+      ?' The three steps add up to '+Math.round(wfSum)+'s and the four-year figure is '
+        +Math.round(cE.four)+'s, and they are not supposed to match \u2014 a step is '
+        +'averaged over the athletes who raced both of its two years, and the total '
+        +'over the ones who raced grade 9 and grade 12. Different people, so two '
+        +'different numbers. The dashed outline is the measured total.':'');
+
+  /* Item for item, the same waterfall over the three populations. Three small
+     copies of one chart say "these are comparable" in a way three columns of
+     a table cannot, and the gap between them is the argument this whole page
+     is built on. */
+  document.getElementById('dev-small').innerHTML=
+    [['Everyone',cE],['All four years',cF],['Top 100',cT]].map(([nm,c])=>
+      '<figure class="sm"><figcaption>'+nm+'</figcaption>'
+      +waterfall(c,70,{small:true,label:nm})+'</figure>').join('');
 
   const steps=[['grade 9 \u2192 10','s9','c9'],['10 \u2192 11','s10','c10'],
     ['11 \u2192 12','s11','c11'],['the whole four','four','cf']];
@@ -18502,29 +18912,52 @@ function drawProgram(){
         +'</tr>';
     }).join('');
 
+  const pooled=ent?fin/ent*100:null;
   const cRows=co.map(c=>({label:String(c.classOf).slice(2),v:c.entered?c.g12/c.entered*100:0,
-    title:'Class of '+c.classOf+': '+c.g12+' of '+c.entered,
-    color:c.entered<4?'var(--maroon-deep)':'var(--accent)'}));
-  document.getElementById('comp').innerHTML=barsSimple(cRows,78,
-    {max:100,every:3,fmt:v=>v+'%',mid:ent?fin/ent*100:null});
-  document.getElementById('comp-cap').textContent='By graduating class. The dashed line is the '
-    +(ent?Math.round(fin/ent*100):0)+'% pooled rate. Faded bars are classes of fewer than four '
-    +'entrants, where a single athlete moves the figure by 25 points or more.';
+    title:'Class of '+c.classOf+': '+c.g12+' of '+c.entered+' still racing as seniors'
+      +(c.entered<4?' \u2014 only '+c.entered+' entrants, so one athlete moves this bar '
+        +Math.round(100/c.entered)+' points':''),
+    thin:c.entered<4}));
+  document.getElementById('comp').innerHTML=barsSimple(cRows,86,
+    {max:100,every:3,fmt:v=>v+'%',unit:'still racing as seniors',
+     mid:pooled,midLabel:pooled==null?'':Math.round(pooled)+'% pooled',
+     label:'Four-year completion by graduating class'})
+    +CH.table('Every class as a table',['Class of','Entered','Still racing','Rate'],
+      co.map(c=>['20'+String(c.classOf).slice(2),c.entered,c.g12,
+        (c.entered?Math.round(c.g12/c.entered*100):0)+'%']));
+  document.getElementById('comp-cap').textContent='By graduating class. Hatched bars are '
+    +'classes of fewer than four entrants, where a single athlete moves the figure by 25 '
+    +'points or more \u2014 a different kind of mark, because a small class is a different '
+    +'kind of claim rather than the same one printed fainter.';
 
   const rs=rosterSize(every);
-  document.getElementById('size').innerHTML=stackCols(rs,78,[9,10,11,12],
-    ['var(--accent)','var(--maroon-lift)','var(--t3e)','var(--dim)']);
+  document.getElementById('size').innerHTML=stackCols(rs,86,[9,10,11,12],
+    ['var(--accent)','var(--maroon-lift)','var(--t3e)','var(--dim)'])
+    +CH.table('Every season as a table',['School year','Gr 9','Gr 10','Gr 11','Gr 12','All'],
+      rs.slice().reverse().map(r=>[r.y,r[9],r[10],r[11],r[12],r.n]));
   const last=rs[rs.length-1];
   document.getElementById('size-cap').textContent='Freshmen at the bottom, seniors at the top. '
     +(last?last.y+': '+last.n+' athletes, '+last[9]+' of them freshmen.':'');
 
-  const dp=depth(every,pR);
+  const dp=depth(every,pR),dpNote=thinSeason(dp);
   document.getElementById('depth').innerHTML=dp.length
-    ?twoLines(dp,78,'front','back','var(--accent)','var(--t1e)',ms)
+    ?twoLines(dp,90,'front','back','var(--accent)','var(--steel)',ms,dpNote)
+      +CH.table('Every season as a table',
+        ['School year','Front five','6th\u201310th','Gap','Athletes'],
+        dp.slice().reverse().map(r=>[r.y,ms(r.front),ms(r.back),
+          Math.round(r.back-r.front)+'s',r.n]))
     :'<p class="empty">Not enough seasons with ten runners on this ruler.</p>';
-  document.getElementById('depth-cap').textContent=dp.length
-    ?'Solid is the front five, dashed is sixth through tenth, both season-best averages on '
-     +RULERS[pR].label+'. Only seasons with at least ten recorded athletes appear.':'';
+  document.getElementById('depth-cap').innerHTML=dp.length
+    ?'The shaded band between the two lines is the depth: how far the second five are '
+     +'behind the first, season-best averages on '+RULERS[pR].label+'. It runs '
+     +Math.round(Math.min(...dp.map(r=>r.back-r.front)))+'s at its narrowest and '
+     +Math.round(Math.max(...dp.map(r=>r.back-r.front)))+'s at its widest. Only seasons '
+     +'with at least ten recorded athletes appear.'
+     +(dpNote?' '+dpNote.y+' is marked because the whole school year ran in '
+       +dpNote.span+' \u2014 '+dpNote.meets+' meets, and '
+       +(dpNote.noAutumn?'no autumn season at all':'no spring season at all')
+       +'. That is not a dip in form and should not be read as one.':'')
+    :'';
 
   // --- heritage, from Who's Who
   const team=WW.find(w=>w.kind===0&&w.g===pG);
@@ -18848,76 +19281,125 @@ function drawAthlete(i){
    Every dot is an athlete, placed by their real season best on the chosen
    ruler: the fastest sits at the front and everybody else falls behind by the
    time they are actually behind by, to scale. The scoring five are filled in
-   the school's maroon and the rest are outlined, which is the same mark the
-   app uses - five score, the rest run.
+   the school's maroon and the rest are outlined - five score, the rest run.
 
-   It is one canvas rather than N elements, and it animates once on view for
-   about a second and a half. There is no loop afterwards: a thing that moves
-   for ever is a screensaver, and this is a squad.
+   TWO THINGS THE CHART NOW SAYS OUT LOUD. The scoring five get a bracket, so
+   the line where scoring stops is drawn rather than inferred from a colour.
+   And the gap from the fifth runner to the sixth is a dimension line with its
+   value on it, because that number is the point of the whole panel and it was
+   only in the sentence underneath.
 
-   The canvas is drawn at device resolution and laid out in CSS pixels, or the
-   dots are soft on every phone made in the last decade. */
+   It goes through CV, which owns device pixel ratio, resize and the theme.
+   Before that it was drawn once at whatever width it happened to have: a
+   window resize left the dots stretched and switching to the light theme left
+   maroon on white with grey labels nobody could read. The entrance runs once
+   and then the draw is idempotent, which is what lets a resize repaint it
+   without the squad sprinting off again. */
 function drawPack(cv,rows,fifth){
-  if(!cv||!rows.length)return;
-  const dpr=Math.min(2,devicePixelRatio||1);
-  /* Height follows the squad. Fourteen lanes in a fixed 170px gives nine
-     pixels each, and a 10px name in a 9px lane is a smudge. */
-  const W=cv.clientWidth||600,H=Math.max(150,46+rows.length*15);
-  cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+'px';
-  const g=cv.getContext('2d');
-  g.setTransform(dpr,0,0,dpr,0,0);
-
-  const css=getComputedStyle(document.documentElement);
-  const maroon=css.getPropertyValue('--maroon').trim()||'#880000';
-  const accent=css.getPropertyValue('--accent').trim()||'#EE5566';
-  const line=css.getPropertyValue('--line').trim()||'#2E2732';
-  const dim=css.getPropertyValue('--dim').trim()||'#8A7F87';
-
-  const t0=rows[0].t,tN=rows[rows.length-1].t,span=Math.max(1,tN-t0);
-  const padL=54,padR=26,track=W-padL-padR;
-  const lanes=rows.length,laneH=(H-46)/Math.max(1,lanes-1);
-  const yOf=i=>26+i*laneH;
-  const xOf=t=>padL+(1-(t-t0)/span)*track;
-
+  if(!cv)return;
+  CV.drop(cv);
+  if(!rows.length)return;
   const start=performance.now(),DUR=REDUCED?0:1500;
-  function frame(now){
-    const f=DUR?Math.min(1,(now-start)/DUR):1;
+  let done=DUR===0;
+
+  CV.add(cv,()=>Math.max(160,58+rows.length*15),(g,W,H,C)=>{
+    const f=done?1:Math.min(1,(performance.now()-start)/DUR);
     const e=1-Math.pow(1-f,3);
-    g.clearRect(0,0,W,H);
+
+    const t0=rows[0].t,tN=rows[rows.length-1].t,span=Math.max(1,tN-t0);
+    const padL=Math.min(96,Math.max(58,W*.22)),padR=30,track=W-padL-padR;
+    const laneH=(H-58)/Math.max(1,rows.length-1);
+    const yOf=i=>30+i*laneH;
+    const xOf=t=>padL+(1-(t-t0)/span)*track;
 
     // the line they all left from
-    g.strokeStyle=line;g.lineWidth=1;
-    g.beginPath();g.moveTo(padL,14);g.lineTo(padL,H-14);g.stroke();
-    g.fillStyle=dim;g.font='600 9px Rajdhani,sans-serif';g.textAlign='left';
-    g.fillText('START',padL+4,11);
-    g.textAlign='right';g.fillText('FASTEST',W-2,11);
+    g.strokeStyle=C.line;g.lineWidth=1;
+    g.beginPath();g.moveTo(padL,18);g.lineTo(padL,H-20);g.stroke();
+    g.fillStyle=C.dim;g.font='600 9px Rajdhani,sans-serif';g.textAlign='left';
+    g.fillText('SLOWEST',padL+4,13);
+    g.textAlign='right';g.fillText('FASTEST',W-2,13);
 
     rows.forEach((r,i)=>{
       const x=padL+(xOf(r.t)-padL)*e,y=yOf(i);
-      // a trail, so the dot reads as having travelled rather than jumped
-      const grad=g.createLinearGradient(padL,0,x,0);
+      const grad=g.createLinearGradient(padL,0,Math.max(padL+1,x),0);
       grad.addColorStop(0,'rgba(136,0,0,0)');
-      grad.addColorStop(1,r.scoring?maroon:'rgba(154,145,153,.55)');
+      grad.addColorStop(1,r.scoring?C.maroon:'rgba(154,145,153,.55)');
       g.strokeStyle=grad;g.lineWidth=r.scoring?2.2:1.2;
       g.beginPath();g.moveTo(padL,y);g.lineTo(x,y);g.stroke();
 
       g.beginPath();g.arc(x,y,r.scoring?4.2:3,0,7);
-      if(r.scoring){g.fillStyle=maroon;g.fill();
-        g.strokeStyle=accent;g.lineWidth=1.4;g.stroke();}
-      else{g.fillStyle=css.getPropertyValue('--bg').trim()||'#0B0A0C';g.fill();
-        g.strokeStyle=dim;g.lineWidth=1.2;g.stroke();}
+      if(r.scoring){g.fillStyle=C.maroon;g.fill();
+        g.strokeStyle=C.accent;g.lineWidth=1.4;g.stroke();}
+      else{g.fillStyle=C.bg;g.fill();g.strokeStyle=C.dim;g.lineWidth=1.2;g.stroke();}
 
       if(f>.55){
         g.globalAlpha=Math.min(1,(f-.55)/.35);
-        g.fillStyle=r.scoring?accent:dim;
+        g.fillStyle=r.scoring?C.accent:C.dim;
         g.font=(r.scoring?'700 10px':'500 10px')+' Rajdhani,sans-serif';
         g.textAlign='right';g.fillText(r.label,padL-6,y+3.5);
         g.globalAlpha=1;
       }
     });
-    if(f<1)requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
+
+    if(f>.8){
+      g.globalAlpha=Math.min(1,(f-.8)/.2);
+
+      // the bracket: where scoring stops, drawn
+      const nSc=rows.filter(r=>r.scoring).length;
+      if(nSc&&rows.length>nSc){
+        const yA=yOf(0)-6,yB=yOf(nSc-1)+6,bx=W-14;
+        g.strokeStyle=C.accent;g.lineWidth=1;
+        g.beginPath();
+        g.moveTo(bx-4,yA);g.lineTo(bx,yA);g.lineTo(bx,yB);g.lineTo(bx-4,yB);
+        g.stroke();
+        g.save();
+        g.translate(bx+9,(yA+yB)/2);g.rotate(Math.PI/2);
+        g.fillStyle=C.accent;g.font='700 9px Rajdhani,sans-serif';g.textAlign='center';
+        g.fillText('THESE FIVE SCORE',0,0);
+        g.restore();
+      }
+
+      /* The gap from fifth to sixth, measured on the chart itself. It is the
+         number the sentence underneath leads with, so it belongs on the
+         picture rather than only beside it. */
+      if(rows.length>5&&fifth!=null){
+        const x5=xOf(rows[4].t),x6=xOf(rows[5].t),yM=(yOf(4)+yOf(5))/2;
+        const secs=Math.round(rows[5].t-rows[4].t);
+        const label=secs+'s from 5th to 6th';
+        g.strokeStyle=C.text;g.lineWidth=.9;
+        g.beginPath();
+        g.moveTo(x5,yOf(4)+5);g.lineTo(x5,yM);g.lineTo(x6,yM);g.lineTo(x6,yOf(5)-5);
+        g.stroke();
+        for(const [x,d] of [[x5,-1],[x6,1]]){      // arrowheads, pointing outward
+          g.beginPath();g.moveTo(x,yM);g.lineTo(x+d*4,yM-2.6);g.lineTo(x+d*4,yM+2.6);
+          g.closePath();g.fillStyle=C.text;g.fill();
+        }
+        g.font='700 10px Rajdhani,sans-serif';
+        const tw=g.measureText(label).width;
+        /* The label sits BETWEEN the two runners when there is room for it and
+           beside them when there is not. This squad's gap is one second, which
+           is four pixels: a centred label would cover both dots, the
+           arrowheads and the answer. The narrow case is the interesting one -
+           a gap that small is the whole point of the panel - so it has to be
+           the case that still reads. */
+        const wide=Math.abs(x6-x5)>tw+14;
+        const mx=wide?(x5+x6)/2:Math.min(W-6-tw/2,Math.max(x5,x6)+12+tw/2);
+        if(!wide){
+          g.strokeStyle=C.dim;g.lineWidth=.6;
+          g.beginPath();g.moveTo(Math.max(x5,x6)+4,yM);g.lineTo(mx-tw/2-4,yM);g.stroke();
+        }
+        g.textAlign='center';
+        g.fillStyle=C.surface;
+        g.fillRect(mx-tw/2-4,yM-7.5,tw+8,15);
+        g.fillStyle=C.text;g.fillText(label,mx,yM+3.5);
+      }
+      g.globalAlpha=1;
+    }
+
+    if(f>=1)done=true; else requestAnimationFrame(()=>CV.paint(cv));
+  });
+  // and the same belt: no frames must still end with a finished squad
+  if(!done)setTimeout(()=>{if(!done){done=true;CV.paint(cv);}},DUR+400);
 }
 
 /* ---------- January, rendered ---------- */
