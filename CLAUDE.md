@@ -36,8 +36,8 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
-- 7,473 rows currently across all five classifications: 3,495 athlete-boards,
-  222 schools, up to twelve deep a team. Pulled through Sep 19, 2026 by the refresh
+- 7,604 rows currently across all five classifications: 3,524 athlete-boards,
+  222 schools, up to twelve deep a team. Pulled through Sep 24, 2026 by the refresh
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
@@ -876,7 +876,17 @@ it the same mark twice, quietly eating real mark slots. `buildSeed` also
 deduplicates on day-and-time as a backstop: nobody runs two 5,000m races in one
 afternoon in the same hundredth of a second.
 
-Current coverage: 7,473 marks, 3,495 athlete-boards, 222 schools, from 83 meets.
+**The job runs Monday morning, and the day is the design.** Cross country races
+on Saturdays, so a Monday 07:30 crawl catches a whole weekend and the site is
+current before anybody looks at it. An off-cycle pull picks up whatever midweek
+racing has happened and little else: the Sep 24 run added 131 rows against the
+Sep 19 run's 659, because it ran on a Friday and the only meets between them
+were a Wednesday invitational of 23 results and a Thursday 5k of 3. **A thin
+week is not a broken crawl** - check the meet list in the report before
+suspecting the pull, because the report prints every meet it read and what each
+one gave.
+
+Current coverage: 7,604 marks, 3,524 athlete-boards, 222 schools, from 93 meets.
 That is 671 rows more than the hand-built pull it replaced, which is the crawl
 starting from the full Oregon team list rather than from team ids resolved out of
 meets already pulled - it finds meets the old chicken-and-egg approach could not
@@ -1236,8 +1246,8 @@ The redraw matters. A team that got hot at districts starts again from its
 marks. Carrying one draw through both would amplify luck instead of averaging it.
 
 **Sampling.** Each race draws from an athlete's top three marks at 25/50/25,
-renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 19
-pull: **2,674 of 3,495** athlete-boards carry two or three marks, **77%**, up
+renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 24
+pull: **2,717 of 3,524** athlete-boards carry two or three marks, **77%**, up
 from 53% a fortnight earlier and 348 of 1,172 before the automated pull. This is
 now the ordinary case rather than the exception, which also means the `MARK_W`
 unfairness below is biting less: it only hurts when *some* teams have raced
@@ -1314,7 +1324,7 @@ chance of winning falls from 44% to 24%, qualifying comes off the ceiling
 five is more robust to noise than Grant's. That is the calibration fix the
 backtest asked for, worth about 9% off the error at this range with no new data.
 
-**It narrows on its own, and three refreshes running have shown it.** Nobody has
+**It narrows on its own, and four refreshes running have shown it.** Nobody has
 touched a constant:
 
 | data through | weeks to Lane | drift | total |
@@ -1322,9 +1332,17 @@ touched a constant:
 | Sep 12 | 8.01 | 5.54% | 6.00% |
 | Sep 17 | 7.29 | 4.01% | 4.62% |
 | Sep 19 | 7.01 | 3.39% | 4.10% |
+| Sep 24 | 6.30 | 1.84% | 2.95% |
 
 If a refresh ever leaves the total unchanged, the horizon is not being read -
 check `DATA_DATE` and `STATE_DATE` before believing the board.
+
+**The fall is steeper than the calendar**, and the curve is why. Five days of
+racing took 0.71 weeks off the horizon and 1.15 points off the total, because
+`RECORD.horizon` is measured at 6.0% eight weeks out and 2.6% at six: most of
+the allowance is spent in that first fortnight. The board is now 0.65 points
+above the 2.3% race-day floor and will reach it in late October, after which
+further refreshes move the odds without moving the spread.
 
 **The Dream Team does not get drift**, deliberately. It is a race today between
 a squad that does not exist and the sixteen fastest schools in the state. There
@@ -1469,13 +1487,13 @@ something harder to read.
 | | |
 |---|---|
 | `domInteractive` | ~70ms |
-| seed parse, 7,473 rows | 7ms |
+| seed parse, 7,604 rows | 7ms |
 | `buildModel` | 0.45ms |
 | `buildBoard`, 45 cards | 25ms, once per press of Run |
 | `fitNames` | 0.3ms typical, 9ms on the one board with long names |
 | one simulated season | ~90µs, so 135 fit in a 12ms frame |
 | `paint` full | 0.8ms |
-| page, gzipped | 191KB of a 696KB file |
+| page, gzipped | 198KB of a 723KB file |
 
 The seed has grown by half again since those first numbers and the per-season
 cost went **down**, not up: more marks per athlete means `pickMark` picks from
@@ -1782,21 +1800,31 @@ interesting part of the board - on the September data Grant leads the 6A boys at
 
 `node pull/poll.js` rebuilds it. Three things to know:
 
-**The article ids change every week.** The poll is rewritten at
-`osaa.org/today/article/<id>/view` with a new id each time, so the defaults in
-the file go stale by design. Pass the new pair: `node pull/poll.js 5100 5101`
-(boys, girls). `--dry` parses and reports without writing.
+**Cross country gets three polls a season, not a weekly one.** This was wrong
+in `poll.js` for a month: the comment said the poll is "REWRITTEN WEEKLY on
+Thursdays", which is true of football and volleyball and not of this sport.
+There is a preseason poll in late August, a midseason one in early October and
+a final one at the end. The 2025 set ran Aug 21, Oct 9 and Oct 29.
 
-**Find the ids by title, never by guessing the number.** `osaa.org/today` lists
-recent articles; failing that, walk the id range and read each `<title>`.
+That mattered because three consecutive refreshes each went looking for a
+weekly poll that was never going to exist, and each had to re-derive that
+nothing was missing. **A September with no new poll is the normal state of
+things and not a failed pull.** The 2026 preseason poll is Aug 26 and still
+the only one; expect the midseason pair around Oct 8.
 
-Checked on Sep 17 and again on Sep 19: football and volleyball have weekly
-polls, and **cross country has had none since the preseason one on Aug 26**,
-three weeks into the season. So that poll is still the current one and has been
-left alone both times. **A poll that has not been re-published is not stale
-data, it is the data.** Do not invent a refresh to make the page look current -
-the chip says when it was voted, which is the honest way to carry an old
-opinion.
+**Find the ids on the tag pages, never by guessing the number.**
+`osaa.org/today/tag/Boys+Cross+Country` and the girls' equivalent list every
+poll this sport has ever published, which is a complete answer in one request.
+`osaa.org/today` only carries the last eleven articles, so in a busy football
+week it shows no cross country at all and says nothing about whether a poll
+exists. Each poll is a new article at `osaa.org/today/article/<id>/view`, so
+the defaults in the file go stale three times a season: pass the new pair,
+`node pull/poll.js 5100 5101` (boys, girls). `--dry` parses and reports
+without writing.
+
+**A poll that has not been re-published is not stale data, it is the data.** Do
+not invent a refresh to make the page look current - the chip says when it was
+voted, which is the honest way to carry an old opinion.
 
 **The page says when the poll was voted, because it is often much older than the
 board beside it.** `POLL_DATE` is the article's own byline date and `POLL_KIND`
@@ -1986,7 +2014,7 @@ tenths of a percent as integers. At-large is deliberately *not* stored, because
 derives from the two rather than taking a column of its own. Points is the same
 conditional mean the card shows.
 
-**It costs about 21KB a snapshot.** Three entries are 63KB of a 696KB file, and
+**It costs about 21KB a snapshot.** Four entries are 84KB of a 723KB file, and
 a full season of weekly pulls would add roughly 250KB. That is the one thing to
 watch, and it is now the second-fastest-growing part of the file after the seed
 itself. If it gets uncomfortable the answer is a shared name table, not fewer

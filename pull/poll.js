@@ -8,9 +8,18 @@
 // interesting part of the page.
 //
 // It is published as an article, one per gender, covering all five
-// classifications, and it is REWRITTEN WEEKLY on Thursdays during the season.
-// The article ids change each week, so the two URLs below are the current ones
-// and will go stale; pass new ones as arguments when they do.
+// classifications. Cross country gets THREE polls a season, not a weekly one:
+// preseason in late August, midseason in early October, final at the end. The
+// 2025 set ran Aug 21, Oct 9 and Oct 29; 2026's preseason is Aug 26. Football
+// and volleyball are rewritten every Thursday and this is not, so a September
+// with no new poll is the normal state of things and not a failed pull.
+//
+// Each poll is a new article with a new id, so the defaults below go stale
+// three times a season. Find the next pair on the tag pages, which list every
+// poll this sport has ever had, and never by guessing the number:
+//
+//   osaa.org/today/tag/Boys+Cross+Country
+//   osaa.org/today/tag/Girls+Cross+Country
 //
 //   node pull/poll.js 5100 5101      (boys id, girls id)
 //
