@@ -143,6 +143,23 @@ const mBlock = block(meetIds.map((m) => {
 }));
 
 const eBlock = block(events);
+
+/* ---------- track placings ----------
+   pull/tfmeets.js reads the championship meets the season-best endpoint cannot
+   see. Only what the page can use goes in: the athlete, the year, the event,
+   the place and the mark, for athletes already on this page. Meet names are
+   indexed like everything else - there are 69 of them against 4,583 rows. */
+const tfPlaces = fs.existsSync(path.join(DIR, 't' + teamId + '_tf_places.csv'))
+  ? readCsv(path.join(DIR, 't' + teamId + '_tf_places.csv')) : [];
+const tfMeetNames = [...new Set(tfPlaces.map((r) => r.meet).filter(Boolean))].sort();
+const tmi = new Map(tfMeetNames.map((m, i) => [m, i]));
+const tfRows = tfPlaces
+  .filter((r) => ai.has(r.athleteId))
+  .map((r) => [ai.get(r.athleteId), (r.date || '').slice(0, 4), tmi.get(r.meet),
+    (r.event || '').replace(/,/g, ''), r.place, r.relay === '1' ? 1 : 0,
+    (r.mark || '').replace(/,/g, '')].join(','));
+const tBlock = block(tfRows);
+const tnBlock = block(tfMeetNames.map((m) => m.replace(/[",<>&]/g, ' ').trim()));
 const wBlock = block(wwRows.map((r) => r.map((v) => (v == null ? '' : v)).join(',')));
 
 const info = {
@@ -155,6 +172,7 @@ const info = {
   archived: { athletes: allAthletes.length, results: allResults.length },
   /* what the Who's Who ranks are out of, so the page can say "of 446" rather
      than leaving a rank floating with nothing behind it */
+  tfPlacings: tfRows.length,
   ww: {
     teams: wwTeams.length,
     fourYear: wwFour.length,
@@ -175,6 +193,8 @@ put('d-results', rBlock);
 put('d-meets', mBlock);
 put('d-events', eBlock);
 put('d-ww', wBlock);
+put('d-tf', tBlock);
+put('d-tfmeets', tnBlock);
 
 const ire = /const INFO=\{[\s\S]*?\};/;
 if (!ire.test(html)) throw new Error('no INFO constant in the page');
@@ -190,4 +210,6 @@ console.log('tualatin/index.html: ' + athletes.length + ' athletes, ' + seasons.
 console.log('  ' + wwRows.length + ' Who\'s Who honours for ' + SCHOOL
   + ' against ' + wwTeams.length + ' ranked teams and ' + wwFour.length
   + ' four-year qualifiers statewide');
+console.log('  ' + tfRows.length + ' track placings over ' + tfMeetNames.length
+  + ' championship meets');
 console.log('  ' + kb(Buffer.byteLength(html)) + ' on disk');
