@@ -94,15 +94,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 /* A card mid-reveal is an invisible card, and scrolling the Program tab fast
    left a whole region blank until the observer caught up and a 550ms
    transition finished. Three changes, all of them about the FAILURE mode
-   rather than the animation:
-
-     - the hidden state is much less hidden (opacity .001 would still read as
-       blank, so it starts at a readable .35 and only the lift is dramatic)
-     - the observer fires 20% BEFORE the element arrives, not after
-     - the transition is 380ms, and the stagger caps at 240ms rather than 520
-
-   The content was always in the DOM. It was the styling that made it look
-   broken, which is the worst kind of empty state because nothing is wrong. */
+   rather than the animation: */
 /* Under 600ms end to end, stagger included: 320 + 180 = 500. An entrance
    that outstays that stops reading as arrival and starts reading as lag,
    and it happens on every section of every tab. */
@@ -167,12 +159,10 @@ input[type=search]{background:var(--raised);border:1px solid var(--line);color:v
   border-radius:8px;padding:8px 12px;font:400 14px 'Barlow',sans-serif;min-width:200px}
 input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 
-/* The `hidden` attribute is a UA rule, so ANY class that sets display beats it.
-   The command palette set `display:flex` and shipped permanently open over the
-   whole page, with Escape doing nothing - the handler read `wrap.hidden`, which
-   was true the whole time, so it believed the palette was already closed. The
-   page had already worked around this once for the panels, which was the tell.
-   One rule, everything, no exceptions. */
+/* [hidden] is a UA rule, so any class that sets display beats it. The command
+   palette set display:flex and shipped permanently open, with Escape doing
+   nothing because the handler read wrap.hidden, which was true the whole
+   time. The page had already worked around this once for the panels. */
 [hidden]{display:none!important}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
   padding:18px 18px 20px;margin-bottom:18px;box-shadow:var(--shadow)}
@@ -263,6 +253,8 @@ figure{margin:0}
   padding:8px 6px 2px}
 .smalls figcaption{margin:0 0 2px 6px;color:var(--muted);
   font:600 10.5px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
+/* "36s faster" is two words where the other tiles hold one number */
+.tile .v.small{font-size:clamp(20px,5vw,26px)}
 
 /* The wall. Its own card rather than a chart inside one, because it is the
    first thing on the page and the list is a reading of it. */
@@ -272,10 +264,8 @@ figure{margin:0}
 .wall figcaption{margin-top:10px}
 
 /* every race on one ruler, and the brush over it */
-.er svg{display:block;width:100%;touch-action:pan-y}
-.er .er-hit{cursor:col-resize}
+.er svg{display:block;width:100%}
 .er-note{color:var(--dim);font-size:12.5px;margin:9px 0 0;max-width:66ch}
-.er:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
 .spag svg{display:block;width:100%}
 .sp-seg{margin:0 0 12px}
 .pnet svg{display:block;width:100%}
@@ -17658,6 +17648,11 @@ const FIT=(function(){
   return {res,meetN};
 })();
 const residOf=r=>FIT.res.get(r.a+'|'+r.m+'|'+r.sec);
+/* The fit stores log(expected) - log(actual), so the expectation itself is one
+   multiplication away. It was never shown, which left "6.2% ahead of
+   expectation" as a number the reader had to take on trust - and "ahead of
+   WHAT?" was the first thing anybody asked. Now the page answers in a time. */
+const expectedOf=r=>{const v=residOf(r);return v==null?null:r.sec*Math.exp(v);};
 
 /* ---------- populations ----------
    Track brings in the whole running programme, which is more than this page is
@@ -17800,18 +17795,10 @@ function rulerGap(g){
    visible - that rule cost the How tab a rewrite once. */
 const REDUCED=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-/* A frame and a timer, and whichever arrives first wins.
-
-   requestAnimationFrame is not a promise. A tab in the background, a window
-   behind another window, or a compositor that has stopped delivering frames
-   gives you none at all - and anything that only asks for a frame simply
-   stops. The ghost race did exactly that: the clock sat at 0:00 and the
-   scrubber at zero while the button read "Pause", because the callback after
-   the first one never came.
-
-   The frame is the good path and keeps the motion smooth while the page is
-   painting. The timer is the promise that the thing will finish. Every paced
-   loop on this page uses this rather than rAF directly. */
+/* A frame and a timer, first one wins. requestAnimationFrame is not a
+   promise - a window behind another window delivers none, and the ghost race
+   sat at 0:00 with the button reading "Pause". The frame keeps it smooth
+   while the page paints; the timer is the promise that it finishes. */
 function nextFrame(fn){
   let done=false;
   const go=()=>{if(done)return;done=true;fn(performance.now());};
@@ -17851,7 +17838,10 @@ const FMT={
   sign:v=>(v>0?'+':v<0?'-':'')+Math.abs(v).toFixed(2),
   secs:v=>secs(v),
   s1:v=>v.toFixed(1)+'s',
-  s0:v=>(v>0?'+':'')+Math.round(v)+'s',
+  /* NOT "+36s". Every time a runner has ever seen, a plus in front of it
+     meant slower, and this number means the opposite: seconds taken OFF a
+     personal best. It says which way it went in a word rather than a sign. */
+  s0:v=>Math.abs(Math.round(v))+'s '+(v>=0?'faster':'slower'),
 };
 function runCounts(root){
   for(const el of (root||document).querySelectorAll('[data-count]')){
@@ -17889,17 +17879,11 @@ const OBS=('IntersectionObserver' in window)?new IntersectionObserver(es=>{
   }
 },{rootMargin:'0px 0px 20% 0px',threshold:0}):null;
 
-/* A seven-column table of every race an athlete ever ran wants 452px, and a
-   phone column is 305. It was pushing the WHOLE PAGE sideways: 112px of
-   horizontal scroll on the athlete tab, which moves the headings, the charts
-   and the navigation along with it and is the one thing a phone layout must
-   never do.
-
-   Nothing is dropped and no column is hidden, because every column on that
-   table is a fact somebody might want. The table scrolls inside its own box
-   instead, with a fade at the edge so it is visibly scrollable rather than
-   silently cut. Applied here rather than at each of the eleven places a table
-   is written, so a table added later gets it without remembering. */
+/* A wide table scrolls inside its own box; the page never scrolls sideways.
+   Seven columns want 452px against a 305px phone column and were dragging the
+   headings and navigation with them. No column is hidden - each is a fact
+   somebody might want. Here rather than at each table, so a later one gets it
+   without remembering. */
 function wrapTables(scope){
   for(const t of (scope||document).querySelectorAll('table')){
     if(t.parentElement&&t.parentElement.classList.contains('tscroll'))continue;
@@ -17910,11 +17894,9 @@ function wrapTables(scope){
   }
 }
 
-/* One stop per chart, and the arrows walk it. Left and right step through
-   the marks in the order they were drawn, Home and End jump to the ends, and
-   Escape puts the tooltip away and hands focus back to the chart. Anything
-   that can be hovered can now be read without a mouse, without turning a
-   forty-dot chart into forty tab stops. */
+/* One stop per chart, arrows walk it. tabindex="0" on every mark gave the
+   Program tab 173 tab stops: a keyboard reader had to Tab past every dot to
+   reach the next control, which is worse than no tooltips at all. */
 function wireCharts(scope){
   for(const svg of (scope||document).querySelectorAll('svg')){
     if(svg.dataset.kb)continue;
@@ -17973,45 +17955,20 @@ const T=(x,y,s,cls,anchor)=>'<text x="'+x+'" y="'+y+'" class="'+(cls||'axt')+'"'
 
 
 /* ---------- one chart module ----------
-   Seven charts were written one at a time and disagreed about everything that
-   matters: how many ticks an axis gets, whether it is labelled at all, what
-   hover does, and whether any of it survives a theme switch. These are the
-   parts they all take now.
-
-   Two halves, because the page has two kinds of chart. CH builds SVG strings,
-   which is right for anything up to a few hundred marks and is what every
-   existing panel is. CV owns the canvases, which is what eleven thousand
-   marks needs, and it exists mostly to hold the three things a canvas always
-   forgets: device pixel ratio, resize, and that the palette can change
-   underneath it while the page is open.
-
-   The rules, once, here, instead of in seven places:
-
-     - an axis gets about four labelled ticks, not a minimum and a maximum
-     - every axis says its unit AND its direction, because "faster is up" is
-       not guessable and half these charts invert to get it
-     - direct labels beat a legend
-     - one tooltip - TIP - on hover, on focus and on tap
-     - a data table underneath, so none of the above is the only way in */
+   CH builds SVG, CV owns the canvases. Seven charts written one at a time
+   agreed about nothing: tick counts, whether an axis was labelled, what hover
+   did, whether any of it survived a theme switch.
+   The rules, once, here: about four labelled ticks rather than a min and a
+   max; every axis states its unit AND its direction, because half these
+   charts invert to put faster up; direct labels over a legend; one tooltip on
+   hover, focus and tap; and a data table so none of that is the only way in. */
 const CH=(()=>{
-  /* ---------- the viewBox is not a constant, and this is the single most
-     visible fault on the page ----------
-
-     Every chart here was drawn on a 200-unit viewBox at width:100%. That is
-     right on a phone, where a 340px column scales it by 1.7 and a label
-     written at 6.5 units lands at about 11px. On a 1,008px desktop card the
-     same drawing is scaled by 5.0 and the same label renders at THIRTY-ONE
-     PIXELS - bigger than the page's own headings. Measured, not guessed: the
-     career chart came out 970 wide by 1,019 tall with 40px axis type.
-
-     So the viewBox width tracks the column and the scale stays at about 1.85
-     wherever the chart is. Charts keep their heights in units, which means a
-     wide column gets a wide flat chart instead of a square one - which is
-     what a time series wanted in the first place.
-
-     setW is called by each renderer before it builds anything, and again on
-     resize. Every chart reads W through the getter, so none of them has to
-     know. */
+  /* THE VIEWBOX WIDTH TRACKS THE COLUMN, and this was the most visible fault
+     on the page. A 200-unit box at width:100% is right on a phone and scaled
+     5.0 on a 1,008px card, where a 6.5-unit label renders at THIRTY-ONE PIXELS.
+     setW keeps the scale near 1.85 wherever a chart is; heights stay in units,
+     so a wide column gets a wide flat chart. Called per chart, against the box
+     it is going into - a panel is not one column. */
   let W=200;
   const setW=px=>{W=Math.max(170,Math.min(560,Math.round((px||340)/1.85)));};
 
@@ -18146,16 +18103,12 @@ const CH=(()=>{
     gridY:gridY,gridX:gridX,unitY:unitY,unitX:unitX,tip:tip,open:open,table:table};
 })();
 
-/* ---------- the canvases ----------
-   One registry, so every canvas on the page gets device-pixel sharpness, a
-   redraw on resize and a redraw when the theme changes, without each one
-   having to remember. The pack chart had none of the three: it was drawn once
-   at whatever width it happened to have, and switching to the light theme
-   left maroon dots on a white ground with grey labels nobody could read.
-
-   A draw function takes (g, w, h, C) and nothing else. It has to be willing
-   to run again at any moment, which is also the right shape for a resize and
-   for the Wall's re-flow. */
+/* ---------- the canvases ---------- One registry, so every canvas on the
+   page gets device-pixel sharpness, a redraw on resize and a redraw when the
+   theme changes, without each one having to remember. The pack chart had
+   none of the three: it was drawn once at whatever width it happened to
+   have, and switching to the light theme left maroon dots on a white ground
+   with grey labels nobody could read. */
 const CV=(()=>{
   const reg=new Map();
   function colors(){
@@ -18203,20 +18156,12 @@ const CV=(()=>{
 })();
 
 /* ---------- what a year is worth, as a waterfall ----------
-   Four independent bars put the whole-four total on the same scale as its
-   three parts, so the eye read it as a fourth year rather than as the sum of
-   the other three. A waterfall says what it is: each step starts where the
-   last one finished.
-
-   THE STEPS DO NOT ADD UP TO THE TOTAL, AND THE CHART HAS TO SAY SO. Each
-   step is averaged over the athletes who raced both of ITS two years, and the
-   four-year figure over the athletes who raced grade 9 and grade 12 - three
-   different samples, so the sum and the measured total are two different
-   numbers about two different groups. Drawing the steps landing neatly on the
-   total would be a lie in the shape of a chart. So the stack lands where it
-   lands, the measured total is its own bar beside it, and when they disagree
-   by more than a couple of seconds a dashed rule carries the sum across so
-   the difference is the thing you see. */
+   Each step starts where the last finished. THE STEPS DO NOT SUM TO THE
+   TOTAL: a step is averaged over the athletes who raced both of its two
+   years, the total over those who raced grade 9 and grade 12. Different
+   people. The stack lands where it lands, the measured total is its own
+   dashed bar, and a rule carries the sum across when they differ. Drawing
+   them landing neatly on the total would be a lie in the shape of a chart. */
 function waterfall(c,h,opt){
   opt=opt||{};
   const steps=[['grade 9 \u2192 10','s9','c9'],['10 \u2192 11','s10','c10'],
@@ -18239,7 +18184,8 @@ function waterfall(c,h,opt){
   const cols=4,pw=(f.x1-f.x0)/cols;
   const bw=pw*(small?.64:.54);
   const cx=i=>f.x0+i*pw+pw/2;
-  const s0=v=>(v>0?'+':v<0?'\u2212':'')+Math.abs(Math.round(v))+'s';
+  // on the chart, where a word does not fit: off the clock, or back on it
+  const s0=v=>Math.abs(Math.round(v))+'s '+(v>=0?'off':'on');
 
   let g=CH.gridY(f,y,CH.ticks(lo,hi,small?3:4),v=>Math.round(v)+'s',{zeroAt:0});
   if(!small)g+=CH.unitY(f,'seconds taken off \u00b7 up is faster');
@@ -18251,7 +18197,7 @@ function waterfall(c,h,opt){
     g+='<rect x="'+x.toFixed(1)+'" y="'+Math.min(ya,yb).toFixed(1)+'" width="'
       +bw.toFixed(1)+'" height="'+Math.max(.6,Math.abs(yb-ya)).toFixed(1)
       +'" rx="1.2" fill="url(#wfInk)"'
-      +CH.tip(st.lab+': '+s0(st.v)+' over '+st.n+' athletes who raced both years')
+      +CH.tip(st.lab+': '+FMT.s0(st.v)+' over '+st.n+' athletes who raced both years')
       +'/>';
     // the connector, which is the part that makes it a waterfall
     if(i<cum.length-1&&cum[i+1].v!=null)
@@ -18269,7 +18215,7 @@ function waterfall(c,h,opt){
       +bw.toFixed(1)+'" height="'+Math.max(.6,Math.abs(y1-y0)).toFixed(1)
       +'" rx="1.2" fill="none" stroke="var(--accent)" stroke-width="1.1"'
       +' stroke-dasharray="2.6 1.4"'
-      +CH.tip('the whole four: '+s0(meas)+' over '+c.cf
+      +CH.tip('the whole four: '+FMT.s0(meas)+' over '+c.cf
         +' athletes who raced grade 9 and grade 12')+'/>';
     if(!small)g+='<text x="'+cx(3)+'" y="'+(Math.min(y0,y1)-3).toFixed(1)
       +'" class="axv" text-anchor="middle">'+s0(meas)+'</text>';
@@ -18424,11 +18370,7 @@ function thinSeason(rows){
   /* What makes a season not part of the trend is a MISSING HALF, not a low
      meet count. 2021 has fifteen meets, which is two thirds of a normal year
      and nothing like an outlier; what it has none of is an autumn. Counting
-     meets found nothing, and would have gone on finding nothing.
-
-     NOT the year in progress. It is short every autumn for the ordinary
-     reason that it has not finished, and annotating that as an anomaly would
-     make the chart say something false once a year. */
+     meets found nothing, and would have gone on finding nothing. */
   for(const r of rows){
     if(r.y>=NOW)continue;
     const mo=[...(months.get(r.y)||[])].sort((a,b)=>a-b);
@@ -18443,16 +18385,12 @@ function thinSeason(rows){
   return null;
 }
 
-/* ---------- front five, and the five behind them ----------
-   The depth story IS the gap, and two lines with a hole between them made the
-   reader measure it by eye off an axis labelled at its two ends. The gap is
-   filled now, the axis carries four real stopwatch ticks, and the one year
-   that does not belong to the trend is annotated with what actually happened
-   rather than left as an outlier for somebody to explain to themselves.
-
-   The annotation is derived, never written down: any season whose meets all
-   fall in one half of the calendar had no autumn, and 2021 is the only one -
-   125 races over six meets, every one of them in March and April. */
+/* ---------- front five, and the five behind them ---------- The depth story
+   IS the gap, and two lines with a hole between them made the reader measure
+   it by eye off an axis labelled at its two ends. The gap is filled now, the
+   axis carries four real stopwatch ticks, and the one year that does not
+   belong to the trend is annotated with what actually happened rather than
+   left as an outlier for somebody to explain to themselves. */
 function twoLines(rows,h,a,b,ca,cb,fmt,note){
   if(!rows.length)return '<p class="empty">Nothing here.</p>';
   const f=CH.frame(h,{l:34,r:8,t:14,b:22});
@@ -18836,6 +18774,70 @@ function athleteWelcome(){
     +'<div class="ppl">'+chip(rnd)+'</div></div>';
 }
 
+/* ---------- four years, not twenty-two months ----------
+   Every chart about one athlete runs on grade, not the calendar. A career is
+   four school years; a date axis spaces autumn from spring by the months
+   between, leaves a summer gap in every season and makes the four years
+   different widths. The cohort band is a fact about a GRADE and the spaghetti
+   chart is drawn on grade, so the chronological one lined up with nothing.
+   Four equal bands, races in order inside each. The x position is an order,
+   not a date, which is why the date is on every tooltip.
+   A grade comes from the seasons table, and when that is blank it is derived
+   the way the project derives it: grade = 12 - (classOf - schoolYear).
+   Dropping a race for a missing grade field would quietly thin a career. */
+const GRADES=[9,10,11,12];
+const YEAR_NAME={9:'Freshman',10:'Sophomore',11:'Junior',12:'Senior'};
+const YEAR_ABBR={9:'Fr',10:'So',11:'Jr',12:'Sr'};
+const schoolYearOf=d=>+d.slice(0,4)+(+d.slice(5,7)>=7?1:0);
+
+function gradeMap(i){
+  const o=byA[i],a=A[i],by=new Map();
+  for(const sn of o.seasons)if(sn.grade)by.set(sn.y+'|'+sn.sport,sn.grade);
+  return r=>{
+    if(!r.date)return null;
+    const sy=schoolYearOf(r.date);
+    const got=by.get(sy+'|'+r.sport);
+    if(got)return got;
+    if(a.classOf==null)return null;
+    const g=12-(a.classOf-sy);
+    return (g>=9&&g<=12)?g:null;
+  };
+}
+
+/* Places every race on a 0..4 scale: grade 9 occupies 0-1, grade 12 3-4.
+   Returns the placed races and a scale, so a caller only has to draw. */
+function byGrade(races,gradeOf){
+  const bins={9:[],10:[],11:[],12:[]};
+  const out=[];
+  for(const r of races){
+    const g=gradeOf(r);
+    if(g==null)continue;
+    bins[g].push(r);
+  }
+  for(const g of GRADES){
+    const list=bins[g].sort((x,y)=>(x.date||'').localeCompare(y.date||''));
+    list.forEach((r,n)=>{
+      out.push({r:r,g:g,u:(g-9)+(list.length===1?0.5:(n+0.5)/list.length)});
+    });
+  }
+  return out;
+}
+
+/* The four bands, their rules and their names. Full words when a band can
+   hold one, initials when it cannot. */
+function gradeBands(f,x,H){
+  let g='';
+  for(const q of GRADES){
+    const a=x(q-9),b=x(q-8);
+    if(q>9)g+='<line class="ax" x1="'+a.toFixed(1)+'" x2="'+a.toFixed(1)+'" y1="'+f.y0
+      +'" y2="'+f.y1+'" stroke-dasharray="1.5 2.5"/>';
+    const wide=(b-a)>34;
+    g+='<text x="'+((a+b)/2).toFixed(1)+'" y="'+(H-5)+'" class="lbl" '
+      +'text-anchor="middle">'+(wide?YEAR_NAME[q]:YEAR_ABBR[q])+'</text>';
+  }
+  return g;
+}
+
 /* ---------- the whole career, one picture ----------
    Every race an athlete ever ran, on one axis, in order.
 
@@ -18860,89 +18862,62 @@ function careerChart(i){
     .filter(r=>r.v!=null)
     .sort((x,y)=>x.date.localeCompare(y.date));
   if(races.length<3)return '';
+  const placed=byGrade(races,gradeMap(i));
+  if(placed.length<3)return '';
 
-  const H=210,L=30,Rr=10,Tp=16,B=26;
-  const t0=new Date(races[0].date).getTime();
-  const t1=new Date(races[races.length-1].date).getTime();
-  const span=Math.max(1,t1-t0);
-  const vs=races.map(r=>r.v);
+  const H=200,f=CH.frame(H,{l:30,r:10,t:16,b:26});
+  const x=CH.lin(0,4,f.x0,f.x1);
+  const vs=placed.map(q=>q.r.v);
   let lo=Math.min(...vs)-1.5,hi=Math.max(...vs)+1.5;
   if(hi-lo<6){const mid=(hi+lo)/2;lo=mid-3;hi=mid+3;}
-  const W=CH.W;
-  const X=d=>L+(new Date(d).getTime()-t0)/span*(W-L-Rr);
-  const Y=v=>Tp+(hi-v)/(hi-lo)*(H-Tp-B);
+  const y=CH.lin(lo,hi,f.y1,f.y0);
 
-  let g='';
-  // VDOT gridlines, labelled, every 5
-  for(let v=Math.ceil(lo/5)*5;v<=hi;v+=5){
-    g+='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(v).toFixed(1)+'" y2="'+Y(v).toFixed(1)
-      +'" stroke-dasharray="1.5 2.5"/>'+T(L-3,Y(v)+2,v,'axt','end');
-  }
-  // one tick a school year
-  const yrs=[...new Set(races.map(r=>+r.date.slice(0,4)))];
-  for(const y of yrs){
-    const x=X(y+'-01-01');
-    if(x<L-2||x>W)continue;
-    g+='<line class="ax" x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+Tp+'" y2="'+(H-B)+'"/>';
-    g+=T(x,H-14,y,'axt','middle');
-  }
+  let g=CH.gridY(f,y,CH.ticks(lo,hi,4),v=>Math.round(v))
+    +CH.unitY(f,'VDOT \u00b7 up is fitter')+gradeBands(f,x,H);
 
-  // season bests joined WITHIN a sport only
+  // season bests joined WITHIN a sport and a distance only
   for(const sp of ['xc','tfo']){
     const per=new Map();
-    for(const r of races){
-      if(r.sport!==sp)continue;
-      const y=r.y||+r.date.slice(0,4);
-      const k=y+'|'+r.dist;
-      if(!per.has(k)||r.v>per.get(k).v)per.set(k,r);
+    for(const q of placed){
+      if(q.r.sport!==sp)continue;
+      const k=q.g+'|'+q.r.dist;
+      if(!per.has(k)||q.r.v>per.get(k).r.v)per.set(k,q);
     }
     const byDist={};
-    for(const r of per.values()){(byDist[r.dist]=byDist[r.dist]||[]).push(r);}
+    for(const q of per.values())(byDist[q.r.dist]=byDist[q.r.dist]||[]).push(q);
     for(const d in byDist){
-      const pts=byDist[d].sort((a,b)=>a.date.localeCompare(b.date));
+      const pts=byDist[d].sort((a,b)=>a.u-b.u);
       if(pts.length<2)continue;
-      g+='<path data-draw="1400" d="'+pts.map((r,n)=>(n?'L':'M')+X(r.date).toFixed(1)+' '
-        +Y(r.v).toFixed(1)).join(' ')+'" fill="none" stroke="'
+      g+='<path data-draw="600" d="'+pts.map((q,n)=>(n?'L':'M')+x(q.u).toFixed(1)+' '
+        +y(q.r.v).toFixed(1)).join(' ')+'" fill="none" stroke="'
         +(sp==='xc'?'var(--steel)':'var(--accent)')+'" stroke-width="1.1"'
         +' stroke-linecap="round" opacity=".55"/>';
     }
   }
 
-  // every race, arriving in the order they were run
-  const DUR=1800;
-  races.forEach((r,n)=>{
-    const at=(n/Math.max(1,races.length-1))*DUR;
-    const xc=r.sport==='xc';
-    g+='<circle cx="'+X(r.date).toFixed(1)+'" cy="'+Y(r.v).toFixed(1)+'" r="'
-      +(xc?2.4:2)+'" fill="'+(xc?'var(--steel)':'var(--accent)')+'" opacity="0">'
-      +'<animate attributeName="opacity" to="'+(xc?'.95':'.9')+'" dur="220ms" begin="'
-      +Math.round(at)+'ms" fill="freeze"/>'
-      +'<animate attributeName="r" from="0" to="'+(xc?2.4:2)+'" dur="300ms" begin="'
-      +Math.round(at)+'ms" fill="freeze"/>'
-      +'<title>'+esc((r.date||'')+'  '+(r.dist>=1000?(r.dist/1000).toFixed(r.dist%1000?1:0)
-      +'k':r.dist+'m')+'  '+secs(r.sec)+'  VDOT '+r.v.toFixed(1)+'  '
-      +((MEETS[r.m]||{}).name||''))+'</title></circle>';
-  });
-
-  return '<svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg>';
+  for(const q of placed){
+    const r=q.r,xc=r.sport==='xc';
+    g+='<circle cx="'+x(q.u).toFixed(1)+'" cy="'+y(r.v).toFixed(1)+'" r="'
+      +(xc?2.4:2)+'" fill="'+(xc?'var(--steel)':'var(--accent)')+'" opacity="'
+      +(xc?'.95':'.9')+'"'
+      +CH.tip(YEAR_NAME[q.g]+' year \u00b7 '+r.date+' \u00b7 '
+        +(r.dist>=1000?(r.dist/1000).toFixed(r.dist%1000?1:0)+'k':r.dist+'m')
+        +' \u00b7 '+secs(r.sec)+' \u00b7 VDOT '+r.v.toFixed(1)
+        +' \u00b7 '+((MEETS[r.m]||{}).name||''))+'/>';
+  }
+  return '<svg viewBox="0 0 '+CH.W+' '+H+'" role="img" aria-label="'
+    +esc('Every race on one VDOT scale, by school year')+'">'+g+'</svg>';
 }
 
-/* ---------- four years, as every race that made them ----------
-   Four points and a line said an athlete had four seasons. They had
-   thirty-one races, and the four points were the best one from each - so the
-   chart showed the top of every year and hid the year.
-
-   This is every mark on the chosen ruler against the calendar, with the
-   season best joined as a step, the cohort's middle half behind it, and the
-   championship races drawn as a different shape rather than a different
-   colour. Faster is up, which the axis says.
-
-   Two things are deliberate:
+/* ---------- four years, as every race that made them ---------- Four points
+   and a line said an athlete had four seasons. They had thirty-one races,
+   and the four points were the best one from each - so the chart showed the
+   top of every year and hid the year.
 
    THE BAND IS DRAWN PER SEASON, NOT ACROSS THE CAREER. The cohort quartiles
-   are a fact about a grade, so each grade's band spans exactly the dates that
-   athlete raced in that grade and stops. Interpolating it across the summer
-   would draw a claim about July that nobody measured.
+   are a fact about a grade, so each grade's band spans exactly the dates
+   that athlete raced in that grade and stops. Interpolating it across the
+   summer would draw a claim about July that nobody measured.
 
    A DIAMOND IS A CHAMPIONSHIP, AND IT IS A SHAPE. Colour is already carrying
    the era on the board and the sport on the career chart; a third meaning on
@@ -18952,51 +18927,41 @@ function everyRace(i,K){
   const races=R.filter(r=>r.a===i&&r.sport===ru.sport&&r.dist===ru.dist&&r.date)
     .sort((x,y)=>x.date.localeCompare(y.date));
   if(races.length<3)return '';
-
-  const syOf=d=>+d.slice(0,4)+(+d.slice(5,7)>=7?1:0);
-  const gradeOf=new Map();
-  for(const sn of o.seasons)if(sn.grade)gradeOf.set(sn.y+'|'+sn.sport,sn.grade);
-  const gOf=r=>gradeOf.get(syOf(r.date)+'|'+r.sport)||null;
+  const placed=byGrade(races,gradeMap(i));
+  if(placed.length<3)return '';
 
   const H=200,f=CH.frame(H,{l:38,r:10,t:16,b:26});
-  const t0=new Date(races[0].date).getTime();
-  const t1=new Date(races[races.length-1].date).getTime();
-  const secsOf=r=>r.sec;
-  const lows=races.map(secsOf);
+  const x=CH.lin(0,4,f.x0,f.x1);
 
-  // the cohort's middle half, per grade, from the same population the old
-  // four-point chart used
+  // the cohort's middle half, per grade, from the same population as before
   const pop=V.everyone(A[i].g,'dist');
   const band={};
-  for(const g of [9,10,11,12]){
-    const v=pop.map(x=>(byA[x.i].grade[K]||{})[g]).filter(Boolean).sort((a,b)=>a-b);
+  for(const g of GRADES){
+    const v=pop.map(q=>(byA[q.i].grade[K]||{})[g]).filter(Boolean).sort((a,b)=>a-b);
     if(v.length>6)band[g]={lo:v[Math.floor(v.length*.25)],
       mid:v[Math.floor(v.length*.5)],hi:v[Math.floor(v.length*.75)]};
   }
-  // each grade's own date window, taken from the races the athlete ran in it
-  const win={};
-  for(const r of races){
-    const g=gOf(r);if(!g)continue;
-    const t=new Date(r.date).getTime();
-    if(!win[g])win[g]={a:t,b:t};
-    win[g].a=Math.min(win[g].a,t);win[g].b=Math.max(win[g].b,t);
-  }
-
-  const bandVals=Object.keys(win).flatMap(g=>band[g]?[band[g].lo,band[g].hi]:[]);
+  const has=new Set(placed.map(q=>q.g));
+  const bandVals=GRADES.flatMap(g=>(has.has(g)&&band[g])?[band[g].lo,band[g].hi]:[]);
+  const lows=races.map(r=>r.sec);
   const [ylo,yhi]=CH.padded(Math.min(...lows,...bandVals),
                             Math.max(...lows,...bandVals),4,true);
-  const x=CH.lin(t0,t1||t0+1,f.x0,f.x1);
   const y=CH.lin(ylo,yhi,f.y0,f.y1);    // faster is a smaller number, so up
 
+  /* The band spans its own whole grade now. It used to span the dates that
+     athlete raced inside the grade, which drew a wide block for a busy autumn
+     and a sliver for somebody who raced twice - the width meant nothing and
+     read as if it did. */
   let g='<g class="er-band">';
-  for(const gr of Object.keys(win)){
-    const b=band[gr];if(!b)continue;
-    const a0=x(win[gr].a),a1=Math.max(x(win[gr].b),a0+1.5);
+  for(const q of GRADES){
+    const b=band[q];if(!b||!has.has(q))continue;
+    const a0=x(q-9)+1,a1=x(q-8)-1;
     g+='<rect x="'+a0.toFixed(1)+'" y="'+y(b.hi).toFixed(1)+'" width="'
       +(a1-a0).toFixed(1)+'" height="'+Math.abs(y(b.lo)-y(b.hi)).toFixed(1)
       +'" fill="var(--raised)"'
-      +CH.tip('grade '+gr+': the middle half of every '+(A[i].g==='M'?'boy':'girl')
-        +' here ran '+secs(b.lo)+' to '+secs(b.hi)+', median '+secs(b.mid))+'/>';
+      +CH.tip(YEAR_NAME[q]+' year: the middle half of every '
+        +(A[i].g==='M'?'boy':'girl')+' here ran '+secs(b.lo)+' to '+secs(b.hi)
+        +', median '+secs(b.mid))+'/>';
     g+='<line x1="'+a0.toFixed(1)+'" x2="'+a1.toFixed(1)+'" y1="'+y(b.mid).toFixed(1)
       +'" y2="'+y(b.mid).toFixed(1)+'" stroke="var(--dim)" stroke-width=".7" '
       +'stroke-dasharray="2 1.5"/>';
@@ -19005,46 +18970,34 @@ function everyRace(i,K){
 
   g+='<g class="er-ax">'+CH.gridY(f,y,CH.timeTicks(ylo,yhi,4),secs)
     +CH.unitY(f,ru.label+' \u00b7 up is faster')+'</g>';
-
-  // one tick a school year, on the September of it
-  let gx='';
-  for(let yr=new Date(t0).getFullYear();yr<=new Date(t1).getFullYear();yr++){
-    const px=x(new Date(yr+'-09-01').getTime());
-    if(px<f.x0-1||px>f.x1)continue;
-    gx+='<line class="ax" x1="'+px.toFixed(1)+'" x2="'+px.toFixed(1)+'" y1="'+f.y0
-      +'" y2="'+f.y1+'" stroke-dasharray="1.5 2.5"/>'
-      +'<text x="'+px.toFixed(1)+'" y="'+(H-6)+'" class="axt" text-anchor="middle">'
-      +yr+'</text>';
-  }
-  g+='<g class="er-ax2">'+gx+'</g>';
+  g+='<g class="er-ax2">'+gradeBands(f,x,H)+'</g>';
 
   // the season best, as a step: it holds until a faster one replaces it
   const best=new Map();
-  for(const r of races){
-    const k=syOf(r.date);
-    if(!best.has(k)||r.sec<best.get(k).sec)best.set(k,r);
+  for(const q of placed){
+    const k=q.g;
+    if(!best.has(k)||q.r.sec<best.get(k).r.sec)best.set(k,q);
   }
-  const bs=[...best.values()].sort((a,b)=>a.date.localeCompare(b.date));
+  const bs=[...best.values()].sort((a,b)=>a.u-b.u);
   if(bs.length>1){
     let d='';
-    bs.forEach((r,n)=>{
-      const px=x(new Date(r.date).getTime()),py=y(r.sec);
-      d+=n?' L'+px.toFixed(1)+' '+(y(bs[n-1].sec)).toFixed(1)
+    bs.forEach((q,n)=>{
+      const px=x(q.u),py=y(q.r.sec);
+      d+=n?' L'+px.toFixed(1)+' '+y(bs[n-1].r.sec).toFixed(1)
           +' L'+px.toFixed(1)+' '+py.toFixed(1)
         :'M'+px.toFixed(1)+' '+py.toFixed(1);
     });
-    g+='<path class="er-step" data-draw="1100" d="'+d+'" fill="none" '
+    g+='<path class="er-step" data-draw="600" d="'+d+'" fill="none" '
       +'stroke="url(#arcInk)" stroke-width="1.8" stroke-linejoin="round"/>';
   }
 
   g+='<g class="er-pts">';
-  for(const r of races){
-    const px=x(new Date(r.date).getTime()),py=y(r.sec);
+  for(const q of placed){
+    const r=q.r,px=x(q.u),py=y(r.sec);
     const nm=(MEETS[r.m]||{}).name||'';
     const champ=STATE_RE.test(nm)||DIST_RE.test(nm);
-    const gr=gOf(r);
-    const t=r.date+' \u00b7 '+secs(r.sec)+(r.place?' \u00b7 '+ord(r.place):'')
-      +(gr?' \u00b7 grade '+gr:'')+(nm?' \u00b7 '+nm:'');
+    const t=YEAR_NAME[q.g]+' year \u00b7 '+r.date+' \u00b7 '+secs(r.sec)
+      +(r.place?' \u00b7 '+ord(r.place):'')+(nm?' \u00b7 '+nm:'');
     g+=champ
       ? '<path d="M'+px.toFixed(1)+' '+(py-3.1).toFixed(1)+'l3.1 3.1l-3.1 3.1l-3.1 -3.1Z" '
         +'fill="var(--accent)" stroke="var(--bg)" stroke-width=".5"'+CH.tip(t)+'/>'
@@ -19053,23 +19006,18 @@ function everyRace(i,K){
   }
   g+='</g>';
 
-  // the brush lives on top and is the only thing that takes the pointer
-  g+='<rect class="er-hit" x="'+f.x0+'" y="'+f.y0+'" width="'+(f.x1-f.x0)
-    +'" height="'+(f.y1-f.y0)+'" fill="transparent"/>'
-    +'<rect class="er-sel" x="0" y="'+f.y0+'" width="0" height="'+(f.y1-f.y0)
-    +'" fill="var(--accent)" opacity=".16" pointer-events="none"/>';
-
   const nCh=races.filter(r=>{const nm=(MEETS[r.m]||{}).name||'';
     return STATE_RE.test(nm)||DIST_RE.test(nm);}).length;
 
-  return '<div class="er" data-i="'+i+'" data-k="'+K+'" data-t0="'+t0+'" data-t1="'+t1+'">'
+  return '<div class="er">'
     +'<svg viewBox="0 0 '+CH.W+' '+H+'" role="img" aria-label="'
-    +esc('Every '+ru.label+' raced, against the calendar')+'"><defs>'
+    +esc('Every '+ru.label+' raced, by school year')+'"><defs>'
     +'<linearGradient id="arcInk" x1="0" y1="0" x2="1" y2="0">'
     +'<stop offset="0" stop-color="#880000"/><stop offset="1" stop-color="#EE5566"/>'
     +'</linearGradient></defs>'+g+'</svg>'
-    +'<p class="er-note">Drag across to zoom in on a stretch of the career. '
-    +'Double-click, or press Escape, to come back out.'
+    +'<p class="er-note">Across is the school year and races keep their order '
+    +'inside it, so the four years line up with every other chart on the page. '
+    +'The date is on each mark.'
     +(nCh?' The '+nCh+' diamond'+(nCh===1?' is a':'s are')+' district and State '
       +'championship race'+(nCh===1?'':'s')+'.':'')+'</p></div>'
     +CH.table('Every '+ru.label+' as a table',['Date','Meet','Time','Place'],
@@ -19077,73 +19025,11 @@ function everyRace(i,K){
         secs(r.sec),r.place||'\u2014']));
 }
 
-/* Brushing redraws nothing. The chart is already complete in the DOM, so a
-   zoom is a viewBox change plus a counter-scale on the two things that must
-   not stretch - the axis type and the dots - which is one attribute and two
-   transforms rather than a re-render. That also means a zoomed chart is the
-   same chart: nothing can be recomputed differently on the way in. */
-function wireBrush(scope){
-  for(const box of (scope||document).querySelectorAll('.er')){
-    if(box.dataset.wired)continue;
-    box.dataset.wired='1';
-    const svg=box.querySelector('svg'),sel=box.querySelector('.er-sel');
-    const hit=box.querySelector('.er-hit');
-    const full=[0,CH.W];
-    let a=null;
-    const view=(x0,x1)=>{
-      const k=CH.W/(x1-x0);
-      svg.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+svg.viewBox.baseVal.height);
-      for(const el of svg.querySelectorAll('.er-pts>*,.er-ax>text,.er-ax2>text'))
-        el.setAttribute('transform','translate('+el.dataset.cx0+' 0) scale('
-          +(1/k)+' 1) translate('+(-el.dataset.cx0)+' 0)');
-    };
-    // remember each mark's own x, so the counter-scale pivots on it
-    for(const el of svg.querySelectorAll('.er-pts>*,.er-ax>text,.er-ax2>text')){
-      const b=el.getBBox?el.getBBox():null;
-      el.dataset.cx0=b?(b.x+b.width/2).toFixed(2):'0';
-    }
-    const at=ev=>{
-      const r=svg.getBoundingClientRect();
-      const vb=svg.viewBox.baseVal;
-      return vb.x+(ev.clientX-r.left)/r.width*vb.width;
-    };
-    hit.addEventListener('pointerdown',ev=>{
-      a=at(ev);hit.setPointerCapture(ev.pointerId);
-      sel.setAttribute('width','0');
-    });
-    hit.addEventListener('pointermove',ev=>{
-      if(a==null)return;
-      const b=at(ev);
-      sel.setAttribute('x',Math.min(a,b));
-      sel.setAttribute('width',Math.abs(b-a));
-    });
-    const end=ev=>{
-      if(a==null)return;
-      const b=at(ev);
-      const lo=Math.min(a,b),hi=Math.max(a,b);
-      a=null;sel.setAttribute('width','0');
-      if(hi-lo<6)return;                 // a click is not a brush
-      view(lo,hi);
-    };
-    hit.addEventListener('pointerup',end);
-    hit.addEventListener('pointercancel',()=>{a=null;sel.setAttribute('width','0');});
-    const reset=()=>view(full[0],full[1]);
-    box.addEventListener('dblclick',reset);
-    box.addEventListener('keydown',ev=>{if(ev.key==='Escape')reset();});
-    box.tabIndex=0;
-  }
-}
-
-/* ---------- everybody's four years, with one of them lit ----------
-   The Program tab says in words that ranking on performance makes development
+/* ---------- everybody's four years, with one of them lit ---------- The
+   Program tab says in words that ranking on performance makes development
    look larger than it is. This is the same claim as a picture: every career
    the programme has on this ruler, drawn as a faint line from grade nine to
-   grade twelve, with the athlete whose page this is on top of them.
-
-   The toggle is the whole point. "Everyone who raced grade 9" and "only those
-   who finished grade 12" are the same drawing over two populations, and the
-   difference between them is survivorship - the lines that stop are the
-   athletes the second view cannot see. */
+   grade twelve, with the athlete whose page this is on top of them. */
 function spaghetti(i,K,finishers){
   const ru=RULERS[K],me=A[i];
   const pop=V.everyone(me.g,'dist');
@@ -19278,20 +19164,12 @@ function bestTruth(i){
 }
 
 /* ---------- the hero's own two facts ----------
-   The headline says the best true thing about somebody. Underneath it, the
-   two things a reader asks next: what the shape of the career was, and where
-   this sits against everyone else who ever did it here.
-
-   THE SPARKLINE IS ITS OWN VIEWBOX, not the page's. It is one line in a
-   sentence, about 150px wide wherever it lands, so it keeps a fixed 150x30
-   box rather than taking CH.W - which is sized for a chart that spans a
-   column and would render this at four times the size of the text beside it.
-
-   THE PERCENTILE IS AGAINST A NAMED POPULATION. "Faster than 87%" means
-   nothing on its own; "faster than 87% of the 330 boys who have recorded a
-   5,000m here" is a claim somebody can check, and it says out loud that the
-   denominator is people with a mark on this ruler rather than everyone who
-   ever joined the team. */
+   THE SPARKLINE KEEPS ITS OWN 150x30 VIEWBOX. It is one line in a sentence,
+   not a chart spanning a column, and CH.W would draw it at four times the
+   size of the text beside it.
+   THE PERCENTILE NAMES ITS POPULATION. "Faster than 98%" means nothing on
+   its own; naming the 114 who have a mark on that ruler is a claim somebody
+   can check, and says the denominator is not everyone who joined the team. */
 function heroExtras(i,K){
   if(!K)return '';
   const a=A[i],o=byA[i];
@@ -19344,11 +19222,8 @@ function wireCopy(){
     /* A clipboard write needs a secure context and a permission a browser can
        refuse, so this has to have a real second path. The first version put a
        hidden field on the page, tried execCommand, removed the field and then
-       told the reader to press Ctrl-C - with nothing selected. Instructions
-       you have just made impossible to follow are worse than no fallback.
-
-       So the field STAYS, visible, holding the url and selected. Ctrl-C then
-       does what the button says. */
+       told the reader to press Ctrl-C - with nothing selected. Instructions you
+       have just made impossible to follow are worse than no fallback. */
     let ok=false;
     try{await navigator.clipboard.writeText(url);ok=true;}catch(e){}
     if(!ok){
@@ -19390,52 +19265,18 @@ function growthBoard(g,k){
 }
 
 /* ---------- the wall ----------
-   The board is a list, and a list of a hundred names cannot show you that
-   there are six hundred and forty-nine people behind it. This can. Every
-   athlete who has ever recorded a mark on the chosen ruler is one dot, placed
-   at their time and packed upward off it, so the shape of the whole programme
-   is the first thing on the page - the crowd where most of the school sits,
-   the thinning out through the fast end, the handful out on their own.
-
-   THE DOTS ARE NEVER FILTERED. That is the argument: the board says "this is
-   a view, not the data", and a hero chart that hid everyone below the
-   hundredth would be the same view again, larger. The toggles change which
-   dots are LIT and where the cutoff rule falls; every dot stays on the chart
-   in every view, because the ones outside the light are the point.
-
-   Faster is to the RIGHT, which is stated on the axis rather than assumed.
-
-   Colour is the era, a ramp over class years, so you can see that the fast
-   end is not evenly spread across twenty-two seasons. Anybody running here
-   now is in the accent instead - the one thing a reader looking for their own
-   athlete wants to find first.
-
-   Packing is the ordinary greedy beeswarm: walk the athletes in time order
-   and drop each into the lowest lane whose last dot is far enough to the
-   left. It is O(n x lanes) with about twenty lanes, which at 649 dots is
-   nothing.
-
-   Positions are HELD between redraws and interpolated, so switching ruler
-   moves every dot from where it was to where it belongs rather than cutting.
-   A dot that has no previous position enters from the bottom. */
+   Every athlete with a mark on the chosen ruler, one dot. NOTHING IS EVER
+   FILTERED - the board is a view of this, and the dots outside the light are
+   why that sentence matters; the toggles only change what is lit.
+   THE HEIGHT IS FIXED AND THE PACKING BENDS TO IT. A strict beeswarm needs
+   seventy lanes on a phone; capping lanes piles the overflow into one row,
+   which reads as a bar. Dots keep a size a finger can hit and the crowded
+   middle overlaps, which is what a crowded middle looks like. */
 const WALL=(()=>{
   let cv=null,rows=[],prev=new Map(),t0=0,DUR=650,hot=null,lit=new Set(),cut=null;
 
-  /* THE HEIGHT IS FIXED AND THE PACKING BENDS TO IT, which is the opposite of
-     the first two attempts and the only thing that works at both ends.
-
-     A strict beeswarm - every dot clear of its neighbours - is a promise the
-     data cannot keep. 330 boys on a 313px phone column need seventy-odd lanes
-     however small the dots get, and the chart becomes 1,200px of scrolling
-     above a list that is the actual page. Capping the lane count instead is
-     worse: the overflow silently piles into the last row, which reads as a
-     bar and is not one.
-
-     So the swarm gets a sensible height, dots get a size a finger can hit,
-     and where the programme is genuinely crowded the dots overlap. That is
-     not a compromise in the reading - a hundred boys within thirty seconds of
-     each other SHOULD look solid, and the thin fast end should look thin.
-     Nothing is dropped, which is the one rule this chart has. */
+  /* Radius from width, lanes alternating about the middle. A symmetric swarm
+     is half the height of one stacked off a baseline. */
   function build(){
     const pop=V.everyone(bG,'dist').filter(a=>byA[a.i].best[bR]!=null);
     const ranked=V.top(bG,'dist',bR,0);
@@ -19635,11 +19476,7 @@ function sizeCharts(id){
    them all off the panel gave the small multiples a 545-unit viewBox in a
    301px box, which is a scale of 0.55 and axis type at THREE PIXELS. The
    whole-panel call fixed the big charts and broke the little ones in the
-   opposite direction.
-
-   Every chart is sized against the box it is actually going into. `cols`
-   is for a grid that has not been filled yet, where the box exists but the
-   cell width has to be worked out from the track size. */
+   opposite direction. */
 function chartIn(id,cols,gap){
   const el=document.getElementById(id);
   if(!el||!el.clientWidth)return;
@@ -19695,20 +19532,10 @@ function drawGrowth(){
 }
 
 /* ---------- one selection, three charts ----------
-   The Program tab draws the same twenty-two seasons three times: how many
-   athletes were on the roster, how deep the squad ran, and how many of each
-   class stayed. They were three pictures of one programme with no way to ask
-   a question of all three at once.
-
-   Point at a season anywhere and it lights in every chart that knows about
-   it. Click to keep it; click again to let go.
-
-   A CLASS YEAR AND A SCHOOL YEAR ARE NOT THE SAME THING, and linking them as
-   if they were would be a quiet lie. "Who stays" is by graduating class, and
-   the class of 2016 was in this programme for school years 2013, 2014, 2015
-   and 2016 - so that bar lights whenever any of those four is selected, and
-   selecting the bar lights all four. The note says so, because a reader
-   watching one bar light up for four different picks deserves to know why. */
+   Point at a season anywhere on Program and it lights in every chart that
+   knows about it. A CLASS YEAR AND A SCHOOL YEAR ARE NOT THE SAME THING: the
+   class of 2016 was here for school years 2013 to 2016, so that bar answers
+   to all four, and the note says why. */
 const PSEL=(()=>{
   let held=null,live=null,wired=false;
   const yearsOfClass=c=>[c-3,c-2,c-1,c];
@@ -19787,13 +19614,13 @@ function drawProgram(){
        VDOT label for one build, because devCurve started returning seconds
        and the tile was still calling it VDOT. A unit in a label has to be the
        unit in the number. */
-    ['Four-year gain',dEvery.four,'s0',
+    ['Four years of it',dEvery.four,'s0',
       'Seconds taken off a '+RULERS[pR].label+' between grade 9 and grade 12, over '
       +dEvery.cf+' complete careers'
       +(dEvery.vfour==null?'':' — which is '+sg(dEvery.vfour)+' VDOT, the one '
       +'number that compares fitness across different distances')+'.'],
   ].map(([k,v,f,n],i)=>'<div class="tile reveal"><div class="k">'+k+'</div><div class="v'
-    +(i===1?' acc':'')+'">'+(v==null?'—'
+    +(i===1?' acc':'')+(f==='s0'?' small':'')+'">'+(v==null?'—'
       :'<span data-count="'+v+'" data-fmt="'+f+'">'+FMT[f](v)+'</span>')
     +'</div><div class="n">'+n+'</div></div>').join('');
 
@@ -19816,11 +19643,11 @@ function drawProgram(){
     {label:'Seconds taken off a '+rl+', by year, with the four-year figure beside it'})
     +CH.table('The same four numbers as a table',
       ['Step','Seconds off','Athletes'],
-      [['grade 9 \u2192 10',cE.s9==null?null:Math.round(cE.s9)+'s',cE.c9],
-       ['10 \u2192 11',cE.s10==null?null:Math.round(cE.s10)+'s',cE.c10],
-       ['11 \u2192 12',cE.s11==null?null:Math.round(cE.s11)+'s',cE.c11],
-       ['the three steps added up',Math.round(wfSum)+'s','\u2014'],
-       ['measured over four years',cE.four==null?null:Math.round(cE.four)+'s',cE.cf]]);
+      [['grade 9 \u2192 10',cE.s9==null?null:FMT.s0(cE.s9),cE.c9],
+       ['10 \u2192 11',cE.s10==null?null:FMT.s0(cE.s10),cE.c10],
+       ['11 \u2192 12',cE.s11==null?null:FMT.s0(cE.s11),cE.c11],
+       ['the three steps added up',FMT.s0(wfSum),'\u2014'],
+       ['measured over four years',cE.four==null?null:FMT.s0(cE.four),cE.cf]]);
   document.getElementById('dev-cap').innerHTML='Each step starts where the last one '
     +'finished. Hover, tap or tab to a bar for how many athletes are behind it. '
     +'<b>The freshman year is the biggest one</b>, on every ruler and in every group, '
@@ -19855,7 +19682,7 @@ function drawProgram(){
     +cols.map(c=>'<th>'+c[0]+'</th>').join('')+'</tr>'
     +steps.map(([lab,k,nk])=>'<tr><td class="name">'+lab+'</td>'
       +cols.map(([,c])=>'<td class="'+(c[k]==null?'dimv':c[k]>0?'pos':'neg')+'">'
-        +(c[k]==null?'\u2014':(c[k]>0?'+':'')+Math.round(c[k])+'s')
+        +(c[k]==null?'\u2014':FMT.s0(c[k]))
         +'<span class="dimv" style="font-size:11px"> n='+c[nk]+'</span></td>').join('')
       +'</tr>').join('');
   const thin=cT.c9===cE.c9&&cT.four===cE.four;
@@ -19982,23 +19809,14 @@ function drawProgram(){
 }
 
 /* ---------- the ghost race ----------
-   Two seasons of this programme, on one strip, at the pace each athlete
-   actually averaged that year.
-
-   IT IS A PACE PROJECTION AND NOBODY PASSES ANYBODY. Everyone runs their own
-   season best at an even pace, so the finishing order is settled at the gun
-   and the only thing that changes is how far apart they are. That is not a
-   flaw to hide behind a label - it IS the reading. A real race is decided by
-   who has a day; this asks the other question, which is what two squads were
-   actually worth, and the answer is the width of the gap after 5,000 metres.
-
-   The score is the NFHS dual: everyone on the course takes a place, the first
-   five on each side add up, six and seven displace without scoring, and a tie
-   goes to the better sixth runner. A perfect dual is 15-50 rather than 15-40,
-   which is what displacement means and what the app's own audit asserts.
-
-   Seven a side, because seven is what a team races. A year that cannot field
-   seven is not offered. */
+   Two seasons at the pace each athlete averaged, scored as an NFHS dual:
+   everyone takes a place, the first five a side add up, six and seven
+   displace, a tie goes to the better sixth runner. A perfect dual is 15-50.
+   NOBODY PASSES ANYBODY, and that is the reading rather than a flaw to hide.
+   Even pace off a season best means the order is settled at the gun and only
+   the gaps change. A real race is decided by who has a day; this asks what
+   two squads were worth, and the answer is the width of the gap at 5,000m.
+   Seven a side, because seven is what a team races. */
 const GHOST=(()=>{
   let cv=null,A7=[],B7=[],res=null,dur=0,t=0,playing=false,rate=1,last=0,wired=false;
   const BASE=20;                      // 1x runs the whole 5,000m in twenty seconds
@@ -20235,16 +20053,9 @@ function drawAthlete(i){
   const career=careerChart(i);
   let arc='';
   if(K){
-    /* K is the ruler this athlete is best DESCRIBED by - the one they have
-       most seasons on - and it is the right choice for the rank and the
-       headline. It is the wrong choice for a chart called "every race".
-
-       athletic.net serves track as one season best per event, so a track
-       ruler has four marks in a four-year career however many times somebody
-       raced. Mark French came out on the 3,000m with four points, under a
-       heading promising every race and a sentence complaining that four
-       points hide the year. The chart picks the ruler it can actually fill:
-       the one with the most races on it. */
+    /* K is the ruler this athlete is best DESCRIBED by - the one they have most
+       seasons on - and it is the right choice for the rank and the headline. It
+       is the wrong choice for a chart called "every race". */
     const raceN=k=>R.filter(r=>r.a===i&&r.sport===RULERS[k].sport
       &&r.dist===RULERS[k].dist).length;
     const EK=RKEYS.slice().sort((x,y)=>raceN(y)-raceN(x))[0];
@@ -20258,22 +20069,26 @@ function drawAthlete(i){
        this one. Change --maroon or --accent and change these two stops. */
     arc='<div class="card reveal"><h2>Every race, in order</h2>'
       +'<p class="why">The whole career on one axis. Height is VDOT, the one number '
-      +'that puts a 1,500m and a 5,000m at comparable heights; across is the calendar. '
+      +'that puts a 1,500m and a 5,000m at comparable heights; across is the school '
+      +'year. '
       +'<b style="color:var(--steel)">Grey is cross country</b> and '
       +'<b style="color:var(--accent)">maroon is track</b>, and the two are never joined '
       +'by a line, because a track VDOT runs about three points above a cross country '
       +'one for the same athlete and a line between them would draw an improvement that '
       +'did not happen. Within a sport the season bests are joined, because that '
       +'comparison is honest. Hover any dot for the race.</p>'
-      +'<figure><div>'+career+'</div><figcaption>It plays forward: the dots arrive in '
-      +'the order the races were run.</figcaption></figure>'
+      +'<figure><div>'+career+'</div><figcaption>Across is the school year, so '
+      +'this sits on the same four years as everything else on the page. Races keep '
+      +'their order inside a year: cross country on the left of it, track on the '
+      +'right.</figcaption></figure>'
       +'</div>'
       +(ever?'<div class="card reveal"><h2>Every '+RULERS[EK].label+' they ever ran</h2>'
         +'<p class="why">Four points and a line said this athlete had four seasons. They had '
         +raceN(EK)+' races on this ruler, and each of those points was the best one from a '
         +'year \u2014 so the old chart showed the top of every season and hid the season. '
-        +'This is all of them. The thick line is the season best as it stood; the shaded '
-        +'block behind each season is the middle half of every '
+        +'This is all of them, laid out on the four school years. The thick line is the '
+        +'season best as it stood; the shaded block behind each year is the middle half '
+        +'of every '
         +(a.g==='M'?'boy':'girl')+' at that grade, with their median dashed through it.'
         +(RULERS[EK].sport==='tfo'?' Track is thinner than it looks here: athletic.net '
           +'serves it as one season best per event, so these are the bests rather than '
@@ -20302,18 +20117,28 @@ function drawAthlete(i){
   const pctOf=v=>((Math.exp(v)-1)*100).toFixed(1)+'%';
   const xcRaces=races.filter(r=>r.sport==='xc'&&r.dist===5000);
   const xcPr=xcRaces.length?Math.min(...xcRaces.map(r=>r.sec)):null;
-  const bestCard=bestRace?'<div class="card"><h2>Best race</h2><p class="why">Not the '
-    +'fastest time. The cross country race furthest ahead of what that athlete’s form '
-    +'and that afternoon predicted — the meet term is fitted from the whole squad, so '
-    +'a heavy day counts for everybody on it. Track has no equivalent here, because '
-    +'athletic.net serves it as season bests, and a best is already the best day.</p>'
+  const bestExp=bestRace?expectedOf(bestRace.r):null;
+  const bestCard=bestRace?'<div class="card"><h2>Best race</h2>'
+    +'<p class="why">Not the fastest time. The race furthest ahead of what was '
+    +'expected of them that afternoon.</p>'
+    +'<p class="why"><b>Where the expectation comes from.</b> Every Tualatin runner '
+    +'at a meet ran the same course on the same day, so the squad\u2019s times split '
+    +'into two parts: how fit each runner was that season, and how hard that '
+    +'particular afternoon was for everybody on it. Both are worked out from the '
+    +'squad\u2019s own results. A day where forty team-mates all ran slow is a hard '
+    +'day, not forty bad races. Put the two together and you get the time this '
+    +'athlete was expected to run there.</p>'
     +'<div class="tiles"><div class="tile"><div class="k">'
     +esc((MEETS[bestRace.r.m].name||'').slice(0,40))+'</div><div class="v acc">'
     +secs(bestRace.r.sec)+'</div><div class="n">'+MEETS[bestRace.r.m].date
-    +(bestRace.r.place?' · '+ord(bestRace.r.place):'')+'</div></div>'
-    +'<div class="tile"><div class="k">Ahead of expectation</div><div class="v pos">'
-    +pctOf(bestRace.v)+'</div><div class="n">'+(xcPr===bestRace.r.sec
-      ?'which was also their cross country PR':'their PR was '+secs(xcPr))
+    +(bestRace.r.place?' \u00b7 '+ord(bestRace.r.place):'')+'</div></div>'
+    +'<div class="tile"><div class="k">Expected that day</div><div class="v">'
+    +(bestExp==null?'\u2014':secs(bestExp))+'</div><div class="n">from their form '
+    +'that season and what the meet did to the rest of the squad</div></div>'
+    +'<div class="tile"><div class="k">Beat it by</div><div class="v pos">'
+    +(bestExp==null?'\u2014':Math.round(bestExp-bestRace.r.sec)+'s')
+    +'</div><div class="n">'+pctOf(bestRace.v)+' faster than expected \u00b7 '
+    +(xcPr===bestRace.r.sec?'also their cross country PR':'their PR was '+secs(xcPr))
     +'</div></div></div></div>':'';
 
   /* The first thing on the page, before any table. Whatever is truest and
@@ -20401,13 +20226,17 @@ function drawAthlete(i){
   /* ---------- more than one good afternoon ---------- */
   const bd=bigDays(i,3);
   const daysCard=bd.length>1?'<div class="card reveal"><h2>Their best afternoons</h2>'
-    +'<p class="why">The three races furthest ahead of what their form and that day '
-    +'predicted. A career has more than one good afternoon in it.</p><table>'
-    +'<tr><th>Meet</th><th>Year</th><th>Time</th><th>Place</th><th>Beat the day by</th></tr>'
-    +bd.map(x=>'<tr><td class="name" style="text-align:left">'
-      +esc(MEETS[x.r.m].name||'')+'</td><td>'+(MEETS[x.r.m].date||'').slice(0,4)
-      +'</td><td>'+secs(x.r.sec)+'</td><td>'+(x.r.place||'\u2014')+'</td>'
-      +'<td class="pos">'+((Math.exp(x.v)-1)*100).toFixed(1)+'%</td></tr>').join('')
+    +'<p class="why">The three races furthest ahead of what was expected of them that '
+    +'day, worked out the same way as the one above. A career has more than one good '
+    +'afternoon in it.</p><table>'
+    +'<tr><th>Meet</th><th>Year</th><th>Expected</th><th>Ran</th><th>Place</th>'
+    +'<th>Beat it by</th></tr>'
+    +bd.map(x=>{const e=expectedOf(x.r);
+      return '<tr><td class="name" style="text-align:left">'
+        +esc(MEETS[x.r.m].name||'')+'</td><td>'+(MEETS[x.r.m].date||'').slice(0,4)
+        +'</td><td class="dimv">'+(e==null?'\u2014':secs(e))+'</td><td>'+secs(x.r.sec)
+        +'</td><td>'+(x.r.place||'\u2014')+'</td><td class="pos">'
+        +(e==null?'\u2014':Math.round(e-x.r.sec)+'s')+'</td></tr>';}).join('')
     +'</table></div>':'';
 
   /* ---------- who they run with ---------- */
@@ -20442,7 +20271,7 @@ function drawAthlete(i){
     +medals
     +(arc||(career?'<div class="card reveal"><h2>Every race, in order</h2>'
       +'<p class="why">Height is VDOT, the one number that puts different distances at '
-      +'comparable heights; across is the calendar. Grey is cross country, maroon is '
+      +'comparable heights; across is the school year. Grey is cross country, maroon is '
       +'track, and the two are never joined by a line because they do not share a '
       +'ruler.</p><figure><div>'+career+'</div></figure></div>':''))
     +rangeCard
@@ -20453,24 +20282,31 @@ function drawAthlete(i){
     +'<th>VDOT</th></tr>'+pbRows+'</table>'
     +'<p class="why" style="margin:12px 0 0">A VDOT from track and one from cross country are '
     +'not on the same scale — see Two rulers on the Program tab.</p></div>'
-    +'<div class="card"><h2>Every mark</h2><table><tr><th>Date</th><th>Meet</th><th>Sport</th>'
-    +'<th>Event</th><th>Time</th><th>Place</th><th>vs expected</th></tr>'
+    +'<div class="card"><h2>Every mark</h2><table><tr><th>Date</th><th>Meet</th>'
+    +'<th>Sport</th><th>Event</th><th>Time</th><th>Place</th><th>Expected</th>'
+    +'<th>Beat it by</th></tr>'
     +races.slice().reverse().map(r=>{
       const v=r.sport==='xc'?residOf(r):null;
       const thin=(FIT.meetN.get(r.m)||0)<MIN_AT_MEET;
+      const e=(v==null||thin)?null:expectedOf(r);
       return '<tr><td>'+r.date+'</td><td class="name" style="text-align:left">'
         +esc((MEETS[r.m].name||'').slice(0,32))+'</td><td>'
         +(r.sport==='xc'?'XC':'Track')+'</td><td>'+(r.event||dlab(r.dist))+'</td><td>'
-        +secs(r.sec)+'</td><td>'+(r.place||'—')+'</td>'
-        +'<td class="'+(v==null||thin?'dimv':v>0?'pos':'neg')+'">'
-        +(v==null||thin?'—':pctOf(v))+'</td></tr>';
+        +secs(r.sec)+'</td><td>'+(r.place||'\u2014')+'</td>'
+        +'<td class="dimv">'+(e==null?'\u2014':secs(e))+'</td>'
+        +'<td class="'+(e==null?'dimv':v>0?'pos':'neg')+'">'
+        +(e==null?'\u2014':(v>0?'':'\u2212')+Math.abs(Math.round(e-r.sec))+'s')
+        +'</td></tr>';
     }).join('')
-    +'</table><p class="why" style="margin:12px 0 0">Cross country is every race, so it can be '
-    +'measured against the day. Track is each season’s best per event, which is what '
-    +'athletic.net serves for it. A dash in the last column means either that, or a race with '
-    +'too few team-mates on the line to say what the day was worth.</p></div>';
+    +'</table><p class="why" style="margin:12px 0 0"><b>Expected</b> is the time this '
+    +'athlete\u2019s form and that afternoon predicted, fitted from the whole '
+    +'squad\u2019s results at that meet \u2014 see Best race above. <b>Beat it by</b> '
+    +'is how far inside that they ran, and a negative number is a day that went the '
+    +'other way. Cross country is every race, so it can be measured against the day. '
+    +'Track is each season\u2019s best per event, which is what athletic.net serves '
+    +'for it, so it has no expectation here. A dash also means a race with too few '
+    +'team-mates on the line to say what the day was worth.</p></div>';
   animate(el);
-  wireBrush(el);
   wireCopy();
   const sp=document.getElementById('sp-seg');
   if(sp&&K)sp.addEventListener('click',ev=>{
@@ -20483,20 +20319,13 @@ function drawAthlete(i){
 }
 
 /* ---------- speed or strength, as a scatter ----------
-   A bar sliding left and right off a centre is a scatter with one axis
-   thrown away. Both numbers are real and both are on the same ruler - two
-   track events, no terrain in either - so they can simply be the two axes.
-
-   THE DIAGONAL IS THE SQUAD'S OWN OFFSET, NOT y = x. A 1,500m VDOT and a
-   3,000m VDOT need not agree in the middle, and an offset everybody shares
-   says nothing about anybody. The line is drawn at the squad's median
-   difference, so distance from it is the lean and the line itself is
-   "ordinary here".
-
-   Names are placed by trying four corners and taking the first that does not
-   collide with a label already down. Anybody who cannot be placed keeps their
-   dot and loses their label rather than overprinting somebody else's, which
-   is the trade a scatter of thirty people has to make. */
+   A bar sliding either side of a centre is a scatter with one axis thrown
+   away. Both numbers are track VDOT, so neither carries terrain.
+   THE DIAGONAL IS THE SQUAD'S OWN OFFSET, NOT y = x. The two columns need
+   not agree in the middle, and an offset everybody shares says nothing about
+   anybody. Distance from the line is the lean.
+   Names try four corners; one that cannot be placed keeps its dot and loses
+   its label rather than printing over a neighbour. */
 function fitScatter(F,g){
   const cur=F.rows.filter(r=>r.now);
   const rows=(cur.length>=4?cur:F.rows);
@@ -20587,30 +20416,17 @@ function fitScatter(F,g){
 }
 
 /* ---------- who already races together, as a network ----------
-   A table of pairs makes you hold six names in your head to see a group of
-   three. Drawn, the group is a shape.
-
-   Nodes sit at their season best, so the x axis is the same start line the
-   pack chart uses and a partnership is visibly between two athletes who are
-   actually near each other. Arcs bow above; thickness is how many races the
-   pair has together and opacity is how close they finish, so a thick dark arc
-   is a training group that already exists.
-
-   Hovering a node dims everything it is not part of. That is the whole
-   interaction, and it is what a table cannot do. */
+   Nodes at their season best, so it is the same start line as the chart
+   above. Arc thickness is races together, opacity is how close they finish.
+   EVERY PAIR IS NOT A NETWORK: eighteen athletes who all race each other give
+   152 arcs, which says only that they are on the same team. Each athlete
+   keeps the three partners they finish closest to. */
 function packNet(g,k){
   const P=packs(g);
   const now=P.filter(x=>x.bothNow),all=now.length>=3?now:P.slice(0,40);
   /* EVERY PAIR IS NOT A NETWORK. Eighteen athletes who all race each other
      produce 152 arcs, which is a hairball and says only that they are on the
-     same team - a fact nobody needed a chart for.
-
-     So each athlete keeps their three closest regular partners and the arcs
-     are the union of those. Every node is guaranteed to show its own pack,
-     which is the question being asked, and a pair that is in each other's
-     three appears once rather than twice. It is a nearest-neighbour graph,
-     and "nearest" here means the smallest median finishing gap, which is what
-     packs() already ranks on. */
+     same team - a fact nobody needed a chart for. */
   const near=new Map();
   for(const pr of all){
     for(const [me,them] of [[pr.lo,pr.hi],[pr.hi,pr.lo]]){
@@ -20729,25 +20545,13 @@ function wireNet(){
 }
 
 /* ---------- the pack ----------
-   The squad as it actually stands, drawn as a start line that strings out.
-
-   Every dot is an athlete, placed by their real season best on the chosen
-   ruler: the fastest sits at the front and everybody else falls behind by the
-   time they are actually behind by, to scale. The scoring five are filled in
-   the school's maroon and the rest are outlined - five score, the rest run.
-
-   TWO THINGS THE CHART NOW SAYS OUT LOUD. The scoring five get a bracket, so
-   the line where scoring stops is drawn rather than inferred from a colour.
-   And the gap from the fifth runner to the sixth is a dimension line with its
-   value on it, because that number is the point of the whole panel and it was
-   only in the sentence underneath.
-
-   It goes through CV, which owns device pixel ratio, resize and the theme.
-   Before that it was drawn once at whatever width it happened to have: a
-   window resize left the dots stretched and switching to the light theme left
-   maroon on white with grey labels nobody could read. The entrance runs once
-   and then the draw is idempotent, which is what lets a resize repaint it
-   without the squad sprinting off again. */
+   The squad as a start line that strings out, every athlete at the time they
+   actually ran. The scoring five are bracketed and the fifth-to-sixth gap is
+   a dimension line with its value, because that number is the point of the
+   panel. The label steps aside when the gap is too narrow to write between
+   the dots, which one second is.
+   Through CV, which owns device pixel ratio, resize and the theme. It runs
+   once and stops: a thing that moves for ever is a screensaver. */
 function drawPack(cv,rows,fifth){
   if(!cv)return;
   CV.drop(cv);
@@ -21039,15 +20843,10 @@ const TIP=(()=>{
   return {show,hide,at:at2};
 })();
 
-/* ---------- the command palette ----------
-   Slash or Cmd-K from any tab. Seven hundred and forty-nine athletes is more
-   than a datalist can usefully hold, and the search that existed only lived on
-   the Athlete tab, so finding somebody meant leaving wherever you were.
-
-   The match is deliberately forgiving: initials, surname first, class year, or
-   a time. "french 16" finds Mark French, class of 2016, and so does "mf".
-   Ranked so an exact prefix beats a subsequence, because typing three letters
-   should land on the obvious person rather than the alphabetically first. */
+/* ---------- the command palette ---------- Slash or Cmd-K from any tab.
+   Seven hundred and forty-nine athletes is more than a datalist can usefully
+   hold, and the search that existed only lived on the Athlete tab, so
+   finding somebody meant leaving wherever you were. */
 const PAL=(()=>{
   const wrap=document.createElement('div');
   wrap.className='pal';wrap.hidden=true;
@@ -21124,21 +20923,11 @@ const PAL=(()=>{
   return {open,close};
 })();
 
-/* ---------- routing ----------
-   Nothing on this site was linkable. No hash, no history, no way for a coach
-   to send anybody a runner, and the back button did nothing at all. That is
-   the largest gap in the product and everything else in this phase leans on
-   fixing it - the empty state's entry points, the command palette and the
-   copy-link button are all just routes.
-
-   Hash routing rather than paths, because this is a static file on a CDN with
-   no rewrite rules and a real path would 404 on reload.
-
-   The URL is the state. Every switch writes it, hashchange reads it, and the
-   two share one applyRoute() so the back button cannot drift out of step with
-   the page. replaceState for a toggle and pushState for a navigation: a reader
-   flipping between boys and girls does not want six history entries, but
-   opening an athlete is somewhere they should be able to come back from. */
+/* ---------- routing ---------- Nothing on this site was linkable. No hash,
+   no history, no way for a coach to send anybody a runner, and the back
+   button did nothing at all. That is the largest gap in the product and
+   everything else in this phase leans on fixing it - the empty state's entry
+   points, the command palette and the copy-link button are all just routes. */
 const SEXQ={M:'boys',F:'girls'},SEXR={boys:'M',girls:'F'};
 const EVQ={xc5000:'xc5k',tf3000:'tf3k',tf1500:'tf1500'};
 const EVR={xc5k:'xc5000',tf3k:'tf3000',tf1500:'tf1500'};
