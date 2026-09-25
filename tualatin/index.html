@@ -230,10 +230,26 @@ figure{margin:0}
 .dtab[open]>summary::before{transform:rotate(90deg)}
 .dtab>summary:hover{color:var(--text)}
 .dtab table{margin-top:6px}
+/* the table scrolls, the page does not */
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;max-width:100%}
+.tscroll>table{min-width:100%}
+/* a fade at the right edge, so a cut-off column reads as scrollable */
+@media(max-width:700px){
+  .tscroll{position:relative;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);
+    mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent)}
+  .tscroll:not(:hover){scrollbar-width:none}
+}
 /* Three copies of one chart, side by side. Small multiples only work if the
    copies are identical in everything but their data, which is why they call
    the same function rather than a shrunken variant of it. */
-.smalls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+/* 240, not 150. At a 690px container a 150px minimum gave THREE columns of
+   206px, and a chart drawn on its own 170-unit viewBox in a 206px box renders
+   its axis type at 7.9 pixels. The grid has to stop before the chart does:
+   240 gives two columns at tablet width and one on a phone, and no cell is
+   ever narrower than about 300px. Change this and change SMALL_MIN with it. */
+.smalls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   gap:12px;margin:8px 0 16px}
 .smalls .sm{background:var(--raised);border:1px solid var(--line);border-radius:9px;
   padding:8px 6px 2px}
@@ -17173,7 +17189,7 @@ Three Rivers League JV District
       <button aria-pressed="false" data-p="xc">Cross country</button>
     </div>
   </div>
-  <p class="why" id="pop-why" style="color:var(--dim);font-size:13px;margin:-4px 0 16px"></p>
+  <p class="why" id="pop-why" style="color:var(--muted);font-size:13.5px;margin:-4px 0 16px;max-width:66ch"></p>
   <div class="tiles" id="tiles"></div>
 
   <div class="card" style="margin-top:18px">
@@ -17755,8 +17771,30 @@ const OBS=('IntersectionObserver' in window)?new IntersectionObserver(es=>{
   }
 },{rootMargin:'0px 0px 20% 0px',threshold:0}):null;
 
+/* A seven-column table of every race an athlete ever ran wants 452px, and a
+   phone column is 305. It was pushing the WHOLE PAGE sideways: 112px of
+   horizontal scroll on the athlete tab, which moves the headings, the charts
+   and the navigation along with it and is the one thing a phone layout must
+   never do.
+
+   Nothing is dropped and no column is hidden, because every column on that
+   table is a fact somebody might want. The table scrolls inside its own box
+   instead, with a fade at the edge so it is visibly scrollable rather than
+   silently cut. Applied here rather than at each of the eleven places a table
+   is written, so a table added later gets it without remembering. */
+function wrapTables(scope){
+  for(const t of (scope||document).querySelectorAll('table')){
+    if(t.parentElement&&t.parentElement.classList.contains('tscroll'))continue;
+    const box=document.createElement('div');
+    box.className='tscroll';
+    t.parentNode.insertBefore(box,t);
+    box.appendChild(t);
+  }
+}
+
 function animate(scope){
   const root=scope||document;
+  wrapTables(root);
   [...root.querySelectorAll('.reveal:not(.in)')].forEach((el,i)=>{
     if(!el.style.getPropertyValue('--d'))el.style.setProperty('--d',Math.min(i*40,240)+'ms');
     if(OBS)OBS.observe(el); else el.classList.add('in');
@@ -17890,7 +17928,7 @@ const CH=(()=>{
       const q=x(v).toFixed(1);
       return (o.lines===false?'':'<line class="ax" x1="'+q+'" x2="'+q+'" y1="'+f.y0
           +'" y2="'+f.y1+'" stroke-dasharray="1.5 2.5"/>')
-        +'<text x="'+q+'" y="'+(f.H-5)+'" class="axt" text-anchor="middle">'
+        +'<text x="'+q+'" y="'+(f.y1+8)+'" class="axt" text-anchor="middle">'
         +esc(fmt?fmt(v):v)+'</text>';
     }).join('');
   }
@@ -17903,8 +17941,12 @@ const CH=(()=>{
       +') rotate(-90)" class="lbl" text-anchor="middle" '
       +'style="font-size:6.2px">'+esc(text)+'</text>';
   }
+  /* The bottom line belongs to the unit label alone. It used to share f.H-5
+     with the x ticks, so on a phone the last tick and "1,500m VDOT" were
+     written on top of each other. A chart calling unitX has to leave room for
+     both in its bottom padding. */
   function unitX(f,text){
-    return '<text x="'+f.x1+'" y="'+(f.H-5)+'" class="lbl" text-anchor="end" '
+    return '<text x="'+f.x1+'" y="'+(f.H-2)+'" class="lbl" text-anchor="end" '
       +'style="font-size:6.2px">'+esc(text)+'</text>';
   }
 
@@ -19376,6 +19418,7 @@ function drawGrowth(){
 
 /* ---------- program ---------- */
 let pG='M',pP='dist',pR='xc5000';
+const SMALL_MIN=240;          // must equal the minmax() in .smalls
 function drawProgram(){
   sizeCharts('p-program');
   const every=V.everyone(pG,pP),four=V.fourYear(pG,pP,pR),top=V.top(pG,pP,pR,100);
@@ -19448,9 +19491,12 @@ function drawProgram(){
      copies of one chart say "these are comparable" in a way three columns of
      a table cannot, and the gap between them is the argument this whole page
      is built on. */
-  // the row is auto-fit at a 150px minimum, so work out what it will actually do
+  /* auto-fit works out its own column count, and this has to work out the
+     same one or the charts are drawn for the wrong box. Same arithmetic the
+     grid uses: as many tracks of at least SMALL_MIN as fit, counting gaps. */
   const smallEl=document.getElementById('dev-small');
-  const smallCols=Math.max(1,Math.min(3,Math.floor((smallEl.clientWidth||300)/150)));
+  const smallCols=Math.max(1,Math.min(3,
+    Math.floor(((smallEl.clientWidth||300)+12)/(SMALL_MIN+12))));
   chartIn('dev-small',smallCols,12);
   document.getElementById('dev-small').innerHTML=
     [['Everyone',cE],['All four years',cF],['Top 100',cT]].map(([nm,c])=>
@@ -19886,7 +19932,7 @@ function fitScatter(F,g){
      338 units, which rendered 602px tall. A scatter wants to be squarish on a
      phone and wide on a desktop, which is what a cap does. */
   const H=Math.max(150,Math.min(215,Math.round(CH.W*0.62)));
-  const f=CH.frame(H,{l:30,r:12,t:16,b:26});
+  const f=CH.frame(H,{l:30,r:12,t:16,b:34});   // ticks AND the unit label
   const xs=pts.map(q=>q.x),ys=pts.map(q=>q.y);
   const [xlo,xhi]=CH.padded(Math.min(...xs),Math.max(...xs),4);
   const [ylo,yhi]=CH.padded(Math.min(...ys),Math.max(...ys),4);
@@ -19914,8 +19960,12 @@ function fitScatter(F,g){
       +'" x2="'+x(line[1][0]).toFixed(1)+'" y2="'+y(line[1][1]).toFixed(1)
       +'" stroke="var(--dim)" stroke-width=".8" stroke-dasharray="3 2"/>';
 
-  // labels: four candidate corners, first one clear of everything already down
-  const put=[],lab=[];
+  /* The two corner notes are placed FIRST, so a name cannot be written on top
+     of them. They were outside the collision set and produced the one
+     overlapping pair left at 375px. */
+  const put=[{a:f.x1-46,b:f.x1,c:f.y0,d:f.y0+7},
+             {a:f.x0,b:f.x0+40,c:f.y1-8,d:f.y1}],
+        lab=[];
   const CH_W=6.2*0.52;                       // about one character at 6.2px
   const order=pts.slice().sort((a,b)=>(b.x+b.y)-(a.x+a.y));
   for(const q of order){
@@ -20009,8 +20059,8 @@ function packNet(g,k){
   const node=ids.map(i=>({i:i,t:bestOf(i)})).sort((a,b)=>a.t-b.t);
   const lo=node[0].t,hi=node[node.length-1].t;
 
-  const H=Math.max(130,Math.min(200,Math.round(CH.W*0.40)));
-  const f=CH.frame(H,{l:10,r:10,t:14,b:30});
+  const H=Math.max(146,Math.min(215,Math.round(CH.W*0.40)));
+  const f=CH.frame(H,{l:10,r:10,t:14,b:42});
   const x=CH.lin(hi,lo,f.x0,f.x1);           // faster to the right, as ever
   const base=f.y1-6;
   const maxN=Math.max(...use.map(p=>p.n));
@@ -20040,14 +20090,29 @@ function packNet(g,k){
         +(pr.med<60?pr.med.toFixed(1)+'s':Math.floor(pr.med/60)+':'
           +String(Math.round(pr.med%60)).padStart(2,'0'))+' apart')+'/>';
   }
+  /* EIGHTEEN NAMES ACROSS A PHONE IS NOT A LABEL, IT IS A SMUDGE. Measured at
+     375px: 29 overlapping pairs. So the labels take two staggered rows, which
+     doubles the horizontal budget for each, and any name that still would not
+     fit is left off rather than printed over its neighbour. Every node keeps
+     its dot, its tooltip and its row in the table underneath, so nothing is
+     lost by dropping a label - only by drawing one nobody can read. */
+  const CHW=5.8*0.52;
+  const rows=[[],[]];
   for(const n of node){
     const px=x(n.t);
     const nm=nameOf(A[n.i]).split(' ')[0];
     g2+='<circle class="pn-node" data-n="'+n.i+'" cx="'+px.toFixed(1)+'" cy="'+base
       +'" r="2.6" fill="var(--maroon-lift)" stroke="var(--bg)" stroke-width=".6"'
-      +CH.tip(nameOf(A[n.i])+' \u00b7 '+secs(n.t))+'/>'
-      +'<text x="'+px.toFixed(1)+'" y="'+(base+7)+'" class="axt" text-anchor="middle" '
-      +'style="font-size:5.8px">'+esc(nm)+'</text>';
+      +CH.tip(nameOf(A[n.i])+' \u00b7 '+secs(n.t))+'/>';
+    const w=nm.length*CHW+2;
+    let put=-1;
+    for(const r of [0,1]){
+      if(rows[r].some(o=>px-w/2<o[1]&&px+w/2>o[0]))continue;
+      rows[r].push([px-w/2,px+w/2]);put=r;break;
+    }
+    if(put<0)continue;
+    g2+='<text x="'+px.toFixed(1)+'" y="'+(base+7+put*8.6)+'" class="axt" '
+      +'text-anchor="middle" style="font-size:5.8px">'+esc(nm)+'</text>';
   }
   return '<div class="pnet">'+CH.open(H,'Who already races together',g2)+'</div>';
 }
