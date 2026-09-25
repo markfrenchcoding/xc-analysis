@@ -19264,21 +19264,26 @@ function applyRoute(r){
     return;
   }
   if(r.tab==='program'){
-    if(SEXR[q.sex])pG=SEXR[q.sex];
-    if(q.pop==='dist'||q.pop==='xc')pP=q.pop;
-    if(EVR[q.event])pR=EVR[q.event];
+    pG=SEXR[q.sex]||'M';
+    pP=(q.pop==='dist'||q.pop==='xc')?q.pop:'dist';
+    pR=EVR[q.event]||'xc5000';
     setSeg('g-prog',pG);setSeg('p-prog',pP);setSeg('r-dev',pR);
     showTab('program');drawProgram();return;
   }
   if(r.tab==='plan'||r.tab==='january'){
-    if(SEXR[q.sex])jG=SEXR[q.sex];
-    if(EVR[q.event])jR=EVR[q.event];
+    jG=SEXR[q.sex]||'M';
+    jR=EVR[q.event]||'xc5000';
     setSeg('g-jan',jG);setSeg('r-jan',jR);
     showTab('january');drawJanuary();return;
   }
-  if(SEXR[q.sex])bG=SEXR[q.sex];
-  if(EVR[q.event])bR=EVR[q.event];
-  if(q.view in VIEWR)bN=VIEWR[q.view];
+  /* A MISSING PARAM MEANS THE DEFAULT, not "whatever it was before". Going
+     back to #/board?sex=girls from a route that had set the 1,500m ruler left
+     the ruler on 1,500m, so the same URL rendered two different pages
+     depending on how you arrived at it. A URL either determines the state or
+     it is not state. */
+  bG=SEXR[q.sex]||'M';
+  bR=EVR[q.event]||'xc5000';
+  bN=(q.view in VIEWR)?VIEWR[q.view]:100;
   bQ=q.q||'';
   const f=document.getElementById('q-board');if(f)f.value=bQ;
   setSeg('g-board',bG);setSeg('r-board',bR);setSeg('n-board',String(bN));
