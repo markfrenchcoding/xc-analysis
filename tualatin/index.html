@@ -152,7 +152,17 @@ section[hidden]{display:none}
 .row:hover{border-color:var(--line);background:var(--raised)}
 .row .rk{font:700 15px/1 var(--num);color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
 .row .nm{font:600 16px/1.2 var(--disp);letter-spacing:.01em}
-.row .cl{font:500 12px/1 var(--num);color:var(--dim);white-space:nowrap}
+.row .cl{font:500 12px/1.35 var(--num);color:var(--dim);text-align:right;
+  max-width:34ch;overflow-wrap:anywhere}
+@media(max-width:760px){.row .cl{display:none}}
+.row{align-items:center}
+
+.chip{display:inline-block;font:700 9.5px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;padding:4px 7px;border-radius:5px;vertical-align:2px;
+  margin-left:9px;white-space:nowrap}
+.chip.live{background:var(--maroon);color:#fff}
+.chip.past{background:transparent;color:var(--faint);border:1px solid var(--line);
+  letter-spacing:.06em}
 .row .tm{font:700 18px/1 var(--num);font-variant-numeric:tabular-nums;min-width:66px;text-align:right}
 .row.gold .rk{color:var(--accent)}
 
@@ -178,7 +188,8 @@ figcaption{color:var(--dim);font-size:12.5px;margin-top:9px;max-width:66ch}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .ax{stroke:var(--line);stroke-width:.5}
 .axt{fill:var(--dim);font:500 6.5px var(--num)}
-.lbl{fill:var(--muted);font:600 7px var(--disp);letter-spacing:.04em}
+.lbl{fill:var(--muted);font:600 7.5px var(--disp);letter-spacing:.04em}
+.axv{fill:var(--text);font:700 7.5px var(--num)}
 
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px;color:var(--muted)}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;
@@ -187,6 +198,12 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .note{background:var(--raised);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
   padding:12px 15px;font-size:13.5px;color:var(--muted);margin:0 0 18px;max-width:72ch}
 .note b{color:var(--text)}
+details>summary{cursor:pointer;color:var(--muted);font:600 11.5px/1 var(--disp);
+  letter-spacing:.09em;text-transform:uppercase;padding:10px 0;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:'+ ';color:var(--accent)}
+details[open]>summary::before{content:'\2212 '}
+details>summary:hover{color:var(--text)}
 
 /* ---------- the truth card ----------
    The first thing anybody sees about an athlete. It animates in because this
@@ -238,6 +255,38 @@ svg{display:block;width:100%;height:auto;overflow:visible}
   background:var(--line)}
 .lean .bar i{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--accent);
   animation:sweep .7s cubic-bezier(.22,1,.36,1) both}
+
+/* ---------- earned on the course ---------- */
+.med{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;
+  padding:12px 14px;border-radius:10px;background:var(--raised);margin-bottom:8px}
+.med .pl{font-family:'Anton',var(--disp);font-size:23px;line-height:1;
+  transform:skewX(-8deg);min-width:44px;text-align:center}
+.med.t0 .pl{color:#F2C79D}
+.med.t1 .pl{color:var(--accent)}
+.med.t2 .pl{color:var(--steel)}
+.med.t3 .pl{color:var(--faint)}
+.med .ti{font:600 14.5px/1.25 var(--disp);letter-spacing:.01em}
+.med .mt{color:var(--dim);font-size:12.5px;margin-top:3px}
+.med .yr{font:700 15px/1 var(--num);color:var(--muted)}
+.med.t0{background:linear-gradient(100deg,color-mix(in srgb,var(--maroon) 34%,var(--raised)),var(--raised))}
+
+/* ---------- range ---------- */
+.rng{display:flex;flex-direction:column;gap:7px}
+.rr{display:grid;grid-template-columns:62px 1fr 74px;gap:11px;align-items:center}
+.rr .d{font:600 12px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rr .b{height:9px;border-radius:5px;background:var(--raised);overflow:hidden}
+.rr .b i{display:block;height:100%;border-radius:5px;transform-origin:left;
+  background:linear-gradient(90deg,var(--maroon),var(--accent));
+  animation:sweep .8s var(--ease) both}
+.rr.xc .b i{background:linear-gradient(90deg,var(--steel),var(--t2e))}
+.rr .t{font:700 14px/1 var(--num);text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---------- people ---------- */
+.ppl{display:flex;flex-wrap:wrap;gap:9px}
+.ppl button{background:var(--raised);border:1px solid var(--line);border-radius:999px;
+  padding:8px 14px;color:var(--text);font:600 13.5px/1 var(--disp);cursor:pointer}
+.ppl button:hover{border-color:var(--accent);color:var(--accent)}
+.ppl button span{color:var(--dim);font:500 12px var(--num);margin-left:7px}
 
 /* ---------- honours ---------- */
 .hon{display:flex;flex-wrap:wrap;gap:10px;margin:0}
@@ -15328,7 +15377,7 @@ footer{color:var(--dim);font-size:12.5px;border-top:1px solid var(--line);paddin
     <button role="tab" id="t-board"   aria-selected="true"  aria-controls="p-board">Board</button>
     <button role="tab" id="t-program" aria-selected="false" aria-controls="p-program">Program</button>
     <button role="tab" id="t-athlete" aria-selected="false" aria-controls="p-athlete">Athlete</button>
-    <button role="tab" id="t-january" aria-selected="false" aria-controls="p-january">January</button>
+    <button role="tab" id="t-january" aria-selected="false" aria-controls="p-january">Plan</button>
   </nav>
 </header>
 
@@ -15359,15 +15408,19 @@ footer{color:var(--dim);font-size:12.5px;border-top:1px solid var(--line);paddin
   <div class="tiles" id="tiles"></div>
 
   <div class="card" style="margin-top:18px">
-    <h2>Four-year development</h2>
-    <p class="why">Mean change in VDOT from one grade to the next. The same
-    calculation over three different groups of people, on a ruler you choose.
-    Nothing else changes.</p>
-    <div class="ctl"><label>Ruler</label><div class="seg" id="r-dev"></div></div>
-    <div class="legend" id="dev-legend"></div>
+    <h2>What a year here is worth</h2>
+    <p class="why" id="dev-lede"></p>
+    <div class="ctl"><label>Measured on</label><div class="seg" id="r-dev"></div></div>
     <figure><div id="dev"></div>
-    <table id="dev-tab" style="margin-top:14px"></table>
     <figcaption id="dev-cap"></figcaption></figure>
+    <details id="dev-more" style="margin-top:18px">
+      <summary>The same calculation over three different groups of people</summary>
+      <p class="why" style="margin:12px 0 10px">Identical arithmetic, three
+      populations. The gap between them is why this page never lets a statistic
+      choose its own sample.</p>
+      <table id="dev-tab"></table>
+      <p class="why" id="dev-gap" style="margin:12px 0 0"></p>
+    </details>
   </div>
 
   <div class="card">
@@ -15583,12 +15636,20 @@ const RKEYS=Object.keys(RULERS);
 const NOW=Math.max(...S.map(s=>s.y));
 const current=a=>a.classOf!=null&&a.classOf>=NOW;
 const nameOf=a=>(!SHOW_CURRENT&&current(a))?a.first+' '+(a.last[0]||'')+'.':a.first+' '+a.last;
+/* Running here now, or the year they left. First thing anybody wants off a
+   board reaching back twenty-two years: half these names graduated before the
+   current squad was born. */
+const isActive=a=>a.classOf!=null&&a.classOf>=NOW;
+const statusChip=a=>isActive(a)
+  ?'<span class="chip live">Running now</span>'
+  :'<span class="chip past">class of '+(a.classOf||'?')+'</span>';
 const fullKey=a=>(a.first+' '+a.last+' '+a.aka).toLowerCase();
 
 /* Round to tenths FIRST, then split. Formatting the minutes and the tenths
    independently cannot carry: 625.96s came out as "10:25.10", because the
    tenths rounded to 10 and were printed as two digits beside a seconds field
    that had already been floored. */
+const DOTC='\u00b7';
 const mmss=s=>{
   if(s==null)return '—';
   const t=Math.round(s*10)/10,m=Math.floor(t/60),r=t-m*60;
@@ -15702,23 +15763,40 @@ const V={
 };
 
 /* ---------- statistics, each taking a population and a ruler ---------- */
+/* SECONDS FIRST, VDOT SECOND.
+
+   This used to report VDOT and only VDOT, on an unlabelled axis, over three
+   populations at once. A coach does not think in VDOT and should not have to:
+   "+4.48" means nothing out loud, and "a minute and ten off a 5k" means
+   everything.
+
+   Seconds are also the honest unit here, because a step is measured within one
+   ruler - grade 10's 5,000m against grade 11's 5,000m - and seconds are
+   directly comparable inside a single distance. VDOT only earns its keep when
+   comparing ACROSS distances, which is what the ruler switch is for. So both
+   are computed and the page leads with the one a human holds. */
 function devCurve(pop,k){
   const d=RULERS[k].dist,step={9:[],10:[],11:[]},four=[];
+  const vstep={9:[],10:[],11:[]},vfour=[];
   for(const a of pop){
     const b=byA[a.i].grade[k]||{};
     for(const g of [9,10,11]){
       if(b[g]&&b[g+1]){
+        step[g].push(b[g]-b[g+1]);                 // seconds taken off
         const x=vdot(b[g],d),y=vdot(b[g+1],d);
-        if(x!=null&&y!=null)step[g].push(y-x);
+        if(x!=null&&y!=null)vstep[g].push(y-x);
       }
     }
     if(b[9]&&b[12]){
+      four.push(b[9]-b[12]);
       const x=vdot(b[9],d),y=vdot(b[12],d);
-      if(x!=null&&y!=null)four.push(y-x);
+      if(x!=null&&y!=null)vfour.push(y-x);
     }
   }
   const m=x=>x.length?x.reduce((s,v)=>s+v,0)/x.length:null;
-  return {n:pop.length,s9:m(step[9]),s10:m(step[10]),s11:m(step[11]),four:m(four),
+  return {n:pop.length,
+    s9:m(step[9]),s10:m(step[10]),s11:m(step[11]),four:m(four),
+    v9:m(vstep[9]),v10:m(vstep[10]),v11:m(vstep[11]),vfour:m(vfour),
     c9:step[9].length,c10:step[10].length,c11:step[11].length,cf:four.length};
 }
 function cohorts(pop){
@@ -15822,6 +15900,7 @@ const FMT={
   sign:v=>(v>0?'+':v<0?'-':'')+Math.abs(v).toFixed(2),
   secs:v=>secs(v),
   s1:v=>v.toFixed(1)+'s',
+  s0:v=>(v>0?'+':'')+Math.round(v)+'s',
 };
 function runCounts(root){
   for(const el of (root||document).querySelectorAll('[data-count]')){
@@ -15883,6 +15962,43 @@ const W=200;
 const svg=(h,body)=>'<svg viewBox="0 0 '+W+' '+h+'" role="img">'+body+'</svg>';
 const T=(x,y,s,cls,anchor)=>'<text x="'+x+'" y="'+y+'" class="'+(cls||'axt')+'"'
   +(anchor?' text-anchor="'+anchor+'"':'')+'>'+esc(s)+'</text>';
+
+/* One population, seconds, and an axis that says what it is.
+
+   The old chart put three populations of grouped bars on an unlabelled VDOT
+   axis and asked the reader to stare. The comparison it was making is real and
+   is kept - it is the whole argument for the roster-and-views split - but it
+   belongs in a sentence and a small table underneath, not competing with the
+   first read. */
+function barsSeconds(groups,h,unit){
+  const L=34,Rr=6,Tp=14,B=22,pw=(W-L-Rr)/groups.length;
+  const vals=groups.map(g=>g.v).filter(v=>v!=null);
+  if(!vals.length)return '<p class="empty">Nothing to measure on this ruler.</p>';
+  const hi=Math.max(0,...vals),lo=Math.min(0,...vals),span=(hi-lo)||1;
+  const Y=v=>Tp+(hi-v)/span*(h-Tp-B);
+  let s='';
+  // gridlines with their values written on them, which is the whole fix
+  const ticks=[hi,(hi+lo)/2,lo].filter((v,i,a)=>a.indexOf(v)===i);
+  for(const t of ticks){
+    s+='<line class="ax" x1="'+L+'" x2="'+W+'" y1="'+Y(t).toFixed(1)+'" y2="'+Y(t).toFixed(1)
+      +'"'+(Math.abs(t)<1e-9?'':' stroke-dasharray="1.5 2"')+'/>';
+    s+=T(L-4,Y(t)+2,(t>0?'+':'')+Math.round(t)+unit,'axt','end');
+  }
+  groups.forEach((g,i)=>{
+    if(g.v==null)return;
+    const x=L+i*pw+pw*.2,bw=pw*.6,y0=Y(0),y1=Y(g.v);
+    s+='<rect x="'+x.toFixed(1)+'" y="'+Math.min(y0,y1).toFixed(1)+'" width="'+bw.toFixed(1)
+      +'" height="'+(Math.abs(y1-y0)||.6).toFixed(1)+'" rx="1.2" fill="url(#barInk)">'
+      +'<title>'+esc(g.label+': '+(g.v>0?'+':'')+Math.round(g.v)+unit+' over '+g.n+' athletes')
+      +'</title></rect>';
+    s+=T(x+bw/2,(g.v>=0?y1-3:y1+7),(g.v>0?'+':'')+Math.round(g.v)+unit,'axv','middle');
+    s+=T(L+i*pw+pw/2,h-6,g.label,'lbl','middle');
+  });
+  return '<svg viewBox="0 0 '+W+' '+h+'" role="img"><defs>'
+    +'<linearGradient id="barInk" x1="0" y1="0" x2="0" y2="1">'
+    +'<stop offset="0" stop-color="#EE5566"/><stop offset="1" stop-color="#880000"/>'
+    +'</linearGradient></defs>'+s+'</svg>';
+}
 
 function barsGrouped(groups,series,h){
   const L=20,Rr=4,Tp=8,B=18,pw=(W-L-Rr)/groups.length;
@@ -16156,6 +16272,92 @@ function packs(g){
   return out;
 }
 
+/* ---------- honours earned on the course ----------
+   Who's Who records what a career added up to. This records what happened on
+   particular afternoons, and it is already sitting in the race table: every
+   State and district championship Tualatin has run since 2004, with the place
+   each athlete crossed the line in.
+
+   ALL-STATE in Oregon cross country is the top twenty-one at the State
+   championship - first team through seventh, second team through fourteenth,
+   honourable mention through twenty-first. That is the sport's own definition
+   and the odds site already marks its individual board with it.
+
+   The district line is NOT stated with the same confidence. Leagues award
+   all-league on their own cuts and this data cannot prove which, so the top
+   seven at a district championship is described as exactly that - "top seven
+   at the district meet" - rather than given a title it might not carry. Say
+   what happened; do not award a medal the record cannot show.
+
+   Twenty-nine all-state performances and a hundred and twenty-seven district
+   top-sevens are in here, and none of them were on the page. */
+const STATE_RE=/State Champ/i;
+const DIST_RE=/League Champ|District Meet|District Champ|Conference Champ/i;
+const ALL_STATE=[[7,'All-State, first team'],[14,'All-State, second team'],
+  [21,'All-State, honourable mention']];
+
+function earnedHonours(i){
+  const out=[];
+  for(const r of R){
+    if(r.a!==i||r.sport!=='xc'||!r.place)continue;
+    const m=MEETS[r.m]||{},name=m.name||'',yr=(m.date||'').slice(0,4);
+    if(STATE_RE.test(name)){
+      const tier=ALL_STATE.find(t=>r.place<=t[0]);
+      if(tier)out.push({rank:r.place<=7?0:r.place<=14?1:2,title:tier[1],
+        year:yr,place:r.place,meet:name,sec:r.sec});
+    }else if(DIST_RE.test(name)&&r.place<=7){
+      out.push({rank:r.place===1?1.5:3,
+        title:r.place===1?'District champion':'Top seven at the district meet',
+        year:yr,place:r.place,meet:name,sec:r.sec});
+    }
+  }
+  out.sort((a,b)=>a.rank-b.rank||a.place-b.place||b.year-a.year);
+  return out;
+}
+
+/* ---------- what they are built for ----------
+   Every distance they have raced, on one scale, so a page about somebody is
+   not a page about one number. VDOT is what makes 400m and 5,000m comparable
+   at all; the cross country marks are held apart from the track ones because
+   the two rulers do not share an axis, which the panel says out loud. */
+function range(i){
+  const o=byA[i],best={};
+  for(const r of R){
+    if(r.a!==i)continue;
+    const k=r.sport+'|'+r.dist;
+    if(!best[k]||r.sec<best[k].sec)best[k]={sec:r.sec,dist:r.dist,sport:r.sport};
+  }
+  const rows=Object.values(best).filter(b=>VCOL[b.dist])
+    .map(b=>({...b,v:vdot(b.sec,b.dist)}))
+    .filter(b=>b.v!=null).sort((a,b)=>a.dist-b.dist);
+  return rows;
+}
+
+/* The three races they most beat the day by, not just the one. A career has
+   more than one good afternoon in it. */
+function bigDays(i,n){
+  const out=[];
+  for(const r of R){
+    if(r.a!==i||r.sport!=='xc'||r.dist!==5000)continue;
+    const v=residOf(r);
+    if(v==null||(FIT.meetN.get(r.m)||0)<MIN_AT_MEET)continue;
+    out.push({r,v});
+  }
+  out.sort((a,b)=>b.v-a.v);
+  return out.slice(0,n||3);
+}
+
+/* Who they actually run with. Same pair maths the Plan tab uses, narrowed to
+   one athlete and reported as people rather than as a table of gaps. */
+function partnersOf(i){
+  const g=A[i].g,out=[];
+  for(const x of packs(g)){
+    if(x.lo!==i&&x.hi!==i)continue;
+    out.push({other:x.lo===i?x.hi:x.lo,n:x.n,med:x.med});
+  }
+  return out.slice(0,4);
+}
+
 /* ---------- the best true thing ----------
    Every athlete has one. The job of this function is to find it, and the
    order of the candidates is the whole design: an honour that put somebody in
@@ -16187,7 +16389,15 @@ function bestTruth(i){
       +(INFO.ww?INFO.ww.best:0)+' fastest 5,000m ever run there by an Oregon '
       +(a.g==='M'?'boy':'girl')+'.'};
 
-  // 2. the biggest year they ever had, on whichever ruler they have most of
+  // 2. an afternoon that put them on an all-state list
+  const ea=earnedHonours(i),top=ea[0];
+  if(top&&top.rank<=1)return {tag:top.title,
+    head:ord(top.place)+' at State',
+    sub:'in '+top.year+', which is '+(top.rank===0?'first-team':'second-team')
+      +' All-State in Oregon. Twenty-one athletes in the whole classification '
+      +'make that list in a year.'};
+
+  // 3. the biggest year they ever had, on whichever ruler they have most of
   const K=RKEYS.filter(k=>Object.keys(o.grade[k]||{}).length>1)
     .sort((x,y)=>Object.keys(o.grade[y]).length-Object.keys(o.grade[x]).length)[0];
   if(K){
@@ -16204,7 +16414,12 @@ function bestTruth(i){
         +' on '+RULERS[K].label+'. That is a year of work you can see.'};
   }
 
-  // 3. the race they beat the day by
+  // 4. a district championship
+  if(top&&top.rank===1.5)return {tag:'District champion',
+    head:'Won the district',
+    sub:'in '+top.year+'. One athlete a year wins that race.'};
+
+  // 5. the race they beat the day by
   let br=null;
   for(const r of races){
     if(r.sport!=='xc'||r.dist!==5000)continue;
@@ -16264,9 +16479,9 @@ function drawBoard(){
     const o=byA[a.i],m=MEETS[o.bestAt[bR]]||{};
     return '<button class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i+'">'
       +'<span class="rk">'+rank+'</span>'
-      +'<span class="nm">'+esc(nameOf(a))+'</span>'
+      +'<span class="nm">'+esc(nameOf(a))+statusChip(a)+'</span>'
       +'<span class="cl">'+(a.classOf?"'"+String(a.classOf).slice(2):'—')
-      +' · '+esc((m.name||'').slice(0,26))+'</span>'
+      +' · '+esc(m.name||'')+'</span>'
       +'<span class="tm">'+secs(o.best[bR])+'</span></button>';
   }).join('');
   animate(el);
@@ -16283,7 +16498,7 @@ function drawGrowth(){
   el.innerHTML=shown.map(({a,rank,gain,from,to,lo,hi})=>
     '<button class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i+'">'
     +'<span class="rk">'+rank+'</span>'
-    +'<span class="nm">'+esc(nameOf(a))
+    +'<span class="nm">'+esc(nameOf(a))+statusChip(a)
       +'<span class="standing"><i style="width:'+Math.max(4,gain/top*100).toFixed(0)
       +'%;animation-delay:'+Math.min(rank*14,420)+'ms"></i></span></span>'
     +'<span class="cl">gr '+lo+' — '+hi+' — '+secs(from)+' to '+secs(to)+'</span>'
@@ -16311,48 +16526,65 @@ function drawProgram(){
       'Of the '+ent+' who raced here as freshmen, '+fin+' were still racing as seniors.'],
     ['Joined after grade 9',every.length?mix['late-entry']/every.length*100:null,'pct',
       mix['late-entry']+' of '+every.length+' started later than grade 9 and still had a career here.'],
-    ['Four-year VDOT gain',dEvery.four,'sign',
-      'Fitness gained from grade 9 to 12 on '+RULERS[pR].label+', over '+dEvery.cf
-      +' complete careers. VDOT is one number for fitness across every distance.'],
+    /* Seconds, to match the panel below it. This tile said "+77.31" under a
+       VDOT label for one build, because devCurve started returning seconds
+       and the tile was still calling it VDOT. A unit in a label has to be the
+       unit in the number. */
+    ['Four-year gain',dEvery.four,'s0',
+      'Seconds taken off a '+RULERS[pR].label+' between grade 9 and grade 12, over '
+      +dEvery.cf+' complete careers'
+      +(dEvery.vfour==null?'':' — which is '+sg(dEvery.vfour)+' VDOT, the one '
+      +'number that compares fitness across different distances')+'.'],
   ].map(([k,v,f,n],i)=>'<div class="tile reveal"><div class="k">'+k+'</div><div class="v'
     +(i===1?' acc':'')+'">'+(v==null?'—'
       :'<span data-count="'+v+'" data-fmt="'+f+'">'+FMT[f](v)+'</span>')
     +'</div><div class="n">'+n+'</div></div>').join('');
 
   const cT=devCurve(top,pR),cF=devCurve(four,pR),cE=dEvery;
-  const series=[{label:'Top 100',color:'var(--accent)'},
-    {label:'All four years',color:'var(--t1e)'},
-    {label:'Everyone',color:'var(--dim)'}];
-  document.getElementById('dev-legend').innerHTML=series.map(s=>
-    '<span><i style="background:'+s.color+'"></i>'+s.label+'</span>').join('');
-  document.getElementById('dev').innerHTML=barsGrouped([
-    {label:'9 → 10',values:[cT.s9,cF.s9,cE.s9]},
-    {label:'10 → 11',values:[cT.s10,cF.s10,cE.s10]},
-    {label:'11 → 12',values:[cT.s11,cF.s11,cE.s11]},
-    {label:'9 → 12',values:[cT.four,cF.four,cE.four]},
-  ],series,84);
-  const steps=[['9 → 10','s9','c9'],['10 → 11','s10','c10'],
-    ['11 → 12','s11','c11'],['9 → 12','four','cf']];
-  const cols=[['Top 100',cT],['All four years',cF],['Everyone',cE]];
+  const rl=RULERS[pR].label;
+
+  /* Lead with the sentence, in seconds, because that is the unit a coach
+     thinks in and says out loud. */
+  document.getElementById('dev-lede').innerHTML=cE.four==null
+    ?'Not enough complete careers on '+rl+' to measure a four-year arc yet.'
+    :'Between grade 9 and grade 12, a '+(pG==='M'?'boy':'girl')+' here takes an average '
+      +'of <b>'+Math.round(cE.four)+' seconds</b> off their '+rl+' '
+      +'<span class="dimv">(VDOT '+sg(cE.vfour)+')</span>. '
+      +'That is measured over every one of the '+cE.cf+' athletes who has raced '
+      +'both years, not over the ones who turned out well.';
+
+  document.getElementById('dev').innerHTML=barsSeconds([
+    {label:'grade 9 \u2192 10',v:cE.s9,n:cE.c9},
+    {label:'10 \u2192 11',v:cE.s10,n:cE.c10},
+    {label:'11 \u2192 12',v:cE.s11,n:cE.c11},
+    {label:'the whole four',v:cE.four,n:cE.cf},
+  ],96,'s');
+  document.getElementById('dev-cap').innerHTML='Seconds taken off a '+rl+', averaged '
+    +'over everyone who raced both of the years in question. Hover a bar for how many '
+    +'athletes are behind it. <b>The freshman year is the biggest one</b>, on every '
+    +'ruler and in every group, which is the one finding here that has never moved.';
+
+  const steps=[['grade 9 \u2192 10','s9','c9'],['10 \u2192 11','s10','c10'],
+    ['11 \u2192 12','s11','c11'],['the whole four','four','cf']];
+  const cols=[['Everyone',cE],['All four years',cF],['Top 100',cT]];
   document.getElementById('dev-tab').innerHTML='<tr><th>Step</th>'
     +cols.map(c=>'<th>'+c[0]+'</th>').join('')+'</tr>'
     +steps.map(([lab,k,nk])=>'<tr><td class="name">'+lab+'</td>'
       +cols.map(([,c])=>'<td class="'+(c[k]==null?'dimv':c[k]>0?'pos':'neg')+'">'
-        +(c[k]==null?'—':sg(c[k]))+'<span class="dimv" style="font-size:11px"> n='
-        +c[nk]+'</span></td>').join('')+'</tr>').join('');
+        +(c[k]==null?'\u2014':(c[k]>0?'+':'')+Math.round(c[k])+'s')
+        +'<span class="dimv" style="font-size:11px"> n='+c[nk]+'</span></td>').join('')
+      +'</tr>').join('');
+  const thin=cT.c9===cE.c9&&cT.four===cE.four;
   const gap=(cT.four!=null&&cE.four!=null&&cE.four>0)?(cT.four/cE.four):null;
-  /* On a thin ruler the top hundred IS everybody, and two identical columns
-     read as a result rather than as an empty comparison. Say which it is. */
-  const thin=cT.c9===cE.c9&&cT.c10===cE.c10&&cT.four===cE.four;
-  document.getElementById('dev-cap').textContent=
-    'On '+RULERS[pR].label+'. Top 100 n='+cT.n+', four-year athletes n='+cF.n
-    +', everyone n='+cE.n+'. '
-    +(thin?'Fewer than a hundred athletes have two seasons on this ruler, so the '
-      +'first two columns are the same people and the comparison is empty here. '
-      +'Switch to XC 5k for the selection effect. '
-     :gap&&gap>1.15?'Ranking on performance first makes development look '
-      +gap.toFixed(1)+' times larger than it is across the programme. '
-      +'The board is a leaderboard. It is not a sample.':'');
+  document.getElementById('dev-gap').innerHTML=thin
+    ?'Fewer than a hundred athletes have two seasons on this ruler, so the first and '
+      +'last columns are the same people and the comparison is empty here. Switch to '
+      +'XC 5k for it.'
+    :(gap&&gap>1.15
+      ?'Ranking on performance first makes development look <b>'+gap.toFixed(1)
+        +' times larger</b> than it is across the programme. The board is a '
+        +'leaderboard. It is not a sample.'
+      :'The three groups agree closely on this ruler.');
 
   // --- the two rulers
   const rg=rulerGap(pG);
@@ -16571,6 +16803,74 @@ function drawAthlete(i){
         +'at all.</p>':'')
     +'</div>':'';
 
+  /* ---------- what they won ---------- */
+  const ea=earnedHonours(i);
+  const medals=ea.length?'<div class="card reveal"><h2>Earned on the course</h2>'
+    +'<p class="why">Every State and district championship in the record, and where '
+    +'they crossed the line. All-State in Oregon is the top twenty-one at the State '
+    +'meet; the district lines are described as what they are rather than given a '
+    +'title this record cannot prove.</p>'
+    +ea.map(h=>'<div class="med t'+Math.floor(h.rank)+'"><div class="pl">'
+      +ord(h.place)+'</div><div><div class="ti">'+esc(h.title)+'</div>'
+      +'<div class="mt">'+esc(h.meet)+(h.sec?' '+DOTC+' '+secs(h.sec):'')+'</div></div>'
+      +'<div class="yr">'+h.year+'</div></div>').join('')
+    +'</div>':'';
+
+  /* ---------- what they are built for ---------- */
+  const rg=range(i);
+  const rangeCard=rg.length>1?'<div class="card reveal"><h2>What they are built for</h2>'
+    +'<p class="why">Every distance they have raced, put on one scale. VDOT is the '
+    +'number that makes a 1,500m and a 5,000m comparable at all \u2014 higher is fitter. '
+    +'Track bars are maroon and cross country bars are grey, because the two do not '
+    +'sit on the same ruler and averaging them would be inventing a number.</p>'
+    /* Two groups, scaled separately. One chart with both would put a track
+       3,000m and a cross country 3,000m side by side at comparable bar
+       lengths, which is exactly the comparison the caption says cannot be
+       made. A bar that lies is worse than no bar. */
+    +(()=>{
+      const grp=[['tfo','On the track'],['xc','Cross country']];
+      return grp.map(([sp,title])=>{
+        const rows=rg.filter(r=>r.sport===sp);
+        if(!rows.length)return '';
+        const mx=Math.max(...rows.map(r=>r.v)),mn=Math.min(...rows.map(r=>r.v));
+        const span=Math.max(4,mx-mn);
+        return '<p class="why" style="margin:2px 0 8px;color:var(--muted);'
+          +'font:600 10.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase">'
+          +title+'</p><div class="rng" style="margin-bottom:16px">'
+          +rows.map((r,n)=>'<div class="rr'+(sp==='xc'?' xc':'')+'">'
+            +'<div class="d">'+(r.dist>=1000?(r.dist/1000).toFixed(r.dist%1000?1:0)+'k'
+              :r.dist+'m')+'</div>'
+            +'<div class="b"><i style="width:'+(28+(r.v-mn)/span*72).toFixed(0)
+            +'%;animation-delay:'+(n*70)+'ms"></i></div>'
+            +'<div class="t">'+secs(r.sec)+'</div></div>').join('')+'</div>';
+      }).join('');
+    })()
+    +'<p class="why" style="margin:4px 0 0">Longest bar in a group is their strongest '
+    +'event relative to their others in that group, not their fastest time. The two '
+    +'groups are scaled separately and must not be read against each other.</p></div>':'';
+
+  /* ---------- more than one good afternoon ---------- */
+  const bd=bigDays(i,3);
+  const daysCard=bd.length>1?'<div class="card reveal"><h2>Their best afternoons</h2>'
+    +'<p class="why">The three races furthest ahead of what their form and that day '
+    +'predicted. A career has more than one good afternoon in it.</p><table>'
+    +'<tr><th>Meet</th><th>Year</th><th>Time</th><th>Place</th><th>Beat the day by</th></tr>'
+    +bd.map(x=>'<tr><td class="name" style="text-align:left">'
+      +esc(MEETS[x.r.m].name||'')+'</td><td>'+(MEETS[x.r.m].date||'').slice(0,4)
+      +'</td><td>'+secs(x.r.sec)+'</td><td>'+(x.r.place||'\u2014')+'</td>'
+      +'<td class="pos">'+((Math.exp(x.v)-1)*100).toFixed(1)+'%</td></tr>').join('')
+    +'</table></div>':'';
+
+  /* ---------- who they run with ---------- */
+  const pr=partnersOf(i);
+  const pplCard=pr.length?'<div class="card reveal"><h2>Who they run with</h2>'
+    +'<p class="why">Team-mates they have raced alongside four times or more, closest '
+    +'finisher first. Nobody planned these; they are just true.</p><div class="ppl">'
+    +pr.map(x=>'<button data-i="'+x.other+'">'+esc(nameOf(A[x.other]))
+      +'<span>'+(x.med<60?x.med.toFixed(0)+'s':Math.floor(x.med/60)+':'
+      +String(Math.round(x.med%60)).padStart(2,'0'))+' apart, '+x.n+' races</span>'
+      +'</button>').join('')+'</div></div>':'';
+
   el.innerHTML=truth+'<div class="card"><h2>'+esc(nameOf(a))+(a.aka?' · also '+esc(a.aka):'')
     +'</h2><p class="why">Class of '+(a.classOf||'—')+' · entered in grade '
     +(a.entryGrade||'—')+' ('+a.entry+') · '+races.length+' recorded marks'
@@ -16589,8 +16889,12 @@ function drawAthlete(i){
       +(fy==null?'—':sg(fy))+'</div><div class="n">VDOT, grade 9 to 12</div></div>'
     +'</div></div>'
     +honCard
+    +medals
     +arc
+    +rangeCard
     +bestCard
+    +daysCard
+    +pplCard
     +'<div class="card"><h2>Personal bests</h2><table><tr><th>Distance</th><th>Best</th>'
     +'<th>VDOT</th></tr>'+pbRows+'</table>'
     +'<p class="why" style="margin:12px 0 0">A VDOT from track and one from cross country are '
@@ -16807,6 +17111,13 @@ function drawJanuary(){
     :'<tr><td class="dimv">No pair has four races together yet.</td></tr>';
   animate(document.getElementById('p-january'));
 }
+
+document.getElementById('ath').addEventListener('click',e=>{
+  const b=e.target.closest('.ppl button');if(!b)return;
+  document.getElementById('q-ath').value=nameOf(A[+b.dataset.i]);
+  drawAthlete(+b.dataset.i);
+  scrollTo({top:0,behavior:'smooth'});
+});
 
 document.getElementById('jan').addEventListener('click',e=>{
   const c=e.target.closest('.jc');if(!c)return;
