@@ -80,6 +80,63 @@ eq(R.eventMetres('3,000 Meters'), 3000, 'and survives a thousands comma');
 eq(R.eventMetres('300m Hurdles'), 0, 'hurdles are not on the same ruler as a flat run');
 eq(R.eventMetres('Shot Put'), 0, 'and a throw is not a run at all');
 eq(R.eventMetres('4x400 Relay'), 0, 'nor is a relay leg');
+/* The three the parser used to refuse. athletic.net spells the indoor sprint
+   "60 Meter", singular, and a mile is a running event on a track whatever the
+   units on the sign. 119 marks over 22 seasons were being dropped for these,
+   on a page built for distance runners. */
+eq(R.eventMetres('60 Meter'), 60, 'the singular spelling is the same event');
+eq(R.eventMetres('1 Mile'), 1609, 'a mile is 1609 metres');
+eq(R.eventMetres('2 Miles'), 3219, 'and two of them are 3219');
+eq(R.eventMetres('1.5 Mile'), 2414, 'a fractional mile still parses');
+eq(R.eventMetres('2000m Steeplechase'), 0, 'a barrier race is still not a flat run');
+eq(R.eventMetres('40 Yard Dash'), 0, 'and a combine test is not a track event');
+eq(R.eventMetres('Mile'), 0, 'a distance with no number is not a distance');
+
+/* ---------- every track race, from the bio endpoint ----------
+   The season-bests call gave one mark per event per season, so a senior with
+   twenty-two races showed four. These rows are the real ones. */
+const EV = {
+  3: { IDEvent: 3, Event: '400 Meters', Type: 'T', Description: 'Relay Split' },
+  4: { IDEvent: 4, Event: '800 Meters', Type: 'T', Description: null },
+  5: { IDEvent: 5, Event: '1500 Meters', Type: 'T', Description: null },
+  8: { IDEvent: 8, Event: '4x400 Relay', Type: 'T', Description: null },
+  40: { IDEvent: 40, Event: 'DMR 4000m', Type: 'T', Description: '[1200-400-800-1600]' },
+  58: { IDEvent: 58, Event: '1 Mile', Type: 'T', Description: null },
+  77: { IDEvent: 77, Event: 'Shot Put', Type: 'F', Description: null },
+};
+const GRADES = { '284_2016': 12, '284_12016': 12 };
+const raw = (o) => Object.assign({
+  AthleteID: 10489917, SchoolID: 284, EventID: 5, SortInt: 238980,
+  Place: '3', Round: 'F', SeasonID: 2016, ResultDate: '2016-05-13T00:00:00',
+  MeetID: 251667,
+}, o);
+const bio = (o) => R.bioRow(raw(o), EV, GRADES, 284);
+
+eq(bio({}).dist, 1500, 'a flat 1500 is a 1500');
+eq(bio({}).seconds, 238.98, 'SortInt is milliseconds here too');
+eq(bio({}).place, 3, 'and a place comes along with it');
+eq(bio({}).grade, 12, 'the grade comes from the bio grades table');
+eq(bio({ EventID: 58 }).dist, 1609, 'a mile is a mile');
+eq(bio({ EventID: 3 }), null, 'A RELAY LEG IS SPELLED LIKE THE OPEN EVENT and is not one');
+eq(bio({ EventID: 8 }), null, 'a whole relay is not a solo run');
+eq(bio({ EventID: 40 }), null, 'nor is a distance medley');
+eq(bio({ EventID: 77 }), null, 'and a throw is not a run');
+eq(bio({ SchoolID: 21244 }), null, 'a season at their college is not this team');
+eq(bio({ SortInt: 20000001 }), null, 'DNS carries a sentinel, not a blank');
+eq(bio({ SortInt: 0 }), null, 'and neither is nothing a time');
+eq(bio({ EventID: 4, SortInt: 118400 }).dist, 800, 'an 800 survives its own pace bound');
+eq(bio({ SortInt: 4000 }), null, 'a four-second 1500 is not a time anybody ran');
+
+/* Indoor seasons are numbered +10000 and are real races at this school. */
+eq(bio({ SeasonID: 12016 }).season, 2016, 'an indoor season files under its own year');
+eq(bio({ SeasonID: 12016 }).indoor, 1, 'and says that is what it was');
+eq(bio({ SeasonID: 12016 }).grade, 12, 'and still finds its grade');
+eq(bio({ SeasonID: 2016 }).indoor, 0, 'an outdoor one says so too');
+
+eq(R.bioEventMetres(EV[5]), 1500, 'the event table gives the distance');
+eq(R.bioEventMetres(EV[3]), 0, 'except for a split');
+eq(R.bioEventMetres(EV[77]), 0, 'and a field event');
+ok(/sport=tf&/.test(R.BIO), 'THE SPORT CODE IS tf HERE, not tfo: the endpoint 400s on tfo');
 
 const rec = (o) => R.recordRow(Object.assign({
   IDAthlete: 5, FirstName: 'A', LastName: 'B', GenderID: 'M', GradeID: 10,

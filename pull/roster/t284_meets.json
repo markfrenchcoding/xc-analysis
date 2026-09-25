@@ -7,7 +7,7 @@
   "pulled": "2026-09-25",
   "sports": {
     "xc": 8876,
-    "tfo": 5144
+    "tfo": 5263
   },
   "fieldMarksSkipped": 2687,
   "emptySeasons": [],
@@ -1564,6 +1564,10 @@
       "date": "2025-11-08",
       "name": "OSAA State XC Championships"
     },
+    "259527": {
+      "date": "2016-03-14",
+      "name": "Monday Night Miles"
+    },
     "259865": {
       "date": "2016-04-13",
       "name": "West Linn and St. Mary's @ Tualatin"
@@ -1935,6 +1939,10 @@
     "516718": {
       "date": "2024-04-20",
       "name": "Oregon Relays presented by AthleticNET"
+    },
+    "518152": {
+      "date": "2024-04-26",
+      "name": "Nike/Jesuit Twilight Relays"
     },
     "520151": {
       "date": "2024-05-18",

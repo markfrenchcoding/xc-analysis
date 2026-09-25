@@ -57,6 +57,11 @@ const API = 'https://www.athletic.net/api/v1/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
   + '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 const GAP_GET = 700, TRIES = 4;
+/* The bio endpoint has its own budget and it is generous: measured, 25 for 25
+   clean at 300ms and 10 of 25 refused at 120ms. Fifteen hundred athletes at
+   this pace is about twenty-two minutes, which is the price of a complete
+   track record and is worth paying. */
+const GAP_BIO = 300;
 
 // athletic.net's Tualatin coverage thins out before this and stops entirely
 // before 2004. An "all-time" board that is silently a "since 2005" board is
@@ -150,10 +155,26 @@ const classOf = (year, sport, grade) => schoolYear(year, sport) + (12 - grade);
    not a time at all - SortInt for a field event is a distance, so treating it
    as milliseconds would put a 12-metre throw on the board as a 12-second race.
    The count of what was skipped is in the report, the same way divMetres
-   dropping the imperial cross country divisions is. */
+   dropping the imperial cross country divisions is.
+
+   THREE NAMES IT USED TO REFUSE AND SHOULD NOT HAVE. Insisting on the plural
+   "Meters" threw away every "60 Meter", which is how athletic.net spells the
+   indoor sprint - 66 marks. And a mile is a running event on a track like any
+   other: "1 Mile" and "2 Miles" were dropped for not being metric, 53 marks
+   between them, on a page built for distance runners. A mile is 1609 metres
+   and is recorded as 1609 metres; nothing is converted to a 1500 equivalent,
+   because nothing on this page is ever converted between distances.
+
+   What stays out stays out: hurdles and the steeplechase are barrier races on
+   their own ruler, a relay leg is not a solo run, and "40 Yard Dash" is a
+   combine test rather than a track event. */
+const MILE = 1609.344;
 function eventMetres(name) {
-  const m = String(name || '').match(/^([\d,]+)\s*Meters$/i);
-  return m ? +m[1].replace(/,/g, '') : 0;
+  const m = String(name || '').match(/^([\d,]+(?:\.\d+)?)\s*(Meters?|Miles?)$/i);
+  if (!m) return 0;
+  const n = +m[1].replace(/,/g, '');
+  if (!(n > 0)) return 0;
+  return /^mile/i.test(m[2]) ? Math.round(n * MILE) : n;
 }
 
 /* One row of GetTeamAthleteRecords -> the same shape a cross country result
@@ -392,7 +413,86 @@ function pull(teamId, from, to) {
   return { rows, meets, empty };
 }
 
-/* Track: one GET a season, no token. Season bests per athlete per event. */
+/* ---------- every track race, not every season best ----------
+   GetTeamAthleteRecords serves each athlete's SEASON BEST per event. This file
+   said that was "the right shape here" and it was wrong: it means a senior
+   with twenty-two races shows four marks, one per event, and a page built for
+   distance runners was quietly missing five sixths of its track.
+
+   Mark French, 2016: four rows in the old pull, seventy-three races across his
+   four years and twenty-two in his senior season alone. He noticed.
+
+   AthleteBio/GetAthleteBioData?athleteId=N&sport=tf&level=4 returns every
+   track result an athlete has ever had, all seasons, in one unauthenticated
+   GET - with the place, the round, the division, the meet and the date on each
+   one. It costs one request an athlete rather than one a season, which is the
+   only reason it was not the first choice; the answer is worth the minutes.
+
+   THE SPORT CODE IS "tf" HERE. It is "tfo" for GetTeamCore and
+   GetTeamAthleteRecords, "tf" for GetMeetData, and this endpoint 400s on
+   "tfo" and 404s with no sport at all. Four endpoints, three spellings, no
+   rule to infer - only the record of which one wants which.
+
+   WHAT IS KEPT. A flat running event with a distance in its name, at this
+   school. Relay legs go, and the trap is that a leg is spelled exactly like
+   the open event - EventID 3 is "400 Meters" with Description "Relay Split" -
+   so the description has to be read or a split lands on the board as a solo
+   400. Whole relays, the distance medley, hurdles, the steeplechase and every
+   field event go for the reasons eventMetres already gives.
+
+   DNS AND DNF CARRY A SENTINEL, not a blank: SortInt is 20000001. The pace
+   bound would catch it anyway at thirteen seconds a metre, but a sentinel
+   read as a time is the kind of thing that survives until somebody sees a
+   five-hour 1500m, so it is refused by name.
+
+   INDOOR SEASONS ARE NUMBERED +10000 - 12016 is the 2016 indoor season. They
+   are real races at this school and they are kept, filed under their own
+   school year. */
+const BIO = 'AthleteBio/GetAthleteBioData?sport=tf&level=4&athleteId=';
+const DNS_SORT = 20000001;
+
+/* An event id to a distance, using the bio response's own event table. */
+function bioEventMetres(ev) {
+  if (!ev || String(ev.Type || '').toUpperCase() !== 'T') return 0;
+  if (/relay split/i.test(ev.Description || '')) return 0;   // a leg is not a race
+  return eventMetres(ev.Event);
+}
+
+/* One resultsTF row -> the same shape every other result on this page has. */
+function bioRow(raw, evById, grades, teamId) {
+  if (+raw.SchoolID !== +teamId) return null;          // their college is not this team
+  const ev = evById[raw.EventID];
+  const dist = bioEventMetres(ev);
+  if (!dist) return null;
+  const sort = +raw.SortInt;
+  if (!(sort > 0) || sort >= DNS_SORT) return null;    // DNS, DNF, DQ
+  const sec = sort / 1000;
+  const [lo, hi] = paceBounds(dist);
+  const pace = sec / dist;
+  if (pace < lo || pace > hi) return null;
+  const idSeason = +raw.SeasonID || 0;
+  const season = idSeason > 10000 ? idSeason - 10000 : idSeason;   // indoor is +10000
+  if (!season) return null;
+  const place = parseInt(raw.Place, 10);
+  return {
+    athleteId: +raw.AthleteID || 0,
+    first: '', last: '', gender: '',
+    grade: grades ? (grades[teamId + '_' + idSeason] || grades[teamId + '_' + season] || null) : null,
+    place: place > 0 ? place : null,
+    dist, seconds: sec,
+    event: (ev && ev.Event) || '',
+    meetId: String(raw.MeetID || ''),
+    meetName: '',
+    date: String(raw.ResultDate || '').slice(0, 10),
+    season, sport: 'tfo',
+    indoor: idSeason > 10000 ? 1 : 0,
+  };
+}
+
+/* Track: one GET a season, no token. Season bests per athlete per event.
+   Kept for the ROSTER - it is the cheapest way to learn who ever scored a
+   track mark here, and it carries the gender the bio rows do not. The
+   results it returns are thrown away; pullRaces fetches the real ones. */
 function pullTrack(teamId, from, to) {
   const rows = [], meets = {}, empty = [];
   let field = 0;
@@ -416,6 +516,51 @@ function pullTrack(teamId, from, to) {
   return { rows, meets, empty, field };
 }
 
+/* One request an athlete, and the whole of their track career comes back.
+   Paced gently because there are fifteen hundred of them; this is the long
+   stage of the pull and it is worth the minutes.
+
+   A run that loses more than one athlete in fifty refuses to be believed -
+   the caller checks `failed` and does not write. Half a track record is worse
+   than none, because the gaps are invisible: a missing race just looks like a
+   season somebody did not run. */
+function pullRaces(teamId, ids) {
+  const rows = [], meets = {}, failed = [];
+  let n = 0, seen = 0;
+  const t0 = Date.now();
+  for (const id of ids) {
+    n++;
+    let j = null;
+    try { j = ask(API + BIO + id); }
+    catch (e) { failed.push(id); sleep(GAP_BIO); continue; }
+    if (!j || !Array.isArray(j.resultsTF)) { failed.push(id); sleep(GAP_BIO); continue; }
+    const evById = {};
+    for (const e of j.eventsTF || []) evById[e.IDEvent] = e;
+    /* The response carries its own meet table, keyed by id, with the name and
+       the date on it. Taking only the meetId off the result row and leaving
+       the name blank is how the page ended up with unnamed meets once
+       before - a race at "" is a race nobody can place. */
+    for (const [mid, m] of Object.entries(j.meets || {})) {
+      if (meets[mid] && meets[mid].name) continue;
+      meets[mid] = { date: String(m.EndDate || '').slice(0, 10), name: m.MeetName || '' };
+    }
+    for (const raw of j.resultsTF) {
+      seen++;
+      const r = bioRow(raw, evById, j.grades, teamId);
+      if (!r) continue;
+      r.meetName = (meets[r.meetId] || {}).name || '';
+      rows.push(r);
+    }
+    if (n % 200 === 0 || n === ids.length) {
+      const per = (Date.now() - t0) / n / 1000;
+      log('    ' + String(n).padStart(4) + '/' + ids.length + '  ' + rows.length
+        + ' races so far, ' + ((ids.length - n) * per / 60).toFixed(1) + ' min left');
+    }
+    sleep(GAP_BIO);
+  }
+  return { rows, meets, failed, seen };
+}
+
 function main() {
   const args = process.argv.slice(2);
   const flag = (f, d) => { const i = args.indexOf(f); return i < 0 ? d : args[i + 1]; };
@@ -431,8 +576,32 @@ function main() {
   log('pulling ' + label + ' (team ' + teamId + '), ' + from + '-' + to);
   log('  cross country, every race:');
   const xc = pull(teamId, from, to);
-  log('  track, each athlete\'s season best per event:');
+  log('  track, the roster:');
   const tf = pullTrack(teamId, from, to);
+
+  /* Every athlete who has ever appeared here, in either sport. The bio call
+     needs a list and this is it: the cross country grid knows the autumn
+     athletes and the records call knows the spring ones. */
+  const ids = [...new Set([...xc.rows, ...tf.rows].map(r => r.athleteId).filter(Boolean))]
+    .sort((a, b) => a - b);
+  log('  track, every race, one request an athlete (' + ids.length + '):');
+  const races = pullRaces(teamId, ids);
+  log('    ' + races.rows.length + ' races kept of ' + races.seen + ' results read'
+    + (races.failed.length ? ', ' + races.failed.length + ' athletes failed' : ''));
+
+  /* The season-best rows have done their job - they named the roster. Every
+     one of them is inside the race list, so keeping both would double-count
+     the best race of every season. */
+  if (races.failed.length > ids.length / 50) {
+    log('\n  REFUSING TO WRITE: ' + races.failed.length + ' of ' + ids.length
+      + ' athletes did not answer. A track record with holes in it looks exactly'
+      + ' like a season somebody did not run.');
+    process.exit(2);
+  }
+  tf.rows = races.rows;
+  // merge without clobbering: a named meet beats an unnamed one either way round
+  for (const [mid, m] of Object.entries(races.meets))
+    if (!tf.meets[mid] || !tf.meets[mid].name) tf.meets[mid] = m;
 
   /* One results table, both sports. classOf votes from track as well as cross
      country, which is strictly more evidence for the same inference - an
@@ -514,6 +683,7 @@ function main() {
 
 module.exports = {
   gradeOf, schoolYear, classOf, gridRow, eventMetres, recordRow,
+  bioEventMetres, bioRow, BIO,
   buildAthletes, entryOf, buildSeasons,
   cohorts, csv, NAME_BY_ID, paceBounds, FIRST_SEASON,
 };
