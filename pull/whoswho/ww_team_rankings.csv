@@ -1,0 +1,447 @@
+gender,rank,points,school,cls,appearances
+M,1,2930,South Eugene,6A,57
+M,2,2034,Central Catholic,6A,36
+M,3,2004,Jesuit,6A,37
+M,4,1864,Philomath,4A,52
+M,5,1760,Union (inc.Union/Cove),2A/1A,36
+M,6,1706,Bend,5A,37
+M,7,1536,Grant,6A,37
+M,8,1438,Crater,5A,20
+M,9,1404,Siuslaw,3A,34
+M,10,1346,Ashland,5A,37
+M,11,1328,Sunset,6A,35
+M,12,1142,Lincoln,6A,40
+M,13,1136,Phoenix,4A,31
+M,14,1096,Astoria,4A,32
+M,15,1056,Summit,5A,19
+M,16,1038,The Dalles,4A,31
+M,17,1028,Corvallis,5A,32
+M,18,1028,Klamath Union,4A,25
+M,19,1022,Rogue River,3A,24
+M,20,1012,Wilsonville,5A,26
+M,21,1000,Scappoose,4A,42
+M,22,988,Chemawa,2A/1A,27
+M,23,984,Crescent Valley,5A,38
+M,24,954,Franklin,6A,27
+M,25,952,Ida,B,
+M,26,942,Madras,4A,21
+M,27,922,Oakridge,2A/1A,29
+M,28,896,Tillamook,4A,27
+M,29,894,Enterprise,3A,19
+M,30,872,Brookings-Harbor,3A,26
+M,31,844,Hermiston,5A,21
+M,32,840,Crook County,5A,22
+M,33,830,Canyonville Christian,2A/1A,26
+M,34,822,Reedsport,2A/1A,23
+M,35,818,North Eugene,5A,18
+M,36,808,South Salem,6A,25
+M,37,784,Bandon,2A/1A,25
+M,38,784,Henley,4A,21
+M,39,784,Marist,4A,24
+M,40,782,Valley Catholic,3A,15
+M,41,780,Vernonia,2A/1A,20
+M,42,764,Gladstone,4A,14
+M,43,740,Mountain View,5A,21
+M,44,738,West Linn,6A,28
+M,45,732,Pleasant Hill,3A,19
+M,46,716,Gilchrist,2A/1A,16
+M,47,682,Centennial,6A,25
+M,48,682,Marshfield,4A,20
+M,49,678,Lake Oswego,6A,20
+M,50,676,Lakeridge,6A,24
+M,51,658,Sheldon,6A,21
+M,52,648,McKenzie,2A/1A,20
+M,53,636,Westside Christian,3A,24
+M,54,624,Regis,2A/1A,22
+M,55,624,Sisters,3A,20
+M,56,620,Molalla,4A,24
+M,57,608,Beaverton,6A,17
+M,58,592,Pacific,2A/1A,21
+M,59,584,Glide,2A/1A,21
+M,60,566,Burns,3A,23
+M,61,566,Canby,5A,23
+M,62,548,Catlin Gabel,3A,16
+M,63,548,La Salle Prep,5A,17
+M,64,542,North Medford,6A,17
+M,65,538,Hood River Valley,5A,18
+M,66,526,Thurston,5A,17
+M,67,512,Springfield,5A,22
+M,68,510,Oregon City,6A,19
+M,69,500,Cottage Grove,4A,14
+M,70,488,Elmira,4A,17
+M,71,486,Hillsboro,5A,15
+M,72,474,Nyssa,3A,13
+M,73,472,Newberg,6A,20
+M,74,472,Taft,3A,19
+M,75,468,Neah-Kah-Nie,3A,13
+M,76,460,Myrtle Point,3A,23
+M,77,458,Crow,2A/1A,11
+M,78,458,Southwest Christian,2A/1A,16
+M,79,456,East Linn Christain,3A,11
+M,80,456,Putnam,5A,18
+M,81,454,North Bend,5A,16
+M,82,450,Tigard,6A,15
+M,83,438,Hidden Valley,4A,17
+M,84,432,Knappa,2A/1A,11
+M,85,430,Kennedy,2A/1A,23
+M,86,426,Silverton,5A,23
+M,87,420,St.Helens,5A,16
+M,88,412,Sweet Home,4A,17
+M,89,404,Cascade,4A,17
+M,90,404,Cleveland,6A,14
+M,91,400,Central Linn,2A/1A,14
+M,92,398,Junction City,4A,13
+M,93,396,Grants Pass,6A,13
+M,94,392,Clackamas,6A,18
+M,95,392,Sherwood,6A,15
+M,96,380,Waldport,3A,11
+M,97,378,Forest Grove,6A,21
+M,98,374,Tualatin,6A,16
+M,99,374,Wallowa,2A/1A,16
+M,100,372,Milwaukie,5A,11
+M,101,372,West Albany,6A,12
+M,102,368,La Grande,4A,17
+M,103,364,Roseburg,6A,12
+M,104,362,Central,5A,16
+M,105,356,West Salem,6A,17
+M,106,352,Aloha,6A,10
+M,107,350,Rainier,3A,14
+M,108,348,Elgin,2A/1A,9
+M,109,340,Newport,4A,7
+M,110,334,David Douglas,6A,11
+M,111,330,Eagle Point,5A,7
+M,112,318,Monroe,2A/1A,14
+M,113,316,Creswell,3A,18
+M,114,316,South Medford,6A,13
+M,115,308,Madison,6A,15
+M,116,308,Vale,3A,14
+M,117,306,Pendleton,4A,15
+M,118,298,Baker,4A,20
+M,119,298,Cascade Christian,3A,10
+M,120,282,Oakland,2A/1A,10
+M,121,272,Yamhill Carlton,3A,17
+M,122,270,Lakeview,2A/1A,11
+M,123,268,McMinnville,6A,13
+M,124,264,Griswold,2A/1A,9
+M,125,262,Santiam Christian,3A,13
+M,126,258,Oregon Episcopal,3A,9
+M,127,252,La Pine,3A,6
+M,128,244,Reynolds,5A,16
+M,129,240,Seaside,4A,5
+M,130,234,Nestucca,2A/1A,10
+M,131,232,North Valley,4A,7
+M,132,232,Sprague,6A,11
+M,133,224,Riverdale,3A,9
+M,134,224,Salem Academy,3A,5
+M,135,220,New Hope Christian,2A/1A,8
+M,136,216,Ontario,4A,14
+M,137,212,Bonanza,2A/1A,8
+M,138,200,Redmond,5A,8
+M,139,198,Parkrose,5A,10
+M,140,192,Estacada,4A,8
+M,141,192,Toledo,3A,7
+M,142,186,Coquille,3A,7
+M,143,186,Sandy,5A,11
+M,144,184,Western Mennonite,2A/1A,7
+M,145,178,Jefferson (Jefferson),3A,10
+M,146,174,St.Stephens Academy,2A/1A,4
+M,147,172,Columbia Christian,2A/1A,11
+M,148,166,Stayton,4A,6
+M,149,162,Churchill,5A,8
+M,150,160,Barlow,6A,9
+M,151,156,South Albany,5A,6
+M,152,156,Banks,3A,4
+M,153,152,Woodburn,5A,8
+M,154,146,South Umpqua,4A,9
+M,155,138,North Marion,4A,10
+M,156,132,Joseph,2A/1A,4
+M,157,132,St.Mary's (Medford),3A,10
+M,158,124,Monument,2A/1A,6
+M,159,122,McNary,6A,7
+M,160,122,Portland Christian,2A/1A,8
+M,161,120,Dallas,5A,7
+M,162,120,North Douglas,2A/1A,6
+M,163,116,Enterprise/Joseph/Wallowa,3A,4
+M,164,114,Sutherlin,4A,6
+M,165,112,Benson,6A,5
+M,166,112,Heppner,2A/1A,5
+M,167,112,Stanfield,2A/1A,3
+M,168,108,Stanfield / Echo,2A/1A,4
+M,169,106,Harrisburg,3A,7
+M,170,104,Amity,3A,4
+M,171,94,Scio,2A/1A,6
+M,172,92,Western Christian,2A/1A,5
+M,173,86,Day's Creek,2A/1A,3
+M,174,80,Glencoe,6A,4
+M,175,78,Douglas,4A,3
+M,176,76,Heppner / Ione,2A/1A,2
+M,177,74,Siletz,2A/1A,2
+M,178,70,Gresham,6A,5
+M,179,68,Horizon Christian,3A,3
+M,180,66,Westview,6A,3
+M,181,64,Willamina,3A,4
+M,182,62,Culver,2A/1A,3
+M,183,62,Riddle,2A/1A,4
+M,185,62,Sheridan,3A,4
+M,186,56,McKay,6A,4
+M,187,54,N.Clackamas Christian,2A/1A,3
+M,188,54,North Salem,6A,4
+M,189,54,Veritas,2A/1A,3
+M,190,52,Clatskanie,3A,4
+M,191,50,Liberty,5A,3
+M,192,50,Powers,2A/1A,3
+M,193,46,Baker/Powder Valley,4A,2
+M,194,46,Caldera,5A,2
+M,195,46,Gold Beach,2A/1A,3
+M,196,46,Lebanon,5A,2
+M,197,44,Adrienne Nelson,6A,3
+M,198,44,Dayton,3A,4
+M,199,40,Perrydale,2A/1A,3
+M,200,36,Warrenton,3A,2
+M,201,34,Colton,3A,3
+M,202,34,Jefferson (Portland),6A,1
+M,204,28,Country Christian,2A/1A,2
+M,205,28,Glendale,2A/1A,2
+M,206,28,McLoughlin,4A,2
+M,207,28,Mountainside,6A,2
+M,208,26,Lowell,2A/1A,2
+M,209,26,The Dalles / Dufur,5A,1
+M,210,24,Camas Valley,2A/1A,1
+M,211,24,Lost River,2A/1A,1
+M,212,24,Prairie City,2A/1A,1
+M,213,24,Ukiah,2A/1A,2
+M,214,24,Yoncalla,2A/1A,2
+M,215,22,Century,6A,1
+M,216,22,Sherman County,2A/1A,2
+M,217,22,Triangle Lake,2A/1A,1
+M,218,22,Umatilla,3A,1
+M,219,20,Trinity Academy,2A/1A,1
+M,220,20,Wasco County,2A/1A,2
+M,221,18,Blanchet Christian,3A,1
+M,222,18,Faith Bible Christian,2A/1A,1
+M,223,18,Grant Union,2A/1A,1
+M,224,18,Illinois Valley,2A/1A,1
+M,225,18,Mapleton,2A/1A,1
+M,226,18,Mohawk,2A/1A,1
+M,227,16,Ridgeview,5A,1
+M,228,16,Riverside (Boardman),3A,1
+M,229,16,Willamette,6A,1
+M,230,14,Burns-Crane,3A,1
+M,231,14,Corbett,4A,1
+M,232,12,Imbler,2A/1A,1
+M,233,12,Jewell,2A/1A,1
+M,234,12,Oak Hill,2A/1A,1
+M,235,12,Southridge,6A,1
+M,236,12,St. Paul,2A/1A,1
+M,237,10,Crosshill Christian,2A/1A,1
+M,238,16,Trout Lake,2A/1A,1
+M,239,10,Long Creek,2A/1A,1
+M,240,0,Bickerton,2A/1A,0
+M,241,0,Pine Eagle,2A/1A,0
+M,242,0,Roosevelt,6A,0
+M,243,0,Weston - McEwen,2A/1A,0
+F,1,2216,Jesuit,6A,30
+F,2,2168,South Eugene,6A,47
+F,3,2000,Philomath,4A,44
+F,4,1870,Sunset,6A,35
+F,5,1864,Lincoln,6A,41
+F,6,1828,Union (inc.Union/Cove),3/2/1A,34
+F,7,1652,Summit,5A,22
+F,8,1562,Catlin Gabel,3/2/1A,39
+F,9,1532,Siuslaw,3/2/1A,29
+F,10,1126,Bend,5A,28
+F,11,1066,Crescent Valley,5A,40
+F,12,1054,Rogue River,3/2/1A,20
+F,13,1040,St.Marys Academy,6A,22
+F,14,1018,Oakridge,3/2/1A,29
+F,15,952,Grant,6A,35
+F,16,952,Mountain View,6A,22
+F,17,948,Crater,5A,23
+F,18,926,Ashland,5A,27
+F,19,854,Sisters,3/2/1A,25
+F,20,850,Regis,3/2/1A,26
+F,21,820,Henley,4A,20
+F,22,772,Marist,4A,23
+F,23,758,Hood River Valley,5A,25
+F,24,748,St.Mary's (Medford),3/2/1A,18
+F,25,744,Klamath Union,4A,23
+F,26,744,Molalla,4A,27
+F,27,732,Bandon,3/2/1A,24
+F,28,730,Corvallis,5A,23
+F,29,720,Tualatin,6A,23
+F,30,716,The Dalles,4A,21
+F,31,712,Valley Catholic,3/2/1A,21
+F,32,700,Scappoose,4A,25
+F,33,690,Beaverton,6A,13
+F,34,686,Sherwood,6A,28
+F,35,682,Crook County,4A,18
+F,36,670,Lakeridge,6A,24
+F,37,662,West Linn,6A,28
+F,38,660,Myrtle Point,3/2/1A,22
+F,39,632,La Grande,4A,18
+F,40,594,Oregon Episcopal,3/2/1A,15
+F,41,582,La Salle Prep,5A,20
+F,42,580,Ida,B,
+F,43,558,Wilsonville,5A,22
+F,44,546,Phoenix,4A,18
+F,45,530,Kennedy,3/2/1A,23
+F,46,516,Brookings-Harbor,4A,11
+F,47,510,Aloha,6A,10
+F,48,510,Cascade,4A,18
+F,49,506,Burns,3/2/1A,21
+F,50,496,North Bend,4A,17
+F,51,488,Enterprise,3/2/1A,11
+F,52,484,Baker,4A,19
+F,53,484,Franklin,6A,20
+F,54,476,Pacific,3/2/1A,15
+F,55,474,Sheldon,6A,14
+F,56,472,Glide,3/2/1A,14
+F,57,466,Centennial,6A,21
+F,58,464,South Salem,6A,23
+F,59,458,Roseburg,6A,16
+F,60,456,Junction City,4A,18
+F,61,448,Westside Christian,3/2/1A,19
+F,62,420,Gold Beach,3/2/1A,13
+F,63,410,Hidden Valley,4A,10
+F,64,398,Clackamas,6A,20
+F,65,388,Tillamook,4A,20
+F,66,374,Sprague,6A,15
+F,67,354,Ontario,4A,9
+F,68,350,South Medford,6A,13
+F,69,346,Sweet Home,4A,17
+F,70,344,Hermiston (*WA),5A,8
+F,71,338,Seaside,4A,15
+F,72,336,Vale,3/2/1A,15
+F,73,334,Illinois Valley,3/2/1A,10
+F,74,332,Lake Oswego,6A,12
+F,75,328,Tigard,6A,15
+F,76,322,East Linn Christian,3/2/1A,14
+F,77,310,North Medford,6A,12
+F,78,296,Thurston,5A,15
+F,79,288,Oregon City,6A,12
+F,80,284,Pendleton,5A,9
+F,81,280,Churchill,5A,12
+F,82,278,Hillsboro,5A,5
+F,83,278,McMinnville,6A,15
+F,84,278,Salem Academy,3/2/1A,9
+F,85,272,Gladstone,4A,7
+F,86,268,Banks,3/2/1A,9
+F,87,264,Lakeview,3/2/1A,13
+F,88,258,Elmira,4A,13
+F,89,252,Central Catholic,6A,11
+F,90,250,Estacada,4A,12
+F,91,248,Central Linn,3/2/1A,13
+F,92,246,Cleveland,6A,11
+F,93,242,Barlow,6A,17
+F,94,242,St.Helens,5A,11
+F,95,236,Astoria,4A,11
+F,96,236,Rainier,3/2/1A,7
+F,97,234,Silverton,5A,15
+F,98,232,Vernonia,3/2/1A,12
+F,99,228,Stayton,4A,10
+F,100,226,Newberg,6A,10
+F,101,226,Springfield,5A,14
+F,102,222,Grants Pass,6A,7
+F,103,220,Forest Grove,6A,11
+F,104,220,Lebanon,5A,9
+F,105,214,Redmond,5A,11
+F,106,208,Waldport,3/2/1A,9
+F,107,206,Canby,6A,12
+F,108,204,Madras,4A,10
+F,109,190,Gresham,6A,10
+F,110,190,Santiam Christian,3/2/1A,12
+F,111,188,Sutherlin,3/2/1A,9
+F,112,186,Monroe,3/2/1A,5
+F,113,182,Pleasant Hill,3/2/1A,10
+F,114,174,Canyonville Christian,3/2/1A,9
+F,115,174,West Salem,6A,9
+F,116,172,Ukiah,3/2/1A,4
+F,117,170,Putnam,5A,11
+F,118,168,Coquille,3/2/1A,7
+F,119,168,Reedsport,3/2/1A,6
+F,120,166,Enterprise/Joseph/Wallowa,3/2/1A,3
+F,121,164,Nyssa,3/2/1A,6
+F,122,164,Paisley,3/2/1A,3
+F,123,160,Cottage Grove,4A,7
+F,124,160,Creswell,3/2/1A,6
+F,125,154,Sandy,6A,9
+F,126,152,Oakland,3/2/1A,9
+F,127,150,Heppner,3/2/1A,4
+F,128,148,Westview,6A,6
+F,129,142,North Valley,4A,3
+F,130,136,Neah-Kah-Nie,3/2/1A,9
+F,131,136,South Umpqua,4A,5
+F,132,130,South Wasco County,3/2/1A,4
+F,133,124,Dallas,5A,6
+F,134,118,Elgin,3/2/1A,5
+F,135,118,Willamina,3/2/1A,4
+F,136,116,Cascade Christian,3/2/1A,6
+F,137,116,West Albany,5A,8
+F,138,114,Caldera,5A,3
+F,139,114,Newport,4A,9
+F,140,114,Southwest Christian,3/2/1A,5
+F,141,112,Yamhill-Carlton,3/2/1A,9
+F,142,110,Siletz Valley,3/2/1A,4
+F,143,108,North Salem,6A,4
+F,144,106,Wallowa,3/2/1A,4
+F,145,98,Mazama,4A,4
+F,146,94,Crow,3/2/1A,4
+F,147,92,Taft,3/2/1A,7
+F,148,86,Blanchet Catholic,3/2/1A,6
+F,149,84,Amity,3/2/1A,4
+F,150,84,David Douglas,6A,6
+F,151,84,Umatilla,3/2/1A,3
+F,152,80,Central,5A,4
+F,153,78,Harrisburg,3/2/1A,4
+F,154,72,Marshfield,4A,5
+F,155,72,Nestucca,3/2/1A,5
+F,156,70,Gervais,3/2/1A,4
+F,157,70,North Eugene,5A,3
+F,158,68,Weston-McEwen,3/2/1A,3
+F,159,66,Gilchrist,3/2/1A,4
+F,160,66,Glendale,3/2/1A,5
+F,161,66,Oak Hill,3/2/1A,4
+F,162,62,Knappa,3/2/1A,4
+F,163,60,Colton,3/2/1A,2
+F,164,60,McLoughlin,4A,5
+F,165,60,The Dalles / Dufur,4A,3
+F,166,58,South Albany,5A,3
+F,167,56,Baker/Powder Valley,4A,3
+F,168,56,La Pine,3/2/1A,3
+F,169,50,Bonanza,3/2/1A,1
+F,170,50,Woodburn,5A,3
+F,171,48,Portland Waldorf,3/2/1A,3
+F,172,42,Toledo,3/2/1A,3
+F,173,40,Joseph,3/2/1A,3
+F,174,40,Madison,6A,4
+F,175,40,Portland Christian,3/2/1A,3
+F,176,40,Reynolds,6A,3
+F,177,30,Corbett,4A,3
+F,178,30,McKenzie,3/2/1A,2
+F,179,30,New Hope Christian,3/2/1A,2
+F,180,28,Liberty,6A,2
+F,183,24,Mountainside,6A,1
+F,184,24,North Douglas,3/2/1A,2
+F,185,24,Ridgeview,5A,2
+F,186,22,Eagle Point,5A,1
+F,187,22,Glencoe,6A,2
+F,188,22,Riverdale,3/2/1A,1
+F,189,22,St. Paul,3/2/1A,1
+F,190,20,McKay,6A,1
+F,191,16,Adrian,3/2/1A,1
+F,192,16,Century,6A,1
+F,193,16,Sheridan,3/2/1A,1
+F,194,14,Veritas,3/2/1A,1
+F,195,12,Grant Union,3/2/1A,1
+F,196,12,Scio,3/2/1A,1
+F,197,12,St.Stephens Academy,3/2/1A,1
+F,198,10,Jefferson (Jefferson),3/2/1A,1
+F,199,10,Life Christian,3/2/1A,1
+F,200,10,Sherman County,3/2/1A,1
+F,201,0,Columbia Christian,3/2/1A,0
+F,202,0,Condon,3/2/1A,0
+F,203,0,Horizon Christian,3/2/1A,0
+F,204,0,Lowell,3/2/1A,0
+F,205,0,Pine Eagle,3/2/1A,0
+F,206,0,Trinity Lutherian,3/2/1A,0
+F,207,0,Western Christian,3/2/1A,0
