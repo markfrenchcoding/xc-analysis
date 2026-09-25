@@ -27,7 +27,7 @@
    measured, not chosen by eye. */
 :root{
   --bg:#0B0A0C;--surface:#151217;--raised:#1E1922;--line:#2E2732;
-  --text:#F4F1F3;--muted:#A79DA4;--dim:#8A7F87;--faint:#6E636B;
+  --text:#F4F1F3;--muted:#B3AAB1;--dim:#A0959D;--faint:#867B83;
   --maroon:#880000;--maroon-lift:#B31B2C;--maroon-deep:#4A0008;
   --accent:#EE5566;--on-accent:#FFFFFF;
   --steel:#9A9199;
@@ -41,7 +41,7 @@
 }
 [data-theme="light"]{
   --bg:#FBF9FA;--surface:#FFFFFF;--raised:#F3EFF1;--line:#E4DEE2;
-  --text:#141014;--muted:#5C525A;--dim:#857A82;--faint:#A79DA4;
+  --text:#141014;--muted:#4E4550;--dim:#645A63;--faint:#7C7179;
   --maroon:#880000;--maroon-lift:#A81020;--maroon-deep:#6B0008;
   --accent:#880000;--on-accent:#FFFFFF;
   --steel:#6E636B;
@@ -54,6 +54,17 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);
   font:400 15px/1.55 'Barlow',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* Every figure on the page lines up in a column, so tabular numerals belong to
+   the numeric face rather than being remembered rule by rule. It was declared
+   seven times and missed everywhere else. */
+.tm,.rk,.v,.yr,.pl,td,th,.t,.amt,.tile .v,.row .cl{font-variant-numeric:tabular-nums}
+
+/* A visible focus ring everywhere, in the accent, because the whole page is
+   now keyboard-navigable and a ring you cannot see is not one. */
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,
+[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:3px;
+  border-radius:6px}
 
 /* A wash of the school colour behind everything, and a grain over it. Both are
    fixed, both are pointer-events:none, and neither ever animates - they are
@@ -80,9 +91,21 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
    observer AND unconditionally by a timer, so a browser that never fires the
    observer still shows a complete page. Never leave content depending on an
    animation to become visible. */
-.reveal{opacity:0;transform:translateY(18px)}
+/* A card mid-reveal is an invisible card, and scrolling the Program tab fast
+   left a whole region blank until the observer caught up and a 550ms
+   transition finished. Three changes, all of them about the FAILURE mode
+   rather than the animation:
+
+     - the hidden state is much less hidden (opacity .001 would still read as
+       blank, so it starts at a readable .35 and only the lift is dramatic)
+     - the observer fires 20% BEFORE the element arrives, not after
+     - the transition is 380ms, and the stagger caps at 240ms rather than 520
+
+   The content was always in the DOM. It was the styling that made it look
+   broken, which is the worst kind of empty state because nothing is wrong. */
+.reveal{opacity:.35;transform:translateY(10px)}
 .reveal.in{opacity:1;transform:none;
-  transition:opacity .55s var(--ease),transform .55s var(--ease);
+  transition:opacity .38s var(--ease),transform .38s var(--ease);
   transition-delay:var(--d,0ms)}
 @media (prefers-reduced-motion:reduce){
   .reveal,.reveal.in{opacity:1;transform:none;transition:none}
@@ -141,7 +164,7 @@ section[hidden]{display:none}
   padding:18px 18px 20px;margin-bottom:18px;box-shadow:var(--shadow)}
 .card h2{font:700 13px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);margin:0 0 4px}
-.card .why{color:var(--dim);font-size:13px;margin:0 0 16px;max-width:66ch}
+.card .why{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0 0 16px;max-width:66ch}
 .grid2{display:grid;gap:18px}
 @media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
 
@@ -152,14 +175,16 @@ section[hidden]{display:none}
 .row:hover{border-color:var(--line);background:var(--raised)}
 .row .rk{font:700 15px/1 var(--num);color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
 .row .nm{font:600 16px/1.2 var(--disp);letter-spacing:.01em}
-/* Meet names in full, wrapped rather than cut. A name truncated at 26
-   characters told you a race happened somewhere beginning with "Meriwether";
-   two lines of small type tell you which race it was. The column only gives up
-   below 560px, where a phone genuinely has no room for it and the name, the
-   status and the time are what matter. */
-.row .cl{font:500 12px/1.3 var(--num);color:var(--dim);text-align:right;
-  max-width:30ch;overflow-wrap:anywhere;hyphens:auto}
+/* ONE LINE, ellipsed, with the whole name in the title and the tooltip.
+   Wrapping to two lines was worse than truncating: it made every row a
+   different height, so the board lost its rhythm and the eye had nothing to
+   run down. A list of four hundred names is a rhythm before it is anything
+   else. */
+.row .cl{font:500 12px/1 var(--num);color:var(--dim);text-align:right;
+  max-width:32ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:560px){.row .cl{display:none}}
+.row{min-height:42px;text-decoration:none}
+.row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row{align-items:center}
 
 .chip{display:inline-block;font:700 9.5px/1 var(--disp);letter-spacing:.1em;
@@ -203,6 +228,43 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .note{background:var(--raised);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
   padding:12px 15px;font-size:13.5px;color:var(--muted);margin:0 0 18px;max-width:72ch}
 .note b{color:var(--text)}
+
+/* ---------- command palette ---------- */
+.pal{position:fixed;inset:0;z-index:70;background:rgba(6,5,7,.72);
+  backdrop-filter:blur(4px);display:flex;justify-content:center;
+  padding:12vh 16px 16px}
+.pal-box{width:100%;max-width:520px;height:fit-content;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.pal-box input{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;
+  background:transparent;color:var(--text);padding:16px 18px;
+  font:500 17px 'Barlow',sans-serif}
+.pal-box input:focus{outline:none}
+#pal-list{list-style:none;margin:0;padding:6px;max-height:46vh;overflow:auto}
+#pal-list li{display:grid;grid-template-columns:1fr auto auto;gap:12px;
+  align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer}
+#pal-list li.on{background:var(--maroon)}
+#pal-list li.on .p-c,#pal-list li.on .p-t{color:rgba(255,255,255,.82)}
+#pal-list li.none{color:var(--dim);cursor:default;display:block}
+.p-n{font:600 15.5px/1 var(--disp);letter-spacing:.01em}
+.p-c{color:var(--dim);font:500 12px/1 var(--num)}
+.p-t{font:700 14px/1 var(--num);font-variant-numeric:tabular-nums}
+.pal-foot{border-top:1px solid var(--line);padding:9px 14px;color:var(--faint);
+  font:500 11.5px/1 var(--num)}
+kbd{background:var(--raised);border:1px solid var(--line);border-radius:4px;
+  padding:1px 5px;font:600 11px var(--num)}
+.ppl a{background:var(--raised);border:1px solid var(--line);border-radius:999px;
+  padding:8px 14px;color:var(--text);font:600 13.5px/1 var(--disp);
+  text-decoration:none;display:inline-block}
+.ppl a:hover{border-color:var(--accent);color:var(--accent)}
+.ppl a span{color:var(--dim);font:500 12px var(--num);margin-left:7px}
+
+.tip{position:fixed;left:0;top:0;z-index:60;pointer-events:none;
+  background:var(--raised);color:var(--text);border:1px solid var(--line);
+  border-radius:8px;padding:7px 11px;font:500 12.5px/1.35 'Barlow',sans-serif;
+  max-width:280px;box-shadow:0 6px 22px rgba(0,0,0,.45);
+  opacity:0;transition:opacity .13s ease}
+.tip.on{opacity:1}
 details>summary{cursor:pointer;color:var(--muted);font:600 11.5px/1 var(--disp);
   letter-spacing:.09em;text-transform:uppercase;padding:10px 0;list-style:none}
 details>summary::-webkit-details-marker{display:none}
@@ -17627,12 +17689,12 @@ const OBS=('IntersectionObserver' in window)?new IntersectionObserver(es=>{
     runCounts(e.target);runDraws(e.target);
     OBS.unobserve(e.target);
   }
-},{rootMargin:'0px 0px -8% 0px',threshold:.08}):null;
+},{rootMargin:'0px 0px 20% 0px',threshold:0}):null;
 
 function animate(scope){
   const root=scope||document;
   [...root.querySelectorAll('.reveal:not(.in)')].forEach((el,i)=>{
-    if(!el.style.getPropertyValue('--d'))el.style.setProperty('--d',Math.min(i*55,520)+'ms');
+    if(!el.style.getPropertyValue('--d'))el.style.setProperty('--d',Math.min(i*40,240)+'ms');
     if(OBS)OBS.observe(el); else el.classList.add('in');
   });
   // whatever the observer does, the page is whole a moment later
@@ -18069,6 +18131,37 @@ function partnersOf(i){
   return out.slice(0,4);
 }
 
+/* ---------- somewhere to start ----------
+   "Pick a name." was a dead end on a page holding seven hundred careers. Three
+   ways in instead, each of them a real link so it can be shared, opened in a
+   tab or reached by keyboard: the fastest anybody has ever run here, whoever is
+   on the squad right now, and somebody at random - which is the one people
+   actually use, because the point of this page is that everybody on it has a
+   story and you do not need to know a name to find one. */
+function athleteWelcome(){
+  const pick=(g,n)=>V.top(g,'dist','xc5000',n).map(x=>x.i);
+  const fastest=[...pick('M',3),...pick('F',3)];
+  const now=A.filter(x=>isActive(x)&&byA[x.i].seasons.some(sn=>sn.y===NOW))
+    .sort((x,y)=>(byA[x.i].best.xc5000||9e9)-(byA[y.i].best.xc5000||9e9)).slice(0,10);
+  const anyone=A.filter(x=>byA[x.i].seasons.length>=3);
+  const rnd=anyone.length?anyone[Math.floor(Math.random()*anyone.length)]:A[0];
+  const chip=x=>'<a class="jump" data-i="'+x.i+'" href="#/athlete/'
+    +esc(SLUG.get(x.i)||'')+'">'+esc(nameOf(x))
+    +'<span>'+(x.classOf||'')+'</span></a>';
+  return '<div class="card reveal"><h2>Seven hundred careers</h2>'
+    +'<p class="why">Type a name above, press <kbd>/</kbd> from anywhere, or start '
+    +'with one of these.</p>'
+    +'<p class="why" style="margin:16px 0 8px;color:var(--muted);font:600 10.5px/1 '
+    +'var(--disp);letter-spacing:.11em;text-transform:uppercase">Fastest ever</p>'
+    +'<div class="ppl">'+fastest.map(j=>chip(A[j])).join('')+'</div>'
+    +(now.length?'<p class="why" style="margin:18px 0 8px;color:var(--muted);'
+      +'font:600 10.5px/1 var(--disp);letter-spacing:.11em;text-transform:uppercase">'
+      +'Running now</p><div class="ppl">'+now.map(chip).join('')+'</div>':'')
+    +'<p class="why" style="margin:18px 0 8px;color:var(--muted);font:600 10.5px/1 '
+    +'var(--disp);letter-spacing:.11em;text-transform:uppercase">Or somebody else</p>'
+    +'<div class="ppl">'+chip(rnd)+'</div></div>';
+}
+
 /* ---------- the whole career, one picture ----------
    Every race an athlete ever ran, on one axis, in order.
 
@@ -18278,13 +18371,15 @@ function drawBoard(){
   if(!rows.length){el.innerHTML='<p class="empty">Nobody here on this ruler.</p>';return;}
   el.innerHTML=rows.map(({a,rank})=>{
     const o=byA[a.i],m=MEETS[o.bestAt[bR]]||{};
-    return '<button class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i+'">'
+    return '<a class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i
+      +'" href="#/athlete/'+esc(SLUG.get(a.i)||'')+'">'
       +'<span class="rk">'+rank+'</span>'
       +'<span class="nm">'+esc(nameOf(a))+statusChip(a)+'</span>'
       /* Just the meet. The class year moved into the status chip beside the
          name, and printing it twice on one row is noise. */
-      +'<span class="cl">'+esc(m.name||'')+'</span>'
-      +'<span class="tm">'+secs(o.best[bR])+'</span></button>';
+      +'<span class="cl" title="'+esc(m.name||'')+'" data-tip="'+esc(m.name||'')
+      +'">'+esc(m.name||'')+'</span>'
+      +'<span class="tm">'+secs(o.best[bR])+'</span></a>';
   }).join('');
   animate(el);
 }
@@ -18298,13 +18393,14 @@ function drawGrowth(){
   if(!shown.length){el.innerHTML='<p class="empty">Nobody has two seasons on this ruler yet.</p>';return;}
   const top=rows[0]?rows[0].gain:1;
   el.innerHTML=shown.map(({a,rank,gain,from,to,lo,hi})=>
-    '<button class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i+'">'
+    '<a class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i
+    +'" href="#/athlete/'+esc(SLUG.get(a.i)||'')+'">'
     +'<span class="rk">'+rank+'</span>'
     +'<span class="nm">'+esc(nameOf(a))+statusChip(a)
       +'<span class="standing"><i style="width:'+Math.max(4,gain/top*100).toFixed(0)
       +'%;animation-delay:'+Math.min(rank*14,420)+'ms"></i></span></span>'
     +'<span class="cl">gr '+lo+' — '+hi+' — '+secs(from)+' to '+secs(to)+'</span>'
-    +'<span class="tm">+'+gain.toFixed(1)+'</span></button>').join('');
+    +'<span class="tm">+'+gain.toFixed(1)+'</span></a>').join('');
   animate(el);
 }
 
@@ -18472,7 +18568,7 @@ function drawProgram(){
 /* ---------- one athlete ---------- */
 function drawAthlete(i){
   const a=A[i],el=document.getElementById('ath');
-  if(!a){el.innerHTML='<p class="empty">Pick a name.</p>';return;}
+  if(!a){el.innerHTML=athleteWelcome();animate(el);return;}
   const o=byA[i];
   const races=R.filter(r=>r.a===i).sort((x,y)=>(x.date||'').localeCompare(y.date||''));
 
@@ -18683,10 +18779,11 @@ function drawAthlete(i){
   const pplCard=pr.length?'<div class="card reveal"><h2>Who they run with</h2>'
     +'<p class="why">Team-mates they have raced alongside four times or more, closest '
     +'finisher first. Nobody planned these; they are just true.</p><div class="ppl">'
-    +pr.map(x=>'<button data-i="'+x.other+'">'+esc(nameOf(A[x.other]))
+    +pr.map(x=>'<a data-i="'+x.other+'" href="#/athlete/'
+      +esc(SLUG.get(x.other)||'')+'">'+esc(nameOf(A[x.other]))
       +'<span>'+(x.med<60?x.med.toFixed(0)+'s':Math.floor(x.med/60)+':'
       +String(Math.round(x.med%60)).padStart(2,'0'))+' apart, '+x.n+' races</span>'
-      +'</button>').join('')+'</div></div>':'';
+      +'</a>').join('')+'</div></div>':'';
 
   el.innerHTML=truth+'<div class="card"><h2>'+esc(nameOf(a))+(a.aka?' · also '+esc(a.aka):'')
     +'</h2><p class="why">Class of '+(a.classOf||'—')+' · entered in grade '
@@ -18934,18 +19031,273 @@ function drawJanuary(){
 }
 
 document.getElementById('ath').addEventListener('click',e=>{
-  const b=e.target.closest('.ppl button');if(!b)return;
-  document.getElementById('q-ath').value=nameOf(A[+b.dataset.i]);
-  drawAthlete(+b.dataset.i);
-  scrollTo({top:0,behavior:'smooth'});
+  const b=e.target.closest('.ppl a, .jump');if(!b||!plainClick(e))return;
+  e.preventDefault();openAthlete(+b.dataset.i,true);
 });
 
 document.getElementById('jan').addEventListener('click',e=>{
-  const c=e.target.closest('.jc');if(!c)return;
-  tab('athlete');
-  document.getElementById('q-ath').value=nameOf(A[+c.dataset.i]);
-  drawAthlete(+c.dataset.i);
+  const c=e.target.closest('.jc');if(!c||!plainClick(e))return;
+  e.preventDefault();openAthlete(+c.dataset.i,true);
 });
+
+/* ---------- one tooltip ----------
+   Everything that explained itself did so through a native SVG <title>, which
+   means no touch, no keyboard, no styling and no consistency. This is one
+   element for the page, shown on hover, on focus and on tap, dismissed on
+   Escape or on the next tap elsewhere. Anything carrying data-tip gets it. */
+const TIP=(()=>{
+  const el=document.createElement('div');
+  el.className='tip';el.setAttribute('role','tooltip');el.hidden=true;
+  document.body.appendChild(el);
+  let at=null;
+  const place=t=>{
+    const r=t.getBoundingClientRect();
+    el.hidden=false;
+    const w=el.offsetWidth,h=el.offsetHeight;
+    let x=r.left+r.width/2-w/2;
+    x=Math.max(8,Math.min(innerWidth-w-8,x));
+    let y=r.top-h-9;
+    if(y<6)y=r.bottom+9;
+    el.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px)';
+  };
+  const show=t=>{
+    const txt=t.getAttribute('data-tip')||t.getAttribute('title');
+    if(!txt)return;
+    at=t;el.textContent=txt;place(t);el.classList.add('on');
+  };
+  const hide=()=>{at=null;el.classList.remove('on');el.hidden=true;};
+  const find=e=>e.target.closest&&e.target.closest('[data-tip]');
+  addEventListener('pointerover',e=>{const t=find(e);if(t&&t!==at)show(t);else if(!t&&at)hide();});
+  addEventListener('focusin',e=>{const t=find(e);if(t)show(t);});
+  addEventListener('focusout',hide);
+  addEventListener('keydown',e=>{if(e.key==='Escape')hide();});
+  addEventListener('scroll',hide,{passive:true});
+  // tap: show once, and let the next tap anywhere dismiss it
+  addEventListener('click',e=>{const t=find(e);if(t)show(t);else hide();});
+  return {show,hide};
+})();
+
+/* ---------- the command palette ----------
+   Slash or Cmd-K from any tab. Seven hundred and forty-nine athletes is more
+   than a datalist can usefully hold, and the search that existed only lived on
+   the Athlete tab, so finding somebody meant leaving wherever you were.
+
+   The match is deliberately forgiving: initials, surname first, class year, or
+   a time. "french 16" finds Mark French, class of 2016, and so does "mf".
+   Ranked so an exact prefix beats a subsequence, because typing three letters
+   should land on the obvious person rather than the alphabetically first. */
+const PAL=(()=>{
+  const wrap=document.createElement('div');
+  wrap.className='pal';wrap.hidden=true;
+  wrap.innerHTML='<div class="pal-box" role="dialog" aria-modal="true" '
+    +'aria-label="Find an athlete"><input type="search" id="pal-q" '
+    +'placeholder="Find any athlete\u2026" autocomplete="off" '
+    +'aria-controls="pal-list"><ul id="pal-list" role="listbox"></ul>'
+    +'<div class="pal-foot">\u2191\u2193 to move \u00b7 \u21b5 to open \u00b7 esc to close</div></div>';
+  document.body.appendChild(wrap);
+  const inp=wrap.querySelector('#pal-q'),list=wrap.querySelector('#pal-list');
+  let hits=[],at=0;
+
+  const norm=t=>String(t||'').toLowerCase();
+  function score(a,q){
+    const name=norm(a.first+' '+a.last),cls=String(a.classOf||'');
+    const ini=norm((a.first[0]||'')+(a.last[0]||''));
+    if(!q)return 0;
+    const terms=q.split(/\s+/).filter(Boolean);
+    let sc=0;
+    for(const t of terms){
+      if(/^\d{2,4}$/.test(t)){ if(cls.endsWith(t))sc+=40; else return -1; continue; }
+      if(name.startsWith(t))sc+=60;
+      else if(norm(a.last).startsWith(t))sc+=50;
+      else if(ini===t)sc+=45;
+      else if(name.includes(t))sc+=25;
+      else if(norm(a.aka).includes(t))sc+=20;
+      else return -1;
+    }
+    if(isActive(a))sc+=6;                 // somebody on the squad is likelier
+    if(byA[a.i].best.xc5000)sc+=2;
+    return sc;
+  }
+  function render(){
+    list.innerHTML=hits.map((h,n)=>{
+      const a=A[h.i],o=byA[h.i];
+      return '<li role="option" aria-selected="'+(n===at)+'" class="'+(n===at?'on':'')
+        +'" data-i="'+h.i+'"><span class="p-n">'+esc(nameOf(a))+'</span>'
+        +'<span class="p-c">'+(isActive(a)?'running now':'class of '+(a.classOf||'?'))
+        +'</span><span class="p-t">'+(o.best.xc5000?secs(o.best.xc5000):'')+'</span></li>';
+    }).join('')||'<li class="none">Nobody by that name.</li>';
+    const on=list.querySelector('.on');
+    if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest'});
+  }
+  function search(q){
+    const n=norm(q).trim();
+    hits=!n?[]:A.map(a=>({i:a.i,s:score(a,n)})).filter(h=>h.s>=0)
+      .sort((x,y)=>y.s-x.s||(byA[x.i].best.xc5000||9e9)-(byA[y.i].best.xc5000||9e9))
+      .slice(0,12);
+    at=0;render();
+  }
+  function open(){
+    wrap.hidden=false;inp.value='';hits=[];render();
+    requestAnimationFrame(()=>inp.focus());
+  }
+  function close(){wrap.hidden=true;}
+  inp.addEventListener('input',e=>search(e.target.value));
+  wrap.addEventListener('click',e=>{
+    const li=e.target.closest('li[data-i]');
+    if(li){close();openAthlete(+li.dataset.i,true);return;}
+    if(e.target===wrap)close();
+  });
+  addEventListener('keydown',e=>{
+    if(!wrap.hidden){
+      if(e.key==='Escape'){e.preventDefault();close();return;}
+      if(e.key==='ArrowDown'){e.preventDefault();at=Math.min(at+1,hits.length-1);render();return;}
+      if(e.key==='ArrowUp'){e.preventDefault();at=Math.max(at-1,0);render();return;}
+      if(e.key==='Enter'&&hits[at]){e.preventDefault();close();openAthlete(hits[at].i,true);return;}
+      return;
+    }
+    const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''));
+    if((e.key==='k'||e.key==='K')&&(e.metaKey||e.ctrlKey)){e.preventDefault();open();return;}
+    if(e.key==='/'&&!typing&&!e.metaKey&&!e.ctrlKey){e.preventDefault();open();}
+  });
+  return {open,close};
+})();
+
+/* ---------- routing ----------
+   Nothing on this site was linkable. No hash, no history, no way for a coach
+   to send anybody a runner, and the back button did nothing at all. That is
+   the largest gap in the product and everything else in this phase leans on
+   fixing it - the empty state's entry points, the command palette and the
+   copy-link button are all just routes.
+
+   Hash routing rather than paths, because this is a static file on a CDN with
+   no rewrite rules and a real path would 404 on reload.
+
+   The URL is the state. Every switch writes it, hashchange reads it, and the
+   two share one applyRoute() so the back button cannot drift out of step with
+   the page. replaceState for a toggle and pushState for a navigation: a reader
+   flipping between boys and girls does not want six history entries, but
+   opening an athlete is somewhere they should be able to come back from. */
+const SEXQ={M:'boys',F:'girls'},SEXR={boys:'M',girls:'F'};
+const EVQ={xc5000:'xc5k',tf3000:'tf3k',tf1500:'tf1500'};
+const EVR={xc5k:'xc5000',tf3k:'tf3000',tf1500:'tf1500'};
+const VIEWQ={100:'top100',0:'everyone','-1':'improved'};
+const VIEWR={top100:100,everyone:0,improved:-1};
+
+/* A slug a human can read, and that survives a rebuild. Athlete indices do
+   not - they shift whenever the roster grows - so the slug is built from the
+   name and the class year, with the athletic.net id appended only where two
+   athletes would otherwise collide. */
+const slugify=t=>String(t||'').toLowerCase().normalize('NFKD')
+  .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const SLUG=new Map(),BY_SLUG=new Map();
+(function(){
+  const seen=new Map();
+  for(const a of A){
+    const base=slugify(a.first+' '+a.last+' '+(a.classOf||''));
+    seen.set(base,(seen.get(base)||0)+1);
+  }
+  for(const a of A){
+    const base=slugify(a.first+' '+a.last+' '+(a.classOf||''));
+    const key=seen.get(base)>1?base+'-'+a.id:base;
+    SLUG.set(a.i,key);BY_SLUG.set(key,a.i);
+    // the athletic.net id always resolves too, as a permanent fallback
+    BY_SLUG.set(String(a.id),a.i);
+  }
+})();
+
+function parseRoute(h){
+  const raw=String(h||'').replace(/^#\/?/,'');
+  const [pathPart,queryPart]=raw.split('?');
+  const seg=pathPart.split('/').filter(Boolean);
+  const q={};
+  for(const kv of (queryPart||'').split('&')){
+    if(!kv)continue;
+    const i=kv.indexOf('=');
+    q[decodeURIComponent(kv.slice(0,i<0?kv.length:i))]=i<0?'':decodeURIComponent(kv.slice(i+1));
+  }
+  return {tab:seg[0]||'board',arg:seg[1]?decodeURIComponent(seg[1]):'',q};
+}
+
+function routeNow(){
+  if(CUR_TAB==='board')return {tab:'board',q:{sex:SEXQ[bG],event:EVQ[bR],
+    view:VIEWQ[String(bN)],q:bQ||undefined}};
+  if(CUR_TAB==='program')return {tab:'program',q:{sex:SEXQ[pG],pop:pP,event:EVQ[pR]}};
+  if(CUR_TAB==='january')return {tab:'plan',q:{sex:SEXQ[jG],event:EVQ[jR]}};
+  return {tab:'athlete',arg:CUR_ATH==null?'':SLUG.get(CUR_ATH)||'',q:{}};
+}
+
+function routeToHash(r){
+  const qs=Object.entries(r.q||{}).filter(([,v])=>v!=null&&v!=='')
+    .map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+  return '#/'+r.tab+(r.arg?'/'+encodeURIComponent(r.arg):'')+(qs?'?'+qs:'');
+}
+
+let SUPPRESS=false;
+function writeHash(push){
+  const h=routeToHash(routeNow());
+  if(h===location.hash)return;
+  SUPPRESS=true;
+  if(push)history.pushState(null,'',h); else history.replaceState(null,'',h);
+  setTimeout(()=>{SUPPRESS=false;},0);
+}
+
+/* The one place a route becomes the page. Called by hashchange and on load,
+   never by a control - controls set state and call writeHash, which is the
+   opposite direction and is what keeps the two from fighting. */
+function applyRoute(r){
+  const q=r.q||{};
+  const setSeg=(id,val)=>{
+    const el=document.getElementById(id);if(!el)return;
+    for(const b of el.children){
+      const d=b.dataset;
+      const mine=d.g||d.n||d.p||d.k;
+      b.setAttribute('aria-pressed',String(String(mine)===String(val)));
+    }
+  };
+  if(r.tab==='athlete'){
+    const i=BY_SLUG.has(r.arg)?BY_SLUG.get(r.arg):null;
+    showTab('athlete');
+    CUR_ATH=i;
+    const f=document.getElementById('q-ath');
+    if(f)f.value=i==null?'':nameOf(A[i]);
+    drawAthlete(i);
+    return;
+  }
+  if(r.tab==='program'){
+    if(SEXR[q.sex])pG=SEXR[q.sex];
+    if(q.pop==='dist'||q.pop==='xc')pP=q.pop;
+    if(EVR[q.event])pR=EVR[q.event];
+    setSeg('g-prog',pG);setSeg('p-prog',pP);setSeg('r-dev',pR);
+    showTab('program');drawProgram();return;
+  }
+  if(r.tab==='plan'||r.tab==='january'){
+    if(SEXR[q.sex])jG=SEXR[q.sex];
+    if(EVR[q.event])jR=EVR[q.event];
+    setSeg('g-jan',jG);setSeg('r-jan',jR);
+    showTab('january');drawJanuary();return;
+  }
+  if(SEXR[q.sex])bG=SEXR[q.sex];
+  if(EVR[q.event])bR=EVR[q.event];
+  if(q.view in VIEWR)bN=VIEWR[q.view];
+  bQ=q.q||'';
+  const f=document.getElementById('q-board');if(f)f.value=bQ;
+  setSeg('g-board',bG);setSeg('r-board',bR);setSeg('n-board',String(bN));
+  showTab('board');drawBoard();
+}
+
+let CUR_TAB='board',CUR_ATH=null;
+
+/* Open an athlete from anywhere. One function, so a board row, a pack partner
+   and the command palette all behave identically and all push history. */
+function openAthlete(i,push){
+  CUR_ATH=i;
+  showTab('athlete');
+  const f=document.getElementById('q-ath');
+  if(f)f.value=i==null?'':nameOf(A[i]);
+  drawAthlete(i);
+  writeHash(push!==false);
+  scrollTo({top:0,behavior:REDUCED?'auto':'smooth'});
+}
 
 /* ---------- wiring ---------- */
 function seg(id,items,cur,fn){
@@ -18959,9 +19311,9 @@ function seg(id,items,cur,fn){
   });
 }
 const rulerItems=RKEYS.map(k=>[k,RULERS[k].short]);
-seg('r-board',rulerItems,bR,k=>{bR=k;drawBoard();});
-seg('r-dev',rulerItems,pR,k=>{pR=k;drawProgram();});
-seg('r-jan',rulerItems,jR,k=>{jR=k;drawJanuary();});
+seg('r-board',rulerItems,bR,k=>{bR=k;drawBoard();writeHash();});
+seg('r-dev',rulerItems,pR,k=>{pR=k;drawProgram();writeHash();});
+seg('r-jan',rulerItems,jR,k=>{jR=k;drawJanuary();writeHash();});
 
 function segStatic(id,fn){
   document.getElementById(id).addEventListener('click',e=>{
@@ -18970,7 +19322,7 @@ function segStatic(id,fn){
     fn(b.dataset);
   });
 }
-segStatic('g-board',d=>{bG=d.g;drawBoard();});
+segStatic('g-board',d=>{bG=d.g;drawBoard();writeHash();});
 segStatic('n-board',d=>{bN=+d.n;
   document.getElementById('board-note').innerHTML=bN===-1
     ?'<b>Ranked on what they gained, not on what they ran.</b> VDOT added between '
@@ -18981,37 +19333,69 @@ segStatic('n-board',d=>{bN=+d.n;
       +'Every number on the Program tab is computed over a population you can see '
       +'and change, because a statistic taken over this list is a statistic about '
       +'the people who stayed.';
-  drawBoard();});
-segStatic('g-prog',d=>{pG=d.g;drawProgram();});
-segStatic('p-prog',d=>{pP=d.p;drawProgram();});
-segStatic('g-jan',d=>{jG=d.g;drawJanuary();});
-document.getElementById('q-board').addEventListener('input',e=>{bQ=e.target.value;drawBoard();});
+  drawBoard();writeHash();});
+segStatic('g-prog',d=>{pG=d.g;drawProgram();writeHash();});
+segStatic('p-prog',d=>{pP=d.p;drawProgram();writeHash();});
+segStatic('g-jan',d=>{jG=d.g;drawJanuary();writeHash();});
+let qTimer=null;
+document.getElementById('q-board').addEventListener('input',e=>{
+  bQ=e.target.value;drawBoard();
+  // one history entry for a search, not one per keystroke
+  clearTimeout(qTimer);qTimer=setTimeout(()=>writeHash(),400);
+});
 
-function tab(which){
+/* showTab only paints. It must not render or navigate, because applyRoute
+   needs to choose the panel before it sets the state the renderer will read. */
+function showTab(which){
+  CUR_TAB=which;
   for(const k of ['board','program','athlete','january']){
     document.getElementById('t-'+k).setAttribute('aria-selected',String(k===which));
     document.getElementById('p-'+k).hidden=k!==which;
   }
+}
+function tab(which){
+  showTab(which);
   if(which==='program')drawProgram();
   if(which==='january')drawJanuary();
+  if(which==='board')drawBoard();
+  writeHash(true);
 }
-for(const k of ['board','program','athlete','january'])
-  document.getElementById('t-'+k).addEventListener('click',()=>tab(k));
+for(const k of ['board','program','athlete','january']){
+  const btn=document.getElementById('t-'+k);
+  btn.addEventListener('click',()=>tab(k));
+  // arrow keys move between tabs, which is what a tablist is supposed to do
+  btn.addEventListener('keydown',e=>{
+    const order=['board','program','athlete','january'];
+    const at=order.indexOf(k);
+    let to=null;
+    if(e.key==='ArrowRight')to=order[(at+1)%order.length];
+    if(e.key==='ArrowLeft')to=order[(at+order.length-1)%order.length];
+    if(e.key==='Home')to=order[0];
+    if(e.key==='End')to=order[order.length-1];
+    if(!to)return;
+    e.preventDefault();tab(to);document.getElementById('t-'+to).focus();
+  });
+}
 
+/* The rows are real anchors now, so a plain click is left to the browser and
+   only intercepted to avoid a full re-render from hashchange. Modified clicks
+   - new tab, new window, download - are not touched at all, which is the
+   whole point of using an anchor. */
+const plainClick=e=>!(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0);
 document.getElementById('board').addEventListener('click',e=>{
-  const b=e.target.closest('.row');if(!b)return;
-  tab('athlete');
-  document.getElementById('q-ath').value=nameOf(A[+b.dataset.i]);
-  drawAthlete(+b.dataset.i);
+  const b=e.target.closest('.row');if(!b||!plainClick(e))return;
+  e.preventDefault();openAthlete(+b.dataset.i,true);
 });
 
 document.getElementById('names').innerHTML=A.filter(a=>byA[a.i].seasons.length)
   .map(a=>'<option value="'+esc(nameOf(a))+'">').join('');
 document.getElementById('q-ath').addEventListener('input',e=>{
   const q=e.target.value.trim().toLowerCase();
-  if(q.length<2){drawAthlete(null);return;}
+  if(q.length<2){CUR_ATH=null;drawAthlete(null);writeHash();return;}
   const hit=A.find(a=>nameOf(a).toLowerCase()===q)||A.find(a=>fullKey(a).includes(q));
-  drawAthlete(hit?hit.i:null);
+  CUR_ATH=hit?hit.i:null;
+  drawAthlete(CUR_ATH);
+  writeHash();
 });
 
 document.getElementById('themer').addEventListener('click',e=>{
@@ -19037,8 +19421,12 @@ document.getElementById('foot').innerHTML='Built by <code>pull/roster.js</code> 
   +'difficulty and time of season cannot be told apart in data where every meet happens on '
   +'exactly one day.';
 
-drawBoard();
-drawAthlete(null);
+/* Boot from whatever the address bar says, and keep listening. Back and
+   forward are just hashchange, so they cost nothing extra. */
+addEventListener('hashchange',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
+addEventListener('popstate',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
+applyRoute(parseRoute(location.hash));
+if(!location.hash)writeHash();
 </script>
 </body>
 </html>
