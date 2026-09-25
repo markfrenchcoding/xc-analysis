@@ -1,18 +1,17 @@
-# What the CHUTEXC deployment does not serve.
+# Shared by BOTH Vercel projects, and that is the trap.
 #
-# chutexc.vercel.app is the statewide projections site. The Tualatin roster
-# dashboard is a different product for a different audience - one school, 749
-# named local athletes - and it gets its own Vercel project rather than a path
-# on this one. Strangers come to chutexc for the odds and should not be one
-# guessed URL away from a page about somebody's kid.
+# This file is applied at UPLOAD time, before either project narrows to its
+# root directory. Listing `tualatin/` here to keep it off chutexc therefore
+# stripped it from the tualatinxctf upload as well, and that project deployed
+# empty - every path 404, including files that plainly exist. An hour lost to
+# it. A path excluded here is excluded from every project in the repo, full
+# stop.
 #
-# So tualatin/ is excluded here and is the ROOT DIRECTORY of a second Vercel
-# project, which serves it at tualatinxctf.vercel.app with its own
-# tualatin/vercel.json carrying its own headers. That project cannot see
-# anything above its root, so the seed, the archive and the backtest are all
-# out of its reach by construction rather than by a rule somebody has to keep
-# maintaining.
+# So the split is enforced the other way round: tualatin/ ships to both, and
+# chutexc's own vercel.json redirects /tualatin/* to / so the page is not
+# served on the projections domain. tualatinxctf has root directory tualatin/
+# and serves it at its own root.
 #
-# Both projects must keep framework preset "Other". See CLAUDE.md.
-tualatin/
+# pull/roster/ is safe to list. Neither site needs it - the page embeds
+# everything - and it sits above tualatinxctf's root anyway.
 pull/roster/

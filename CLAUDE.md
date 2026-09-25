@@ -1129,11 +1129,25 @@ about 749 named local kids should not be one guessed URL away from it. Two
 audiences, two products, two domains.
 
 **A second Vercel project, root directory `tualatin/`.** Same repo, same
-commits, same push. The root `.vercelignore` excludes `tualatin/` from chutexc,
-and the second project cannot see anything above its own root — so the seed,
-the archive and the backtest are out of its reach **by construction** rather
-than by a rule somebody has to keep maintaining. Both projects must keep
-framework preset **Other**.
+commits, same push. The second project cannot see anything above its own root,
+so the seed, the archive and the backtest are out of its reach **by
+construction** rather than by a rule somebody has to keep maintaining. Both
+projects must keep framework preset **Other**.
+
+**`.vercelignore` is shared by both projects and that cost an hour.** It is
+applied at **upload** time, before either project narrows to its root
+directory, so listing `tualatin/` there to keep the page off chutexc stripped
+it from the tualatinxctf upload too. That project deployed **empty** — every
+path 404, including files that plainly exist at the repo root, which is the
+fingerprint: `X-Vercel-Error: NOT_FOUND` rather than `DEPLOYMENT_NOT_FOUND`
+means the project is real and has nothing in it.
+
+So the split runs the other way round. `tualatin/` ships to both, and chutexc's
+own `vercel.json` **redirects `/tualatin/*` to `/`**, which works because
+redirects are matched in the routing phase before static files. A `rewrite`
+would not: those run *after* the filesystem check, so the page would still be
+served. A path listed in `.vercelignore` is gone from every project in the
+repo, full stop.
 
 `tualatin/vercel.json` carries its own headers rather than borrowing the app's,
 because a separate project gets no inheritance. Same CSP shape —
