@@ -1641,6 +1641,123 @@ numbers are track VDOT, so neither carries terrain and both can simply be axes.
 The line sits at the squad's median difference rather than at `y = x`, because
 an offset everybody shares says nothing about anybody.
 
+### The ghost race
+
+Two seasons of this programme on one strip, at the pace each athlete averaged
+that year, scored as an NFHS dual: everyone takes a place, the first five a
+side add up, the sixth and seventh displace without scoring, and a tie goes to
+the better sixth runner. A perfect dual is 15-50, which is what displacement
+means.
+
+**Nobody passes anybody, and that is the reading rather than a flaw to hide.**
+Everyone runs an even pace off their season best, so the order is settled at the
+gun and the only thing that changes is how far apart they are. A real race is
+decided by who has a day; this asks what two squads were actually worth, and the
+answer is the width of the gap after 5,000 metres. The panel says so in its own
+words, twice.
+
+Seven a side, because seven is what a team races, so a season that cannot field
+seven is not offered. Scrub, play, pause, 1x/4x/16x, where 1x runs the 5,000m in
+about twenty seconds.
+
+**The verdict line said "beat" and was wrong half the time.** The two panels sit
+in the order the reader picked, not in finishing order, so it read "2027 squad 30
+beat 2022 squad 25" with 2022 winning. It is a neutral "v" now, with the winner
+marked on its own panel and named in the sentence.
+
+### A frame and a timer, whichever arrives first
+
+`nextFrame` replaced every bare `requestAnimationFrame` on the page. The ghost
+race proved why: the clock sat at 0:00 and the scrubber at zero while the button
+read "Pause", because the callback after the first one never came. A window
+behind another window delivers no frames at all.
+
+The frame keeps the motion smooth while the page is painting. The timer is the
+promise that the thing will finish. This is the same rule the app's own
+`nextTick` exists for, and the same family as `countTo` writing `fmt(0)` and
+stranding four tiles on "0 athletes on record".
+
+### One selection, three charts
+
+The Program tab draws the same twenty-two seasons three times - roster size,
+squad depth, who stayed. Point at a season anywhere and it lights in every chart
+that knows about it; click to keep it, Escape or click again to let go.
+
+**A class year and a school year are not the same thing.** The class of 2016 was
+here for school years 2013 to 2016, so that bar lights whenever any of those
+four is picked, and picking the bar lights all four. The note says so, because a
+reader watching one bar answer to four different picks deserves to know why.
+Linking them as if they were the same would have been a quiet lie of exactly the
+kind this file keeps recording.
+
+### The hero's own two facts
+
+Under the headline: a sparkline of the season bests, and where this sits against
+everyone else. **The sparkline keeps its own 150x30 viewBox** rather than taking
+`CH.W`, which is sized for a chart that spans a column and would draw this at
+four times the size of the text beside it.
+
+**The percentile names its population.** "Faster than 98%" means nothing alone;
+"faster than 98% of the 114 boys who have recorded a Track 3,000m here" is a
+claim somebody can check, and it says out loud that the denominator is people
+with a mark on that ruler rather than everyone who joined the team.
+
+**The copy-link fallback has to leave something to copy.** The first version put
+a hidden field on the page, tried `execCommand`, removed the field and then told
+the reader to press Ctrl-C - with nothing selected. Instructions you have just
+made impossible to follow are worse than no fallback. The field stays, visible
+and selected.
+
+### Mobile and desktop, measured at three widths
+
+Checked at 375, 768 and 1440 in both themes: no horizontal page scroll on any
+tab, no SVG text under 10.2px, no overlapping labels on any chart.
+
+**A table scrolls itself; the page never does.** Seven columns of every race an
+athlete ever ran want 452px against a 305px phone column, and it was pushing the
+whole page sideways - headings, charts and navigation with it. No column is
+hidden, because each one is a fact somebody might want. `wrapTables` runs from
+`animate()`, so a table written later gets it without anyone remembering.
+
+**The grid has to stop before the chart does.** `.smalls` was auto-fit at a 150px
+minimum, which at a 690px container gives three columns of 206px - and a
+170-unit viewBox in a 206px box renders its axis type at **7.9 pixels**. 240px
+gives two columns at tablet width and one on a phone. The page's own column
+arithmetic has to match what auto-fit will actually do, against a named
+`SMALL_MIN`.
+
+**Labels shorten, step aside, or do not print.** Four separate collisions at
+375px, all the same shape: a rotated unit label written through the widest y
+tick, "grade 9 → 10" at 45 units in a 32-unit column, an annotation wider than
+the bar it annotates, and two stacked-segment labels in a segment too thin to
+hold one. The waterfall picks one of three label lengths off the measured column
+rather than off a breakpoint, because the same chart appears full width, half
+width and as one of three small multiples on the same page.
+
+**Eighteen names across a phone is a smudge.** The pack network had 29
+overlapping pairs at 375px. Two staggered rows, and any name that still would not
+fit is left off rather than printed over its neighbour - every node keeps its
+dot, its tooltip and its row in the table, so dropping a label loses nothing an
+unreadable one would have kept.
+
+**A hatch key was removed rather than fixed.** It was anchored start at the right
+edge, so it wrote outside its own viewBox and across the chart in the next grid
+cell - and the caption already said the same thing at more length and with the
+reason. A direct label earns its place by saying something the prose does not.
+
+### A chart is one tab stop, not a hundred
+
+`CH.tip` put `tabindex="0"` on every mark, which gave the Program tab **173 tab
+stops** and the Plan tab 70. A keyboard reader had to press Tab through every dot
+on every chart to reach the next control, which is worse for them than no
+tooltips at all.
+
+Marks are `tabindex="-1"` - reachable by script, invisible to Tab - and the chart
+itself is the stop. Left and right walk its marks, Home and End jump to the ends,
+Escape puts the tooltip away. The `aria-label` says how many marks there are and
+that the arrows work. Program went to 26 stops, Plan to 9, Athlete to 13. The
+Board keeps 109, and should: a hundred of those are real links to real people.
+
 ### Charts carry the shape, tables carry the numbers
 
 Three series in a grouped bar leaves about fifteen viewBox units a bar, and

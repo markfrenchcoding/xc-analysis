@@ -103,10 +103,18 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
    The content was always in the DOM. It was the styling that made it look
    broken, which is the worst kind of empty state because nothing is wrong. */
+/* Under 600ms end to end, stagger included: 320 + 180 = 500. An entrance
+   that outstays that stops reading as arrival and starts reading as lag,
+   and it happens on every section of every tab. */
 .reveal{opacity:.35;transform:translateY(10px)}
 .reveal.in{opacity:1;transform:none;
-  transition:opacity .38s var(--ease),transform .38s var(--ease);
+  transition:opacity .32s var(--ease),transform .32s var(--ease);
   transition-delay:var(--d,0ms)}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none}
+  .reveal.in{transition:none}
+  .truth>*{animation:none}
+}
 @media (prefers-reduced-motion:reduce){
   .reveal,.reveal.in{opacity:1;transform:none;transition:none}
   *{animation-duration:.01ms!important;animation-iteration-count:1!important}
@@ -352,6 +360,63 @@ details>summary:hover{color:var(--text)}
   letter-spacing:.005em;font-size:clamp(30px,8vw,52px);line-height:.98;margin:0;
   transform:skewX(-8deg);transform-origin:left bottom}
 .truth .sub{color:var(--muted);font-size:14.5px;margin:12px 0 0;max-width:56ch}
+
+/* the hero's two facts, plus the one button */
+.hx{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:flex-end;
+  gap:16px 22px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.hx-s{display:flex;flex-direction:column;gap:5px}
+.hx-s .spark{width:150px;height:30px;display:block}
+.hx-s span{color:var(--dim);font:500 11.5px/1 var(--num)}
+.hx-p{flex:1 1 230px;min-width:200px;display:flex;flex-direction:column;gap:7px}
+.hx-p .bar{height:5px;border-radius:3px;background:var(--raised);overflow:hidden}
+.hx-p .bar i{display:block;height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--maroon),var(--accent));
+  transform-origin:left;animation:hxgrow .8s var(--ease) both .2s}
+@keyframes hxgrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hx-p span{color:var(--muted);font-size:12.5px;line-height:1.45;max-width:52ch}
+.hx-p b{color:var(--text)}
+.hx-c{background:none;border:1px solid var(--line);border-radius:999px;
+  color:var(--muted);font:600 12px/1 var(--num);padding:9px 15px;cursor:pointer;
+  white-space:nowrap}
+.hx-c:hover{color:var(--text);border-color:var(--dim)}
+.hx-c.done{color:var(--accent);border-color:var(--accent)}
+.hx-u{flex:1 1 100%;background:var(--raised);border:1px solid var(--line);
+  border-radius:8px;color:var(--text);font:500 12px var(--num);padding:8px 11px}
+
+/* ---------- the ghost race ---------- */
+.gh-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:16px 0 12px}
+.gh-ctl label{color:var(--dim);font:600 11.5px/1 var(--num)}
+.gh-ctl select{background:var(--raised);border:1px solid var(--line);border-radius:8px;
+  color:var(--text);font:700 14px var(--num);padding:8px 10px}
+.gh-go{background:var(--accent);color:var(--on-accent);border:0;border-radius:999px;
+  font:700 13px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;
+  padding:11px 18px;cursor:pointer}
+.gh-go:hover{filter:brightness(1.08)}
+.gh-clock{margin-left:auto;color:var(--muted);font:700 14px var(--num);
+  font-variant-numeric:tabular-nums}
+.gh-scrub{width:100%;margin:0 0 10px;accent-color:var(--accent)}
+#gh-cv{display:block;width:100%}
+.gh-sc{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.gh-sc .s{flex:1 1 130px;background:var(--raised);border:1px solid var(--line);
+  border-radius:10px;padding:10px 14px;display:flex;align-items:baseline;gap:10px}
+.gh-sc .s.win{border-color:var(--accent)}
+.gh-sc .y{color:var(--muted);font:600 12.5px/1 var(--disp);letter-spacing:.05em}
+.gh-sc .p{margin-left:auto;font:700 26px/1 var(--num);color:var(--text)}
+.gh-sc .s.win .p{color:var(--accent)}
+.gh-sc .v{color:var(--dim);font:600 11px/1 var(--disp);letter-spacing:.14em;
+  text-transform:uppercase}
+@media(max-width:560px){.gh-clock{margin-left:0;width:100%}}
+
+/* ---------- one selection, three charts ---------- */
+.lk{transition:opacity .16s ease}
+#p-program.linked .lk{opacity:.22}
+#p-program.linked .lk.lk-on{opacity:1}
+#p-program.linked .lk-hit{opacity:1}
+.psel{background:var(--raised);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;color:var(--muted);font-size:12.5px;line-height:1.5;
+  padding:9px 13px;margin:-8px 0 16px;max-width:66ch}
+.psel b{color:var(--text)}
+@media(prefers-reduced-motion:reduce){.hx-p .bar i{animation:none}}
 .truth>*{animation:rise .62s var(--ease,cubic-bezier(.22,1,.36,1)) both}
 .truth .head{animation-delay:.06s}
 .truth .sub{animation-delay:.14s}
@@ -17190,6 +17255,7 @@ Three Rivers League JV District
     </div>
   </div>
   <p class="why" id="pop-why" style="color:var(--muted);font-size:13.5px;margin:-4px 0 16px;max-width:66ch"></p>
+  <p class="psel" id="psel" hidden></p>
   <div class="tiles" id="tiles"></div>
 
   <div class="card" style="margin-top:18px">
@@ -17219,6 +17285,38 @@ Three Rivers League JV District
     VDOT from cross country never share an axis here. The <em>change</em>
     between two years is comparable, because the offset cancels in a difference.
     The level is not.</p>
+  </div>
+
+  <div class="card" id="gh-wrap">
+    <h2>Race any two seasons</h2>
+    <p class="why">Two squads of seven from this programme's own record, on one
+    strip, at the pace each athlete averaged in that season. Scored as a dual
+    meet: everyone takes a place, the first five a side add up, the sixth and
+    seventh displace without scoring, lower total wins.</p>
+    <p class="why"><b>It is a pace projection, not a race.</b> Everybody runs
+    their season best at an even pace, so nobody passes anybody and the order is
+    settled at the gun. What the strip shows is not who would win a Saturday —
+    it is how far apart these two squads actually were.</p>
+    <div class="gh-ctl">
+      <label for="gh-a">Race</label>
+      <select id="gh-a" aria-label="First season"></select>
+      <label for="gh-b">against</label>
+      <select id="gh-b" aria-label="Second season"></select>
+      <button id="gh-play" type="button" class="gh-go">Race them</button>
+      <div class="seg" id="gh-rate" role="group" aria-label="Speed">
+        <button aria-pressed="true" data-r="1">1&times;</button>
+        <button aria-pressed="false" data-r="4">4&times;</button>
+        <button aria-pressed="false" data-r="16">16&times;</button>
+      </div>
+      <span id="gh-clock" class="gh-clock">0:00 &middot; 0m</span>
+    </div>
+    <input id="gh-scrub" class="gh-scrub" type="range" min="0" max="1000" value="0"
+      aria-label="Scrub the race">
+    <canvas id="gh-cv" aria-label="Two seasons racing 5,000m at their season-best paces"></canvas>
+    <div id="gh-result" hidden></div>
+    <p class="why" style="margin:12px 0 0">At 1&times; the 5,000m takes about
+    twenty seconds. Only seasons with seven athletes on this ruler are offered,
+    because seven is what a team races.</p>
   </div>
 
   <div class="grid2">
@@ -17702,19 +17800,38 @@ function rulerGap(g){
    visible - that rule cost the How tab a rewrite once. */
 const REDUCED=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
+/* A frame and a timer, and whichever arrives first wins.
+
+   requestAnimationFrame is not a promise. A tab in the background, a window
+   behind another window, or a compositor that has stopped delivering frames
+   gives you none at all - and anything that only asks for a frame simply
+   stops. The ghost race did exactly that: the clock sat at 0:00 and the
+   scrubber at zero while the button read "Pause", because the callback after
+   the first one never came.
+
+   The frame is the good path and keeps the motion smooth while the page is
+   painting. The timer is the promise that the thing will finish. Every paced
+   loop on this page uses this rather than rAF directly. */
+function nextFrame(fn){
+  let done=false;
+  const go=()=>{if(done)return;done=true;fn(performance.now());};
+  requestAnimationFrame(go);
+  setTimeout(go,120);
+}
+
 function countTo(el,to,fmt,ms){
   if(REDUCED||!el){if(el)el.textContent=fmt(to);return;}
-  const t0=performance.now(),dur=ms||780;
+  const t0=performance.now(),dur=ms||560;
   let settled=false;
   const land=()=>{if(!settled){settled=true;el.textContent=fmt(to);}};
   const step=now=>{
     if(settled)return;
     const f=Math.min(1,(now-t0)/dur);
     el.textContent=fmt(to*(1-Math.pow(1-f,3)));
-    if(f<1)requestAnimationFrame(step); else land();
+    if(f<1)nextFrame(step); else land();
   };
   el.textContent=fmt(0);
-  requestAnimationFrame(step);
+  nextFrame(step);
   /* A frame callback is not a promise. A tab in the background, a window
      behind another one, or an engine that has stopped painting delivers no
      frames at all - and this animation starts by writing NOUGHT, so a run
@@ -17756,8 +17873,9 @@ function runDraws(root){
     if(!L)continue;
     el.style.strokeDasharray=L;
     el.style.strokeDashoffset=L;
-    el.style.transition='stroke-dashoffset '+(+el.dataset.draw||900)
-      +'ms var(--ease) '+(+el.dataset.delay||0)+'ms';
+    // capped, so one long line cannot hold a section past the budget
+    el.style.transition='stroke-dashoffset '+Math.min(600,+el.dataset.draw||600)
+      +'ms var(--ease) '+Math.min(120,+el.dataset.delay||0)+'ms';
     requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.strokeDashoffset=0;}));
   }
 }
@@ -17792,11 +17910,46 @@ function wrapTables(scope){
   }
 }
 
+/* One stop per chart, and the arrows walk it. Left and right step through
+   the marks in the order they were drawn, Home and End jump to the ends, and
+   Escape puts the tooltip away and hands focus back to the chart. Anything
+   that can be hovered can now be read without a mouse, without turning a
+   forty-dot chart into forty tab stops. */
+function wireCharts(scope){
+  for(const svg of (scope||document).querySelectorAll('svg')){
+    if(svg.dataset.kb)continue;
+    const marks=[...svg.querySelectorAll('[data-tip]')];
+    if(!marks.length)continue;
+    svg.dataset.kb='1';
+    svg.setAttribute('tabindex','0');
+    let at=-1;
+    const show=n=>{
+      at=Math.max(0,Math.min(marks.length-1,n));
+      const el=marks[at];
+      el.focus({preventScroll:true});
+      const r=el.getBoundingClientRect();
+      TIP.at(r.left+r.width/2,r.top,el.getAttribute('data-tip'));
+    };
+    svg.addEventListener('keydown',ev=>{
+      if(ev.key==='ArrowRight'||ev.key==='ArrowDown'){ev.preventDefault();show(at+1);}
+      else if(ev.key==='ArrowLeft'||ev.key==='ArrowUp'){ev.preventDefault();show(at<0?0:at-1);}
+      else if(ev.key==='Home'){ev.preventDefault();show(0);}
+      else if(ev.key==='End'){ev.preventDefault();show(marks.length-1);}
+      else if(ev.key==='Escape'){TIP.hide();at=-1;svg.focus();}
+    });
+    svg.addEventListener('blur',()=>{TIP.hide();at=-1;},true);
+    const lab=svg.getAttribute('aria-label')||'';
+    svg.setAttribute('aria-label',lab+(lab?'. ':'')
+      +marks.length+' marks. Use the arrow keys to read them.');
+  }
+}
+
 function animate(scope){
   const root=scope||document;
   wrapTables(root);
+  wireCharts(root);
   [...root.querySelectorAll('.reveal:not(.in)')].forEach((el,i)=>{
-    if(!el.style.getPropertyValue('--d'))el.style.setProperty('--d',Math.min(i*40,240)+'ms');
+    if(!el.style.getPropertyValue('--d'))el.style.setProperty('--d',Math.min(i*32,180)+'ms');
     if(OBS)OBS.observe(el); else el.classList.add('in');
   });
   // whatever the observer does, the page is whole a moment later
@@ -17936,8 +18089,13 @@ const CH=(()=>{
   /* The unit and the direction, set small down the left edge. Every chart on
      this page inverts something - faster is a smaller number - and a reader
      should never have to work out which way is good. */
+  /* Hard against the left edge, not a fixed offset inside the padding. At
+     f.L-19 it sat where a wide tick label goes: "18:00.0" at 6.5px is about
+     24 units long, so on a phone the rotated unit label was written straight
+     through the time it was labelling. The ticks own the padding; the unit
+     owns the margin. */
   function unitY(f,text){
-    return '<text transform="translate('+(f.L-19)+','+((f.y0+f.y1)/2)
+    return '<text transform="translate(4,'+((f.y0+f.y1)/2)
       +') rotate(-90)" class="lbl" text-anchor="middle" '
       +'style="font-size:6.2px">'+esc(text)+'</text>';
   }
@@ -17950,10 +18108,18 @@ const CH=(()=>{
       +'style="font-size:6.2px">'+esc(text)+'</text>';
   }
 
-  /* Anything hoverable is also focusable and tappable, which is the whole
-     point of routing every explanation through TIP. */
+  /* Anything hoverable is also focusable and tappable, which is the point of
+     routing every explanation through TIP.
+
+     BUT A CHART IS ONE TAB STOP, NOT A HUNDRED. tabindex="0" on every mark
+     put 173 stops on the Program tab and 70 on the Plan tab: a keyboard
+     reader had to press Tab through every dot on every chart to reach the
+     next control, which is worse for them than no tooltips at all. The marks
+     are tabindex="-1" - reachable by script, invisible to Tab - and the chart
+     itself is the stop, with the arrow keys walking its marks. wireCharts
+     does that half. */
   function tip(text){
-    return ' data-tip="'+esc(text)+'" tabindex="0" role="img" aria-label="'
+    return ' data-tip="'+esc(text)+'" tabindex="-1" role="img" aria-label="'
       +esc(text)+'"';
   }
 
@@ -18112,15 +18278,33 @@ function waterfall(c,h,opt){
       g+='<line x1="'+(cx(2)+bw/2).toFixed(1)+'" x2="'+(cx(3)+bw/2).toFixed(1)
         +'" y1="'+y(sum).toFixed(1)+'" y2="'+y(sum).toFixed(1)
         +'" stroke="var(--steel)" stroke-width=".6" stroke-dasharray="2 2"/>'
-        +(small?'':'<text x="'+(cx(3)+bw/2)+'" y="'+(y(sum)-2.5).toFixed(1)
-          +'" class="axt" text-anchor="end">steps sum to '+s0(sum)+'</text>');
+        /* "steps sum to +59s" is 40 units of text over a 34-unit column, so
+           on a phone it was written across the bar's own figure. The rule
+           stays - it is the thing worth seeing - and the caption underneath
+           already says the number in words. */
+        +((small||f.x1-f.x0<170)?''
+          :'<text x="'+(cx(3)+bw/2)+'" y="'+(y(sum)-2.5).toFixed(1)
+            +'" class="axt" text-anchor="end">steps sum to '+s0(sum)+'</text>');
   }
 
-  const labs=[...cum.map(x=>x.lab),'the whole four'];
-  labs.forEach((l,i)=>{
+  /* The labels shorten when the column does. "grade 9 → 10" wants about 45
+     units and a phone gives each of the four columns 34, so at full width
+     they overlapped each other - not by a little, by a word. Three lengths,
+     chosen off the measured column rather than off a breakpoint, because the
+     same chart appears full width, half width and one of three small
+     multiples on the same page. */
+  const room=pw*0.96;
+  const LONG=[...cum.map(x=>x.lab),'the whole four'];
+  const MID=['gr 9\u201310','10\u201311','11\u201312','all four'];
+  const SHORT=['9\u201310','10\u201311','11\u201312','four'];
+  /* Measured against the column rather than guessed: the display face
+     sets wide, so "gr 9-10" wants about 30 units and a phone column is
+     32 - which overlapped. Under 40 units a column takes the short
+     form. */
+  const pick=(small||room<40)?SHORT:(room<62?MID:LONG);
+  pick.forEach((l,i)=>{
     g+='<text x="'+cx(i)+'" y="'+(f.H-(small?4:6))+'" class="'+(small?'axt':'lbl')
-      +'" text-anchor="middle">'+esc(small?l.replace('grade ','').replace('the whole ','all ')
-      :l)+'</text>';
+      +'" text-anchor="middle">'+esc(l)+'</text>';
   });
 
   /* An SVG gradient cannot read a custom property, so these two stops repeat
@@ -18159,23 +18343,21 @@ function barsSimple(rows,h,opt){
   }
   rows.forEach((r,i)=>{
     const x=f.x0+i*pw+pw*.16,bw=pw*.68;
-    g+='<rect x="'+x.toFixed(1)+'" y="'+y(r.v).toFixed(1)+'" width="'+bw.toFixed(1)
-      +'" height="'+Math.max(.5,y(0)-y(r.v)).toFixed(1)+'" rx="0.7" fill="'
+    g+='<rect class="lk" x="'+x.toFixed(1)+'" y="'+y(r.v).toFixed(1)+'" width="'
+      +bw.toFixed(1)+'" height="'+Math.max(.5,y(0)-y(r.v)).toFixed(1)+'" rx="0.7" fill="'
       +(r.thin?'url(#hatch)':(r.color||'var(--accent)'))+'"'
       +(r.thin?' stroke="var(--steel)" stroke-width=".4"':'')
+      +(r.cls!=null?' data-cls="'+r.cls+'"':'')
       +CH.tip(r.title||'')+'/>';
     if(i%(opt.every||1)===0||i===rows.length-1)
       g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
         +'text-anchor="middle">'+esc(r.label)+'</text>';
   });
-  // one direct label on the hatching, rather than a sentence underneath
-  const firstThin=rows.findIndex(r=>r.thin);
-  if(firstThin>=0){
-    const x=f.x0+firstThin*pw+pw*.5,r=rows[firstThin];
-    g+='<text x="'+Math.min(f.x1-1,x+4).toFixed(1)+'" y="'
-      +Math.max(f.y0+5,y(r.v)-4).toFixed(1)+'" class="axt" text-anchor="start" '
-      +'style="fill:var(--steel)">hatched: fewer than four</text>';
-  }
+  /* There was a "hatched: fewer than four" label here and it is gone. It was
+     anchored start at the right edge, so it wrote outside its own viewBox and
+     across the chart in the next grid cell - and the caption underneath
+     already says what the hatching means, at more length and with the reason.
+     A direct label earns its place by saying something the prose does not. */
   return CH.open(h,opt.label||'',g);
 }
 
@@ -18192,8 +18374,8 @@ function stackCols(rows,h,keys,colors){
     keys.forEach((k,ki)=>{
       if(!r[k])return;
       const y0=y(acc),y1=y(acc+r[k]);acc+=r[k];
-      g+='<rect x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+bw.toFixed(1)
-        +'" height="'+(y0-y1).toFixed(1)+'" fill="'+colors[ki]+'"'
+      g+='<rect class="lk" data-y="'+r.y+'" x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)
+        +'" width="'+bw.toFixed(1)+'" height="'+(y0-y1).toFixed(1)+'" fill="'+colors[ki]+'"'
         +CH.tip(r.y+' \u00b7 grade '+k+': '+r[k]+' of '+r.n)+'/>';
     });
     if(i%3===0||i===rows.length-1)
@@ -18206,7 +18388,7 @@ function stackCols(rows,h,keys,colors){
     let acc=0;
     keys.forEach((k,ki)=>{
       const v=last[k];const y0=y(acc),y1=y(acc+v);acc+=v;
-      if(v&&Math.abs(y0-y1)>5)
+      if(v&&Math.abs(y0-y1)>9)      // a 7.5-unit label needs more than 5 units
         g+='<text x="'+(f.x1-1)+'" y="'+((y0+y1)/2+2).toFixed(1)+'" class="axt" '
           +'text-anchor="end" style="fill:'+colors[ki]+'">gr '+k+'</text>';
     });
@@ -18294,10 +18476,15 @@ function twoLines(rows,h,a,b,ca,cb,fmt,note){
 
   rows.forEach((r,i)=>{
     const gapS=Math.round(r[b]-r[a]);
-    g+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(r[a]).toFixed(1)+'" r="1.3" fill="'+ca+'"'
+    g+='<circle class="lk" data-y="'+r.y+'" cx="'+x(i).toFixed(1)+'" cy="'
+      +y(r[a]).toFixed(1)+'" r="1.3" fill="'+ca+'"'
       +CH.tip(r.y+' front five '+fmt(r[a])+', sixth to tenth '+fmt(r[b])
         +' \u2014 '+gapS+'s apart, '+r.n+' athletes on record')+'/>';
-    g+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(r[b]).toFixed(1)+'" r="1.3" fill="'+cb+'"/>';
+    g+='<circle class="lk" data-y="'+r.y+'" cx="'+x(i).toFixed(1)+'" cy="'
+      +y(r[b]).toFixed(1)+'" r="1.3" fill="'+cb+'"/>';
+    // a wide invisible target, because a 1.3-unit dot is not a hover area
+    g+='<rect class="lk lk-hit" data-y="'+r.y+'" x="'+(x(i)-2.6).toFixed(1)+'" y="'+f.y0
+      +'" width="5.2" height="'+(f.y1-f.y0)+'" fill="transparent"/>';
     if(i%3===0||i===rows.length-1)
       g+='<text x="'+x(i).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
         +'text-anchor="middle">'+String(r.y).slice(2)+'</text>';
@@ -19090,6 +19277,97 @@ function bestTruth(i){
       +'in the record for good.'};
 }
 
+/* ---------- the hero's own two facts ----------
+   The headline says the best true thing about somebody. Underneath it, the
+   two things a reader asks next: what the shape of the career was, and where
+   this sits against everyone else who ever did it here.
+
+   THE SPARKLINE IS ITS OWN VIEWBOX, not the page's. It is one line in a
+   sentence, about 150px wide wherever it lands, so it keeps a fixed 150x30
+   box rather than taking CH.W - which is sized for a chart that spans a
+   column and would render this at four times the size of the text beside it.
+
+   THE PERCENTILE IS AGAINST A NAMED POPULATION. "Faster than 87%" means
+   nothing on its own; "faster than 87% of the 330 boys who have recorded a
+   5,000m here" is a claim somebody can check, and it says out loud that the
+   denominator is people with a mark on this ruler rather than everyone who
+   ever joined the team. */
+function heroExtras(i,K){
+  if(!K)return '';
+  const a=A[i],o=byA[i];
+  const board=V.top(a.g,'dist',K,0);
+  const rank=board.findIndex(x=>x.i===i)+1;
+  if(!rank)return '';
+  const n=board.length;
+  const pct=n>1?Math.round((n-rank)/(n-1)*100):100;
+
+  // the career, as one line: season bests in order on this ruler
+  const yrs=Object.keys(o.grade[K]||{}).map(Number).sort((x,y)=>x-y);
+  let spark='';
+  if(yrs.length>1){
+    const W=150,H=30,pad=3;
+    const vs=yrs.map(g=>o.grade[K][g]);
+    const lo=Math.min(...vs),hi=Math.max(...vs),span=(hi-lo)||1;
+    const X=q=>pad+(q-yrs[0])/((yrs[yrs.length-1]-yrs[0])||1)*(W-pad*2);
+    const Y=v=>pad+(v-lo)/span*(H-pad*2);          // faster is up
+    const d=yrs.map((g,q)=>(q?'L':'M')+X(g).toFixed(1)+' '+Y(o.grade[K][g]).toFixed(1))
+      .join(' ');
+    spark='<svg class="spark" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'
+      +esc('Season bests, grade '+yrs[0]+' to '+yrs[yrs.length-1]+', faster is higher')
+      +'"><path d="'+d+'" fill="none" stroke="var(--accent)" stroke-width="2" '
+      +'stroke-linecap="round" stroke-linejoin="round" data-draw="700"/>'
+      +yrs.map(g=>'<circle cx="'+X(g).toFixed(1)+'" cy="'+Y(o.grade[K][g]).toFixed(1)
+        +'" r="2.4" fill="var(--accent)"'
+        +CH.tip('grade '+g+': '+secs(o.grade[K][g]))+'/>').join('')
+      +'</svg>';
+  }
+
+  return '<div class="hx">'
+    +(spark?'<div class="hx-s">'+spark+'<span>grade '+yrs[0]+'\u2013'
+      +yrs[yrs.length-1]+' on '+esc(RULERS[K].short)+'</span></div>':'')
+    +'<div class="hx-p"><div class="bar"><i style="width:'+pct+'%"></i></div>'
+    +'<span>Faster than <b>'+pct+'%</b> of the '+n+' '+(a.g==='M'?'boys':'girls')
+    +' who have recorded a '+esc(RULERS[K].label)+' here \u00b7 '+ord(rank)
+    +' all-time</span></div>'
+    +'<button class="hx-c" type="button" data-slug="'+esc(SLUG.get(i)||'')
+    +'">Copy link</button></div>';
+}
+
+/* One listener for the page, because the athlete panel is rewritten whole on
+   every navigation and anything bound to the button goes with it. */
+function wireCopy(){
+  if(wireCopy.done)return;wireCopy.done=true;
+  document.addEventListener('click',async ev=>{
+    const b=ev.target.closest&&ev.target.closest('.hx-c');
+    if(!b)return;
+    const url=location.origin+location.pathname+'#/athlete/'+b.dataset.slug;
+    /* A clipboard write needs a secure context and a permission a browser can
+       refuse, so this has to have a real second path. The first version put a
+       hidden field on the page, tried execCommand, removed the field and then
+       told the reader to press Ctrl-C - with nothing selected. Instructions
+       you have just made impossible to follow are worse than no fallback.
+
+       So the field STAYS, visible, holding the url and selected. Ctrl-C then
+       does what the button says. */
+    let ok=false;
+    try{await navigator.clipboard.writeText(url);ok=true;}catch(e){}
+    if(!ok){
+      let f=b.parentElement.querySelector('.hx-u');
+      if(!f){
+        f=document.createElement('input');
+        f.className='hx-u';f.setAttribute('readonly','');
+        f.setAttribute('aria-label','Link to this athlete');
+        b.parentElement.appendChild(f);
+      }
+      f.value=url;f.focus();f.select();
+      try{ok=document.execCommand('copy');}catch(e2){}
+    }
+    b.textContent=ok?'Link copied':'Copy it from here';
+    b.classList.add('done');
+    setTimeout(()=>{b.textContent='Copy link';b.classList.remove('done');},2600);
+  });
+}
+
 /* ---------- board ---------- */
 let bG='M',bN=100,bQ='',bR='xc5000';
 
@@ -19264,7 +19542,7 @@ const WALL=(()=>{
       g.globalAlpha=1;
       if(isHot){g.strokeStyle=C.text;g.lineWidth=1.4;g.stroke();}
     }
-    if(f<1)requestAnimationFrame(()=>CV.paint(cv));
+    if(f<1)nextFrame(()=>CV.paint(cv));
   }
 
   function hit(px,py){
@@ -19416,6 +19694,73 @@ function drawGrowth(){
   WALL.render();
 }
 
+/* ---------- one selection, three charts ----------
+   The Program tab draws the same twenty-two seasons three times: how many
+   athletes were on the roster, how deep the squad ran, and how many of each
+   class stayed. They were three pictures of one programme with no way to ask
+   a question of all three at once.
+
+   Point at a season anywhere and it lights in every chart that knows about
+   it. Click to keep it; click again to let go.
+
+   A CLASS YEAR AND A SCHOOL YEAR ARE NOT THE SAME THING, and linking them as
+   if they were would be a quiet lie. "Who stays" is by graduating class, and
+   the class of 2016 was in this programme for school years 2013, 2014, 2015
+   and 2016 - so that bar lights whenever any of those four is selected, and
+   selecting the bar lights all four. The note says so, because a reader
+   watching one bar light up for four different picks deserves to know why. */
+const PSEL=(()=>{
+  let held=null,live=null,wired=false;
+  const yearsOfClass=c=>[c-3,c-2,c-1,c];
+  function apply(){
+    const sel=live||held;
+    const root=document.getElementById('p-program');
+    if(!root)return;
+    const on=sel!=null;
+    root.classList.toggle('linked',on);
+    for(const el of root.querySelectorAll('.lk')){
+      let mine;
+      if(el.dataset.y!=null)mine=+el.dataset.y===sel;
+      else if(el.dataset.cls!=null)mine=yearsOfClass(+el.dataset.cls).includes(sel);
+      else mine=false;
+      el.classList.toggle('lk-on',on&&mine);
+    }
+    const note=document.getElementById('psel');
+    if(note){
+      note.hidden=!on;
+      if(on)note.innerHTML='Linked to school year <b>'+sel+'</b>'
+        +(held!=null?' \u00b7 click it again to let go':'')
+        +'. A graduating class lights whenever any of its four school years is '
+        +'picked, which is why one bar answers to four of them.';
+    }
+  }
+  function from(el){
+    if(el.dataset.y!=null)return +el.dataset.y;
+    if(el.dataset.cls!=null)return +el.dataset.cls;   // its senior year
+    return null;
+  }
+  function wire(){
+    if(wired)return;wired=true;
+    const root=document.getElementById('p-program');
+    root.addEventListener('pointerover',e=>{
+      const el=e.target.closest&&e.target.closest('.lk');
+      const v=el?from(el):null;
+      if(v===live)return;
+      live=v;apply();
+    });
+    root.addEventListener('pointerleave',()=>{live=null;apply();});
+    root.addEventListener('click',e=>{
+      const el=e.target.closest&&e.target.closest('.lk');
+      if(!el)return;
+      const v=from(el);
+      held=(held===v)?null:v;
+      apply();
+    });
+    addEventListener('keydown',e=>{if(e.key==='Escape'&&held!=null){held=null;apply();}});
+  }
+  return {wire:wire,apply:apply,clear:()=>{held=null;live=null;apply();}};
+})();
+
 /* ---------- program ---------- */
 let pG='M',pP='dist',pR='xc5000';
 const SMALL_MIN=240;          // must equal the minmax() in .smalls
@@ -19539,7 +19884,8 @@ function drawProgram(){
 
   chartIn('comp');
   const pooled=ent?fin/ent*100:null;
-  const cRows=co.map(c=>({label:String(c.classOf).slice(2),v:c.entered?c.g12/c.entered*100:0,
+  const cRows=co.map(c=>({label:String(c.classOf).slice(2),cls:c.classOf,
+    v:c.entered?c.g12/c.entered*100:0,
     title:'Class of '+c.classOf+': '+c.g12+' of '+c.entered+' still racing as seniors'
       +(c.entered<4?' \u2014 only '+c.entered+' entrants, so one athlete moves this bar '
         +Math.round(100/c.entered)+' points':''),
@@ -19625,12 +19971,242 @@ function drawProgram(){
     'late-entry':'joined later, and the school did post freshmen that year',
     'unknown-gap':'joined later in a year with no freshman results at all',
     ungraded:'no usable grade on any result'};
+  GHOST.render();
+  PSEL.wire();PSEL.apply();
+  wireCharts(document.getElementById('p-program'));
   document.getElementById('entry').innerHTML='<tr><th>Entry</th><th>Athletes</th><th>Share</th>'
     +'<th>What it means</th></tr>'+ENTRY.map(k=>'<tr><td class="name">'+k+'</td><td>'+mix[k]
     +'</td><td>'+(every.length?Math.round(mix[k]/every.length*100):0)+'%</td>'
     +'<td style="text-align:left" class="dimv">'+why[k]+'</td></tr>').join('');
   animate(document.getElementById('p-program'));
 }
+
+/* ---------- the ghost race ----------
+   Two seasons of this programme, on one strip, at the pace each athlete
+   actually averaged that year.
+
+   IT IS A PACE PROJECTION AND NOBODY PASSES ANYBODY. Everyone runs their own
+   season best at an even pace, so the finishing order is settled at the gun
+   and the only thing that changes is how far apart they are. That is not a
+   flaw to hide behind a label - it IS the reading. A real race is decided by
+   who has a day; this asks the other question, which is what two squads were
+   actually worth, and the answer is the width of the gap after 5,000 metres.
+
+   The score is the NFHS dual: everyone on the course takes a place, the first
+   five on each side add up, six and seven displace without scoring, and a tie
+   goes to the better sixth runner. A perfect dual is 15-50 rather than 15-40,
+   which is what displacement means and what the app's own audit asserts.
+
+   Seven a side, because seven is what a team races. A year that cannot field
+   seven is not offered. */
+const GHOST=(()=>{
+  let cv=null,A7=[],B7=[],res=null,dur=0,t=0,playing=false,rate=1,last=0,wired=false;
+  const BASE=20;                      // 1x runs the whole 5,000m in twenty seconds
+
+  function squadOf(g,k,year){
+    const col=RULERS[k].col,sport=RULERS[k].sport;
+    return S.filter(sn=>sn.y===year&&sn.sport===sport&&sn[col]&&A[sn.a]&&A[sn.a].g===g)
+      .map(sn=>({i:sn.a,t:sn[col]}))
+      .sort((x,y)=>x.t-y.t)
+      .slice(0,7);
+  }
+  function years(g,k){
+    const col=RULERS[k].col,sport=RULERS[k].sport,n=new Map();
+    for(const sn of S){
+      if(sn.sport!==sport||!sn[col]||!A[sn.a]||A[sn.a].g!==g)continue;
+      n.set(sn.y,(n.get(sn.y)||0)+1);
+    }
+    return [...n.entries()].filter(([,c])=>c>=7).map(([y])=>y).sort((x,y)=>y-x);
+  }
+
+  /* Places are assigned across BOTH squads, which is the whole point of a
+     dual: a sixth runner who beats the other team's fifth costs them a point
+     without earning one. */
+  function score(a,b){
+    const all=[...a.map(r=>({...r,side:'A'})),...b.map(r=>({...r,side:'B'}))]
+      .sort((x,y)=>x.t-y.t);
+    all.forEach((r,n)=>{r.place=n+1;});
+    const one=side=>{
+      const p=all.filter(r=>r.side===side).map(r=>r.place);
+      return {pts:p.slice(0,5).reduce((q,v)=>q+v,0),sixth:p[5]==null?null:p[5],n:p.length};
+    };
+    const x=one('A'),y=one('B');
+    let win=x.pts<y.pts?'A':y.pts<x.pts?'B':null;
+    if(win===null){
+      if(x.sixth==null&&y.sixth==null)win=null;
+      else if(x.sixth==null)win='B';
+      else if(y.sixth==null)win='A';
+      else win=x.sixth<y.sixth?'A':'B';
+    }
+    return {all:all,a:x,b:y,win:win};
+  }
+
+  function draw(g,W,H,C){
+    const padL=Math.min(104,Math.max(64,W*.22)),padR=26,padT=26,padB=20;
+    const track=W-padL-padR;
+    const lanes=A7.length+B7.length;
+    const laneH=(H-padT-padB)/Math.max(1,lanes);
+    const rows=[...A7.map(r=>({...r,side:'A'})),...B7.map(r=>({...r,side:'B'}))]
+      .sort((x,y)=>x.t-y.t);
+
+    // the course: a start line, a finish line, and the kilometre marks
+    g.strokeStyle=C.line;g.lineWidth=1;
+    g.beginPath();g.moveTo(padL,padT-8);g.lineTo(padL,H-padB+4);g.stroke();
+    g.font='600 9px Rajdhani,sans-serif';g.textAlign='left';g.fillStyle=C.faint;
+    for(let km=1;km<=5;km++){
+      const x=padL+track*(km===5?1:km/5);
+      g.strokeStyle=km===5?C.accent:C.line;
+      g.setLineDash(km===5?[]:[2,4]);
+      g.beginPath();g.moveTo(x,padT-8);g.lineTo(x,H-padB+4);g.stroke();
+      g.setLineDash([]);
+      g.fillStyle=km===5?C.accent:C.faint;
+      g.textAlign=km===5?'right':'center';
+      g.fillText(km===5?'FINISH':km+'k',km===5?x-3:x,padT-12);
+    }
+
+    rows.forEach((r,n)=>{
+      const y=padT+laneH*(n+0.5);
+      const f=Math.min(1,t/r.t);
+      const x=padL+track*f;
+      const col=r.side==='A'?C.accent:C.steel;
+      g.strokeStyle=col;g.globalAlpha=.28;g.lineWidth=1;
+      g.beginPath();g.moveTo(padL,y);g.lineTo(x,y);g.stroke();
+      g.globalAlpha=1;
+      g.beginPath();g.arc(x,y,f>=1?4.4:3.4,0,7);
+      g.fillStyle=col;g.fill();
+      if(f>=1){g.strokeStyle=C.bg;g.lineWidth=1.2;g.stroke();}
+      g.fillStyle=f>=1?C.text:C.dim;
+      g.font=(f>=1?'700 10px':'500 10px')+' Rajdhani,sans-serif';
+      g.textAlign='right';
+      g.fillText(nameOf(A[r.i]).split(' ')[0]+' '
+        +((nameOf(A[r.i]).split(' ')[1]||'')[0]||''),padL-7,y+3.5);
+      if(f>=1){
+        g.textAlign='left';g.fillStyle=C.muted;g.font='600 9.5px Rajdhani,sans-serif';
+        g.fillText(ord(r.place),Math.min(W-padR+4,x+7),y+3);
+      }
+    });
+  }
+
+  function paint(){if(cv)CV.paint(cv);}
+  function setT(v){t=Math.max(0,Math.min(dur,v));syncOut();paint();}
+
+  function syncOut(){
+    const sc=document.getElementById('gh-clock');
+    if(sc)sc.textContent=ms(t)+' \u00b7 '+Math.round(Math.min(1,t/dur)*5000)+'m';
+    const sl=document.getElementById('gh-scrub');
+    if(sl&&document.activeElement!==sl)sl.value=String(Math.round(t/dur*1000));
+    const done=t>=dur;
+    const out=document.getElementById('gh-result');
+    if(!out||!res)return;
+    out.innerHTML=done?resultHTML():'';
+    out.hidden=!done;
+  }
+
+  function resultHTML(){
+    const yA=+document.getElementById('gh-a').value,
+          yB=+document.getElementById('gh-b').value;
+    const nm=y=>y+' squad';
+    const w=res.win;
+    return '<div class="gh-sc">'
+      +'<div class="s'+(w==='A'?' win':'')+'"><span class="y">'+nm(yA)
+        +'</span><span class="p">'+res.a.pts+'</span></div>'
+      /* Not "beat". The two panels are in the order the reader picked, not in
+         finishing order, so a word that names an outcome is wrong half the
+         time - it read "2027 squad 30 beat 2022 squad 25" on the first run,
+         with 2022 winning. The winner is marked on its own panel and said in
+         the sentence underneath. */
+      +'<div class="v">v</div>'
+      +'<div class="s'+(w==='B'?' win':'')+'"><span class="y">'+nm(yB)
+        +'</span><span class="p">'+res.b.pts+'</span></div></div>'
+      +'<p class="er-note">'+(w===null?'A dead heat on points, and neither side has a '
+        +'sixth runner to break it.'
+        :(w==='A'?yA:yB)+' wins '+Math.min(res.a.pts,res.b.pts)+'\u2013'
+          +Math.max(res.a.pts,res.b.pts)
+          +(res.a.pts===res.b.pts?', on the sixth runner.':'.'))
+      +' Lower score wins: the first five on each side add up, and the sixth and '
+      +'seventh displace without scoring.</p>';
+  }
+
+  function build(){
+    const g=pG,k=pR;
+    const ys=years(g,k);
+    const selA=document.getElementById('gh-a'),selB=document.getElementById('gh-b');
+    if(!selA)return false;
+    if(!ys.length){
+      document.getElementById('gh-wrap').innerHTML=
+        '<p class="empty">No season on '+RULERS[k].label+' has seven '
+        +(g==='M'?'boys':'girls')+' on it.</p>';
+      return false;
+    }
+    const keep=(sel,fallback)=>{
+      const was=+sel.value;
+      sel.innerHTML=ys.map(y=>'<option value="'+y+'">'+y+'</option>').join('');
+      sel.value=String(ys.includes(was)?was:fallback);
+    };
+    keep(selA,ys[0]);
+    keep(selB,ys.length>1?ys[Math.min(ys.length-1,5)]:ys[0]);
+    return true;
+  }
+
+  function load(){
+    const yA=+document.getElementById('gh-a').value,
+          yB=+document.getElementById('gh-b').value;
+    A7=squadOf(pG,pR,yA);B7=squadOf(pG,pR,yB);
+    if(A7.length<7||B7.length<7)return;
+    res=score(A7,B7);
+    dur=Math.max(...res.all.map(r=>r.t));
+    t=0;playing=false;
+    const pb=document.getElementById('gh-play');
+    if(pb)pb.textContent='Race them';
+    CV.drop(cv);
+    cv=document.getElementById('gh-cv');
+    CV.add(cv,()=>Math.max(210,52+(A7.length+B7.length)*17),draw);
+    syncOut();
+  }
+
+  function tick(now){
+    if(!playing)return;
+    const dt=(now-last)/1000;last=now;
+    /* Off the wall clock, not off a frame count: a slow frame should make the
+       race coarser, not slower, and a tab that stops painting should not
+       leave the race half run when it comes back. */
+    setT(t+dt*(dur/BASE)*rate);
+    if(t>=dur){playing=false;document.getElementById('gh-play').textContent='Again';return;}
+    nextFrame(tick);
+  }
+
+  function wire(){
+    if(wired)return;wired=true;
+    for(const id of ['gh-a','gh-b'])
+      document.getElementById(id).addEventListener('change',()=>{load();});
+    document.getElementById('gh-play').addEventListener('click',()=>{
+      if(playing){playing=false;document.getElementById('gh-play').textContent='Resume';return;}
+      if(t>=dur)t=0;
+      playing=true;last=performance.now();
+      document.getElementById('gh-play').textContent='Pause';
+      nextFrame(tick);
+    });
+    document.getElementById('gh-scrub').addEventListener('input',e=>{
+      playing=false;
+      const pb=document.getElementById('gh-play');
+      if(pb&&pb.textContent==='Pause')pb.textContent='Resume';
+      setT(+e.target.value/1000*dur);
+    });
+    document.getElementById('gh-rate').addEventListener('click',e=>{
+      const b=e.target.closest('button');if(!b)return;
+      rate=+b.dataset.r;
+      for(const q of e.currentTarget.children)
+        q.setAttribute('aria-pressed',String(q===b));
+    });
+  }
+
+  function render(){
+    if(!document.getElementById('gh-cv'))return;
+    if(!build())return;
+    wire();load();
+  }
+  return {render:render};
+})();
 
 /* ---------- one athlete ---------- */
 function drawAthlete(i){
@@ -19746,7 +20322,8 @@ function drawAthlete(i){
      here put the arc's own labels in the temporal dead zone. */
   const best=bestTruth(i);
   const truth='<div class="truth"><p class="tag">'+esc(best.tag)+'</p>'
-    +'<p class="head">'+esc(best.head)+'</p><p class="sub">'+esc(best.sub)+'</p></div>';
+    +'<p class="head">'+esc(best.head)+'</p><p class="sub">'+esc(best.sub)+'</p>'
+    +heroExtras(i,K)+'</div>';
 
   const hon=honoursFor(a);
   const honCard=hon.length?'<div class="card"><h2>In the Oregon record</h2>'
@@ -19894,13 +20471,14 @@ function drawAthlete(i){
     +'too few team-mates on the line to say what the day was worth.</p></div>';
   animate(el);
   wireBrush(el);
+  wireCopy();
   const sp=document.getElementById('sp-seg');
   if(sp&&K)sp.addEventListener('click',ev=>{
     const b=ev.target.closest('button');if(!b)return;
     for(const q of sp.children)q.setAttribute('aria-pressed',String(q===b));
     const out=document.getElementById('sp-out');
     out.innerHTML=spaghetti(i,K,b.dataset.f==='1');
-    runDraws(out);
+    runDraws(out);wireCharts(out);
   });
 }
 
@@ -19966,13 +20544,16 @@ function fitScatter(F,g){
   const put=[{a:f.x1-46,b:f.x1,c:f.y0,d:f.y0+7},
              {a:f.x0,b:f.x0+40,c:f.y1-8,d:f.y1}],
         lab=[];
-  const CH_W=6.2*0.52;                       // about one character at 6.2px
+  /* Measured, not assumed: at 0.52em two names still touched at 1440px. The
+     numeric face sets wider than that and a label needs a gap as well as its
+     own width, so the estimate is 0.58 plus three units of air. */
+  const CH_W=6.2*0.58;
   const order=pts.slice().sort((a,b)=>(b.x+b.y)-(a.x+a.y));
   for(const q of order){
     const px=x(q.x),py=y(q.y);
     const name=nameOf(q.r.a).split(' ')[0]+' '
       +((nameOf(q.r.a).split(' ')[1]||'')[0]||'');
-    const w=name.length*CH_W+1.5,h=6.2;
+    const w=name.length*CH_W+3,h=6.8;
     const spots=[[px+4,py-2,'start'],[px-4-w,py-2,'start'],
                  [px+4,py+6,'start'],[px-4-w,py+6,'start']];
     let placed=null;
@@ -20268,7 +20849,7 @@ function drawPack(cv,rows,fifth){
       g.globalAlpha=1;
     }
 
-    if(f>=1)done=true; else requestAnimationFrame(()=>CV.paint(cv));
+    if(f>=1)done=true; else nextFrame(()=>CV.paint(cv));
   });
   // and the same belt: no frames must still end with a finished squad
   if(!done)setTimeout(()=>{if(!done){done=true;CV.paint(cv);}},DUR+400);
