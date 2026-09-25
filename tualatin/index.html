@@ -159,7 +159,13 @@ input[type=search]{background:var(--raised);border:1px solid var(--line);color:v
   border-radius:8px;padding:8px 12px;font:400 14px 'Barlow',sans-serif;min-width:200px}
 input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 
-section[hidden]{display:none}
+/* The `hidden` attribute is a UA rule, so ANY class that sets display beats it.
+   The command palette set `display:flex` and shipped permanently open over the
+   whole page, with Escape doing nothing - the handler read `wrap.hidden`, which
+   was true the whole time, so it believed the palette was already closed. The
+   page had already worked around this once for the panels, which was the tell.
+   One rule, everything, no exceptions. */
+[hidden]{display:none!important}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
   padding:18px 18px 20px;margin-bottom:18px;box-shadow:var(--shadow)}
 .card h2{font:700 13px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;

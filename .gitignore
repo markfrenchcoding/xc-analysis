@@ -13,3 +13,6 @@ pull/.crawl-state.json
 # Who's Who source PDFs: 6MB, re-fetchable, and the committed .txt is what
 # the parser actually reads.
 pull/whoswho/raw/
+
+# local preview server, per-machine
+.claude/launch.json
