@@ -7,3 +7,5 @@ pull/.probe.json
 pull/.commit-msg
 pull/last-run.log
 pull/.crawl-state.json
+# per-machine tool approvals, not a project setting
+.claude/settings.local.json
