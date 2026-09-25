@@ -258,12 +258,25 @@ const esc = (v) => {
 const csv = (head, rows) => [head.join(','),
   ...rows.map((r) => head.map((h) => esc(r[h])).join(','))].join('\n') + '\n';
 
+/* Two different things happen here and conflating them misrepresents both.
+
+   A TYPO is the publication mistyping somebody: "Matther Lovos" for Matthew.
+   The published spelling is worth keeping so Who's Who stays quotable as
+   printed, but it is not a name the athlete ever had.
+
+   A NAME CHANGE is real: Meghan Armstrong ran here 2000-2003 and is Meghan
+   Peyton now. That one belongs on the page, because it is the name her coach
+   will type.
+
+   So they get separate columns. "now Meghan Peyton" is true. "now Matther
+   Lovos" was on the page for an hour and is not. */
 function applyAthleteAlias(rows) {
   let n = 0;
   for (const r of rows) {
     const a = ATHLETE_ALIAS[(r.name + '|' + r.school).toLowerCase()];
-    if (!a) { r.alsoKnownAs = ''; continue; }
-    r.alsoKnownAs = a.alsoKnownAs || (a.name !== r.name ? r.name : '');
+    if (!a) { r.alsoKnownAs = ''; r.published = ''; continue; }
+    r.alsoKnownAs = a.alsoKnownAs || '';       // a later name, if there is one
+    r.published = a.name !== r.name ? r.name : '';   // what the book actually printed
     r.name = a.name;
     n++;
   }
@@ -303,7 +316,8 @@ function main() {
   fs.writeFileSync(path.join(OUT, 'ww_team_rankings.csv'),
     csv(['gender', 'rank', 'points', 'school', 'cls', 'appearances'], teams));
   fs.writeFileSync(path.join(OUT, 'ww_four_year.csv'),
-    csv(['gender', 'rank', 'points', 'cls', 'name', 'alsoKnownAs', 'school', 'from', 'to'], fy.rows));
+    csv(['gender', 'rank', 'points', 'cls', 'name', 'alsoKnownAs', 'published',
+      'school', 'from', 'to'], fy.rows));
   fs.writeFileSync(path.join(OUT, 'ww_state_best.csv'),
     csv(['gender', 'rank', 'name', 'school', 'mark', 'seconds', 'year'], best));
 

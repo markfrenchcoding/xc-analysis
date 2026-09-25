@@ -91,6 +91,33 @@ const ei = new Map(events.map((e, i) => [e, i]));
 const ENTRY = ['observed', 'late-entry', 'unknown-gap', 'ungraded'];
 const SPORT = ['xc', 'tfo'];
 
+/* ---------- Who's Who ----------
+   Three statewide lists reaching back to 1960, of which the page needs only
+   this school's rows plus the totals they are ranked against - "29th of 446"
+   is the fact, and 446 is most of what makes it one. A few hundred bytes for
+   sixty years of standing.
+
+   One block with a kind column rather than three blocks, because these are
+   all the same kind of thing to a reader: honours, with a number saying how
+   rare they are. */
+const WW = path.join(__dirname, 'whoswho');
+const wwRead = (f) => (fs.existsSync(path.join(WW, f)) ? readCsv(path.join(WW, f)) : []);
+const wwTeams = wwRead('ww_team_rankings.csv');
+const wwFour = wwRead('ww_four_year.csv');
+const wwBest = wwRead('ww_state_best.csv');
+const SCHOOL = 'Tualatin';
+
+const wwRows = [
+  ...wwTeams.filter((r) => r.school === SCHOOL)
+    .map((r) => [0, r.gender, r.rank, r.points, '', '', r.appearances, '']),
+  ...wwFour.filter((r) => r.school === SCHOOL)
+    .sort((a, b) => +a.from - +b.from)
+    .map((r) => [1, r.gender, r.rank, r.points, r.name, r.alsoKnownAs, r.from, r.to]),
+  ...wwBest.filter((r) => r.school === SCHOOL)
+    .sort((a, b) => +a.rank - +b.rank)
+    .map((r) => [2, r.gender, r.rank, '', r.name, '', r.mark, r.year]),
+];
+
 const block = (rows) => '\n' + rows.join('\n') + '\n';
 
 const aBlock = block(athletes.map((a) => [
@@ -116,6 +143,7 @@ const mBlock = block(meetIds.map((m) => {
 }));
 
 const eBlock = block(events);
+const wBlock = block(wwRows.map((r) => r.map((v) => (v == null ? '' : v)).join(',')));
 
 const info = {
   teamId, label: meta.label, from: meta.from, to: meta.to,
@@ -125,6 +153,14 @@ const info = {
   fieldMarksSkipped: meta.fieldMarksSkipped || 0,
   distFloor: DIST_FLOOR,
   archived: { athletes: allAthletes.length, results: allResults.length },
+  /* what the Who's Who ranks are out of, so the page can say "of 446" rather
+     than leaving a rank floating with nothing behind it */
+  ww: {
+    teams: wwTeams.length,
+    fourYear: wwFour.length,
+    best: wwBest.length,
+    since: { teamsM: 1960, teamsF: 1974, fourYear: 1963 },
+  },
 };
 
 let html = fs.readFileSync(PAGE, 'utf8');
@@ -138,6 +174,7 @@ put('d-seasons', sBlock);
 put('d-results', rBlock);
 put('d-meets', mBlock);
 put('d-events', eBlock);
+put('d-ww', wBlock);
 
 const ire = /const INFO=\{[\s\S]*?\};/;
 if (!ire.test(html)) throw new Error('no INFO constant in the page');
@@ -150,4 +187,7 @@ console.log('  ' + (allAthletes.length - athletes.length) + ' sprint-only athlet
 console.log('tualatin/index.html: ' + athletes.length + ' athletes, ' + seasons.length
   + ' athlete-seasons, ' + (rBlock.split('\n').length - 2) + ' results, '
   + meetIds.length + ' meets, ' + events.length + ' track events');
+console.log('  ' + wwRows.length + ' Who\'s Who honours for ' + SCHOOL
+  + ' against ' + wwTeams.length + ' ranked teams and ' + wwFour.length
+  + ' four-year qualifiers statewide');
 console.log('  ' + kb(Buffer.byteLength(html)) + ' on disk');

@@ -1188,6 +1188,103 @@ The board is the front door because it is what anybody actually wants to open.
 It is never the population a number is computed over unless the page says so,
 and it carries a note at the top saying exactly that.
 
+### Who's Who, and the sixty years before the horizon
+
+athletic.net starts in 2004. *Who's Who in Oregon High School Track & Field and
+Cross Country* has published continuously since **1965**, carries all-time team
+rankings back to 1960 and four-year State qualifiers back to 1963, and is kept
+by volunteers who are the closest thing these two sports have to official
+historians. It is 49 static PDFs on a school district's server.
+
+```
+python pull/whoswho_extract.py   # PDF -> committed text, the one step Node cannot
+node pull/whoswho.js             # text -> committed CSV
+node pull/test_whoswho.js        # 67 checks, no network, no Python
+```
+
+The split is deliberate. Extraction needs a library; **parsing is where the bugs
+live**, so it is in Node with the rest of the tooling where the suite can aim at
+it. The `.txt` is committed, so a re-run does not depend on a school district's
+web server still being up. The 6MB of source PDFs is gitignored.
+
+**What it found.** The girls are **29th all-time in Oregon** off 23 trips to
+State, the boys 98th off 16. Ten four-year State qualifiers. Caleb Lakeman is
+**21st all-time in the state** for a 5,000m at the State meet, Lauren Gerlach
+45th, Kaitlyn Gearin 55th.
+
+And **Meghan Armstrong, 2000-2003, 31st all-time in Oregon** — the athlete
+athletic.net could not find under either name, whose whole career sits four
+years before its horizon. She is Meghan Peyton now.
+
+**The hard part is the column, not the regex.** Every one of these documents is
+printed boys-left, girls-right and extracts to one line per row, so the column
+an entry came from is the only thing that says which gender it is, and a wrong
+answer is silent and permanent.
+
+Two source typos broke the first attempt:
+
+- `2021=2024` uses an **equals sign for a hyphen**. A regex insisting on a
+  hyphen does not skip that, it reads straight through into the next entry and
+  returns a rank of **2,024,519**. That poisoned the sequence tracker and filed
+  Devon Frazier, who is a girl, as a boy.
+- The list runs 702, **7803**, 704, where 7803 is plainly 703 mistyped.
+
+So inference uses **points as well as rank**. Points are a sum of State
+finishing places and only ever climb within a column, so a typo shows up as a
+step backwards rather than as a plausible number. A rank that goes backwards is
+never written into the tracker.
+
+**Verified rather than asserted, two ways.** The top-80 document prints the
+genders on **separate pages** and needs no inference: 41 athletes appear in both
+lists and the inferred column agrees **41 times out of 41**. And athletic.net
+knows the gender of everyone who has raced here since 2004: **9 of 9** agree.
+Both are in the suite.
+
+**A typo and a name change are different facts and got conflated for an hour.**
+`alsoKnownAs` is a *later* name — "now Meghan Peyton" — and `published` is what
+the book actually printed — "Matther Lovos". The page said "Matthew Lovos (now
+Matther Lovos)", which is true of nobody. Separate columns now, with a test.
+
+### Every athlete has a true thing that is good
+
+`bestTruth(i)` finds it, and **the order of the candidates is the whole design**:
+a statewide honour outranks a good number, a good number outranks a tidy one.
+
+1. a Who's Who honour, which almost nobody in Oregon has
+2. their biggest single year, on whichever ruler they have most of
+3. the race they beat the day by, off the existing residual fit
+4. all four years, which fewer than half of starters manage
+5. how many races they ran, which is true of anybody who ever pinned on a number
+
+**It never returns nothing.** The last candidate is unconditional on purpose: an
+athlete with no good line on any axis is a failure of the axes, not a fact about
+the kid. Nothing in it is invented — every branch is a statement the data
+supports and a coach could defend out loud.
+
+It renders as `.truth`, the first thing on an athlete's page, above every table.
+It animates because the sentence *arriving* reads as a finding where one that is
+simply present reads as a lookup. `transform` and `opacity` only.
+
+### The growth board
+
+`Most improved` ranks on VDOT gained between an athlete's first and last graded
+season rather than on the mark at the end of it. A 21:00 freshman who becomes a
+19:30 sophomore did something a 16:10 senior did not, and on a board sorted by
+speed that work is invisible for ever.
+
+Elijah Goiburn leads the boys at **+14.1 VDOT, 21:44.0 to 17:12.8**, and appears
+nowhere on the speed board. That is the entire argument for the feature.
+
+Two seasons on the chosen ruler are required, and **anybody with one is absent
+rather than last** — the page has no bottom-N anywhere, deliberately.
+
+**`ord` and `T` were both shadowed, and both were silent.** A local
+`const ord = n => n + (n===1?'st':...)` inside `drawAthlete` shadowed the module
+one and printed "31th" for a rank that mattered. A local `const T = bestTruth(i)`
+shadowed the SVG text helper and put the four-year arc's own labels in the
+temporal dead zone. Check what a name already means in this file before reusing
+it.
+
 ### Three rulers, and they do not share an axis
 
 A cross country 5,000m is what the sport scores on. A track 1,500m or 3,000m is
@@ -2009,6 +2106,7 @@ node audit2.js               # 93 checks, 1 deliberate failure
 node pull/test_seed.js       # 64 checks on the seed builder, no network
 node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
 node pull/test_roster.js     # 93 checks on the roster builder, no network
+node pull/test_whoswho.js    # 67 checks on the Who's Who parser, no network
 node backtest/test_snapshot.js   # 38 checks that the archive REFUSES, both line endings
 ```
 

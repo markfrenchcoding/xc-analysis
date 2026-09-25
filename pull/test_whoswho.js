@@ -184,7 +184,9 @@ ok(+meghan.to < 2004, 'her whole career sits before athletic.net\'s horizon, '
 
 const lovos = mine.find((r) => /lovos/i.test(r.name));
 eq(lovos.name, 'Matthew Lovos', 'a published typo is corrected toward the roster spelling');
-eq(lovos.alsoKnownAs, 'Matther Lovos', 'and the published spelling is kept');
+eq(lovos.published, 'Matther Lovos', 'and the published spelling is kept as printed');
+eq(lovos.alsoKnownAs, '', 'but a typo is not a name he ever went by');
+eq(meghan.published, '', 'and a genuine name change is not a typo in the book');
 
 const tt = teams.filter((r) => r.school === 'Tualatin');
 eq(tt.length, 2, 'both Tualatin teams are ranked all-time');
