@@ -254,6 +254,10 @@ figure{margin:0}
 .er:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
 .spag svg{display:block;width:100%}
 .sp-seg{margin:0 0 12px}
+.pnet svg{display:block;width:100%}
+.pn-arc,.pn-node{transition:opacity .16s ease}
+.pn-arc.off{opacity:.05!important}
+.pn-node.off{opacity:.18}
 /* The list end of the link. Background and an inset rule only - nothing
    that changes a row's size, or hovering the wall would reflow the list
    under the reader's hand. */
@@ -17289,7 +17293,7 @@ Three Rivers League JV District
     <p class="why">Every pair of team-mates who have been on the same start line
     four times or more, by how close they finish. These groups exist whether
     anybody planned them or not.</p>
-    <table id="pack"></table>
+    <div id="pack"></div>
   </div>
 </section>
 
@@ -19306,6 +19310,23 @@ function sizeCharts(id){
   if(el&&el.clientWidth)CH.setW(el.clientWidth);
 }
 
+/* And per chart, because a panel is not one column. The Program tab puts two
+   charts in a half-width grid and three more in a third-width row; sizing
+   them all off the panel gave the small multiples a 545-unit viewBox in a
+   301px box, which is a scale of 0.55 and axis type at THREE PIXELS. The
+   whole-panel call fixed the big charts and broke the little ones in the
+   opposite direction.
+
+   Every chart is sized against the box it is actually going into. `cols`
+   is for a grid that has not been filled yet, where the box exists but the
+   cell width has to be worked out from the track size. */
+function chartIn(id,cols,gap){
+  const el=document.getElementById(id);
+  if(!el||!el.clientWidth)return;
+  const w=cols?(el.clientWidth-(cols-1)*(gap||12))/cols:el.clientWidth;
+  CH.setW(w);
+}
+
 function drawBoard(){
   sizeCharts('p-board');
   if(bN===-1)return drawGrowth();
@@ -19402,6 +19423,7 @@ function drawProgram(){
       +'both years, not over the ones who turned out well.';
 
   const wfSum=[cE.s9,cE.s10,cE.s11].reduce((q,v)=>q+(v||0),0);
+  chartIn('dev');
   document.getElementById('dev').innerHTML=waterfall(cE,112,
     {label:'Seconds taken off a '+rl+', by year, with the four-year figure beside it'})
     +CH.table('The same four numbers as a table',
@@ -19426,6 +19448,10 @@ function drawProgram(){
      copies of one chart say "these are comparable" in a way three columns of
      a table cannot, and the gap between them is the argument this whole page
      is built on. */
+  // the row is auto-fit at a 150px minimum, so work out what it will actually do
+  const smallEl=document.getElementById('dev-small');
+  const smallCols=Math.max(1,Math.min(3,Math.floor((smallEl.clientWidth||300)/150)));
+  chartIn('dev-small',smallCols,12);
   document.getElementById('dev-small').innerHTML=
     [['Everyone',cE],['All four years',cF],['Top 100',cT]].map(([nm,c])=>
       '<figure class="sm"><figcaption>'+nm+'</figcaption>'
@@ -19465,6 +19491,7 @@ function drawProgram(){
         +'</tr>';
     }).join('');
 
+  chartIn('comp');
   const pooled=ent?fin/ent*100:null;
   const cRows=co.map(c=>({label:String(c.classOf).slice(2),v:c.entered?c.g12/c.entered*100:0,
     title:'Class of '+c.classOf+': '+c.g12+' of '+c.entered+' still racing as seniors'
@@ -19484,6 +19511,7 @@ function drawProgram(){
     +'kind of claim rather than the same one printed fainter.';
 
   const rs=rosterSize(every);
+  chartIn('size');
   document.getElementById('size').innerHTML=stackCols(rs,86,[9,10,11,12],
     ['var(--accent)','var(--maroon-lift)','var(--t3e)','var(--dim)'])
     +CH.table('Every season as a table',['School year','Gr 9','Gr 10','Gr 11','Gr 12','All'],
@@ -19492,6 +19520,7 @@ function drawProgram(){
   document.getElementById('size-cap').textContent='Freshmen at the bottom, seniors at the top. '
     +(last?last.y+': '+last.n+' athletes, '+last[9]+' of them freshmen.':'');
 
+  chartIn('depth');
   const dp=depth(every,pR),dpNote=thinSeason(dp);
   document.getElementById('depth').innerHTML=dp.length
     ?twoLines(dp,90,'front','back','var(--accent)','var(--steel)',ms,dpNote)
@@ -19829,6 +19858,230 @@ function drawAthlete(i){
   });
 }
 
+/* ---------- speed or strength, as a scatter ----------
+   A bar sliding left and right off a centre is a scatter with one axis
+   thrown away. Both numbers are real and both are on the same ruler - two
+   track events, no terrain in either - so they can simply be the two axes.
+
+   THE DIAGONAL IS THE SQUAD'S OWN OFFSET, NOT y = x. A 1,500m VDOT and a
+   3,000m VDOT need not agree in the middle, and an offset everybody shares
+   says nothing about anybody. The line is drawn at the squad's median
+   difference, so distance from it is the lean and the line itself is
+   "ordinary here".
+
+   Names are placed by trying four corners and taking the first that does not
+   collide with a label already down. Anybody who cannot be placed keeps their
+   dot and loses their label rather than overprinting somebody else's, which
+   is the trade a scatter of thirty people has to make. */
+function fitScatter(F,g){
+  const cur=F.rows.filter(r=>r.now);
+  const rows=(cur.length>=4?cur:F.rows);
+  if(rows.length<4)return '';
+  const pts=rows.map(r=>({r:r,x:vdot(r.b15,1500),y:vdot(r.b30,3000)}))
+    .filter(q=>q.x!=null&&q.y!=null);
+  if(pts.length<4)return '';
+
+  /* Capped. A height that is a fraction of the width keeps the aspect at a
+     narrow column and runs away at a wide one - 0.62 of a 545-unit viewBox is
+     338 units, which rendered 602px tall. A scatter wants to be squarish on a
+     phone and wide on a desktop, which is what a cap does. */
+  const H=Math.max(150,Math.min(215,Math.round(CH.W*0.62)));
+  const f=CH.frame(H,{l:30,r:12,t:16,b:26});
+  const xs=pts.map(q=>q.x),ys=pts.map(q=>q.y);
+  const [xlo,xhi]=CH.padded(Math.min(...xs),Math.max(...xs),4);
+  const [ylo,yhi]=CH.padded(Math.min(...ys),Math.max(...ys),4);
+  const x=CH.lin(xlo,xhi,f.x0,f.x1),y=CH.lin(ylo,yhi,f.y1,f.y0);
+
+  let g2=CH.gridY(f,y,CH.ticks(ylo,yhi,4),v=>v.toFixed(0))
+    +CH.gridX(f,x,CH.ticks(xlo,xhi,4),v=>v.toFixed(0))
+    +CH.unitY(f,'3,000m VDOT \u00b7 up is fitter')
+    +CH.unitX(f,'1,500m VDOT \u2192');
+
+  /* y = x - med, clipped to the frame. med is v15 - v30, so a squad whose
+     1,500m rates three points higher puts the line three points below the
+     diagonal and nobody is called a speed athlete for being ordinary. */
+  const line=[];
+  for(const vx of [xlo,xhi]){
+    const vy=vx-F.med;
+    if(vy>=ylo&&vy<=yhi)line.push([vx,vy]);
+  }
+  for(const vy of [ylo,yhi]){
+    const vx=vy+F.med;
+    if(vx>xlo&&vx<xhi)line.push([vx,vy]);
+  }
+  if(line.length>=2)
+    g2+='<line x1="'+x(line[0][0]).toFixed(1)+'" y1="'+y(line[0][1]).toFixed(1)
+      +'" x2="'+x(line[1][0]).toFixed(1)+'" y2="'+y(line[1][1]).toFixed(1)
+      +'" stroke="var(--dim)" stroke-width=".8" stroke-dasharray="3 2"/>';
+
+  // labels: four candidate corners, first one clear of everything already down
+  const put=[],lab=[];
+  const CH_W=6.2*0.52;                       // about one character at 6.2px
+  const order=pts.slice().sort((a,b)=>(b.x+b.y)-(a.x+a.y));
+  for(const q of order){
+    const px=x(q.x),py=y(q.y);
+    const name=nameOf(q.r.a).split(' ')[0]+' '
+      +((nameOf(q.r.a).split(' ')[1]||'')[0]||'');
+    const w=name.length*CH_W+1.5,h=6.2;
+    const spots=[[px+4,py-2,'start'],[px-4-w,py-2,'start'],
+                 [px+4,py+6,'start'],[px-4-w,py+6,'start']];
+    let placed=null;
+    for(const [lx,ly,an] of spots){
+      if(lx<f.x0-2||lx+w>f.x1+2||ly-h<f.y0||ly>f.y1+6)continue;
+      const box={a:lx,b:lx+w,c:ly-h,d:ly};
+      if(put.some(o=>!(box.b<o.a||box.a>o.b||box.d<o.c||box.c>o.d)))continue;
+      put.push(box);placed=[lx,ly,an];break;
+    }
+    if(placed)lab.push('<text x="'+placed[0].toFixed(1)+'" y="'+placed[1].toFixed(1)
+      +'" class="axt" style="font-size:6.2px;fill:var(--muted)">'+esc(name)+'</text>');
+    const lean=q.r.lean;
+    g2+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="'
+      +(q.r.now?3:2.2)+'" fill="'+(q.r.now?'var(--accent)':'var(--steel)')+'" opacity="'
+      +(q.r.now?1:.65)+'"'
+      +CH.tip(nameOf(q.r.a)+' \u00b7 1,500m '+secs(q.r.b15)+' (VDOT '+q.x.toFixed(1)
+        +') \u00b7 3,000m '+secs(q.r.b30)+' (VDOT '+q.y.toFixed(1)+') \u00b7 '
+        +(Math.abs(lean)<0.8?'balanced':lean>0?'leans speed by '+lean.toFixed(1)
+          :'leans strength by '+Math.abs(lean).toFixed(1)))+'/>';
+  }
+  g2+=lab.join('');
+
+  // the two ends of the line, said in words, once
+  g2+='<text x="'+(f.x1-1)+'" y="'+(f.y0+6)+'" class="axt" text-anchor="end" '
+    +'style="fill:var(--steel)">above the line: leans strength</text>'
+    +'<text x="'+(f.x0+1)+'" y="'+(f.y1-2)+'" class="axt" '
+    +'style="fill:var(--steel)">below it: leans speed</text>';
+
+  return CH.open(H,'1,500m VDOT against 3,000m VDOT, with the squad\u2019s own '
+    +'median offset as the line',g2);
+}
+
+/* ---------- who already races together, as a network ----------
+   A table of pairs makes you hold six names in your head to see a group of
+   three. Drawn, the group is a shape.
+
+   Nodes sit at their season best, so the x axis is the same start line the
+   pack chart uses and a partnership is visibly between two athletes who are
+   actually near each other. Arcs bow above; thickness is how many races the
+   pair has together and opacity is how close they finish, so a thick dark arc
+   is a training group that already exists.
+
+   Hovering a node dims everything it is not part of. That is the whole
+   interaction, and it is what a table cannot do. */
+function packNet(g,k){
+  const P=packs(g);
+  const now=P.filter(x=>x.bothNow),all=now.length>=3?now:P.slice(0,40);
+  /* EVERY PAIR IS NOT A NETWORK. Eighteen athletes who all race each other
+     produce 152 arcs, which is a hairball and says only that they are on the
+     same team - a fact nobody needed a chart for.
+
+     So each athlete keeps their three closest regular partners and the arcs
+     are the union of those. Every node is guaranteed to show its own pack,
+     which is the question being asked, and a pair that is in each other's
+     three appears once rather than twice. It is a nearest-neighbour graph,
+     and "nearest" here means the smallest median finishing gap, which is what
+     packs() already ranks on. */
+  const near=new Map();
+  for(const pr of all){
+    for(const [me,them] of [[pr.lo,pr.hi],[pr.hi,pr.lo]]){
+      if(!near.has(me))near.set(me,[]);
+      near.get(me).push({them:them,pr:pr});
+    }
+  }
+  const keep=new Set(),use=[];
+  for(const [,list] of near){
+    list.sort((a,b)=>a.pr.med-b.pr.med||b.pr.n-a.pr.n);
+    for(const e of list.slice(0,3)){
+      const id=Math.min(e.pr.lo,e.pr.hi)+'|'+Math.max(e.pr.lo,e.pr.hi);
+      if(keep.has(id))continue;
+      keep.add(id);use.push(e.pr);
+    }
+  }
+  if(use.length<2)return '';
+  const col=RULERS[k].col,sport=RULERS[k].sport;
+  const bestOf=i=>{
+    let b=null;
+    for(const sn of byA[i].seasons)
+      if(sn.sport===sport&&sn[col]&&(b==null||sn[col]<b))b=sn[col];
+    return b;
+  };
+  const ids=[...new Set(use.flatMap(p=>[p.lo,p.hi]))].filter(i=>bestOf(i)!=null);
+  if(ids.length<3)return '';
+  const node=ids.map(i=>({i:i,t:bestOf(i)})).sort((a,b)=>a.t-b.t);
+  const lo=node[0].t,hi=node[node.length-1].t;
+
+  const H=Math.max(130,Math.min(200,Math.round(CH.W*0.40)));
+  const f=CH.frame(H,{l:10,r:10,t:14,b:30});
+  const x=CH.lin(hi,lo,f.x0,f.x1);           // faster to the right, as ever
+  const base=f.y1-6;
+  const maxN=Math.max(...use.map(p=>p.n));
+  const minMed=Math.min(...use.map(p=>p.med)),maxMed=Math.max(...use.map(p=>p.med));
+
+  let g2='<line x1="'+f.x0+'" x2="'+f.x1+'" y1="'+base+'" y2="'+base
+    +'" stroke="var(--line)" stroke-width=".6"/>';
+  for(const t of CH.timeTicks(lo,hi,3))
+    if(t>=lo&&t<=hi)g2+='<text x="'+x(t).toFixed(1)+'" y="'+(H-14)
+      +'" class="axt" text-anchor="middle">'+ms(t)+'</text>';
+  g2+='<text x="'+f.x1+'" y="'+(H-4)+'" class="lbl" text-anchor="end" '
+    +'style="font-size:6.2px">'+esc(RULERS[k].label)+' season best \u00b7 faster \u2192</text>';
+
+  const at=new Map(node.map(n=>[n.i,x(n.t)]));
+  for(const pr of use){
+    if(!at.has(pr.lo)||!at.has(pr.hi))continue;
+    const a=at.get(pr.lo),b=at.get(pr.hi);
+    const span=Math.abs(b-a);
+    const lift=Math.min(f.y1-f.y0-14,10+span*0.55);
+    const close=maxMed===minMed?1:1-(pr.med-minMed)/(maxMed-minMed);
+    g2+='<path class="pn-arc" data-a="'+pr.lo+'" data-b="'+pr.hi+'" d="M'+a.toFixed(1)
+      +' '+base+' Q'+((a+b)/2).toFixed(1)+' '+(base-lift*2).toFixed(1)+' '+b.toFixed(1)
+      +' '+base+'" fill="none" stroke="var(--accent)" stroke-width="'
+      +(0.5+pr.n/maxN*1.9).toFixed(2)+'" opacity="'+(0.2+close*0.55).toFixed(2)+'"'
+      +CH.tip(nameOf(A[pr.lo])+' and '+nameOf(A[pr.hi])+' \u00b7 '+pr.n
+        +' races together \u00b7 typically '
+        +(pr.med<60?pr.med.toFixed(1)+'s':Math.floor(pr.med/60)+':'
+          +String(Math.round(pr.med%60)).padStart(2,'0'))+' apart')+'/>';
+  }
+  for(const n of node){
+    const px=x(n.t);
+    const nm=nameOf(A[n.i]).split(' ')[0];
+    g2+='<circle class="pn-node" data-n="'+n.i+'" cx="'+px.toFixed(1)+'" cy="'+base
+      +'" r="2.6" fill="var(--maroon-lift)" stroke="var(--bg)" stroke-width=".6"'
+      +CH.tip(nameOf(A[n.i])+' \u00b7 '+secs(n.t))+'/>'
+      +'<text x="'+px.toFixed(1)+'" y="'+(base+7)+'" class="axt" text-anchor="middle" '
+      +'style="font-size:5.8px">'+esc(nm)+'</text>';
+  }
+  return '<div class="pnet">'+CH.open(H,'Who already races together',g2)+'</div>';
+}
+
+/* Hovering a node dims every arc it is not an end of. Delegated on the
+   document, because the Plan tab rewrites this markup on every switch and a
+   listener bound to the SVG would go with it. */
+function wireNet(){
+  if(wireNet.done)return;wireNet.done=true;
+  const clear=root=>{
+    for(const el of root.querySelectorAll('.pn-arc,.pn-node'))el.classList.remove('off');
+  };
+  document.addEventListener('pointerover',ev=>{
+    const box=ev.target.closest&&ev.target.closest('.pnet');
+    if(!box)return;
+    const n=ev.target.closest('.pn-node');
+    clear(box);
+    if(!n)return;
+    const id=n.dataset.n;
+    const keep=new Set([id]);
+    for(const a of box.querySelectorAll('.pn-arc')){
+      const mine=a.dataset.a===id||a.dataset.b===id;
+      if(mine){keep.add(a.dataset.a);keep.add(a.dataset.b);}
+      else a.classList.add('off');
+    }
+    for(const c of box.querySelectorAll('.pn-node'))
+      if(!keep.has(c.dataset.n))c.classList.add('off');
+  });
+  document.addEventListener('pointerleave',ev=>{
+    const box=ev.target.closest&&ev.target.closest('.pnet');
+    if(box)clear(box);
+  },true);
+}
+
 /* ---------- the pack ----------
    The squad as it actually stands, drawn as a start line that strings out.
 
@@ -20032,44 +20285,50 @@ function drawJanuary(){
 
   // --- speed or strength
   const F=eventFit(jG);
+  chartIn('fit');
   const fe=document.getElementById('fit');
   if(!F.rows.length){fe.innerHTML='<p class="empty">Not enough athletes have run both '
     +'a 1,500m and a 3,000m.</p>';}
   else{
     const cur=F.rows.filter(r=>r.now);
     const show=(cur.length>=4?cur:F.rows);
-    const mx=Math.max(1,...show.map(r=>Math.abs(r.lean)));
-    fe.innerHTML='<table><tr><th>Athlete</th><th>1,500m</th><th>3,000m</th>'
-      +'<th style="width:38%">Leans</th></tr>'
-      +show.map(r=>{
-        const pct=Math.abs(r.lean)/mx*50;
-        const left=r.lean>=0?50:50-pct;
-        return '<tr><td class="name" style="text-align:left">'+esc(nameOf(r.a))+'</td>'
-          +'<td>'+secs(r.b15)+'</td><td>'+secs(r.b30)+'</td>'
-          +'<td><div class="lean"><div class="bar"><i style="left:'+left.toFixed(1)
-          +'%;width:'+Math.max(1.5,pct).toFixed(1)+'%"></i></div>'
-          +'<span class="dimv" style="font-size:11.5px;min-width:74px">'
-          +(Math.abs(r.lean)<0.8?'balanced':(r.lean>0?'speed':'strength'))
-          +'</span></div></td></tr>';
-      }).join('')+'</table>'
-      +'<p class="why" style="margin:12px 0 0">Bars right of centre are athletes whose '
-      +'1,500m is stronger than their 3,000m relative to this squad; bars left are the '
-      +'other way. '+(cur.length>=4?'Current squad only.':'Everyone on record, because '
-      +'too few of this season\u2019s athletes have both marks yet.')
-      +' A lean is a hint about what to train, not a verdict about an event.</p>';
+    fe.innerHTML=fitScatter(F,jG)
+      +'<p class="why" style="margin:12px 0 0">Both axes are VDOT, so both are the same '
+      +'ruler and neither carries any terrain. The dashed line is not y = x \u2014 it sits '
+      +'at this squad\u2019s own median difference between the two, because an offset '
+      +'everybody shares says nothing about anybody. How far somebody sits from that '
+      +'line is their lean. '
+      +(cur.length>=4?'Current squad only.':'Everyone on record, because too few of '
+      +'this season\u2019s athletes have both marks yet.')
+      +' A lean is a hint about what to train, not a verdict about an event.</p>'
+      +CH.table('The same athletes as a table',
+        ['Athlete','1,500m','3,000m','Leans'],
+        show.map(r=>[nameOf(r.a),secs(r.b15),secs(r.b30),
+          Math.abs(r.lean)<0.8?'balanced'
+            :(r.lean>0?'speed by ':'strength by ')+Math.abs(r.lean).toFixed(1)]));
   }
 
   // --- who races together
   const P=packs(jG),now=P.filter(x=>x.bothNow).slice(0,8),
     use=now.length>=3?now:P.slice(0,8);
+  chartIn('pack');
+  const gapOf=x=>x.med<60?x.med.toFixed(1)+'s'
+    :Math.floor(x.med/60)+':'+String(Math.round(x.med%60)).padStart(2,'0');
+  const net=packNet(jG,jR);
   document.getElementById('pack').innerHTML=use.length
-    ?'<tr><th>Pair</th><th>Races together</th><th>Typical gap</th></tr>'
-      +use.map(x=>'<tr><td class="name" style="text-align:left">'+esc(nameOf(A[x.lo]))
-        +' <span class="dimv" style="font-weight:400">and</span> '+esc(nameOf(A[x.hi]))
-        +'</td><td>'+x.n+'</td><td>'+(x.med<60?x.med.toFixed(1)+'s'
-        :Math.floor(x.med/60)+':'+String(Math.round(x.med%60)).padStart(2,'0'))
-        +'</td></tr>').join('')
-    :'<tr><td class="dimv">No pair has four races together yet.</td></tr>';
+    ?net
+      +'<p class="why" style="margin:12px 0 0">Every athlete sits at their season best, '
+      +'so this is the same start line as the chart above. An arc is a pair who have '
+      +'raced together four times or more: the thicker it is the more races, and the '
+      +'darker it is the closer they finish. Everyone on this squad has raced everyone '
+      +'else, so drawing every pair would be a hairball that only says they are on the '
+      +'same team \\u2014 each athlete keeps the three partners they finish closest to. '
+      +'Hover anybody to keep only their own pack. Nobody planned these; they are just '
+      +'true.</p>'
+      +CH.table('Every pair as a table',['Pair','Races together','Typical gap'],
+        use.map(x=>[nameOf(A[x.lo])+' and '+nameOf(A[x.hi]),x.n,gapOf(x)]))
+    :'<p class="empty">No pair has four races together yet.</p>';
+  wireNet();
   animate(document.getElementById('p-january'));
 }
 

@@ -1458,6 +1458,189 @@ page and `roster.js` now use "strictly before the latest school year", and both
 print the same number. Two places computing the same statistic differently is
 how a dashboard ends up disagreeing with its own source.
 
+### The URL is the state
+
+Nothing on this page was linkable: no hash, no history, and the back button did
+nothing. `grep` for `location.hash`, `pushState` and `replaceState` returned
+zero. A coach could not send anybody a runner.
+
+**Hash routing, not paths.** It is a static file on a CDN with no rewrite rules,
+so a real path 404s on reload. `#/board?sex=boys&event=xc5k&view=top100`,
+`#/athlete/mark-french-2016`, `#/program?...`, `#/plan?...`.
+
+**Every switch writes the URL; `hashchange` reads it; both go through one
+`applyRoute`.** `replaceState` for a toggle and `pushState` for a navigation,
+because flipping between boys and girls should not fill the history with six
+entries but opening an athlete is somewhere to come back from.
+
+**A missing parameter means the DEFAULT, not the last value.** `applyRoute`
+originally only assigned when a parameter was present, so `#/board?sex=girls`
+rendered differently depending on which page you arrived from. The same URL has
+to be the same page. Found by using the back button, not by reading the code.
+
+**The slug is name plus class year**, with the athletic.net id appended only
+where two athletes would collide, and the bare id always resolves as well.
+Indices shift whenever the roster grows and a shared link must not rot.
+
+`/` or Cmd-K opens a command palette from any tab, which matches on initials,
+surname, class year or a time.
+
+### The hidden attribute has to actually hide
+
+The command palette shipped **permanently open over the whole page**, and
+Escape did nothing. `.pal` set `display:flex` in a class, and a class beats the
+UA stylesheet's `[hidden]{display:none}`, so `wrap.hidden=true` removed nothing.
+The keydown handler then branched on `wrap.hidden` - true the whole time - so it
+believed the palette was closed and fell through to the "open it" branch.
+
+The page had already worked around this once, for the tab panels
+(`section[hidden]{display:none}`), which is the tell: a workaround for one
+element means the next element that sets `display` breaks the same way. It is
+one global rule now, `[hidden]{display:none!important}`.
+
+### One chart module, and the viewBox that was five times too big
+
+`CH` builds SVG and `CV` owns the canvases. Before them there were seven chart
+functions written one at a time that agreed about nothing - tick counts, whether
+an axis was labelled at all, what hover did, and whether any of it survived a
+theme switch.
+
+**Every axis states its unit and its direction.** Half these charts invert
+something, because faster is a smaller number, and "up is faster" is not
+guessable.
+
+**`CV` holds the three things a canvas always forgets**: device pixel ratio,
+resize, and that the palette can change while the page is open. The pack chart
+had none of them - a resize stretched it and the light theme left maroon dots on
+white with grey labels.
+
+**THE VIEWBOX WIDTH TRACKS THE COLUMN.** This is the single most visible fault
+the page had and it was one number. Every chart was drawn on a 200-unit viewBox
+at `width:100%`. On a phone that is right: a 340px column scales it 1.7 and a
+6.5-unit label lands at about 11px. On a 1,008px desktop card the same drawing
+is scaled **5.0** and the same label renders at **31 pixels**, bigger than the
+page's own headings. The career chart measured 970 wide by 1,019 tall with 40px
+axis type.
+
+`CH.setW(px)` keeps the scale near 1.85 wherever a chart is, and `CH.W` is a
+getter so every call site moved with it. Heights stay in units, so a wide column
+gets a wide flat chart rather than a square one - which is what a time series
+wanted anyway.
+
+**And a panel is not one column.** Sizing every chart off the panel fixed the
+big ones and broke the little ones the other way: the small multiples got a
+545-unit viewBox in a 301px box, a scale of 0.55, axis type at **three pixels**.
+`chartIn(id, cols)` sizes each chart against the box it is actually going into.
+
+SVG charts cannot rescale themselves the way `CV`'s canvases can, so a window
+resize past 40px rebuilds the panel on screen, debounced.
+
+### A frame callback is not a promise
+
+`countTo` wrote `fmt(0)` and then depended on `requestAnimationFrame`. A window
+behind another window delivers no frames, so four tiles sat reading **"0
+athletes on record"**. A missing animation is cosmetic; a wrong number is not.
+Both it and the pack's entrance land on their value on a timer whatever the
+frames do. Same family as the reveal bug: `.reveal` set `opacity:0` and waited
+for `IntersectionObserver`, so a fast scroll left a whole card invisible with
+nothing actually wrong.
+
+### The Wall
+
+Every athlete who has ever recorded a mark on the chosen ruler, one dot, above
+the list. 330 boys on the 5,000m; 211 on the 1,500m.
+
+**The dots are never filtered, and that is the argument.** The board already
+says "this is a view, not the data"; a hero chart that hid everyone below the
+hundredth would be that view again, larger. The toggles change which dots are
+lit and where the cutoff rule falls. Hovering a dot lights its row and hovering
+a row lights its dot.
+
+**The height is fixed and the packing bends to it**, which is the third attempt
+and the only one that works at both ends. A strict beeswarm is a promise this
+data cannot keep: 330 boys in a 313px phone column need seventy-odd lanes
+however small the dots get, and the chart becomes 1,200px of scrolling above the
+list that is the actual page. Capping the lane count is worse - the overflow
+piles into the last row, which reads as a bar and is not one. So dots keep a
+size a finger can hit and the crowded middle overlaps. A hundred boys within
+thirty seconds of each other *should* look solid.
+
+`TIP.at(x, y, text)` exists because a canvas dot cannot carry `data-tip`. A
+chart with its own tooltip would be a second thing to style, a second thing to
+dismiss on Escape, and a second thing a re-render can leave on screen.
+
+### Four years is every race
+
+Four points and a line said an athlete had four seasons. Mark French had
+**28 races** on the 5,000m and those four points were the best one from each, so
+the chart showed the top of every year and hid the year.
+
+**The cohort band is drawn per season, not across the career.** The quartiles
+are a fact about a grade; interpolating them across the summer draws a claim
+about July that nobody measured.
+
+**A championship is a shape, not a colour.** Colour already carries the era on
+the board and the sport on the career chart, and a third meaning on one channel
+is how a page ends up needing a legend for its legend.
+
+**It picks the ruler it can fill.** `K` is the ruler an athlete is best
+*described* by, which is right for the rank and the headline and wrong for a
+chart called "every race": athletic.net serves track as one season best per
+event, so French came out on the 3,000m with four points under a heading
+promising all of them. The chart picks the ruler with the most races and says so
+when that ruler is track.
+
+Beside it, **everybody's four years**: every career on the ruler as a faint
+line, this athlete lit on top, and a toggle between everyone who started and
+only those who finished. The lines that vanish are the athletes a board made of
+finishers cannot see - the Program tab's survivorship argument as a picture.
+
+### 2021 names itself, and the first version named it wrong
+
+`thinSeason` annotates the one season on the depth chart that is not part of the
+trend. **A school year starts in July, and that is the rule rather than a
+shortcut.** "Cross country is the autumn half, so its school year is year + 1"
+holds for twenty-one of these twenty-two seasons and is exactly wrong for the
+one the function exists to find: 2020-21 ran its cross country season in
+**March 2021**, 116 races, all of which the shortcut pushed into 2022.
+
+**It looks for a missing half, not a low meet count.** Counting meets found
+nothing and would have gone on finding nothing: 2021 has 15 meets against a
+median of 23, nowhere near an outlier. What it has none of is an autumn. The
+annotation says which months and how many meets and stops - no reason is
+invented.
+
+**Not the season in progress.** It is short every autumn for the ordinary reason
+that it has not finished, and annotating that as an anomaly would make the chart
+say something false once a year.
+
+### The waterfall says the steps do not add up
+
+"What a year here is worth" put the whole-four total on the same scale as its
+three parts, so the eye read it as a fourth year. As a waterfall each step
+starts where the last finished - and **the steps do not sum to the total**,
+because a step is averaged over the athletes who raced both of its two years and
+the total over the ones who raced grade 9 and grade 12. Different people. The
+stack lands where it lands, the measured total is its own dashed bar beside it,
+and a rule carries the sum across so the difference is what you see. Boys, XC
+5k: +36, +18, +5 summing to +59, against a measured +77.
+
+Drawing them landing neatly on the total would be a lie in the shape of a chart.
+
+### Every pair is not a network
+
+Eighteen athletes who all race each other produce **152 arcs**, which is a
+hairball and says only that they are on the same team. Each athlete keeps the
+three partners they finish closest to and the arcs are the union of those, so
+every node shows its own pack - which is the question being asked. Nearest means
+smallest median finishing gap, which is what `packs()` already ranks on.
+
+**The lean is a scatter now, and the diagonal is the squad's own offset.** A bar
+sliding either side of a centre is a scatter with one axis thrown away. Both
+numbers are track VDOT, so neither carries terrain and both can simply be axes.
+The line sits at the squad's median difference rather than at `y = x`, because
+an offset everybody shares says nothing about anybody.
+
 ### Charts carry the shape, tables carry the numbers
 
 Three series in a grouped bar leaves about fifteen viewBox units a bar, and
