@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='3.2' cy='8' r='2.3' fill='%23880000'/><circle cx='8' cy='8' r='2.3' fill='%23B31B2C'/><circle cx='12.8' cy='8' r='2.3' fill='%23EE5566'/></svg>">
+<!-- Three runners strung out, which is what every chart here is about.
+     Without it a browser asks for /favicon.ico on every visit and gets a
+     404 - a failed request on a page that otherwise makes none. -->
 <title>Tualatin distance — the whole record</title>
 <meta name="description" content="Every athlete who has ever run for Tualatin, cross country and track, and what happened to them.">
 <meta name="robots" content="noindex,nofollow">
@@ -224,7 +228,10 @@ figure{margin:0}
 .dtab>summary{cursor:pointer;color:var(--dim);font:500 12px var(--num);
   padding:4px 0;list-style:none}
 .dtab>summary::-webkit-details-marker{display:none}
-.dtab>summary::before{content:'\u25B8 ';display:inline-block;transition:transform .15s}
+/* A CSS escape is \25B8, not \u25B8. Written the JavaScript way it is not an
+   escape at all, and every disclosure on the page read "u25B8 Every XC
+   5,000m as a table". */
+.dtab>summary::before{content:'\25B8\00a0';display:inline-block;transition:transform .15s}
 .dtab[open]>summary::before{transform:rotate(90deg)}
 .dtab>summary:hover{color:var(--text)}
 .dtab table{margin-top:6px}
@@ -18956,8 +18963,12 @@ function everyRace(i,K){
   for(const q of GRADES){
     const b=band[q];if(!b||!has.has(q))continue;
     const a0=x(q-9)+1,a1=x(q-8)-1;
-    g+='<rect x="'+a0.toFixed(1)+'" y="'+y(b.hi).toFixed(1)+'" width="'
-      +(a1-a0).toFixed(1)+'" height="'+Math.abs(y(b.lo)-y(b.hi)).toFixed(1)
+    /* y(b.lo) is the FASTER end and therefore the higher one on the page.
+       Starting the rect at y(b.hi) put its top edge at the bottom of the
+       band and drew the block downwards, off the chart and through the
+       grade labels underneath it. */
+    g+='<rect x="'+a0.toFixed(1)+'" y="'+Math.min(y(b.lo),y(b.hi)).toFixed(1)
+      +'" width="'+(a1-a0).toFixed(1)+'" height="'+Math.abs(y(b.lo)-y(b.hi)).toFixed(1)
       +'" fill="var(--raised)"'
       +CH.tip(YEAR_NAME[q]+' year: the middle half of every '
         +(A[i].g==='M'?'boy':'girl')+' here ran '+secs(b.lo)+' to '+secs(b.hi)
@@ -19303,16 +19314,54 @@ const WALL=(()=>{
 
   function heightFor(w){return Math.max(160,Math.min(250,w*0.24));}
 
+  /* A LABELLED MARGIN, BECAUSE THE TAIL WAS EATING THE CHART. The boys' 330
+     run from 14:51 to 43:30, but the 97th percentile is 25:37 and only eleven
+     are slower - so a straight axis gave half its width to eleven dots and
+     crushed the other 319 into the right-hand quarter. That is an honest
+     scale drawing a useless picture.
+
+     Nobody is dropped, which is this chart's one rule. The slow tail sits in
+     its own margin at the left, spread by rank so it can still be picked out,
+     with a break mark and a count between it and the scale. Every dot is
+     still a dot, still hovers, still opens its athlete.
+
+     The cut is derived and only taken when the tail actually wastes the
+     width: the stopwatch tick at or above the 97th percentile, used only if
+     the slowest is more than a third slower again. */
+  function tailCut(){
+    if(rows.length<40)return null;
+    const p97=rows[Math.floor((rows.length-1)*0.97)].t;
+    const slowest=rows[rows.length-1].t;
+    if(slowest<p97*1.34)return null;
+    const st=60;
+    const cut=Math.ceil(p97/st)*st;
+    const n=rows.filter(r=>r.t>cut).length;
+    return (n&&n<rows.length*0.08)?{cut:cut,n:n}:null;
+  }
+
   function layout(w,h){
-    const padL=10,padR=10,padT=22,padB=24;
-    if(!rows.length)return {padL,padR,padT,padB,r:3,step:7,x:()=>0,mid:h/2};
-    const lo=rows[0].t,hi=rows[rows.length-1].t;
+    const padT=22,padB=24;let padL=10;const padR=10;
+    if(!rows.length)return {padL,padR,padT,padB,r:3,step:7,x:()=>0,mid:h/2,tail:null};
+    const tail=tailCut();
+    const gut=tail?Math.max(26,Math.min(56,w*0.09)):0;
+    const fast=rows[0].t;                              // rows ascend by time
+    const slow=tail?tail.cut:rows[rows.length-1].t;    // the left end of the scale
+    const x0=padL+gut;
     // faster is to the right, so the fastest time maps to the far edge
-    const x=t=>padL+(hi===lo?0.5:(hi-t)/(hi-lo))*(w-padL-padR);
+    const main=t=>x0+(slow===fast?0.5
+      :(slow-Math.max(fast,Math.min(t,slow)))/(slow-fast))*(w-x0-padR);
+    let slowRank=null;
+    if(tail){
+      const slow=rows.filter(r=>r.t>tail.cut).sort((a,b)=>b.t-a.t);
+      slowRank=new Map(slow.map((r,n)=>[r.i,
+        padL+2+(slow.length===1?gut/2-4:(n/(slow.length-1))*(gut-12))]));
+    }
+    const x=t=>main(t);
+    const xOf=r=>(slowRank&&slowRank.has(r.i))?slowRank.get(r.i):main(r.t);
     const r0=Math.max(2,Math.min(3.4,w/300));
     const lastX=[];let spread=0;
     for(const r of rows){
-      const px=x(r.t);
+      const px=xOf(r);
       let k=0;
       while(lastX[k]!=null&&px-lastX[k]<r0*2+1.2)k++;
       lastX[k]=px;r.px=px;r.off=offsetOf(k);
@@ -19321,7 +19370,8 @@ const WALL=(()=>{
     const inner=h-padT-padB;
     // spread out to the natural spacing, or squeeze to fit, whichever is less
     const step=Math.min(r0*2+1.2,inner/Math.max(1,spread*2+1));
-    return {padL,padR,padT,padB,r:r0,step:step,x:x,mid:padT+inner/2,spread:spread};
+    return {padL,padR,padT,padB,r:r0,step:step,x:x,mid:padT+inner/2,spread:spread,
+      tail:tail,x0:x0,fast:fast,slow:slow};
   }
 
   /* An era ramp that works on both grounds: deep maroon for the oldest, a
@@ -19343,7 +19393,7 @@ const WALL=(()=>{
 
     // the axis: four stopwatch ticks and the direction, once
     if(rows.length){
-      const lo=rows[0].t,hi=rows[rows.length-1].t;
+      const lo=L.fast,hi=L.slow;
       g.font='500 9px Rajdhani,sans-serif';g.textAlign='center';
       for(const t of CH.timeTicks(lo,hi,4)){
         if(t<lo||t>hi)continue;
@@ -19357,6 +19407,17 @@ const WALL=(()=>{
       g.fillText('FASTER \u2192',w-4,L.padT-6);
       g.textAlign='left';
       g.fillText(rows.length+' athletes, all of them',4,L.padT-6);
+
+      // the break, and what is on the other side of it
+      if(L.tail){
+        const bx=L.x0-5;
+        g.strokeStyle=C.line;g.lineWidth=1;g.setLineDash([2,3]);
+        g.beginPath();g.moveTo(bx,L.padT-4);g.lineTo(bx,h-L.padB+2);g.stroke();
+        g.setLineDash([]);
+        g.fillStyle=C.faint;g.font='500 8.5px Rajdhani,sans-serif';
+        g.textAlign='left';
+        g.fillText(L.tail.n+' slower',2,h-L.padB+13);
+      }
     }
 
     // the cutoff, labelled, because a line with no label is a decoration
@@ -19376,12 +19437,14 @@ const WALL=(()=>{
       const x=p?p.x+(tx-p.x)*e:tx;
       const y=p?p.y+(ty-p.y)*e:mid+(ty-mid)*e;
       r.x=x;r.y=y;
-      const on=lit.has(r.i),isHot=hot===r.i;
+      const on=lit.has(r.i),isHot=hot===r.i,offScale=L.tail&&r.t>L.tail.cut;
+      if(offScale){g.save();g.setLineDash([]);}
       g.beginPath();g.arc(x,y,isHot?R0+1.6:R0,0,7);
       if(r.now){g.fillStyle=C.accent;g.globalAlpha=on?1:.42;g.fill();}
       else{g.fillStyle=eraColor(r.era,C);g.globalAlpha=on?.92:.3;g.fill();}
       g.globalAlpha=1;
       if(isHot){g.strokeStyle=C.text;g.lineWidth=1.4;g.stroke();}
+      if(offScale)g.restore();
     }
     if(f<1)nextFrame(()=>CV.paint(cv));
   }
@@ -19437,6 +19500,7 @@ const WALL=(()=>{
     }
   }
 
+  let WALLTAIL=0;
   function render(){
     mount();
     if(!cv)return;
@@ -19444,6 +19508,7 @@ const WALL=(()=>{
     for(const r of rows)if(r.x!=null)keep.set(r.i,{x:r.x,y:r.y});
     build();
     prev=keep;t0=performance.now();
+    const tc=tailCut();WALLTAIL=tc?tc.n:0;
     CV.drop(cv);
     CV.add(cv,heightFor,draw);
     // no frames, no problem: land on the finished layout anyway
@@ -19457,6 +19522,10 @@ const WALL=(()=>{
         +'Colour is the era, oldest to newest; anybody <b style="color:var(--accent)">'
         +'running here now</b> is picked out. Hover, or run down the list, and the '
         +'other one follows.'
+      + (WALLTAIL?' The '+WALLTAIL+' slowest sit in their own margin at the left, '
+        +'past the dashed line: on a straight scale they took half the width between '
+        +'them and squashed everybody else into a corner. They are still here, still '
+        +'counted and still open when you click them.':'')
       : 'Nobody has recorded a '+RULERS[bR].label+' here yet.';
   }
 
@@ -19870,6 +19939,17 @@ const GHOST=(()=>{
     // the course: a start line, a finish line, and the kilometre marks
     g.strokeStyle=C.line;g.lineWidth=1;
     g.beginPath();g.moveTo(padL,padT-8);g.lineTo(padL,H-padB+4);g.stroke();
+    /* Which colour is which year, on the chart. The selects above say "Race
+       2027 against 2022" and the lanes are interleaved by finishing time, so
+       without this the reader has to work out the key from the order. */
+    const yA=+(document.getElementById('gh-a')||{}).value,
+          yB=+(document.getElementById('gh-b')||{}).value;
+    g.font='700 10px Rajdhani,sans-serif';g.textAlign='left';
+    g.fillStyle=C.accent;g.fillText(yA||'',padL,12);
+    const wA=g.measureText(String(yA||'')).width;
+    g.fillStyle=C.dim;g.fillText('v',padL+wA+6,12);
+    g.fillStyle=C.steel;g.fillText(yB||'',padL+wA+16,12);
+
     g.font='600 9px Rajdhani,sans-serif';g.textAlign='left';g.fillStyle=C.faint;
     for(let km=1;km<=5;km++){
       const x=padL+track*(km===5?1:km/5);
@@ -19879,7 +19959,7 @@ const GHOST=(()=>{
       g.setLineDash([]);
       g.fillStyle=km===5?C.accent:C.faint;
       g.textAlign=km===5?'right':'center';
-      g.fillText(km===5?'FINISH':km+'k',km===5?x-3:x,padT-12);
+      g.fillText(km===5?'FINISH':km+'k',km===5?x-3:x,padT-10);
     }
 
     rows.forEach((r,n)=>{
