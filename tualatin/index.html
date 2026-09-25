@@ -239,6 +239,17 @@ figure{margin:0}
   padding:8px 6px 2px}
 .smalls figcaption{margin:0 0 2px 6px;color:var(--muted);
   font:600 10.5px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
+
+/* The wall. Its own card rather than a chart inside one, because it is the
+   first thing on the page and the list is a reading of it. */
+.wall{padding:16px 14px 14px;margin-bottom:16px}
+.wall h2{margin:0 0 10px}
+.wall canvas{display:block;width:100%;touch-action:manipulation;cursor:pointer}
+.wall figcaption{margin-top:10px}
+/* The list end of the link. Background and an inset rule only - nothing
+   that changes a row's size, or hovering the wall would reflow the list
+   under the reader's hand. */
+.rows .row.lit{background:var(--raised);box-shadow:inset 3px 0 0 var(--accent)}
 figcaption{color:var(--dim);font-size:12.5px;margin-top:9px;max-width:66ch}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .ax{stroke:var(--line);stroke-width:.5}
@@ -17134,6 +17145,11 @@ Three Rivers League JV District
   fast. Every number on the Program tab is computed over a population you can see
   and change, because a statistic taken over this list is a statistic about the
   people who stayed.</p>
+  <figure class="card wall">
+    <h2>Everybody</h2>
+    <canvas id="wall-cv" aria-label="Every athlete's best on this ruler, one dot each"></canvas>
+    <figcaption id="wall-cap"></figcaption>
+  </figure>
   <div class="rows" id="board"></div>
 </section>
 
@@ -18759,13 +18775,247 @@ function growthBoard(g,k){
   }).filter(Boolean).sort((x,y)=>y.gain-x.gain);
 }
 
+/* ---------- the wall ----------
+   The board is a list, and a list of a hundred names cannot show you that
+   there are six hundred and forty-nine people behind it. This can. Every
+   athlete who has ever recorded a mark on the chosen ruler is one dot, placed
+   at their time and packed upward off it, so the shape of the whole programme
+   is the first thing on the page - the crowd where most of the school sits,
+   the thinning out through the fast end, the handful out on their own.
+
+   THE DOTS ARE NEVER FILTERED. That is the argument: the board says "this is
+   a view, not the data", and a hero chart that hid everyone below the
+   hundredth would be the same view again, larger. The toggles change which
+   dots are LIT and where the cutoff rule falls; every dot stays on the chart
+   in every view, because the ones outside the light are the point.
+
+   Faster is to the RIGHT, which is stated on the axis rather than assumed.
+
+   Colour is the era, a ramp over class years, so you can see that the fast
+   end is not evenly spread across twenty-two seasons. Anybody running here
+   now is in the accent instead - the one thing a reader looking for their own
+   athlete wants to find first.
+
+   Packing is the ordinary greedy beeswarm: walk the athletes in time order
+   and drop each into the lowest lane whose last dot is far enough to the
+   left. It is O(n x lanes) with about twenty lanes, which at 649 dots is
+   nothing.
+
+   Positions are HELD between redraws and interpolated, so switching ruler
+   moves every dot from where it was to where it belongs rather than cutting.
+   A dot that has no previous position enters from the bottom. */
+const WALL=(()=>{
+  let cv=null,rows=[],prev=new Map(),t0=0,DUR=650,hot=null,lit=new Set(),cut=null;
+
+  /* THE HEIGHT IS FIXED AND THE PACKING BENDS TO IT, which is the opposite of
+     the first two attempts and the only thing that works at both ends.
+
+     A strict beeswarm - every dot clear of its neighbours - is a promise the
+     data cannot keep. 330 boys on a 313px phone column need seventy-odd lanes
+     however small the dots get, and the chart becomes 1,200px of scrolling
+     above a list that is the actual page. Capping the lane count instead is
+     worse: the overflow silently piles into the last row, which reads as a
+     bar and is not one.
+
+     So the swarm gets a sensible height, dots get a size a finger can hit,
+     and where the programme is genuinely crowded the dots overlap. That is
+     not a compromise in the reading - a hundred boys within thirty seconds of
+     each other SHOULD look solid, and the thin fast end should look thin.
+     Nothing is dropped, which is the one rule this chart has. */
+  function build(){
+    const pop=V.everyone(bG,'dist').filter(a=>byA[a.i].best[bR]!=null);
+    const ranked=V.top(bG,'dist',bR,0);
+    const rank=new Map(ranked.map((a,i)=>[a.i,i+1]));
+    const yrs=pop.map(a=>a.classOf).filter(Boolean);
+    const y0=Math.min(...yrs),y1=Math.max(...yrs);
+    rows=pop.map(a=>({i:a.i,a:a,t:byA[a.i].best[bR],rank:rank.get(a.i)||null,
+      now:isActive(a),era:y1===y0?1:((a.classOf||y0)-y0)/(y1-y0)}))
+      .sort((x,y)=>x.t-y.t);
+    // which dots the current view is about
+    lit=new Set();
+    cut=null;
+    if(bN===-1){
+      for(const r of growthBoard(bG,bR).slice(0,120))lit.add(r.a.i);
+    }else if(bN>0){
+      for(const a of ranked.slice(0,bN))lit.add(a.i);
+      cut=ranked[bN-1]?byA[ranked[bN-1].i].best[bR]:null;
+    }else{
+      for(const r of rows)lit.add(r.i);
+    }
+  }
+
+  const offsetOf=k=>k===0?0:(k%2?(k+1)/2:-k/2);
+
+  function heightFor(w){return Math.max(160,Math.min(250,w*0.24));}
+
+  function layout(w,h){
+    const padL=10,padR=10,padT=22,padB=24;
+    if(!rows.length)return {padL,padR,padT,padB,r:3,step:7,x:()=>0,mid:h/2};
+    const lo=rows[0].t,hi=rows[rows.length-1].t;
+    // faster is to the right, so the fastest time maps to the far edge
+    const x=t=>padL+(hi===lo?0.5:(hi-t)/(hi-lo))*(w-padL-padR);
+    const r0=Math.max(2,Math.min(3.4,w/300));
+    const lastX=[];let spread=0;
+    for(const r of rows){
+      const px=x(r.t);
+      let k=0;
+      while(lastX[k]!=null&&px-lastX[k]<r0*2+1.2)k++;
+      lastX[k]=px;r.px=px;r.off=offsetOf(k);
+      if(Math.abs(r.off)>spread)spread=Math.abs(r.off);
+    }
+    const inner=h-padT-padB;
+    // spread out to the natural spacing, or squeeze to fit, whichever is less
+    const step=Math.min(r0*2+1.2,inner/Math.max(1,spread*2+1));
+    return {padL,padR,padT,padB,r:r0,step:step,x:x,mid:padT+inner/2,spread:spread};
+  }
+
+  /* An era ramp that works on both grounds: deep maroon for the oldest, a
+     light steel for the newest. Hand-mixed rather than a colour-mix, because
+     a canvas cannot resolve one. */
+  function eraColor(f,C){
+    const a=[74,0,8],b=[154,145,153];
+    const m=(i)=>Math.round(a[i]+(b[i]-a[i])*f);
+    return 'rgb('+m(0)+','+m(1)+','+m(2)+')';
+  }
+
+  function draw(g,w,h,C){
+    const L=layout(w,h);
+    const f=DUR?Math.min(1,(performance.now()-t0)/DUR):1;
+    const e=REDUCED?1:1-Math.pow(1-f,3);
+    const mid=L.mid;
+    const yOf=r=>mid+r.off*L.step;
+    const R0=L.r;
+
+    // the axis: four stopwatch ticks and the direction, once
+    if(rows.length){
+      const lo=rows[0].t,hi=rows[rows.length-1].t;
+      g.font='500 9px Rajdhani,sans-serif';g.textAlign='center';
+      for(const t of CH.timeTicks(lo,hi,4)){
+        if(t<lo||t>hi)continue;
+        const px=L.x(t);
+        g.strokeStyle=C.line;g.lineWidth=1;
+        g.beginPath();g.moveTo(px,L.padT-6);g.lineTo(px,h-L.padB+4);g.stroke();
+        g.fillStyle=C.faint;g.fillText(ms(t),px,h-L.padB+15);
+      }
+      g.textAlign='right';g.fillStyle=C.muted;
+      g.font='600 9px Rajdhani,sans-serif';
+      g.fillText('FASTER \u2192',w-4,L.padT-6);
+      g.textAlign='left';
+      g.fillText(rows.length+' athletes, all of them',4,L.padT-6);
+    }
+
+    // the cutoff, labelled, because a line with no label is a decoration
+    if(cut!=null){
+      const px=L.x(cut);
+      g.strokeStyle=C.accent;g.lineWidth=1;g.setLineDash([3,3]);
+      g.beginPath();g.moveTo(px,L.padT-2);g.lineTo(px,h-L.padB+2);g.stroke();
+      g.setLineDash([]);
+      g.fillStyle=C.accent;g.font='700 9px Rajdhani,sans-serif';
+      g.textAlign=px>w*0.55?'right':'left';
+      g.fillText('top '+bN+' ends here \u00b7 '+ms(cut),px+(px>w*0.55?-4:4),h-L.padB-3);
+    }
+
+    for(const r of rows){
+      const ty=yOf(r),tx=r.px;
+      const p=prev.get(r.i);
+      const x=p?p.x+(tx-p.x)*e:tx;
+      const y=p?p.y+(ty-p.y)*e:mid+(ty-mid)*e;
+      r.x=x;r.y=y;
+      const on=lit.has(r.i),isHot=hot===r.i;
+      g.beginPath();g.arc(x,y,isHot?R0+1.6:R0,0,7);
+      if(r.now){g.fillStyle=C.accent;g.globalAlpha=on?1:.42;g.fill();}
+      else{g.fillStyle=eraColor(r.era,C);g.globalAlpha=on?.92:.3;g.fill();}
+      g.globalAlpha=1;
+      if(isHot){g.strokeStyle=C.text;g.lineWidth=1.4;g.stroke();}
+    }
+    if(f<1)requestAnimationFrame(()=>CV.paint(cv));
+  }
+
+  function hit(px,py){
+    let best=null,bd=1e9;
+    for(const r of rows){
+      const d=(r.x-px)*(r.x-px)+(r.y-py)*(r.y-py);
+      if(d<bd){bd=d;best=r;}
+    }
+    return (best&&bd<=169)?best:null;   // thirteen pixels, which is a fingertip
+  }
+
+  function highlightRow(i){
+    for(const el of document.querySelectorAll('#board .row.lit'))el.classList.remove('lit');
+    if(i==null)return;
+    const el=document.querySelector('#board .row[data-i="'+i+'"]');
+    if(el)el.classList.add('lit');
+  }
+
+  function mount(){
+    const el=document.getElementById('wall-cv');
+    if(!el)return;
+    if(cv!==el){
+      cv=el;
+      cv.addEventListener('pointermove',ev=>{
+        const b=cv.getBoundingClientRect();
+        const r=hit(ev.clientX-b.left,ev.clientY-b.top);
+        const id=r?r.i:null;
+        if(id===hot)return;
+        hot=id;highlightRow(id);
+        if(r)TIP.at(ev.clientX,ev.clientY,nameOf(r.a)+' \u00b7 '
+          +(r.a.classOf?(isActive(r.a)?'running now':'class of '+r.a.classOf):'')
+          +' \u00b7 '+secs(r.t)+(r.rank?' \u00b7 '+ord(r.rank)+' all-time':''));
+        else TIP.hide();
+        CV.paint(cv);
+      });
+      cv.addEventListener('pointerleave',()=>{hot=null;highlightRow(null);TIP.hide();CV.paint(cv);});
+      cv.addEventListener('click',ev=>{
+        const b=cv.getBoundingClientRect();
+        const r=hit(ev.clientX-b.left,ev.clientY-b.top);
+        if(r)openAthlete(r.i,true);
+      });
+      /* The board lights the wall too, not only the other way round. A reader
+         running a finger down the list is asking the same question from the
+         other end. */
+      document.getElementById('board').addEventListener('pointerover',ev=>{
+        const row=ev.target.closest&&ev.target.closest('.row');
+        const id=row?+row.dataset.i:null;
+        if(id===hot)return;
+        hot=id;if(cv)CV.paint(cv);
+      });
+    }
+  }
+
+  function render(){
+    mount();
+    if(!cv)return;
+    const keep=new Map();
+    for(const r of rows)if(r.x!=null)keep.set(r.i,{x:r.x,y:r.y});
+    build();
+    prev=keep;t0=performance.now();
+    CV.drop(cv);
+    CV.add(cv,heightFor,draw);
+    // no frames, no problem: land on the finished layout anyway
+    setTimeout(()=>{t0=performance.now()-DUR-1;if(cv)CV.paint(cv);},DUR+400);
+    const el=document.getElementById('wall-cap');
+    if(el)el.innerHTML=rows.length
+      ? 'Every one of the <b>'+rows.length+'</b> '+(bG==='M'?'boys':'girls')
+        +' who has ever recorded a '+RULERS[bR].label+' here, one dot each, at the '
+        +'time they ran. Nothing is filtered out \u2014 the list below is a view of '
+        +'this, and the dots outside the light are the reason that sentence matters. '
+        +'Colour is the era, oldest to newest; anybody <b style="color:var(--accent)">'
+        +'running here now</b> is picked out. Hover, or run down the list, and the '
+        +'other one follows.'
+      : 'Nobody has recorded a '+RULERS[bR].label+' here yet.';
+  }
+
+  return {render:render};
+})();
+
 function drawBoard(){
   if(bN===-1)return drawGrowth();
   const pop=V.top(bG,'dist',bR,bN||0);
   const q=bQ.trim().toLowerCase();
   const rows=pop.map((a,i)=>({a,rank:i+1})).filter(x=>!q||fullKey(x.a).includes(q));
   const el=document.getElementById('board');
-  if(!rows.length){el.innerHTML='<p class="empty">Nobody here on this ruler.</p>';return;}
+  if(!rows.length){el.innerHTML='<p class="empty">Nobody here on this ruler.</p>';
+    WALL.render();return;}
   el.innerHTML=rows.map(({a,rank})=>{
     const o=byA[a.i],m=MEETS[o.bestAt[bR]]||{};
     return '<a class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i
@@ -18779,6 +19029,7 @@ function drawBoard(){
       +'<span class="tm">'+secs(o.best[bR])+'</span></a>';
   }).join('');
   animate(el);
+  WALL.render();
 }
 
 function drawGrowth(){
@@ -18787,7 +19038,8 @@ function drawGrowth(){
   const shown=rows.map((r,i)=>({...r,rank:i+1}))
     .filter(x=>!q||fullKey(x.a).includes(q)).slice(0,120);
   const el=document.getElementById('board');
-  if(!shown.length){el.innerHTML='<p class="empty">Nobody has two seasons on this ruler yet.</p>';return;}
+  if(!shown.length){el.innerHTML='<p class="empty">Nobody has two seasons on this ruler yet.</p>';
+    WALL.render();return;}
   const top=rows[0]?rows[0].gain:1;
   el.innerHTML=shown.map(({a,rank,gain,from,to,lo,hi})=>
     '<a class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i
@@ -18799,6 +19051,7 @@ function drawGrowth(){
     +'<span class="cl">gr '+lo+' — '+hi+' — '+secs(from)+' to '+secs(to)+'</span>'
     +'<span class="tm">+'+gain.toFixed(1)+'</span></a>').join('');
   animate(el);
+  WALL.render();
 }
 
 /* ---------- program ---------- */
@@ -19554,6 +19807,20 @@ const TIP=(()=>{
     at=t;el.textContent=txt;place(t);el.classList.add('on');
   };
   const hide=()=>{at=null;el.classList.remove('on');el.hidden=true;};
+  /* A canvas has no elements in it, so a dot cannot carry data-tip. This is
+     the same tooltip addressed by a point instead. Keeping it on TIP rather
+     than letting the canvases grow their own means one thing to style, one
+     thing to dismiss on Escape, and one thing that cannot be left on screen
+     by a chart that was re-rendered underneath it. */
+  const at2=(cx,cy,txt)=>{
+    if(!txt)return hide();
+    at=null;el.textContent=txt;el.hidden=false;
+    const w=el.offsetWidth,h=el.offsetHeight;
+    const x=Math.max(8,Math.min(innerWidth-w-8,cx-w/2));
+    const y=cy-h-14<6?cy+18:cy-h-14;
+    el.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px)';
+    el.classList.add('on');
+  };
   const find=e=>e.target.closest&&e.target.closest('[data-tip]');
   addEventListener('pointerover',e=>{const t=find(e);if(t&&t!==at)show(t);else if(!t&&at)hide();});
   addEventListener('focusin',e=>{const t=find(e);if(t)show(t);});
@@ -19562,7 +19829,7 @@ const TIP=(()=>{
   addEventListener('scroll',hide,{passive:true});
   // tap: show once, and let the next tap anywhere dismiss it
   addEventListener('click',e=>{const t=find(e);if(t)show(t);else hide();});
-  return {show,hide};
+  return {show,hide,at:at2};
 })();
 
 /* ---------- the command palette ----------
