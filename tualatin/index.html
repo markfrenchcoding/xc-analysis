@@ -10,38 +10,108 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@600;700&family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ---------- Tualatin ----------
+   Crimson, grey and black, which is what the school profile says and what
+   tuhs.ttsdschools.org actually paints with: its own accent is #880000. That
+   is the true colour and it is used as itself wherever there is light behind
+   it.
+
+   It cannot be the ink on a black ground. Measured: #880000 on #0B0A0C is
+   1.93:1, which is invisible, while white on #880000 is 10.26:1. So the
+   maroon FILLS and a lifted crimson WRITES. --maroon is the school's colour
+   and never changes; --accent is whatever reads at 4.5:1 against the ground
+   of the current theme, which on dark is #EE5566 at 5.42:1 and on light is
+   #880000 itself at 9.79:1.
+
+   Same discipline as the app's gold, different colour. Every value below was
+   measured, not chosen by eye. */
 :root{
-  --bg:#0D0D0F;--surface:#17171A;--raised:#212126;--line:#2E2E35;
-  --text:#F3F3F4;--muted:#A2A2AB;--dim:#6C6C77;
-  --accent:#E8A33D;--accent-2:#B87B22;--accent-3:#6E4D18;--on-accent:#1C1405;
-  --good:#6FCF97;--bad:#E8756B;
+  --bg:#0B0A0C;--surface:#151217;--raised:#1E1922;--line:#2E2732;
+  --text:#F4F1F3;--muted:#A79DA4;--dim:#8A7F87;--faint:#6E636B;
+  --maroon:#880000;--maroon-lift:#B31B2C;--maroon-deep:#4A0008;
+  --accent:#EE5566;--on-accent:#FFFFFF;
+  --steel:#9A9199;
+  --good:#5FD39A;--bad:#F26B78;
   --t1e:#9CBEFF;--t2e:#E8ECF2;--t3e:#F2C79D;
-  --shadow:0 1px 2px rgba(0,0,0,.4);
+  --shadow:0 1px 2px rgba(0,0,0,.5);
+  --ease:cubic-bezier(.22,1,.36,1);
   --disp:'Oswald','Barlow Condensed',sans-serif;
   --num:'Rajdhani','Barlow Condensed',sans-serif;
+  --grain:.045;
 }
 [data-theme="light"]{
-  --bg:#FBFBFC;--surface:#FFFFFF;--raised:#F1F1F4;--line:#E3E3E8;
-  --text:#141417;--muted:#5B5B66;--dim:#8C8C97;
-  --accent:#A06811;--accent-2:#D9A44E;--accent-3:#EFD7A8;--on-accent:#FFFFFF;
-  --good:#1E8E52;--bad:#C0392B;
+  --bg:#FBF9FA;--surface:#FFFFFF;--raised:#F3EFF1;--line:#E4DEE2;
+  --text:#141014;--muted:#5C525A;--dim:#857A82;--faint:#A79DA4;
+  --maroon:#880000;--maroon-lift:#A81020;--maroon-deep:#6B0008;
+  --accent:#880000;--on-accent:#FFFFFF;
+  --steel:#6E636B;
+  --good:#127A4A;--bad:#A81020;
   --t1e:#2C55BE;--t2e:#B9C0CA;--t3e:#C08A55;
-  --shadow:0 1px 2px rgba(20,20,25,.07);
+  --shadow:0 1px 2px rgba(20,16,20,.08);
+  --grain:.028;
   color-scheme:light;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);
   font:400 15px/1.55 'Barlow',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* A wash of the school colour behind everything, and a grain over it. Both are
+   fixed, both are pointer-events:none, and neither ever animates - they are
+   two elements for the whole page rather than a cost on every card. The grain
+   is an inline SVG turbulence, which is a few hundred bytes against a texture
+   file and needs no second request on a page whose CSP forbids one. */
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 8% -10%,var(--maroon-deep) 0%,transparent 55%),
+    radial-gradient(90% 60% at 100% 0%,var(--maroon) 0%,transparent 45%);
+  opacity:.5}
+[data-theme="light"] body::before{opacity:.10}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- motion ----------
+   One reveal, driven by IntersectionObserver rather than by a load-time
+   cascade, so a card that is four screens down animates when it is reached
+   instead of having already happened. transform and opacity only.
+
+   .reveal is the RESTING state being deferred, not the content being
+   conditional: everything is visible with .in, and .in is added by the
+   observer AND unconditionally by a timer, so a browser that never fires the
+   observer still shows a complete page. Never leave content depending on an
+   animation to become visible. */
+.reveal{opacity:0;transform:translateY(18px)}
+.reveal.in{opacity:1;transform:none;
+  transition:opacity .55s var(--ease),transform .55s var(--ease);
+  transition-delay:var(--d,0ms)}
+@media (prefers-reduced-motion:reduce){
+  .reveal,.reveal.in{opacity:1;transform:none;transition:none}
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
 b,strong{font-weight:600}
 .wrap{max-width:1040px;margin:0 auto;padding:0 16px 72px}
 
 header{border-bottom:1px solid var(--line);margin-bottom:22px;
-  padding:20px 0 0;position:sticky;top:0;background:var(--bg);z-index:10}
+  padding:20px 0 0;position:sticky;top:0;z-index:10;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(14px) saturate(1.2)}
+h1 em{position:relative}
+/* the wordmark's own underline, drawn once on load */
+h1::after{content:'';position:absolute;left:0;bottom:-3px;height:3px;width:100%;
+  background:linear-gradient(90deg,var(--maroon),var(--accent));
+  transform:scaleX(0);transform-origin:left;
+  animation:sweep .9s .2s var(--ease) forwards}
+h1{position:relative}
 .brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 h1{font-family:'Anton',var(--disp);font-weight:400;letter-spacing:.01em;
   text-transform:uppercase;transform:skewX(-8deg);transform-origin:left bottom;
   font-size:clamp(23px,5.4vw,31px);margin:0}
-h1 em{font-style:normal;color:var(--accent)}
+/* Maroon into the lifted crimson, so the wordmark reads as the school's own
+   colour with enough light at the end of it to stay legible on black. On the
+   light theme the true maroon needs no help and is used straight. */
+h1 em{font-style:normal;background:linear-gradient(100deg,var(--maroon) 0%,var(--accent) 62%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+[data-theme="light"] h1 em{background:none;color:var(--maroon)}
 .sub{color:var(--muted);font-size:13px;margin-left:6px}
 .themer{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);
   border-radius:999px;padding:5px 13px;font:600 12px/1 var(--disp);letter-spacing:.06em;
@@ -15376,6 +15446,17 @@ footer{color:var(--dim);font-size:12.5px;border-top:1px solid var(--line);paddin
   </div>
 
   <div class="card">
+    <h2>The squad, as it stands</h2>
+    <p class="why">Everyone who has raced this season on the chosen ruler, placed
+    by the time they actually ran. Filled dots are the scoring five; the rest are
+    outlined, which is the same mark the odds site uses — five score, everybody
+    runs. The gaps are to scale, so the shape of this picture is the shape of the
+    team.</p>
+    <canvas id="pack-cv" style="width:100%;display:block"></canvas>
+    <p class="why" id="pack-cap" style="margin:12px 0 0"></p>
+  </div>
+
+  <div class="card">
     <h2>Speed or strength</h2>
     <p class="why">A 1,500m against a 3,000m, both on the track, so the comparison
     is clean. Read against the squad's own middle rather than against zero, because
@@ -15698,6 +15779,103 @@ function rulerGap(g){
       med:diff[diff.length>>1]}:null;
   }
   return out;
+}
+
+/* ---------- motion ----------
+   Two things, both cheap, both wired to one observer.
+
+   COUNTING. A figure that ticks up to its value reads as a result arriving;
+   the same figure simply present reads as a lookup. requestAnimationFrame for
+   about three quarters of a second, eased out, writing textContent.
+
+   DRAWING. A line that draws itself is the difference between a chart and a
+   career. stroke-dasharray with the offset animated to zero; the path is
+   complete in the DOM from the first frame, which matters because the
+   animation may never run.
+
+   THE RESTING STATE IS ALWAYS COMPLETE. reveal() adds .in on intersection,
+   and a timer adds it to everything after 1.2s regardless, so a throttled
+   tab, a frozen clock or an engine that skips animation still ends up with a
+   whole page. Never leave content depending on an animation to become
+   visible - that rule cost the How tab a rewrite once. */
+const REDUCED=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+function countTo(el,to,fmt,ms){
+  if(REDUCED||!el){if(el)el.textContent=fmt(to);return;}
+  const t0=performance.now(),dur=ms||780;
+  const step=now=>{
+    const f=Math.min(1,(now-t0)/dur);
+    el.textContent=fmt(to*(1-Math.pow(1-f,3)));
+    if(f<1)requestAnimationFrame(step);
+  };
+  el.textContent=fmt(0);
+  requestAnimationFrame(step);
+}
+
+/* The format is NAMED rather than inferred, because "16:49.5" and "46%" and
+   "+4.48" are three different shapes and guessing between them is how a
+   percent sign ends up inside a time. */
+const FMT={
+  int:v=>Math.round(v).toLocaleString(),
+  pct:v=>Math.round(v)+'%',
+  one:v=>v.toFixed(1),
+  sign:v=>(v>0?'+':v<0?'-':'')+Math.abs(v).toFixed(2),
+  secs:v=>secs(v),
+  s1:v=>v.toFixed(1)+'s',
+};
+function runCounts(root){
+  for(const el of (root||document).querySelectorAll('[data-count]')){
+    if(el.dataset.done)continue;
+    el.dataset.done='1';
+    const f=FMT[el.dataset.fmt||'int']||FMT.int;
+    countTo(el,+el.dataset.count,f,+el.dataset.ms||undefined);
+  }
+}
+
+// length measured off the real geometry, so one helper draws any path
+function runDraws(root){
+  for(const el of (root||document).querySelectorAll('[data-draw]')){
+    if(el.dataset.done)continue;
+    el.dataset.done='1';
+    if(REDUCED)continue;
+    let L=0;
+    try{L=el.getTotalLength();}catch(e){continue;}
+    if(!L)continue;
+    el.style.strokeDasharray=L;
+    el.style.strokeDashoffset=L;
+    el.style.transition='stroke-dashoffset '+(+el.dataset.draw||900)
+      +'ms var(--ease) '+(+el.dataset.delay||0)+'ms';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.strokeDashoffset=0;}));
+  }
+}
+
+const OBS=('IntersectionObserver' in window)?new IntersectionObserver(es=>{
+  for(const e of es){
+    if(!e.isIntersecting)continue;
+    e.target.classList.add('in');
+    runCounts(e.target);runDraws(e.target);
+    OBS.unobserve(e.target);
+  }
+},{rootMargin:'0px 0px -8% 0px',threshold:.08}):null;
+
+function animate(scope){
+  const root=scope||document;
+  [...root.querySelectorAll('.reveal:not(.in)')].forEach((el,i)=>{
+    if(!el.style.getPropertyValue('--d'))el.style.setProperty('--d',Math.min(i*55,520)+'ms');
+    if(OBS)OBS.observe(el); else el.classList.add('in');
+  });
+  // whatever the observer does, the page is whole a moment later
+  setTimeout(()=>{
+    for(const el of root.querySelectorAll('.reveal:not(.in)'))el.classList.add('in');
+    runCounts(root);runDraws(root);
+  },1200);
+  // and anything already on screen starts now rather than on the next scroll
+  requestAnimationFrame(()=>{
+    for(const el of root.querySelectorAll('.reveal')){
+      const r=el.getBoundingClientRect();
+      if(r.top<innerHeight&&r.bottom>0){el.classList.add('in');runCounts(el);runDraws(el);}
+    }
+  });
 }
 
 /* ---------- SVG helpers ---------- */
@@ -16091,6 +16269,7 @@ function drawBoard(){
       +' · '+esc((m.name||'').slice(0,26))+'</span>'
       +'<span class="tm">'+secs(o.best[bR])+'</span></button>';
   }).join('');
+  animate(el);
 }
 
 function drawGrowth(){
@@ -16109,6 +16288,7 @@ function drawGrowth(){
       +'%;animation-delay:'+Math.min(rank*14,420)+'ms"></i></span></span>'
     +'<span class="cl">gr '+lo+' — '+hi+' — '+secs(from)+' to '+secs(to)+'</span>'
     +'<span class="tm">+'+gain.toFixed(1)+'</span></button>').join('');
+  animate(el);
 }
 
 /* ---------- program ---------- */
@@ -16121,15 +16301,23 @@ function drawProgram(){
   const dEvery=devCurve(every,pR);
   document.getElementById('pop-why').textContent=POPS[pP].why;
 
+  /* Every tile says what it MEANS underneath, not only what it is. A number
+     with a label and no definition is the thing a reader guesses at, and three
+     of these were guessable in the wrong direction. */
   document.getElementById('tiles').innerHTML=[
-    ['Athletes on record',every.length,'since '+INFO.horizon],
-    ['Four-year completion',ent?Math.round(fin/ent*100)+'%':'—',fin+' of '+ent+' freshman entrants'],
-    ['Joined after grade 9',every.length?Math.round(mix['late-entry']/every.length*100)+'%':'—',
-      mix['late-entry']+' of '+every.length+' athletes'],
-    ['Four-year VDOT gain',dEvery.four==null?'—':sg(dEvery.four),
-      'on '+RULERS[pR].label+', '+dEvery.cf+' careers'],
-  ].map(([k,v,n],i)=>'<div class="tile"><div class="k">'+k+'</div><div class="v'
-    +(i===1?' acc':'')+'">'+v+'</div><div class="n">'+n+'</div></div>').join('');
+    ['Athletes on record',every.length,'int',
+      'Everyone with a distance mark since '+INFO.horizon+', not only this season.'],
+    ['Four-year completion',ent?fin/ent*100:null,'pct',
+      'Of the '+ent+' who raced here as freshmen, '+fin+' were still racing as seniors.'],
+    ['Joined after grade 9',every.length?mix['late-entry']/every.length*100:null,'pct',
+      mix['late-entry']+' of '+every.length+' started later than grade 9 and still had a career here.'],
+    ['Four-year VDOT gain',dEvery.four,'sign',
+      'Fitness gained from grade 9 to 12 on '+RULERS[pR].label+', over '+dEvery.cf
+      +' complete careers. VDOT is one number for fitness across every distance.'],
+  ].map(([k,v,f,n],i)=>'<div class="tile reveal"><div class="k">'+k+'</div><div class="v'
+    +(i===1?' acc':'')+'">'+(v==null?'—'
+      :'<span data-count="'+v+'" data-fmt="'+f+'">'+FMT[f](v)+'</span>')
+    +'</div><div class="n">'+n+'</div></div>').join('');
 
   const cT=devCurve(top,pR),cF=devCurve(four,pR),cE=dEvery;
   const series=[{label:'Top 100',color:'var(--accent)'},
@@ -16180,7 +16368,7 @@ function drawProgram(){
 
   const cRows=co.map(c=>({label:String(c.classOf).slice(2),v:c.entered?c.g12/c.entered*100:0,
     title:'Class of '+c.classOf+': '+c.g12+' of '+c.entered,
-    color:c.entered<4?'var(--accent-3)':'var(--accent)'}));
+    color:c.entered<4?'var(--maroon-deep)':'var(--accent)'}));
   document.getElementById('comp').innerHTML=barsSimple(cRows,78,
     {max:100,every:3,fmt:v=>v+'%',mid:ent?fin/ent*100:null});
   document.getElementById('comp-cap').textContent='By graduating class. The dashed line is the '
@@ -16189,7 +16377,7 @@ function drawProgram(){
 
   const rs=rosterSize(every);
   document.getElementById('size').innerHTML=stackCols(rs,78,[9,10,11,12],
-    ['var(--accent)','var(--accent-2)','var(--t3e)','var(--dim)']);
+    ['var(--accent)','var(--maroon-lift)','var(--t3e)','var(--dim)']);
   const last=rs[rs.length-1];
   document.getElementById('size-cap').textContent='Freshmen at the bottom, seniors at the top. '
     +(last?last.y+': '+last.n+' athletes, '+last[9]+' of them freshmen.':'');
@@ -16244,6 +16432,7 @@ function drawProgram(){
     +'<th>What it means</th></tr>'+ENTRY.map(k=>'<tr><td class="name">'+k+'</td><td>'+mix[k]
     +'</td><td>'+(every.length?Math.round(mix[k]/every.length*100):0)+'%</td>'
     +'<td style="text-align:left" class="dimv">'+why[k]+'</td></tr>').join('');
+  animate(document.getElementById('p-program'));
 }
 
 /* ---------- one athlete ---------- */
@@ -16294,14 +16483,29 @@ function drawAthlete(i){
       s+='<path d="'+bg.map((g,q)=>(q?'L':'M')+X(g)+' '+Y(band[g].mid)).join(' ')
         +'" fill="none" stroke="var(--dim)" stroke-width=".8" stroke-dasharray="2 1.5"/>';
     }
-    s+='<path d="'+gs.map((g,q)=>(q?'L':'M')+X(g)+' '+Y(mine[g])).join(' ')
-      +'" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
-    for(const g of gs){
-      s+='<circle cx="'+X(g)+'" cy="'+Y(mine[g])+'" r="1.8" fill="var(--accent)"/>';
-      s+=T(X(g),Y(mine[g])-3.4,secs(mine[g]),'axt','middle');
-    }
+    /* The line draws rather than appears. A career is a thing that happened
+       over four years and the drawing says so; the path is complete in the
+       DOM either way, so nothing depends on the animation running. */
+    s+='<path data-draw="1100" d="'+gs.map((g,q)=>(q?'L':'M')+X(g)+' '+Y(mine[g])).join(' ')
+      +'" fill="none" stroke="url(#arcInk)" stroke-width="2"'
+      +' stroke-linecap="round" stroke-linejoin="round"/>';
+    gs.forEach((g,z)=>{
+      s+='<circle cx="'+X(g)+'" cy="'+Y(mine[g])+'" r="2" fill="var(--accent)"'
+        +' opacity="0"><animate attributeName="opacity" to="1" dur="260ms"'
+        +' begin="'+(340+z*240)+'ms" fill="freeze"/>'
+        +'<animate attributeName="r" from="0" to="2" dur="380ms" begin="'
+        +(340+z*240)+'ms" fill="freeze"/></circle>';
+      s+='<text x="'+X(g)+'" y="'+(Y(mine[g])-4)+'" class="axt" text-anchor="middle"'
+        +' opacity="0"><animate attributeName="opacity" to="1" dur="300ms" begin="'
+        +(460+z*240)+'ms" fill="freeze"/>'+esc(secs(mine[g]))+'</text>';
+    });
     for(const g of [9,10,11,12])s+=T(X(g),h-5,'gr '+g,'lbl','middle');
-    arc='<div class="card"><h2>The four years, on '+RULERS[K].label+'</h2>'
+    /* An SVG gradient cannot read a custom property, so the two stops repeat
+       --maroon and --accent by hand. Change one and change the other. */
+    s='<defs><linearGradient id="arcInk" x1="0" y1="0" x2="1" y2="0">'
+      +'<stop offset="0" stop-color="#880000"/><stop offset="1" stop-color="#EE5566"/>'
+      +'</linearGradient></defs>'+s;
+    arc='<div class="card reveal"><h2>The four years, on '+RULERS[K].label+'</h2>'
       +'<p class="why">The ruler they have the most of. The shaded band is the middle half of '
       +'every '+(a.g==='M'?'boy':'girl')+' at that grade on the same ruler, the dashed line '
       +'their median. Faster is higher.</p><figure><div>'+svg(h,s)+'</div></figure></div>';
@@ -16351,7 +16555,7 @@ function drawAthlete(i){
       const old=+String(h.b).slice(0,4)<INFO.horizon;
       const total=h.kind===1?(INFO.ww?INFO.ww.fourYear:0):(INFO.ww?INFO.ww.best:0);
       const pct=total?Math.max(3,100-(h.rank/total*100)):50;
-      return '<div class="h'+(old?' old':'')+'" style="animation-delay:'+(n*90+120)+'ms">'
+      return '<div class="h reveal'+(old?' old':'')+'" style="--d:'+(n*90)+'ms">'
         +'<div class="r">'+ord(h.rank)+'</div>'
         +'<div class="w">'+(h.kind===1?'four-year State qualifier':'fastest ever at State')+'</div>'
         +'<div class="n">'+(h.kind===1?h.a+'\u2013'+h.b:h.a+' in '+h.b)+'</div>'
@@ -16407,6 +16611,85 @@ function drawAthlete(i){
     +'measured against the day. Track is each season’s best per event, which is what '
     +'athletic.net serves for it. A dash in the last column means either that, or a race with '
     +'too few team-mates on the line to say what the day was worth.</p></div>';
+  animate(el);
+}
+
+/* ---------- the pack ----------
+   The squad as it actually stands, drawn as a start line that strings out.
+
+   Every dot is an athlete, placed by their real season best on the chosen
+   ruler: the fastest sits at the front and everybody else falls behind by the
+   time they are actually behind by, to scale. The scoring five are filled in
+   the school's maroon and the rest are outlined, which is the same mark the
+   app uses - five score, the rest run.
+
+   It is one canvas rather than N elements, and it animates once on view for
+   about a second and a half. There is no loop afterwards: a thing that moves
+   for ever is a screensaver, and this is a squad.
+
+   The canvas is drawn at device resolution and laid out in CSS pixels, or the
+   dots are soft on every phone made in the last decade. */
+function drawPack(cv,rows,fifth){
+  if(!cv||!rows.length)return;
+  const dpr=Math.min(2,devicePixelRatio||1);
+  /* Height follows the squad. Fourteen lanes in a fixed 170px gives nine
+     pixels each, and a 10px name in a 9px lane is a smudge. */
+  const W=cv.clientWidth||600,H=Math.max(150,46+rows.length*15);
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.height=H+'px';
+  const g=cv.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+
+  const css=getComputedStyle(document.documentElement);
+  const maroon=css.getPropertyValue('--maroon').trim()||'#880000';
+  const accent=css.getPropertyValue('--accent').trim()||'#EE5566';
+  const line=css.getPropertyValue('--line').trim()||'#2E2732';
+  const dim=css.getPropertyValue('--dim').trim()||'#8A7F87';
+
+  const t0=rows[0].t,tN=rows[rows.length-1].t,span=Math.max(1,tN-t0);
+  const padL=54,padR=26,track=W-padL-padR;
+  const lanes=rows.length,laneH=(H-46)/Math.max(1,lanes-1);
+  const yOf=i=>26+i*laneH;
+  const xOf=t=>padL+(1-(t-t0)/span)*track;
+
+  const start=performance.now(),DUR=REDUCED?0:1500;
+  function frame(now){
+    const f=DUR?Math.min(1,(now-start)/DUR):1;
+    const e=1-Math.pow(1-f,3);
+    g.clearRect(0,0,W,H);
+
+    // the line they all left from
+    g.strokeStyle=line;g.lineWidth=1;
+    g.beginPath();g.moveTo(padL,14);g.lineTo(padL,H-14);g.stroke();
+    g.fillStyle=dim;g.font='600 9px Rajdhani,sans-serif';g.textAlign='left';
+    g.fillText('START',padL+4,11);
+    g.textAlign='right';g.fillText('FASTEST',W-2,11);
+
+    rows.forEach((r,i)=>{
+      const x=padL+(xOf(r.t)-padL)*e,y=yOf(i);
+      // a trail, so the dot reads as having travelled rather than jumped
+      const grad=g.createLinearGradient(padL,0,x,0);
+      grad.addColorStop(0,'rgba(136,0,0,0)');
+      grad.addColorStop(1,r.scoring?maroon:'rgba(154,145,153,.55)');
+      g.strokeStyle=grad;g.lineWidth=r.scoring?2.2:1.2;
+      g.beginPath();g.moveTo(padL,y);g.lineTo(x,y);g.stroke();
+
+      g.beginPath();g.arc(x,y,r.scoring?4.2:3,0,7);
+      if(r.scoring){g.fillStyle=maroon;g.fill();
+        g.strokeStyle=accent;g.lineWidth=1.4;g.stroke();}
+      else{g.fillStyle=css.getPropertyValue('--bg').trim()||'#0B0A0C';g.fill();
+        g.strokeStyle=dim;g.lineWidth=1.2;g.stroke();}
+
+      if(f>.55){
+        g.globalAlpha=Math.min(1,(f-.55)/.35);
+        g.fillStyle=r.scoring?accent:dim;
+        g.font=(r.scoring?'700 10px':'500 10px')+' Rajdhani,sans-serif';
+        g.textAlign='right';g.fillText(r.label,padL-6,y+3.5);
+        g.globalAlpha=1;
+      }
+    });
+    if(f<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
 /* ---------- January, rendered ---------- */
@@ -16444,7 +16727,7 @@ function drawJanuary(){
       const amt=r.moves
         ?'<div class="v">'+r.worth.toFixed(1)+'s</div><div class="u">off the five</div>'
         :'<div class="v">'+Math.round(r.closes*100)+'%</div><div class="u">of the gap</div>';
-      return '<div class="jc" style="--w:'+(r.moves?Math.max(.12,r.worth/top):0.12).toFixed(2)
+      return '<div class="jc reveal" style="--w:'+(r.moves?Math.max(.12,r.worth/top):0.12).toFixed(2)
         +';animation-delay:'+(n*80)+'ms" data-i="'+r.i+'">'
         +'<div class="no">'+(n+1)+'</div>'
         +'<div><div class="who">'+esc(nameOf(r.a))+'<span class="dimv" '
@@ -16464,6 +16747,23 @@ function drawJanuary(){
       +'scoring five. <b>Nobody is ranked below these five \u2014 the list stops at five, '
       +'it does not continue downward.</b>';
   }
+
+  // --- the squad, as it stands
+  const col=RULERS[jR].col,sport=RULERS[jR].sport;
+  const squad=S.filter(sn=>sn.y===CUR_YEAR&&sn.sport===sport&&sn[col]&&A[sn.a]&&A[sn.a].g===jG)
+    .map(sn=>({t:sn[col],label:nameOf(A[sn.a]).split(' ')[0]+' '
+      +(nameOf(A[sn.a]).split(' ')[1]||'').slice(0,1),i:sn.a}))
+    .sort((x,y)=>x.t-y.t).slice(0,14);
+  squad.forEach((r,i)=>{r.scoring=i<5;});
+  drawPack(document.getElementById('pack-cv'),squad,squad[4]?squad[4].t:null);
+  document.getElementById('pack-cap').innerHTML=squad.length
+    ?squad.length+' '+(jG==='M'?'boys':'girls')+' have raced '+RULERS[jR].label
+      +' this season. The five at the front average <b>'
+      +ms(squad.slice(0,5).reduce((a,b)=>a+b.t,0)/Math.min(5,squad.length))+'</b>'
+      +(squad.length>5?', and the gap from the fifth to the sixth is <b>'
+        +Math.round(squad[5].t-squad[4].t)+' second'+(Math.round(squad[5].t-squad[4].t)===1?'':'s')+'</b> \u2014 which is the gap '
+        +'that decides who scores.':'.')
+    :'Nobody has raced this ruler yet this season.';
 
   // --- speed or strength
   const F=eventFit(jG);
@@ -16505,6 +16805,7 @@ function drawJanuary(){
         :Math.floor(x.med/60)+':'+String(Math.round(x.med%60)).padStart(2,'0'))
         +'</td></tr>').join('')
     :'<tr><td class="dimv">No pair has four races together yet.</td></tr>';
+  animate(document.getElementById('p-january'));
 }
 
 document.getElementById('jan').addEventListener('click',e=>{

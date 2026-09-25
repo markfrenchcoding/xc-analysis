@@ -1265,6 +1265,64 @@ It renders as `.truth`, the first thing on an athlete's page, above every table.
 It animates because the sentence *arriving* reads as a finding where one that is
 simply present reads as a lookup. `transform` and `opacity` only.
 
+### It is Tualatin's colours now, and they were measured
+
+Crimson, grey and black. The school profile says so and `tuhs.ttsdschools.org`
+paints with **#880000**, which is the true colour and is used as itself
+wherever there is light behind it.
+
+**It cannot be the ink on a black ground.** Measured: #880000 on #0B0A0C is
+**1.93:1**, which is invisible, while white on #880000 is **10.26:1**. So the
+maroon *fills* and a lifted crimson *writes*. `--maroon` is the school's colour
+and never changes; `--accent` is whatever clears 4.5:1 against the ground of
+the current theme — **#EE5566 at 5.42:1** on dark, and **#880000 itself at
+9.79:1** on light, where it needs no help. Same discipline as the app's gold,
+different colour, every value measured rather than chosen by eye.
+
+The page was built in chutexc's gold for a fortnight, which was a Tualatin site
+wearing another product's identity.
+
+### Motion, and the rule that keeps it safe
+
+Two things, one observer. **Counting**: a figure that ticks up reads as a result
+arriving where the same figure present reads as a lookup. **Drawing**: a career
+line that draws itself is the difference between a chart and four years.
+
+The format is **named** (`data-fmt`) rather than inferred, because `16:49.5`,
+`46%` and `+4.48` are three shapes and guessing between them is how a percent
+sign ends up inside a time.
+
+**The resting state is always complete.** `animate()` adds `.in` on
+intersection, *and* a timer adds it to everything after 1.2s regardless, *and*
+anything already on screen starts immediately rather than on the next scroll.
+A throttled tab, a frozen clock or an engine that skips animation still ends up
+with a whole page. Never leave content depending on an animation to become
+visible — the same rule the How tab's diagrams had to learn.
+`prefers-reduced-motion` turns all of it off and shows final values.
+
+### The pack
+
+The squad as a start line that strings out: every athlete placed by the time
+they actually ran, the scoring five filled in maroon and the rest outlined —
+the same mark the app uses, five score and everybody runs. Gaps are to scale,
+so the shape of the picture is the shape of the team.
+
+One canvas rather than N elements, drawn at device resolution and laid out in
+CSS pixels or the dots are soft on every phone made in a decade. It animates
+once, for about a second and a half, and then stops: **a thing that moves for
+ever is a screensaver, and this is a squad.**
+
+**Its height follows the squad.** Fourteen lanes in a fixed 170px gives nine
+pixels each, and a 10px name in a 9px lane is a smudge.
+
+### Every tile says what it means
+
+A number with a label and no definition is the thing a reader guesses at, and
+three of the four programme tiles were guessable in the wrong direction.
+"Four-year completion 46%" now carries "of the 224 who raced here as freshmen,
+102 were still racing as seniors" underneath it, and the VDOT tile explains
+what VDOT is.
+
 ### January, which is the tab a coach actually opens
 
 Not "who is fastest" — the board answers that and nobody needed a page for it.
