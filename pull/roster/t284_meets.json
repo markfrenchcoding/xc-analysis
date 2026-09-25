@@ -4,9 +4,9 @@
   "from": 2004,
   "to": 2026,
   "horizon": 2004,
-  "pulled": "2026-09-21",
+  "pulled": "2026-09-25",
   "sports": {
-    "xc": 8835,
+    "xc": 8876,
     "tfo": 5144
   },
   "fieldMarksSkipped": 2687,
@@ -1603,6 +1603,10 @@
     "277227": {
       "date": "2017-04-08",
       "name": "Aloha Preview"
+    },
+    "278858": {
+      "date": "2026-09-22",
+      "name": "Coaches' Cup"
     },
     "278860": {
       "date": "2017-04-14",
