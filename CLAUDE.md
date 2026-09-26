@@ -1518,6 +1518,148 @@ shadowed the SVG text helper and put the four-year arc's own labels in the
 temporal dead zone. Check what a name already means in this file before reusing
 it.
 
+### The History tab
+
+Three readings of the same twenty-two years behind one tab, sharing the gender
+and the ruler because they are three questions about one programme rather than
+three tools. Routes are `#/history/records|bracket|lineage`, with `asof`,
+`mode` and `focus` carried in the query.
+
+**The record book on any day.** Name a date and it says what the school record
+was, who held it and how long it had stood by then, with the ten fastest as of
+that morning. The timeline is one pass over every race in order: anything
+faster than everything before it is a new record. **A record that is equalled
+does not change hands** — the holder keeps it until somebody is actually
+faster, which is how records work and is not what a naive `<=` does.
+
+**The sentence is generated, so it had to be verified rather than read.** It is
+checked against an independent recomputation at every step boundary in the
+timeline plus two hundred random days: **226 checks, 0 wrong**. A sentence
+assembled from four variables is a sentence that can be wrong in a way nobody
+notices, and "it looked right on the three dates I tried" is not a test.
+
+### The greatest team ever
+
+Every season that can field seven, seeded on the average of its scoring five,
+run as one single-elimination bracket. Twenty-two boys' seasons padded to
+thirty-two with byes, and **the byes go to the top seeds**, which is what a bye
+is for. The draw order is built by reflection, so seed 1 meets the lowest seed
+and seed 2 is as far away as the bracket can put them.
+
+**Two modes, and they are different kinds of answer.** On paper is arithmetic —
+the NFHS dual scorer, the same result every time you ask. Race day is a model —
+each athlete gets a spread, two thousand meets are run per game, and the figure
+is how often that side won. The copy labels which is which, because a
+probability and a fact should not share a typeface without one.
+
+**The scorer is in ONE place now.** The ghost race had `score` privately inside
+its IIFE and the bracket would have been a second copy of the NFHS rules. Two
+copies of a scorer is two answers waiting to happen, so `dualScore` is at
+module scope and both call it. A perfect dual is 15–50, and `audit2` has always
+said so; now there is only one function for it to be true of.
+
+**The spread is made of something, and thin meets had to come out of it.** On
+cross country it is the standard deviation of that athlete's own residuals that
+season — how far each race landed from what their form and that afternoon
+predicted — which is the right quantity because the meet term is shared by both
+teams in a dual and cancels. On the track there is no meet fit, so it is the
+spread of their own times, which is coarser.
+
+A meet with four runners on it has its effect shrunk almost to nothing by the
+fit, so whatever that afternoon did to everybody lands in the residual instead
+and reads as the athlete being erratic. Excluding meets below `MIN_AT_MEET` —
+the same ones the athlete page refuses to print an expectation for — moved
+2022's top two from 9.0% and 6.7% to **3.7% and 3.8%**, and the final from
+59–41 to **52–48**. That is not a tidy-up; it was the difference between a
+plausible answer and a right one.
+
+A season of three races is three numbers, so anything under four is shrunk
+halfway to the squad's median spread.
+
+**The two modes crown different seasons and the page says so.** On paper 2022
+beats 2027 25–30. On race day 2027 takes it just over half the time, because
+the season with the better five is not always the season with the steadier
+seven. That disagreement is the most interesting thing the feature produces and
+it gets its own note rather than being left for somebody to notice.
+
+**It runs on the main thread, and that was measured.** A whole race-day bracket
+is **127ms** — thirty-one games at two thousand meets each — and the odds are
+cached, so a redraw is thirty-one coin flips. The CSP has no `blob:` source, so
+a worker would mean a second file, and the page is one file. Do not add one
+without re-measuring first.
+
+**Percentages are rounded once.** Rounding both sides of a game independently
+prints 99% against 2%. Round the first and take the second from it.
+
+**A game opens those two seasons in the ghost race**, through `GHOST.race`,
+which routes via the hash rather than setting the pair directly — `pG` and `pR`
+own that strip and the Program tab's own switches have to move with them.
+
+### The lineage
+
+Nobody arrives at this sport on their own. An athlete is linked to the runners
+who were **two or more grades above them in their first cross country season**
+and started **at least three of the same races**. First season, because that is
+when somebody is being shown what the sport is rather than choosing who to run
+with. Two grades, because a classmate is a team-mate and the year below that is
+who you watch. Three races, because one meet is a coincidence.
+
+248 boys and 164 girls have at least one, over 743 and 474 links.
+
+**The grade is the derived one, never the one on the row** — the same rule the
+cohort counts had to learn, for the same reason: somebody can race a whole
+autumn with the grade field blank.
+
+**It cannot loop, and that falls out of the rule rather than being checked
+for.** If A's first season had B two grades up, B's own first season was at
+least two years earlier and A was not in it. So the graph is acyclic and the
+longest path through it is a walk.
+
+**The longest line is 11 boys from 2006 to 2027 and 12 girls from 2005.** Each
+one new when the one before them was already there.
+
+**What it is not**, and the page says so out loud: not who coached whom, not
+friendship, and not credit for anybody's improvement. It is who was on the same
+start line when somebody was new, which is the only part of it the results can
+support.
+
+**The river is a canvas and the focus overlay is SVG.** Seven hundred careers
+as lines is a canvas; a dozen handover curves want to be crisp and to carry a
+`<title>` each. **It opens on the most connected athlete**, not on the end of
+the longest line — whoever is newest has three arcs stacked on one season and
+nothing downstream, which is the worst possible first look at a graph.
+
+**`RIVER.build` has to run before the copy does.** The card's prose reads each
+career's span out of `RIVER.rows`, and mounting the canvas at the end of the
+function is a frame too late. The view threw on first paint until the build
+moved up.
+
+### Career twins
+
+The three athletes whose four years looked most like yours: a per-grade VDOT
+vector on one ruler, compared by root mean square over the grades both have,
+minimum two. One shared grade is a single number and every programme has a
+hundred athletes who once ran the same time.
+
+**The ruler is the one they have most of**, and two athletes are only ever
+compared on the same one — a track 1,500m VDOT runs about three and a half
+points above a cross country one for the same athlete, which is the rule the
+whole page is built on.
+
+**`TWINS_SHOW_FUTURE` is false and should stay false.** A current athlete is
+matched only on the grades they have finished, and the twin's line is drawn
+only that far. The alternative is a chart telling a sixteen-year-old what they
+will run as a senior, which is not a thing this data can know and not a thing
+to publish about a named child. The guard is asserted rather than asserted
+about: all 370 athletes with twins, 32 of them current, checked for a match or
+a drawn point past the cap.
+
+**The axis stops where the record does.** Drawing Freshman to Senior for a
+sophomore leaves two thirds of the chart empty and invites the reader to look
+at the gap, which is the one thing there is nothing to say about. Full words
+when the axis can hold them, initials when it cannot — the same rule
+`gradeBands` uses.
+
 ### Three rulers, and they do not share an axis
 
 A cross country 5,000m is what the sport scores on. A track 1,500m or 3,000m is
