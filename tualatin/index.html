@@ -352,6 +352,35 @@ figure{margin:0}
    that changes a row's size, or hovering the wall would reflow the list
    under the reader's hand. */
 .rows .row.lit{background:var(--raised);box-shadow:inset 3px 0 0 var(--accent)}
+
+/* ---------- run against history ---------- */
+.you-in{width:104px;text-align:center;font-variant-numeric:tabular-nums}
+.you-in.bad{border-color:var(--bad);color:var(--bad)}
+.card.you h2{color:var(--accent)}
+/* Eleven across on a desktop and six on a phone, which is 22 seasons in two
+   rows or four - a shape the eye can count rather than a strip it has to
+   scan. */
+.ygrid{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--s1);
+  margin:var(--s3) 0}
+@media(min-width:760px){.ygrid{grid-template-columns:repeat(11,1fr)}}
+.yc{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;border-radius:var(--r1);padding:var(--s2) 0;cursor:default;
+  border:1px solid transparent}
+.yc b{font:600 9.5px/1 var(--num);opacity:.72}
+.yc i{font:700 15px/1 var(--num);font-style:normal}
+.yc.sc{background:var(--accent);color:var(--on-accent)}
+.yc.va{background:var(--maroon);color:#fff}
+.yc.sq{background:var(--raised);color:var(--muted);border-color:var(--line)}
+.yc:focus{outline:2px solid var(--text);outline-offset:2px}
+.ygrid:focus-visible{outline:2px solid var(--accent);outline-offset:3px;
+  border-radius:var(--r1)}
+.ykey{display:flex;align-items:center;gap:var(--s1);flex-wrap:wrap;
+  color:var(--dim);font-size:var(--f1);margin:0}
+.ykey .yc{width:18px;height:12px;padding:0;margin-left:var(--s3)}
+.ykey .yc:first-child{margin-left:0}
+/* the reader's own row, sitting where the time would sit */
+.rows .row.you{border-color:var(--accent);background:var(--raised)}
+.rows .row.you .nm{color:var(--accent)}
 figcaption{color:var(--dim);font-size:12.5px;margin-top:9px;max-width:66ch}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .ax{stroke:var(--line);stroke-width:.5}
@@ -21836,12 +21865,16 @@ Three Rivers League JV District
     <div class="seg" id="r-board"></div>
     <div class="seg" id="n-board"><button aria-pressed="true" data-n="100">Top 100</button><button aria-pressed="false" data-n="0">Everyone</button><button aria-pressed="false" data-n="-1">Most improved</button></div>
     <input type="search" id="q-board" placeholder="Find a name" aria-label="Find a name">
+    <input type="text" id="you-in" class="you-in" inputmode="decimal"
+      placeholder="Your time" aria-label="Type a time to see where it lands"
+      autocomplete="off">
   </div>
   <p class="note" id="board-note"><b>This is a view, not the data.</b> A board ranks on one mark,
   which means you have to have run it — and run it late enough in a career to be
   fast. Every number on the Program tab is computed over a population you can see
   and change, because a statistic taken over this list is a statistic about the
   people who stayed.</p>
+  <div id="you-card" hidden></div>
   <figure class="card wall">
     <h2>Everybody</h2>
     <canvas id="wall-cv" aria-label="Every athlete's best on this ruler, one dot each"></canvas>
@@ -22640,7 +22673,15 @@ function wireCharts(scope){
       else if(ev.key==='End'){ev.preventDefault();show(marks.length-1);}
       else if(ev.key==='Escape'){TIP.hide();at=-1;svg.focus();}
     });
-    svg.addEventListener('blur',()=>{TIP.hide();at=-1;},true);
+    /* focusout with a relatedTarget test, NOT a capturing blur. A blur fires
+       every time the cursor moves from one mark to the next, so resetting on
+       it meant the arrow keys always restarted at the first mark: right, then
+       right again, and you are back where you began. Only a move OUT of the
+       chart clears it. */
+    svg.addEventListener('focusout',ev=>{
+      if(svg.contains(ev.relatedTarget))return;
+      TIP.hide();at=-1;
+    });
     const lab=svg.getAttribute('aria-label')||'';
     svg.setAttribute('aria-label',lab+(lab?'. ':'')
       +marks.length+' marks. Use the arrow keys to read them.');
@@ -23999,6 +24040,125 @@ function wireCopy(){
   });
 }
 
+/* The card that answers it. Built from the two derivations and nothing else,
+   so what it says and what the board says cannot drift. */
+const YOU={h:null};
+
+function youCard(){
+  const el=document.getElementById('you-card');
+  if(!el)return;
+  if(YOU.h==null){el.hidden=true;el.innerHTML='';return;}
+  const h=YOU.h,g=bG,k=bR,ru=RULERS[k];
+  const r=rankAt(g,k,h),sp=seasonPlaces(g,k,h);
+  const who=x=>x?esc(nameOf(A[x.i])):null;
+  const gapOf=d=>d==null?'':(d<6000?(d/100).toFixed(d%100?2:0)+'s'
+    :Math.floor(d/6000)+':'+String(Math.round((d%6000)/100)).padStart(2,'0'));
+
+  const band=q=>q<=5?'sc':q<=7?'va':'sq';
+  const scoring=sp.filter(x=>x.place<=5).length,
+        seven=sp.filter(x=>x.place<=7).length;
+
+  /* THE GRID IS ONE TAB STOP AND THE ARROWS WALK IT, the same rule the charts
+     follow. Twenty-two focusable squares is twenty-two presses to get past a
+     summary - worse for a keyboard reader than not being able to reach it. */
+  const cells=sp.map(x=>'<span class="yc '+band(x.place)+'" tabindex="-1" role="img"'
+    +' aria-label="'+esc(x.y+': '+ord(x.place)+' of '+x.of
+      +(x.ahead?', '+gapOf(x.gap)+' behind '+nameOf(A[x.ahead.i]):''))+'"'
+    +' data-tip="'+esc(x.y+' \u00b7 '+ord(x.place)+' of '+x.of
+      +(x.ahead?' \u00b7 '+gapOf(x.gap)+' behind '+nameOf(A[x.ahead.i]):' \u00b7 nobody ahead'))+'">'
+    +'<b>'+String(x.y).slice(2)+'</b><i>'+x.place+'</i></span>').join('');
+
+  el.hidden=false;
+  el.innerHTML='<div class="card you"><h2>'+secs(h/100)+' here</h2>'
+    +'<p class="why">'+(r.tied
+      ? 'That is exactly '+(r.tied===1?'one time':r.tied+' times')+' already on this '
+        +'board, so it shares '+ord(r.rank)+'.'
+      : '<b>'+ord(r.rank)+' of '+r.of+'</b> all-time on '+esc(ru.label)
+        +(r.ahead&&r.behind?', between '+who(r.ahead)+' and '+who(r.behind)
+          :r.behind?', ahead of everybody but nobody':', faster than anybody on this board')
+        +'.')+'</p>'
+    +(sp.length?'<p class="why"><b>'+scoring+' of '+sp.length+'</b> seasons it scores in, '
+      +'and <b>'+seven+'</b> it makes the seven.</p>'
+      +'<div class="ygrid" tabindex="0" role="group" aria-label="'
+      +esc('Where '+secs(h/100)+' would place, season by season. '+sp.length
+        +' seasons. Use the arrow keys.')+'">'+cells+'</div>'
+      +'<p class="ykey"><span class="yc sc"></span>scores, 1\u20135'
+      +'<span class="yc va"></span>the seven, 6\u20137'
+      +'<span class="yc sq"></span>squad, 8 and back</p>'
+      +'<p class="why">Each square is a season, and the number is the place this '
+      +'time would take on that year\u2019s list of season bests. Only seasons with '
+      +'seven or more '+(g==='M'?'boys':'girls')+' on '+esc(ru.label)+' are here, '
+      +'because seven is what a team races.</p>'
+      +CH.table('Every season as a table',
+        [{k:'Season',a:'l',name:true},'Place','Of','Behind','By'],
+        sp.slice().reverse().map(x=>[x.y,ord(x.place),x.of,
+          x.ahead?nameOf(A[x.ahead.i]):'\u2014',gapOf(x.gap)||'\u2014']))
+      :'<p class="empty">No season on this ruler has seven athletes.</p>')
+    +'<p class="why" style="margin-top:var(--s3)"><b>This is one time against '
+    +'season bests.</b> It does not say who would have beaten whom on a given '
+    +'afternoon: everybody on those lists ran their best on some day of their own, '
+    +'on a course of its own, and they are not all the same day.</p></div>';
+  animate(el);
+  wireGrid(el);
+}
+
+/* One stop, arrows inside it, Escape back out - and the tooltip follows the
+   cursor so what a mouse reader gets on hover a keyboard reader gets too. */
+function wireGrid(scope){
+  for(const g of (scope||document).querySelectorAll('.ygrid')){
+    if(g.dataset.kb)continue;
+    g.dataset.kb='1';
+    const cells=[...g.querySelectorAll('.yc')];
+    let at=-1;
+    const show=n=>{
+      at=Math.max(0,Math.min(cells.length-1,n));
+      const el=cells[at];
+      el.focus({preventScroll:true});
+      const r=el.getBoundingClientRect();
+      TIP.at(r.left+r.width/2,r.top,el.getAttribute('data-tip'));
+    };
+    g.addEventListener('keydown',ev=>{
+      const cols=getComputedStyle(g).gridTemplateColumns.split(' ').length;
+      if(ev.key==='ArrowRight'){ev.preventDefault();show(at+1);}
+      else if(ev.key==='ArrowLeft'){ev.preventDefault();show(at<0?0:at-1);}
+      else if(ev.key==='ArrowDown'){ev.preventDefault();show(at<0?0:at+cols);}
+      else if(ev.key==='ArrowUp'){ev.preventDefault();show(at<0?0:at-cols);}
+      else if(ev.key==='Home'){ev.preventDefault();show(0);}
+      else if(ev.key==='End'){ev.preventDefault();show(cells.length-1);}
+      else if(ev.key==='Escape'){TIP.hide();at=-1;g.focus();}
+    });
+    g.addEventListener('focusout',ev=>{
+      if(g.contains(ev.relatedTarget))return;
+      TIP.hide();at=-1;
+    });
+  }
+}
+
+function setYou(str,push){
+  const h=parseTime(str,bR);
+  YOU.h=h;
+  const box=document.getElementById('you-in');
+  if(box){
+    box.classList.toggle('bad',!!String(str||'').trim()&&h==null);
+    if(box.value!==str&&str!=null)box.value=str;
+  }
+  drawBoard();writeHash(push===true);
+}
+
+/* A 16:40 is a good 5,000m and nonsense on a 1,500m, so switching ruler has
+   to ask the question again rather than carry the answer across. Anything
+   outside the new ruler's range is dropped, and the box is emptied with it so
+   the reader is not left looking at a time the page is ignoring. */
+function youFits(){
+  if(YOU.h==null)return;
+  const [lo,hi]=YOU_RANGE[bR]||[0,1e9];
+  const sec=YOU.h/100;
+  if(sec>=lo&&sec<=hi)return;
+  YOU.h=null;
+  const box=document.getElementById('you-in');
+  if(box){box.value='';box.classList.remove('bad');}
+}
+
 /* ---------- board ---------- */
 let bG='M',bN=100,bQ='',bR='xc5000';
 
@@ -24018,6 +24178,88 @@ function growthBoard(g,k){
     if(v0==null||v1==null)return null;
     return {a,gain:v1-v0,from:b[lo],to:b[hi],lo,hi};
   }).filter(Boolean).sort((x,y)=>y.gain-x.gain);
+}
+
+/* ---------- run against history ----------
+   A time typed into a box, ranked against every season this programme has.
+
+   IT IS NEVER AN ATHLETE. The typed time is compared against a copy of the
+   board and never enters it, so no derivation, no statistic and no existing
+   number can be moved by somebody typing in a box. That is the whole safety
+   argument for the feature and it is structural rather than careful.
+
+   Two questions, because they are different questions. Where would this time
+   rank all-time, which is one number over twenty-two years; and what would it
+   have been WORTH, season by season, which is the one a coach actually asks -
+   16:40 is a scoring runner in some years here and the ninth man in others.
+
+   Parsing takes what a runner would type. "16:40", "16:40.2", "1640" and
+   "16 40" are all the same time; a bare number under the ruler's floor is
+   minutes and seconds run together, which is how people write times on a
+   whiteboard. */
+const YOU_RANGE={xc5000:[720,2700],tf3000:[450,1800],tf1500:[180,900]};
+
+function parseTime(str,k){
+  const t=String(str||'').trim();
+  if(!t)return null;
+  const [lo,hi]=YOU_RANGE[k]||[0,1e9];
+  let sec=null;
+  let m=t.match(/^(\d{1,2})\s*[:.\s]\s*(\d{1,2}(?:\.\d{1,2})?)$/);
+  if(m)sec=+m[1]*60+ +m[2];
+  else if(/^\d{3,4}(\.\d{1,2})?$/.test(t)){
+    /* 1640 is sixteen forty. Four digits are mmss, three are mss - and the
+       seconds half of either has to be a real number of seconds. */
+    const dot=t.indexOf('.'),whole=dot<0?t:t.slice(0,dot),frac=dot<0?0:+t.slice(dot);
+    const mm=whole.slice(0,whole.length-2),ss=whole.slice(-2);
+    if(+ss<60)sec=+mm*60+ +ss+frac;
+  }
+  else if(/^\d{1,3}(\.\d{1,2})?$/.test(t))sec=+t;
+  if(sec==null||!(sec>0))return null;
+  return (sec>=lo&&sec<=hi)?Math.round(sec*100):null;
+}
+
+/* Every season with a squad on this ruler, deepest first within the season.
+   Seven, because seven is what a team races and a season that cannot field
+   seven has no places to take. */
+const SQUADS=new Map();
+function seasonSquads(g,k){
+  const key=g+'|'+k;
+  if(SQUADS.has(key))return SQUADS.get(key);
+  const col=RULERS[k].col,sport=RULERS[k].sport,by=new Map();
+  for(const sn of S){
+    if(sn.sport!==sport||!sn[col])continue;
+    const a=A[sn.a];
+    if(!a||a.g!==g)continue;
+    if(!by.has(sn.y))by.set(sn.y,[]);
+    by.get(sn.y).push({i:sn.a,h:HUN(sn[col])});
+  }
+  const out=[...by.entries()].filter(([,v])=>v.length>=7)
+    .map(([y,v])=>[y,v.sort((x,z)=>x.h-z.h)])
+    .sort((x,z)=>x[0]-z[0]);
+  SQUADS.set(key,out);
+  return out;
+}
+
+/* Where a time lands all-time, and who it lands between. The tie rule is the
+   board's: equal to the hundredth shares the place. */
+function rankAt(g,k,h){
+  const list=V.top(g,'dist',k,0).map(a=>({i:a.i,h:HUN(byA[a.i].best[k])}));
+  let n=0;
+  while(n<list.length&&list[n].h<h)n++;
+  const tied=list.filter(x=>x.h===h).length;
+  return {rank:n+1,of:list.length,tied:tied,
+    ahead:n>0?list[n-1]:null,behind:list[n+tied]||null};
+}
+
+/* What that time would have been worth in each season: the place it takes on
+   that year's season-best list, and who is immediately ahead of it. */
+function seasonPlaces(g,k,h){
+  return seasonSquads(g,k).map(([y,v])=>{
+    let n=0;
+    while(n<v.length&&v[n].h<h)n++;
+    return {y:y,place:n+1,of:v.length,
+      ahead:n>0?v[n-1]:null,gap:n>0?h-v[n-1].h:null};
+  });
 }
 
 /* ---------- the wall ----------
@@ -24165,6 +24407,21 @@ const WALL=(()=>{
       }
     }
 
+    /* The reader's own time, drawn where it would fall. A rule rather than a
+       dot, because it is not one of these people and should not look like
+       one. */
+    if(YOU.h!=null&&rows.length){
+      const t=YOU.h/100;
+      if(t>=L.fast&&t<=L.slow){
+        const px=L.x(t);
+        g.strokeStyle=C.text;g.lineWidth=1.4;
+        g.beginPath();g.moveTo(px,L.padT-2);g.lineTo(px,h-L.padB+2);g.stroke();
+        g.fillStyle=C.text;g.font='700 9px Rajdhani,sans-serif';
+        g.textAlign=px>w*0.5?'right':'left';
+        g.fillText('you \u00b7 '+secs(t),px+(px>w*0.5?-4:4),L.padT+7);
+      }
+    }
+
     // the cutoff, labelled, because a line with no label is a decoration
     if(cut!=null){
       const px=L.x(cut);
@@ -24300,6 +24557,7 @@ function chartIn(id,cols,gap){
 
 function drawBoard(){
   sizeCharts('p-board');
+  youFits();youCard();
   if(bN===-1)return drawGrowth();
   const pop=V.top(bG,'dist',bR,bN||0);
   const q=bQ.trim().toLowerCase();
@@ -24307,9 +24565,22 @@ function drawBoard(){
   const el=document.getElementById('board');
   if(!rows.length){el.innerHTML='<p class="empty">Nobody here on this ruler.</p>';
     WALL.render();return;}
-  el.innerHTML=rows.map(({a,rank,tied})=>{
+  /* The reader's own row, sitting where the time would sit. It is inserted
+     into the rendered list and is not in `rows`, so nothing downstream - the
+     ranks, the Wall, the search - can mistake it for somebody. */
+  const mine=YOU.h==null?null:rankAt(bG,bR,YOU.h);
+  const youRow='<div class="row you" aria-label="'
+    +esc('your time, '+secs(YOU.h/100))+'">'
+    +'<span class="rk">'+(mine?mine.rank:'')+'</span>'
+    +'<span class="nm">You<span class="chip live">typed</span></span>'
+    +'<span class="cl"></span>'
+    +'<span class="tm">'+(YOU.h==null?'':secs(YOU.h/100))+'</span></div>';
+
+  el.innerHTML=rows.map(({a,rank,tied},n)=>{
     const o=byA[a.i],m=MEETS[o.bestAt[bR]]||{};
-    return '<a class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i
+    const before=(mine&&!q&&rank===mine.rank&&n===rows.findIndex(x=>x.rank===mine.rank))
+      ?youRow:'';
+    const row='<a class="row'+(rank<=3?' gold':'')+'" data-i="'+a.i
       +'" href="#/athlete/'+esc(SLUG.get(a.i)||'')+'">'
       +'<span class="rk'+(tied?' tie':'')+'"'
       +(tied?' title="shares this place" data-tip="Equal to the hundredth, so they share the place"':'')
@@ -24320,7 +24591,11 @@ function drawBoard(){
       +'<span class="cl" title="'+esc(m.name||'')+'" data-tip="'+esc(m.name||'')
       +'">'+esc(m.name||'')+'</span>'
       +'<span class="tm">'+secs(o.best[bR])+'</span></a>';
-  }).join('');
+    return before+row;
+  }).join('')
+    /* A time slower than everybody still belongs on the board: it goes at the
+       bottom rather than nowhere. */
+    +((mine&&!q&&mine.rank>rows.length)?youRow:'');
   animate(el);
   WALL.render();
 }
@@ -25672,6 +25947,10 @@ const TIP=(()=>{
    Seven hundred and forty-nine athletes is more than a datalist can usefully
    hold, and the search that existed only lived on the Athlete tab, so
    finding somebody meant leaving wherever you were. */
+/* The palette can send you to the Board. It is not tab() because that writes
+   its own history entry, and a time typed into the palette should land as one
+   navigation rather than two. */
+function go(which){if(CUR_TAB!==which)showTab(which);}
 const PAL=(()=>{
   const wrap=document.createElement('div');
   wrap.className='pal';wrap.hidden=true;
@@ -25706,6 +25985,13 @@ const PAL=(()=>{
   }
   function render(){
     list.innerHTML=hits.map((h,n)=>{
+      /* A time is not a person, so it gets its own row rather than a hit with
+         nobody in it. Typing 16:40 here is the same question the Board's box
+         asks, and answering it in two places would be two answers. */
+      if(h.time!=null)return '<li role="option" aria-selected="'+(n===at)+'" class="'
+        +(n===at?'on':'')+'" data-time="'+h.time+'"><span class="p-n">See where '
+        +esc(secs(h.time/100))+' lands</span><span class="p-c">on the board you are '
+        +'looking at</span><span class="p-t"></span></li>';
       const a=A[h.i],o=byA[h.i];
       return '<li role="option" aria-selected="'+(n===at)+'" class="'+(n===at?'on':'')
         +'" data-i="'+h.i+'"><span class="p-n">'+esc(nameOf(a))+'</span>'
@@ -25720,6 +26006,8 @@ const PAL=(()=>{
     hits=!n?[]:A.map(a=>({i:a.i,s:score(a,n)})).filter(h=>h.s>=0)
       .sort((x,y)=>y.s-x.s||(byA[x.i].best.xc5000||9e9)-(byA[y.i].best.xc5000||9e9))
       .slice(0,12);
+    const t=parseTime(q,bR);
+    if(t!=null)hits.unshift({time:t});
     at=0;render();
   }
   function open(){
@@ -25729,6 +26017,8 @@ const PAL=(()=>{
   function close(){wrap.hidden=true;}
   inp.addEventListener('input',e=>search(e.target.value));
   wrap.addEventListener('click',e=>{
+    const t=e.target.closest('li[data-time]');
+    if(t){close();go('board');setYou(secs(+t.dataset.time/100),true);return;}
     const li=e.target.closest('li[data-i]');
     if(li){close();openAthlete(+li.dataset.i,true);return;}
     if(e.target===wrap)close();
@@ -25738,7 +26028,12 @@ const PAL=(()=>{
       if(e.key==='Escape'){e.preventDefault();close();return;}
       if(e.key==='ArrowDown'){e.preventDefault();at=Math.min(at+1,hits.length-1);render();return;}
       if(e.key==='ArrowUp'){e.preventDefault();at=Math.max(at-1,0);render();return;}
-      if(e.key==='Enter'&&hits[at]){e.preventDefault();close();openAthlete(hits[at].i,true);return;}
+      if(e.key==='Enter'&&hits[at]){
+        e.preventDefault();close();
+        if(hits[at].time!=null){go('board');setYou(secs(hits[at].time/100),true);}
+        else openAthlete(hits[at].i,true);
+        return;
+      }
       return;
     }
     const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''));
@@ -25796,7 +26091,8 @@ function parseRoute(h){
 
 function routeNow(){
   if(CUR_TAB==='board')return {tab:'board',q:{sex:SEXQ[bG],event:EVQ[bR],
-    view:VIEWQ[String(bN)],q:bQ||undefined}};
+    view:VIEWQ[String(bN)],q:bQ||undefined,
+    you:YOU.h==null?undefined:secs(YOU.h/100)}};
   if(CUR_TAB==='program')return {tab:'program',q:{sex:SEXQ[pG],pop:pP,event:EVQ[pR]}};
   if(CUR_TAB==='january')return {tab:'plan',q:{sex:SEXQ[jG],event:EVQ[jR]}};
   return {tab:'athlete',arg:CUR_ATH==null?'':SLUG.get(CUR_ATH)||'',q:{}};
@@ -25862,6 +26158,9 @@ function applyRoute(r){
   bN=(q.view in VIEWR)?VIEWR[q.view]:100;
   bQ=q.q||'';
   const f=document.getElementById('q-board');if(f)f.value=bQ;
+  YOU.h=q.you?parseTime(q.you,bR):null;
+  const yb=document.getElementById('you-in');
+  if(yb){yb.value=YOU.h==null?'':secs(YOU.h/100);yb.classList.remove('bad');}
   setSeg('g-board',bG);setSeg('r-board',bR);setSeg('n-board',String(bN));
   showTab('board');drawBoard();
 }
@@ -25918,6 +26217,22 @@ segStatic('n-board',d=>{bN=+d.n;
 segStatic('g-prog',d=>{pG=d.g;drawProgram();writeHash();});
 segStatic('p-prog',d=>{pP=d.p;drawProgram();writeHash();});
 segStatic('g-jan',d=>{jG=d.g;drawJanuary();writeHash();});
+/* One history entry for a time, not one per keystroke - and the card
+   redraws as you type so the answer arrives with the typing. */
+let youTimer=null;
+document.getElementById('you-in').addEventListener('input',e=>{
+  const v=e.target.value;
+  clearTimeout(youTimer);
+  YOU.h=parseTime(v,bR);
+  e.target.classList.toggle('bad',!!v.trim()&&YOU.h==null);
+  drawBoard();
+  youTimer=setTimeout(()=>writeHash(),500);
+});
+document.getElementById('you-in').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){clearTimeout(youTimer);writeHash(true);}
+  if(e.key==='Escape'){e.target.value='';setYou('',true);}
+});
+
 let qTimer=null;
 document.getElementById('q-board').addEventListener('input',e=>{
   bQ=e.target.value;drawBoard();

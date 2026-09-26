@@ -1879,6 +1879,36 @@ Escape puts the tooltip away. The `aria-label` says how many marks there are and
 that the arrows work. Program went to 26 stops, Plan to 9, Athlete to 13. The
 Board keeps 109, and should: a hundred of those are real links to real people.
 
+### Run against history
+
+Type a time into the Board and see where it would have landed. Two questions,
+because they are different questions: where it ranks **all-time**, which is one
+number over twenty-two years, and what it would have been **worth season by
+season**, which is the one a coach asks — 16:40 is a scoring runner in most
+years here and the sixth man in 2022.
+
+**The typed time is never an athlete.** It is compared against a copy of the
+board and never enters it, so no derivation and no published number can be
+moved by somebody typing in a box. That is structural rather than careful.
+
+**Parsing takes what a runner would type.** `16:40`, `16:40.2`, `1640` and
+`16 40` are the same time; four digits are mmss and three are mss, and the
+seconds half has to be a real number of seconds so `9:99` is refused. Each
+ruler has its own range — 12:00–45:00 on the 5,000m — and **switching ruler
+drops a time that no longer fits**, because a 16:40 is a good 5,000m and
+nonsense on a 1,500m.
+
+**Only seasons with seven are offered**, because seven is what a team races and
+a season that cannot field seven has no places to take.
+
+**The grid is one tab stop and the arrows walk it** — twenty-two focusable
+squares is twenty-two presses to get past a summary. Which found the same bug
+in the chart keyboard handler shipped in phase 3: a **capturing `blur`** fires
+every time the cursor moves from one mark to the next, so resetting on it meant
+the arrow keys always restarted at the first mark. Right, right, and you are
+back where you began. It is `focusout` with a `relatedTarget` test in both
+places now.
+
 ### One source for every time
 
 The page shipped two answers for one race. `d-results` rounded to hundredths
