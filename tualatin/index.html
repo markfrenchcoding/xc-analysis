@@ -33,6 +33,19 @@
   --bg:#0B0A0C;--surface:#151217;--raised:#1E1922;--line:#2E2732;
   --text:#F4F1F3;--muted:#B3AAB1;--dim:#A0959D;--faint:#867B83;
   --maroon:#880000;--maroon-lift:#B31B2C;--maroon-deep:#4A0008;
+
+  /* ---------- the scales ----------
+     Three of them, because every measurement on this page is one of three
+     kinds: a distance between things, a size of type, or the roundness of a
+     corner. Anything that is not on a scale is a number somebody typed once
+     and nobody can now change consistently.
+
+     The radii were the clearest case: 37 border-radius declarations across
+     eleven different values, several of them a pixel apart and none of them
+     chosen against the others. */
+  --s1:4px;  --s2:8px;  --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --f1:12px; --f2:13.5px; --f3:15px; --f4:18px; --f5:24px; --f6:32px; --f7:56px;
+  --r1:6px;  --r2:10px; --r3:14px; --rp:999px;
   --accent:#EE5566;--on-accent:#FFFFFF;
   --steel:#9A9199;
   --good:#5FD39A;--bad:#F26B78;
@@ -68,7 +81,7 @@ body{margin:0;background:var(--bg);color:var(--text);
    now keyboard-navigable and a ring you cannot see is not one. */
 a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,
 [tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:3px;
-  border-radius:6px}
+  border-radius:var(--r1)}
 
 /* A wash of the school colour behind everything, and a grain over it. Both are
    fixed, both are pointer-events:none, and neither ever animates - they are
@@ -162,26 +175,44 @@ h1 em{font-style:normal;background:linear-gradient(100deg,var(--maroon) 0%,var(-
 [data-theme="light"] h1 em{background:none;color:var(--maroon)}
 .sub{color:var(--muted);font-size:13px;margin-left:6px}
 .themer{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);
-  border-radius:999px;padding:5px 13px;font:600 12px/1 var(--disp);letter-spacing:.06em;
+  border-radius:var(--rp);padding:5px 13px;font:600 12px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;cursor:pointer}
 .themer:hover{color:var(--text);border-color:var(--dim)}
-nav{display:flex;gap:2px;margin-top:16px}
-nav button{flex:0 0 auto;background:none;border:0;border-bottom:2px solid transparent;
-  color:var(--muted);font:600 14px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
-  padding:11px 16px;cursor:pointer}
-nav button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+/* ---------- the nav ----------
+   A GRID OF EQUAL COLUMNS, not a row of buttons that ends wherever the words
+   do. Four labels sat in the left 330px of a 757px bar and left half the
+   navigation looking like empty card.
+
+   The column count is a custom property rather than a literal, because a
+   fifth tab is coming and a nav that has to be rewritten to hold it is a nav
+   built twice.
+
+   The underline is one element that slides, not a border on each button.
+   A border cannot animate between two elements, and four borders that take
+   turns being visible is four things to keep in step. */
+nav{--tabs:4;position:relative;display:grid;grid-template-columns:repeat(var(--tabs),1fr);
+  margin-top:var(--s4);border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;color:var(--muted);
+  font:600 14px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
+  padding:var(--s3) var(--s2);cursor:pointer;text-align:center}
+nav button[aria-selected="true"]{color:var(--text)}
 nav button:hover{color:var(--text)}
+nav::after{content:'';position:absolute;left:0;bottom:-1px;height:2px;
+  width:calc(100%/var(--tabs));background:var(--accent);
+  transform:translateX(calc(var(--tab,0)*100%));
+  transition:transform .25s var(--ease)}
+@media(prefers-reduced-motion:reduce){nav::after{transition:none}}
 
 .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
-.seg{display:inline-flex;background:var(--raised);border:1px solid var(--line);border-radius:8px;
+.seg{display:inline-flex;background:var(--raised);border:1px solid var(--line);border-radius:var(--r2);
   padding:2px;gap:2px}
-.seg button{background:none;border:0;border-radius:6px;color:var(--muted);cursor:pointer;
+.seg button{background:none;border:0;border-radius:var(--r1);color:var(--muted);cursor:pointer;
   font:600 12px/1 var(--disp);letter-spacing:.05em;text-transform:uppercase;padding:7px 12px}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
 .ctl label{font:600 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   color:var(--dim);margin-right:2px}
 input[type=search]{background:var(--raised);border:1px solid var(--line);color:var(--text);
-  border-radius:8px;padding:8px 12px;font:400 14px 'Barlow',sans-serif;min-width:200px}
+  border-radius:var(--r2);padding:8px 12px;font:400 14px 'Barlow',sans-serif;min-width:200px}
 input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 
 /* [hidden] is a UA rule, so any class that sets display beats it. The command
@@ -189,7 +220,7 @@ input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
    nothing because the handler read wrap.hidden, which was true the whole
    time. The page had already worked around this once for the panels. */
 [hidden]{display:none!important}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);
   padding:18px 18px 20px;margin-bottom:18px;box-shadow:var(--shadow)}
 .card h2{font:700 13px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);margin:0 0 4px}
@@ -199,7 +230,7 @@ input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 
 .rows{display:flex;flex-direction:column;gap:1px}
 .row{display:grid;grid-template-columns:44px 1fr auto auto;gap:10px;align-items:center;
-  padding:7px 10px;border-radius:7px;background:var(--surface);cursor:pointer;
+  padding:7px 10px;border-radius:var(--r1);background:var(--surface);cursor:pointer;
   border:1px solid transparent;text-align:left;width:100%;font:inherit;color:inherit}
 .row:hover{border-color:var(--line);background:var(--raised)}
 .row .rk{font:700 15px/1 var(--num);color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
@@ -217,7 +248,7 @@ input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 .row{align-items:center}
 
 .chip{display:inline-block;font:700 9.5px/1 var(--disp);letter-spacing:.1em;
-  text-transform:uppercase;padding:4px 7px;border-radius:5px;vertical-align:2px;
+  text-transform:uppercase;padding:4px 7px;border-radius:var(--r1);vertical-align:2px;
   margin-left:9px;white-space:nowrap}
 .chip.live{background:var(--maroon);color:#fff}
 .chip.past{background:transparent;color:var(--faint);border:1px solid var(--line);
@@ -229,17 +260,31 @@ input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 .row.gold .rk{color:var(--accent)}
 
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px}
-.tile{background:var(--raised);border-radius:10px;padding:13px 14px}
+.tile{background:var(--raised);border-radius:var(--r2);padding:13px 14px}
 .tile .k{font:600 10px/1 var(--disp);letter-spacing:.11em;text-transform:uppercase;color:var(--dim)}
 .tile .v{font:700 27px/1.15 var(--num);font-variant-numeric:tabular-nums;margin-top:5px}
 .tile .n{font-size:12px;color:var(--muted);margin-top:2px}
 .tile .v.acc{color:var(--accent)}
 
-table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
-th{font:600 10px/1.3 var(--disp);letter-spacing:.09em;text-transform:uppercase;color:var(--dim);
-  text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:bottom}
-th:first-child,td:first-child{text-align:left}
-td{padding:6px 8px;font:500 14px var(--num);border-bottom:1px solid var(--line)}
+/* ---------- one table ----------
+   A HEADER AND ITS DATA MUST SHARE AN ALIGNMENT. They did not: th was right
+   aligned and td fell back to left, so every numeric column had its label 40
+   to 100 pixels away from the numbers under it. "Best" sat centred at x=376
+   over values starting at 272.
+
+   So alignment is declared per column and applied to both, and the column
+   itself is declared once in a <colgroup> so a long meet name cannot push the
+   times about. Text goes left; times, places, counts and percentages go
+   centre, which keeps a column of mixed widths reading as a column. */
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;
+  table-layout:fixed}
+th{font:600 10px/1.3 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--dim);padding:var(--s2) var(--s2);border-bottom:1px solid var(--line);
+  vertical-align:bottom;text-align:center}
+td{padding:var(--s2);font:500 14px var(--num);border-bottom:1px solid var(--line);
+  text-align:center;overflow-wrap:anywhere}
+th.l,td.l{text-align:left}
+th.c,td.c{text-align:center}
 td.name{font:600 14px var(--disp);letter-spacing:.01em}
 tr:last-child td{border-bottom:0}
 .pos{color:var(--good)}.neg{color:var(--bad)}
@@ -280,7 +325,7 @@ figure{margin:0}
    ever narrower than about 300px. Change this and change SMALL_MIN with it. */
 .smalls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   gap:12px;margin:8px 0 16px}
-.smalls .sm{background:var(--raised);border:1px solid var(--line);border-radius:9px;
+.smalls .sm{background:var(--raised);border:1px solid var(--line);border-radius:var(--r2);
   padding:8px 6px 2px}
 .smalls figcaption{margin:0 0 2px 6px;color:var(--muted);
   font:600 10.5px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
@@ -315,7 +360,7 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .axv{fill:var(--text);font:700 7.5px var(--num)}
 
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px;color:var(--muted)}
-.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;
+.legend i{display:inline-block;width:11px;height:11px;border-radius:var(--r1);margin-right:6px;
   vertical-align:-1px}
 
 .note{background:var(--raised);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
@@ -327,7 +372,7 @@ svg{display:block;width:100%;height:auto;overflow:visible}
   backdrop-filter:blur(4px);display:flex;justify-content:center;
   padding:12vh 16px 16px}
 .pal-box{width:100%;max-width:520px;height:fit-content;background:var(--surface);
-  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;
   box-shadow:0 24px 70px rgba(0,0,0,.6)}
 .pal-box input{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;
   background:transparent;color:var(--text);padding:16px 18px;
@@ -335,7 +380,7 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .pal-box input:focus{outline:none}
 #pal-list{list-style:none;margin:0;padding:6px;max-height:46vh;overflow:auto}
 #pal-list li{display:grid;grid-template-columns:1fr auto auto;gap:12px;
-  align-items:center;padding:10px 12px;border-radius:8px;cursor:pointer}
+  align-items:center;padding:10px 12px;border-radius:var(--r2);cursor:pointer}
 #pal-list li.on{background:var(--maroon)}
 #pal-list li.on .p-c,#pal-list li.on .p-t{color:rgba(255,255,255,.82)}
 #pal-list li.none{color:var(--dim);cursor:default;display:block}
@@ -344,9 +389,9 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .p-t{font:700 14px/1 var(--num);font-variant-numeric:tabular-nums}
 .pal-foot{border-top:1px solid var(--line);padding:9px 14px;color:var(--faint);
   font:500 11.5px/1 var(--num)}
-kbd{background:var(--raised);border:1px solid var(--line);border-radius:4px;
+kbd{background:var(--raised);border:1px solid var(--line);border-radius:var(--r1);
   padding:1px 5px;font:600 11px var(--num)}
-.ppl a{background:var(--raised);border:1px solid var(--line);border-radius:999px;
+.ppl a{background:var(--raised);border:1px solid var(--line);border-radius:var(--rp);
   padding:8px 14px;color:var(--text);font:600 13.5px/1 var(--disp);
   text-decoration:none;display:inline-block}
 .ppl a:hover{border-color:var(--accent);color:var(--accent)}
@@ -354,7 +399,7 @@ kbd{background:var(--raised);border:1px solid var(--line);border-radius:4px;
 
 .tip{position:fixed;left:0;top:0;z-index:60;pointer-events:none;
   background:var(--raised);color:var(--text);border:1px solid var(--line);
-  border-radius:8px;padding:7px 11px;font:500 12.5px/1.35 'Barlow',sans-serif;
+  border-radius:var(--r2);padding:7px 11px;font:500 12.5px/1.35 'Barlow',sans-serif;
   max-width:280px;box-shadow:0 6px 22px rgba(0,0,0,.45);
   opacity:0;transition:opacity .13s ease}
 .tip.on{opacity:1}
@@ -371,7 +416,7 @@ details>summary:hover{color:var(--text)}
    appears reads as a lookup where one that arrives reads as a finding.
    transform and opacity only; nothing here repaints. */
 .truth{position:relative;overflow:hidden;background:var(--surface);
-  border:1px solid var(--line);border-radius:14px;padding:22px 22px 24px;margin-bottom:18px}
+  border:1px solid var(--line);border-radius:var(--r3);padding:22px 22px 24px;margin-bottom:18px}
 .truth::after{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(120% 140% at 0% 0%,var(--accent) 0%,transparent 46%);
   opacity:.10}
@@ -389,27 +434,27 @@ details>summary:hover{color:var(--text)}
 .hx-s .spark{width:150px;height:30px;display:block}
 .hx-s span{color:var(--dim);font:500 11.5px/1 var(--num)}
 .hx-p{flex:1 1 230px;min-width:200px;display:flex;flex-direction:column;gap:7px}
-.hx-p .bar{height:5px;border-radius:3px;background:var(--raised);overflow:hidden}
-.hx-p .bar i{display:block;height:100%;border-radius:3px;
+.hx-p .bar{height:5px;border-radius:var(--r1);background:var(--raised);overflow:hidden}
+.hx-p .bar i{display:block;height:100%;border-radius:var(--r1);
   background:linear-gradient(90deg,var(--maroon),var(--accent));
   transform-origin:left;animation:hxgrow .8s var(--ease) both .2s}
 @keyframes hxgrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .hx-p span{color:var(--muted);font-size:12.5px;line-height:1.45;max-width:52ch}
 .hx-p b{color:var(--text)}
-.hx-c{background:none;border:1px solid var(--line);border-radius:999px;
+.hx-c{background:none;border:1px solid var(--line);border-radius:var(--rp);
   color:var(--muted);font:600 12px/1 var(--num);padding:9px 15px;cursor:pointer;
   white-space:nowrap}
 .hx-c:hover{color:var(--text);border-color:var(--dim)}
 .hx-c.done{color:var(--accent);border-color:var(--accent)}
 .hx-u{flex:1 1 100%;background:var(--raised);border:1px solid var(--line);
-  border-radius:8px;color:var(--text);font:500 12px var(--num);padding:8px 11px}
+  border-radius:var(--r2);color:var(--text);font:500 12px var(--num);padding:8px 11px}
 
 /* ---------- the ghost race ---------- */
 .gh-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:16px 0 12px}
 .gh-ctl label{color:var(--dim);font:600 11.5px/1 var(--num)}
-.gh-ctl select{background:var(--raised);border:1px solid var(--line);border-radius:8px;
+.gh-ctl select{background:var(--raised);border:1px solid var(--line);border-radius:var(--r2);
   color:var(--text);font:700 14px var(--num);padding:8px 10px}
-.gh-go{background:var(--accent);color:var(--on-accent);border:0;border-radius:999px;
+.gh-go{background:var(--accent);color:var(--on-accent);border:0;border-radius:var(--rp);
   font:700 13px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;
   padding:11px 18px;cursor:pointer}
 .gh-go:hover{filter:brightness(1.08)}
@@ -419,7 +464,7 @@ details>summary:hover{color:var(--text)}
 #gh-cv{display:block;width:100%}
 .gh-sc{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
 .gh-sc .s{flex:1 1 130px;background:var(--raised);border:1px solid var(--line);
-  border-radius:10px;padding:10px 14px;display:flex;align-items:baseline;gap:10px}
+  border-radius:var(--r2);padding:10px 14px;display:flex;align-items:baseline;gap:10px}
 .gh-sc .s.win{border-color:var(--accent)}
 .gh-sc .y{color:var(--muted);font:600 12.5px/1 var(--disp);letter-spacing:.05em}
 .gh-sc .p{margin-left:auto;font:700 26px/1 var(--num);color:var(--text)}
@@ -434,7 +479,7 @@ details>summary:hover{color:var(--text)}
 #p-program.linked .lk.lk-on{opacity:1}
 #p-program.linked .lk-hit{opacity:1}
 .psel{background:var(--raised);border:1px solid var(--line);border-left:3px solid var(--accent);
-  border-radius:8px;color:var(--muted);font-size:12.5px;line-height:1.5;
+  border-radius:var(--r2);color:var(--muted);font-size:12.5px;line-height:1.5;
   padding:9px 13px;margin:-8px 0 16px;max-width:66ch}
 .psel b{color:var(--text)}
 @media(prefers-reduced-motion:reduce){.hx-p .bar i{animation:none}}
@@ -450,7 +495,7 @@ details>summary:hover{color:var(--text)}
 .jan{display:flex;flex-direction:column;gap:12px}
 .jc{position:relative;display:grid;grid-template-columns:38px 1fr auto;gap:14px;
   align-items:center;background:var(--surface);border:1px solid var(--line);
-  border-radius:12px;padding:15px 17px;overflow:hidden;
+  border-radius:var(--r3);padding:15px 17px;overflow:hidden;
   animation:rise .5s cubic-bezier(.22,1,.36,1) both}
 .jc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
   background:var(--accent);transform:scaleY(var(--w,1));transform-origin:bottom}
@@ -467,15 +512,15 @@ details>summary:hover{color:var(--text)}
   .jc .amt .v{font-size:21px}}
 
 .lean{display:flex;align-items:center;gap:10px}
-.lean .bar{position:relative;flex:1;height:6px;border-radius:3px;background:var(--raised)}
+.lean .bar{position:relative;flex:1;height:6px;border-radius:var(--r1);background:var(--raised)}
 .lean .bar::before{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;
   background:var(--line)}
-.lean .bar i{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--accent);
+.lean .bar i{position:absolute;top:0;bottom:0;border-radius:var(--r1);background:var(--accent);
   animation:sweep .7s cubic-bezier(.22,1,.36,1) both}
 
 /* ---------- earned on the course ---------- */
 .med{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;
-  padding:12px 14px;border-radius:10px;background:var(--raised);margin-bottom:8px}
+  padding:12px 14px;border-radius:var(--r2);background:var(--raised);margin-bottom:8px}
 .med .pl{font-family:'Anton',var(--disp);font-size:23px;line-height:1;
   transform:skewX(-8deg);min-width:44px;text-align:center}
 .med.t0 .pl{color:#F2C79D}
@@ -491,8 +536,8 @@ details>summary:hover{color:var(--text)}
 .rng{display:flex;flex-direction:column;gap:7px}
 .rr{display:grid;grid-template-columns:62px 1fr 74px;gap:11px;align-items:center}
 .rr .d{font:600 12px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.rr .b{height:9px;border-radius:5px;background:var(--raised);overflow:hidden}
-.rr .b i{display:block;height:100%;border-radius:5px;transform-origin:left;
+.rr .b{height:9px;border-radius:var(--r1);background:var(--raised);overflow:hidden}
+.rr .b i{display:block;height:100%;border-radius:var(--r1);transform-origin:left;
   background:linear-gradient(90deg,var(--maroon),var(--accent));
   animation:sweep .8s var(--ease) both}
 .rr.xc .b i{background:linear-gradient(90deg,var(--steel),var(--t2e))}
@@ -500,14 +545,14 @@ details>summary:hover{color:var(--text)}
 
 /* ---------- people ---------- */
 .ppl{display:flex;flex-wrap:wrap;gap:9px}
-.ppl button{background:var(--raised);border:1px solid var(--line);border-radius:999px;
+.ppl button{background:var(--raised);border:1px solid var(--line);border-radius:var(--rp);
   padding:8px 14px;color:var(--text);font:600 13.5px/1 var(--disp);cursor:pointer}
 .ppl button:hover{border-color:var(--accent);color:var(--accent)}
 .ppl button span{color:var(--dim);font:500 12px var(--num);margin-left:7px}
 
 /* ---------- honours ---------- */
 .hon{display:flex;flex-wrap:wrap;gap:10px;margin:0}
-.hon .h{flex:1 1 210px;background:var(--raised);border-radius:10px;padding:13px 15px;
+.hon .h{flex:1 1 210px;background:var(--raised);border-radius:var(--r2);padding:13px 15px;
   border-left:3px solid var(--accent);animation:rise .5s cubic-bezier(.22,1,.36,1) both}
 .hon .h .r{font:700 21px/1.1 var(--num);font-variant-numeric:tabular-nums}
 .hon .h .w{font:600 11px/1.3 var(--disp);letter-spacing:.09em;text-transform:uppercase;
@@ -518,7 +563,7 @@ details>summary:hover{color:var(--text)}
 
 /* a rank shown as a position in a field, which reads as standing rather than
    as a score out of something */
-.standing{height:5px;border-radius:3px;background:var(--raised);overflow:hidden;margin-top:9px}
+.standing{height:5px;border-radius:var(--r1);background:var(--raised);overflow:hidden;margin-top:9px}
 .standing i{display:block;height:100%;background:var(--accent);transform-origin:left;
   animation:sweep .9s cubic-bezier(.22,1,.36,1) both}
 @keyframes sweep{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -21829,7 +21874,7 @@ Three Rivers League JV District
       populations. The gap between them is why this page never lets a statistic
       choose its own sample.</p>
       <div class="smalls" id="dev-small"></div>
-      <table id="dev-tab"></table>
+      <div id="dev-tab"></div>
       <p class="why" id="dev-gap" style="margin:12px 0 0"></p>
     </details>
   </div>
@@ -21839,7 +21884,7 @@ Three Rivers League JV District
     <p class="why">Track happens on a flat oval at a measured distance. Cross
     country happens on whatever the host mowed. This is what that difference is
     worth, measured on athletes who did both in the same school year.</p>
-    <table id="ruler"></table>
+    <div id="ruler"></div>
     <p class="why" style="margin:12px 0 0">Which is why a VDOT from track and a
     VDOT from cross country never share an axis here. The <em>change</em>
     between two years is comparable, because the offset cancels in a difference.
@@ -21915,7 +21960,7 @@ Three Rivers League JV District
     <p class="why">A missing freshman year and a genuine late entry look
     identical from one athlete's own rows, so entry is reconciled against
     whether the school posted any freshmen that season at all.</p>
-    <table id="entry"></table>
+    <div id="entry"></div>
   </div>
 </section>
 
@@ -22624,6 +22669,40 @@ function animate(scope){
   });
 }
 
+/* Label every nth column, and the last one - but ONLY if the last is far
+   enough from the one before it. "Draw every third, and always draw the end"
+   put 26 and 27 side by side on a phone, because 21 is both a multiple of
+   three and the end. Two columns of clearance, or the end goes unlabelled and
+   the axis still reads. */
+const tickAt=(i,n,every)=>{
+  const e=every||1;
+  if(i%e===0)return i!==n-1||true;
+  return i===n-1&&(n-1)-Math.floor((n-1)/e)*e>=2;
+};
+/* ---------- one table, everywhere ----------
+   A column says what it is once: its heading, its alignment and its width.
+   Both the header cell and every data cell in it read the same declaration,
+   which is the whole fix - the two used to be set in different places and
+   drifted apart on every table on the site.
+
+   A plain string is a centred column, which is the common case here: this
+   page is mostly times, places and counts. {k,a:'l'} is a text column, and
+   {name:true} is one set in the display face because it is somebody's name. */
+function TBL(cols,rows,cls){
+  const C=cols.map(c=>typeof c==='string'?{k:c,a:'c'}:Object.assign({a:'c'},c));
+  const wide=C.some(c=>!c.w);
+  return '<table'+(cls?' class="'+cls+'"':'')+'><colgroup>'
+    +C.map(c=>'<col'+(c.w?' style="width:'+c.w+'"':'')+'>').join('')+'</colgroup>'
+    +'<thead><tr>'+C.map(c=>'<th class="'+c.a+'">'+esc(c.k)+'</th>').join('')+'</tr></thead>'
+    +'<tbody>'+rows.map(r=>'<tr>'+r.map((v,n)=>{
+      const c=C[n]||{a:'c'};
+      const extra=(v&&typeof v==='object')?(v.cls||''):'';
+      const text=(v&&typeof v==='object')?v.v:v;
+      return '<td class="'+c.a+(c.name?' name':'')+(extra?' '+extra:'')+'">'
+        +(text==null?'\u2014':(v&&v.html?text:esc(String(text))))+'</td>';
+    }).join('')+'</tr>').join('')+'</tbody></table>';
+}
+
 /* ---------- SVG helpers ---------- */
 const svg=(h,body)=>'<svg viewBox="0 0 '+CH.W+' '+h+'" role="img">'+body+'</svg>';
 const T=(x,y,s,cls,anchor)=>'<text x="'+x+'" y="'+y+'" class="'+(cls||'axt')+'"'
@@ -22766,11 +22845,8 @@ const CH=(()=>{
      default, so it costs nothing to the reader who wanted the picture. */
   function table(summary,head,rows){
     if(!rows||!rows.length)return '';
-    return '<details class="dtab"><summary>'+esc(summary)+'</summary><table>'
-      +'<tr>'+head.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>'
-      +rows.map(r=>'<tr>'+r.map((c,n)=>'<td'+(n?'':' class="name" '
-        +'style="text-align:left"')+'>'+esc(c==null?'\u2014':String(c))+'</td>')
-        .join('')+'</tr>').join('')+'</table></details>';
+    return '<details class="dtab"><summary>'+esc(summary)+'</summary>'
+      +TBL(head.map((h,n)=>n?h:{k:h,a:'l',name:true}),rows)+'</details>';
   }
 
   // a getter, so every existing CH.W keeps working and now moves with the page
@@ -22971,7 +23047,7 @@ function barsSimple(rows,h,opt){
       +(r.thin?' stroke="var(--steel)" stroke-width=".4"':'')
       +(r.cls!=null?' data-cls="'+r.cls+'"':'')
       +CH.tip(r.title||'')+'/>';
-    if(i%(opt.every||1)===0||i===rows.length-1)
+    if(tickAt(i,rows.length,opt.every||1))
       g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
         +'text-anchor="middle">'+esc(r.label)+'</text>';
   });
@@ -23000,7 +23076,7 @@ function stackCols(rows,h,keys,colors){
         +'" width="'+bw.toFixed(1)+'" height="'+(y0-y1).toFixed(1)+'" fill="'+colors[ki]+'"'
         +CH.tip(r.y+' \u00b7 grade '+k+': '+r[k]+' of '+r.n)+'/>';
     });
-    if(i%3===0||i===rows.length-1)
+    if(tickAt(i,rows.length,3))
       g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
         +'text-anchor="middle">'+String(r.y).slice(2)+'</text>';
   });
@@ -23099,7 +23175,7 @@ function twoLines(rows,h,a,b,ca,cb,fmt,note){
     // a wide invisible target, because a 1.3-unit dot is not a hover area
     g+='<rect class="lk lk-hit" data-y="'+r.y+'" x="'+(x(i)-2.6).toFixed(1)+'" y="'+f.y0
       +'" width="5.2" height="'+(f.y1-f.y0)+'" fill="transparent"/>';
-    if(i%3===0||i===rows.length-1)
+    if(tickAt(i,rows.length,3))
       g+='<text x="'+x(i).toFixed(1)+'" y="'+(f.H-4)+'" class="axt" '
         +'text-anchor="middle">'+String(r.y).slice(2)+'</text>';
   });
@@ -24418,13 +24494,12 @@ function drawProgram(){
   const steps=[['grade 9 \u2192 10','s9','c9'],['10 \u2192 11','s10','c10'],
     ['11 \u2192 12','s11','c11'],['the whole four','four','cf']];
   const cols=[['Everyone',cE],['All four years',cF],['Top 100',cT]];
-  document.getElementById('dev-tab').innerHTML='<tr><th>Step</th>'
-    +cols.map(c=>'<th>'+c[0]+'</th>').join('')+'</tr>'
-    +steps.map(([lab,k,nk])=>'<tr><td class="name">'+lab+'</td>'
-      +cols.map(([,c])=>'<td class="'+(c[k]==null?'dimv':c[k]>0?'pos':'neg')+'">'
-        +(c[k]==null?'\u2014':FMT.s0(c[k]))
-        +'<span class="dimv" style="font-size:11px"> n='+c[nk]+'</span></td>').join('')
-      +'</tr>').join('');
+  document.getElementById('dev-tab').innerHTML=TBL(
+    [{k:'Step',a:'l',name:true,w:'34%'},...cols.map(c=>c[0])],
+    steps.map(([lab,k,nk])=>[lab,...cols.map(([,c])=>({
+      v:(c[k]==null?'\u2014':FMT.s0(c[k]))
+        +'<span class="dimv" style="font-size:11px"> n='+c[nk]+'</span>',
+      html:true,cls:(c[k]==null?'dimv':c[k]>0?'pos':'neg')}))]));
   const thin=cT.c9===cE.c9&&cT.four===cE.four;
   const gap=(cT.four!=null&&cE.four!=null&&cE.four>0)?(cT.four/cE.four):null;
   document.getElementById('dev-gap').innerHTML=thin
@@ -24439,15 +24514,17 @@ function drawProgram(){
 
   // --- the two rulers
   const rg=rulerGap(pG);
-  document.getElementById('ruler').innerHTML='<tr><th>Ruler</th><th>Mean</th><th>Median</th>'
-    +'<th>Athlete-seasons</th></tr>'
-    +['tf1500','tf3000'].map(k=>{
-      const o=rg[k];
-      return '<tr><td class="name">'+RULERS[k].label+' vs XC 5,000m</td>'
-        +(o?'<td class="'+(o.mean>0?'pos':'neg')+'">'+sg(o.mean)+'</td><td>'+sg(o.med)
-          +'</td><td>'+o.n+'</td>':'<td colspan="3" class="dimv">not enough overlap</td>')
-        +'</tr>';
-    }).join('');
+  /* Mean and median are the same kind of number and now look it. The mean
+     was coloured and the median was not, which read as one being a result
+     and the other an aside. */
+  document.getElementById('ruler').innerHTML=TBL(
+    [{k:'Ruler',a:'l',name:true,w:'46%'},'Mean','Median','Athlete-seasons'],
+    ['tf1500','tf3000'].map(k=>{
+      const o=rg[k],lab=RULERS[k].label+' vs XC 5,000m';
+      if(!o)return [lab,{v:'not enough overlap',cls:'dimv'},'\u2014','\u2014'];
+      const c=o.mean>0?'pos':'neg';
+      return [lab,{v:sg(o.mean),cls:c},{v:sg(o.med),cls:c},o.n];
+    }));
 
   chartIn('comp');
   const pooled=ent?fin/ent*100:null;
@@ -24518,18 +24595,20 @@ function drawProgram(){
       +'<div class="tile"><div class="k">All-time State marks</div><div class="v">'+marks.length
         +'</div><div class="n">inside Oregon\u2019s fastest ever</div></div>'
       +'</div>':'')
-    +(fours.length?'<table><tr><th>Years</th><th>Athlete</th><th>In Oregon</th></tr>'
-      +fours.map(f=>'<tr><td>'+f.a+'\u2013'+f.b+'</td><td class="name" '
-        +'style="text-align:left">'+esc(f.name)
-        +(f.aka?' <span class="dimv" style="font-weight:400">(now '+esc(f.aka)+')</span>':'')
-        +(+f.b<INFO.horizon?' <span class="dimv" style="font-size:11px">pre-2004</span>':'')
-        +'</td><td>'+ord(f.rank)+'</td></tr>').join('')+'</table>':'')
+    +(fours.length?TBL([{k:'Years',w:'22%'},{k:'Athlete',a:'l',name:true},
+      {k:'In Oregon',w:'24%'}],
+      fours.map(f=>[f.a+'\u2013'+f.b,
+        {v:esc(f.name)
+          +(f.aka?' <span class="dimv" style="font-weight:400">(now '+esc(f.aka)+')</span>':'')
+          +(+f.b<INFO.horizon?' <span class="dimv" style="font-size:11px">pre-'
+            +INFO.solid+'</span>':''),html:true},
+        ord(f.rank)])):'')
     +(marks.length?'<p class="why" style="margin:16px 0 6px">Fastest ever run by a '
       +(pG==='M'?'Tualatin boy':'Tualatin girl')+' at the State meet, against every '
-      +'Oregon '+(pG==='M'?'boy':'girl')+' in the record.</p><table>'
-      +marks.map(m=>'<tr><td class="name" style="text-align:left">'+esc(m.name)
-        +'</td><td>'+m.a+'</td><td>'+m.b+'</td><td>'+ord(m.rank)+' all-time</td></tr>').join('')
-      +'</table>':'')
+      +'Oregon '+(pG==='M'?'boy':'girl')+' in the record.</p>'
+      +TBL([{k:'Athlete',a:'l',name:true},{k:'Time',w:'20%'},{k:'Year',w:'16%'},
+        {k:'In Oregon',w:'24%'}],
+        marks.map(m=>[m.name,m.a,m.b,ord(m.rank)+' all-time'])):'')
     +'<p class="why" style="margin:14px 0 0">'
       +(fours.filter(f=>+f.b<INFO.horizon).length)+' of these careers finished before '
       +INFO.horizon+' and are invisible to every other number on this page.</p>';
@@ -24541,10 +24620,12 @@ function drawProgram(){
   GHOST.render();
   PSEL.wire();PSEL.apply();
   wireCharts(document.getElementById('p-program'));
-  document.getElementById('entry').innerHTML='<tr><th>Entry</th><th>Athletes</th><th>Share</th>'
-    +'<th>What it means</th></tr>'+ENTRY.map(k=>'<tr><td class="name">'+k+'</td><td>'+mix[k]
-    +'</td><td>'+(every.length?Math.round(mix[k]/every.length*100):0)+'%</td>'
-    +'<td style="text-align:left" class="dimv">'+why[k]+'</td></tr>').join('');
+  document.getElementById('entry').innerHTML=TBL(
+    [{k:'Entry',a:'l',name:true,w:'18%'},{k:'Athletes',w:'12%'},{k:'Share',w:'12%'},
+     {k:'What it means',a:'l'}],
+    ENTRY.map(k=>[k,mix[k],
+      (every.length?Math.round(mix[k]/every.length*100):0)+'%',
+      {v:why[k],cls:'dimv'}]));
   animate(document.getElementById('p-program'));
 }
 
@@ -24797,9 +24878,8 @@ function drawAthlete(i){
   for(const r of races)if(pb[r.dist]==null||r.sec<pb[r.dist])pb[r.dist]=r.sec;
   const dlab=DIST;
   const pbRows=Object.keys(pb).map(Number).sort((x,y)=>x-y)
-    .map(d=>'<tr><td class="name">'+dlab(d)
-      +'</td><td>'+secs(pb[d])+'</td><td class="dimv">'
-      +(VCOL[d]?'VDOT '+vdot(pb[d],d).toFixed(1):'—')+'</td></tr>').join('');
+    .map(d=>[dlab(d),secs(pb[d]),
+      {v:(VCOL[d]?vdot(pb[d],d).toFixed(1):'—'),cls:'dimv'}]);
 
   const career=careerChart(i);
   let arc='';
@@ -24978,15 +25058,13 @@ function drawAthlete(i){
     +'<p class="why">The three races furthest ahead of what was expected of them that '
     +'day, worked out the same way as the one above. A career has more than one good '
     +'afternoon in it.</p><table>'
-    +'<tr><th>Meet</th><th>Year</th><th>Expected</th><th>Ran</th><th>Place</th>'
-    +'<th>Beat it by</th></tr>'
-    +bd.map(x=>{const e=expectedOf(x.r);
-      return '<tr><td class="name" style="text-align:left">'
-        +esc(MEETS[x.r.m].name||'')+'</td><td>'+(MEETS[x.r.m].date||'').slice(0,4)
-        +'</td><td class="dimv">'+(e==null?'\u2014':est(e))+'</td><td>'+secs(x.r.sec)
-        +'</td><td>'+(x.r.place||'\u2014')+'</td><td class="pos">'
-        +(e==null?'\u2014':Math.round(e-x.r.sec)+'s')+'</td></tr>';}).join('')
-    +'</table></div>':'';
+    +TBL([{k:'Meet',a:'l',name:true},{k:'Year',w:'11%'},{k:'Expected',w:'15%'},
+      {k:'Ran',w:'14%'},{k:'Place',w:'11%'},{k:'Beat it by',w:'15%'}],
+      bd.map(x=>{const e=expectedOf(x.r);
+        return [MEETS[x.r.m].name||'',(MEETS[x.r.m].date||'').slice(0,4),
+          {v:(e==null?'\u2014':est(e)),cls:'dimv'},secs(x.r.sec),x.r.place||'\u2014',
+          {v:(e==null?'\u2014':Math.round(e-x.r.sec)+'s'),cls:'pos'}];}))
+    +'</div>':'';
 
   /* ---------- who they run with ---------- */
   const pr=partnersOf(i);
@@ -25027,27 +25105,25 @@ function drawAthlete(i){
     +bestCard
     +daysCard
     +pplCard
-    +'<div class="card"><h2>Personal bests</h2><table><tr><th>Distance</th><th>Best</th>'
-    +'<th>VDOT</th></tr>'+pbRows+'</table>'
+    +'<div class="card"><h2>Personal bests</h2>'
+    +TBL([{k:'Distance',a:'l',name:true,w:'40%'},'Best','VDOT'],pbRows)
     +'<p class="why" style="margin:12px 0 0">A VDOT from track and one from cross country are '
     +'not on the same scale — see Two rulers on the Program tab.</p></div>'
-    +'<div class="card"><h2>Every mark</h2><table><tr><th>Date</th><th>Meet</th>'
-    +'<th>Sport</th><th>Event</th><th>Time</th><th>Place</th><th>Expected</th>'
-    +'<th>Beat it by</th></tr>'
-    +races.slice().reverse().map(r=>{
-      const v=r.sport==='xc'?residOf(r):null;
-      const thin=(FIT.meetN.get(r.m)||0)<MIN_AT_MEET;
-      const e=(v==null||thin)?null:expectedOf(r);
-      return '<tr><td>'+r.date+'</td><td class="name" style="text-align:left">'
-        +esc((MEETS[r.m].name||'').slice(0,32))+'</td><td>'
-        +(r.sport==='xc'?'XC':'Track')+'</td><td>'+(r.event||dlab(r.dist))+'</td><td>'
-        +secs(r.sec)+'</td><td>'+(r.place||'\u2014')+'</td>'
-        +'<td class="dimv">'+(e==null?'\u2014':est(e))+'</td>'
-        +'<td class="'+(e==null?'dimv':v>0?'pos':'neg')+'">'
-        +(e==null?'\u2014':(v>0?'':'\u2212')+Math.abs(Math.round(e-r.sec))+'s')
-        +'</td></tr>';
-    }).join('')
-    +'</table><p class="why" style="margin:12px 0 0"><b>Expected</b> is the time this '
+    +'<div class="card"><h2>Every mark</h2>'
+    +TBL([{k:'Date',w:'11%'},{k:'Meet',a:'l',name:true},{k:'Sport',w:'9%'},
+      {k:'Event',w:'12%'},{k:'Time',w:'11%'},{k:'Place',w:'8%'},
+      {k:'Expected',w:'11%'},{k:'Beat it by',w:'11%'}],
+      races.slice().reverse().map(r=>{
+        const v=r.sport==='xc'?residOf(r):null;
+        const thin=(FIT.meetN.get(r.m)||0)<MIN_AT_MEET;
+        const e=(v==null||thin)?null:expectedOf(r);
+        return [r.date,(MEETS[r.m].name||''),(r.sport==='xc'?'XC':'Track'),
+          (r.event||dlab(r.dist)),secs(r.sec),r.place||'\u2014',
+          {v:(e==null?'\u2014':est(e)),cls:'dimv'},
+          {v:(e==null?'\u2014':(v>0?'':'\u2212')+Math.abs(Math.round(e-r.sec))+'s'),
+           cls:(e==null?'dimv':v>0?'pos':'neg')}];
+      }))
+    +'<p class="why" style="margin:12px 0 0"><b>Expected</b> is the time this '
     +'athlete\u2019s form and that afternoon predicted, fitted from the whole '
     +'squad\u2019s results at that meet \u2014 see Best race above. <b>Beat it by</b> '
     +'is how far inside that they ran, and a negative number is a day that went the '
@@ -25851,12 +25927,22 @@ document.getElementById('q-board').addEventListener('input',e=>{
 
 /* showTab only paints. It must not render or navigate, because applyRoute
    needs to choose the panel before it sets the state the renderer will read. */
+/* ONE LIST OF TABS, and the nav reads its own length from it. The grid, the
+   underline's width and the distance it slides are all one divided by the
+   number of tabs, so adding the fifth is adding a string to TABS. */
+const TABS=['board','program','athlete','january'];
+(function(){
+  const nav=document.querySelector('nav[role="tablist"]');
+  if(nav)nav.style.setProperty('--tabs',TABS.length);
+})();
 function showTab(which){
   CUR_TAB=which;
-  for(const k of ['board','program','athlete','january']){
+  for(const k of TABS){
     document.getElementById('t-'+k).setAttribute('aria-selected',String(k===which));
     document.getElementById('p-'+k).hidden=k!==which;
   }
+  const nav=document.querySelector('nav[role="tablist"]');
+  if(nav)nav.style.setProperty('--tab',Math.max(0,TABS.indexOf(which)));
 }
 function tab(which){
   showTab(which);
@@ -25865,12 +25951,12 @@ function tab(which){
   if(which==='board')drawBoard();
   writeHash(true);
 }
-for(const k of ['board','program','athlete','january']){
+for(const k of TABS){
   const btn=document.getElementById('t-'+k);
   btn.addEventListener('click',()=>tab(k));
   // arrow keys move between tabs, which is what a tablist is supposed to do
   btn.addEventListener('keydown',e=>{
-    const order=['board','program','athlete','january'];
+    const order=TABS;
     const at=order.indexOf(k);
     let to=null;
     if(e.key==='ArrowRight')to=order[(at+1)%order.length];
