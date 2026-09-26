@@ -131,9 +131,19 @@
     for (const x of p) sec = sec * 60 + x;
     return sec > 0 ? sec : null;
   }
+  /* Round ONCE, to hundredths, and split the integer that comes out.
+     Flooring the minutes first and rounding the remainder second lets the two
+     halves disagree: 1259.9963s floors to 20 minutes and its remainder rounds
+     to "60.00", so the seed carried "20:60.00". The site's own parseCSV
+     refuses a seconds field of 60 and drops that row, so a mark leaves the
+     database silently - which is how this surfaced, as parseCSV's bad count
+     going to 1 on a seed of 8,893. It is about one mark in six thousand, so
+     it was latent from the day this was written and simply had to wait for a
+     big enough database. Same fault the dashboard's mmss had, one file over. */
   const fmt = s => {
-    const m = Math.floor(s / 60);
-    return m + ':' + (s - m * 60).toFixed(2).padStart(5, '0');
+    const c = Math.round(s * 100);
+    const m = Math.floor(c / 6000);
+    return m + ':' + ((c - m * 6000) / 100).toFixed(2).padStart(5, '0');
   };
 
   /* ---------- the build ----------

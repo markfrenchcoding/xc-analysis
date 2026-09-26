@@ -9,7 +9,7 @@ Repo: github.com/markfrenchcoding/xc-analysis (Vercel project is named `chutexc`
 
 ## Shape of the thing
 
-**One file.** `index.html` at the repo root, ~700KB, no build step, no
+**One file.** `index.html` at the repo root, ~800KB, no build step, no
 dependencies, no backend. Vercel serves it statically. Everything — data, CSS,
 simulation, UI — is in that file.
 
@@ -36,8 +36,8 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
-- 7,604 rows currently across all five classifications: 3,524 athlete-boards,
-  222 schools, up to twelve deep a team. Pulled through Sep 24, 2026 by the refresh
+- 8,893 rows currently across all five classifications: 3,617 athlete-boards,
+  225 schools, up to twelve deep a team. Pulled through Sep 26, 2026 by the refresh
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
@@ -870,6 +870,32 @@ and shouts if the seed shrank by more than a tenth — which is what a partial
 crawl looks like from the outside. Do not upload a file that shrank without
 reading the log.
 
+**`fmt` rounds once, and flooring the minutes first is the bug.** The seed
+shipped `20:60.00` for Landon McBride. `Math.floor(s / 60)` took the minutes
+and `.toFixed(2)` rounded the remainder, so the two halves disagreed: 1259.9963
+floors to 20 minutes and rounds to a 60-second remainder. Round to hundredths
+**first**, then split the integer.
+
+Three things make it worth the space. **It was silent.** The site's `parseCSV`
+refuses a seconds field of 60 and drops that row, so a mark left the database
+with nothing said. Here it cost one of McBride's three marks, not his place on
+the board and not his season best, which was the fastest of the three - so the
+damage this time was a `MARK_W` draw over two marks where it should have been
+three. The value was never wrong; the spelling was, and the spelling is what
+the parser reads. On a different athlete the same fault takes the only mark
+they have and removes them. **It was latent from the day it was written** - it
+needs a time within half a hundredth of a minute boundary, about one mark in
+six thousand, so it waited for the seed to pass eight thousand rows. And **the
+dashboard's `mmss` had the identical fault**, found weeks earlier, one file
+over. Fixing a rounding bug in one formatter is not finishing: grep for the
+others.
+
+What caught it was not a reader. `parseCSV` counts bad rows and both `audit2`
+and `test_seed` assert that count is zero, so a dropped athlete failed a build
+rather than quietly shrinking a board. `test_seed` now also sweeps fifty
+minutes of hundredths through `fmt`, and putting the old two-step version back
+fails it three ways.
+
 **Resume must advance the index before it saves.** Saving "meet 40 done" while
 meet 40's rows are only half in re-pulls it on resume and gives every athlete in
 it the same mark twice, quietly eating real mark slots. `buildSeed` also
@@ -886,7 +912,15 @@ week is not a broken crawl** - check the meet list in the report before
 suspecting the pull, because the report prints every meet it read and what each
 one gave.
 
-Current coverage: 7,604 marks, 3,524 athlete-boards, 222 schools, from 93 meets.
+**A Saturday pull is not thin, though, because athletic.net posts same-day.**
+The Sep 26 run went out that afternoon and already had Nike Portland XC with
+2,777 results and Three Course Challenge with 843, both raced that morning:
+1,289 new rows. So the Monday slot buys reliability rather than freshness -
+it catches a meet whose results went up late on the Sunday, and it runs whether
+or not anybody remembers. Do not read the Monday choice as "results are not
+up before then".
+
+Current coverage: 8,893 marks, 3,617 athlete-boards, 225 schools, from 102 meets.
 That is 671 rows more than the hand-built pull it replaced, which is the crawl
 starting from the full Oregon team list rather than from team ids resolved out of
 meets already pulled - it finds meets the old chicken-and-egg approach could not
@@ -2233,8 +2267,8 @@ The redraw matters. A team that got hot at districts starts again from its
 marks. Carrying one draw through both would amplify luck instead of averaging it.
 
 **Sampling.** Each race draws from an athlete's top three marks at 25/50/25,
-renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 24
-pull: **2,717 of 3,524** athlete-boards carry two or three marks, **77%**, up
+renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 26
+pull: **3,068 of 3,617** athlete-boards carry two or three marks, **85%**, up
 from 53% a fortnight earlier and 348 of 1,172 before the automated pull. This is
 now the ordinary case rather than the exception, which also means the `MARK_W`
 unfairness below is biting less: it only hurts when *some* teams have raced
@@ -2311,7 +2345,7 @@ chance of winning falls from 44% to 24%, qualifying comes off the ceiling
 five is more robust to noise than Grant's. That is the calibration fix the
 backtest asked for, worth about 9% off the error at this range with no new data.
 
-**It narrows on its own, and four refreshes running have shown it.** Nobody has
+**It narrows on its own, and five refreshes running have shown it.** Nobody has
 touched a constant:
 
 | data through | weeks to Lane | drift | total |
@@ -2320,16 +2354,21 @@ touched a constant:
 | Sep 17 | 7.29 | 4.01% | 4.62% |
 | Sep 19 | 7.01 | 3.39% | 4.10% |
 | Sep 24 | 6.30 | 1.84% | 2.95% |
+| Sep 26 | 6.00 | 1.23% | 2.61% |
 
 If a refresh ever leaves the total unchanged, the horizon is not being read -
 check `DATA_DATE` and `STATE_DATE` before believing the board.
 
-**The fall is steeper than the calendar**, and the curve is why. Five days of
-racing took 0.71 weeks off the horizon and 1.15 points off the total, because
-`RECORD.horizon` is measured at 6.0% eight weeks out and 2.6% at six: most of
-the allowance is spent in that first fortnight. The board is now 0.65 points
-above the 2.3% race-day floor and will reach it in late October, after which
-further refreshes move the odds without moving the spread.
+**The fall is steeper than the calendar**, and the curve is why. `RECORD.horizon`
+is measured at 6.0% eight weeks out and 2.6% at six, so most of the allowance is
+spent in that first fortnight: a week of calendar between Sep 17 and Sep 24 took
+1.67 points off the total, and the two days to Sep 26 took another 0.34.
+
+**Sep 26 sits exactly on a measured point**, 6.00 weeks, so the drift is read
+rather than interpolated - the first refresh where that is true. From here the
+curve flattens: the board is 0.31 points above the 2.3% race-day floor and
+reaches it in late October, after which a refresh moves the odds without moving
+the spread.
 
 **The Dream Team does not get drift**, deliberately. It is a race today between
 a squad that does not exist and the sixteen fastest schools in the state. There
@@ -2474,13 +2513,13 @@ something harder to read.
 | | |
 |---|---|
 | `domInteractive` | ~70ms |
-| seed parse, 7,604 rows | 7ms |
+| seed parse, 8,893 rows | 7ms |
 | `buildModel` | 0.45ms |
 | `buildBoard`, 45 cards | 25ms, once per press of Run |
 | `fitNames` | 0.3ms typical, 9ms on the one board with long names |
 | one simulated season | ~90µs, so 135 fit in a 12ms frame |
 | `paint` full | 0.8ms |
-| page, gzipped | 198KB of a 723KB file |
+| page, gzipped | 211KB of a 804KB file |
 
 The seed has grown by half again since those first numbers and the per-season
 cost went **down**, not up: more marks per athlete means `pickMark` picks from
@@ -3002,7 +3041,7 @@ tenths of a percent as integers. At-large is deliberately *not* stored, because
 derives from the two rather than taking a column of its own. Points is the same
 conditional mean the card shows.
 
-**It costs about 21KB a snapshot.** Four entries are 84KB of a 723KB file, and
+**It costs about 21KB a snapshot.** Five entries are 105KB of a 804KB file, and
 a full season of weekly pulls would add roughly 250KB. That is the one thing to
 watch, and it is now the second-fastest-growing part of the file after the seed
 itself. If it gets uncomfortable the answer is a shared name table, not fewer

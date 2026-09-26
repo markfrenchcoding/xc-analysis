@@ -36,6 +36,30 @@ const unresolved = [...new Set(rows.filter(r => !(board[S.key(r.school)] || {})[
   .map(r => r.school))];
 ok(unresolved.length === 0, 'every seeded school is on a board; missing: ' + unresolved.join(', '));
 
+/* ---------- fmt must round once ----------
+   Flooring the minutes and then rounding the remainder lets the two halves
+   disagree, and the seed shipped "20:60.00" for exactly that reason. The
+   site's parseCSV refuses a seconds field of 60, so the athlete was dropped
+   from the board without anything saying so. It is about one mark in six
+   thousand, which is why it stayed latent until the seed passed eight
+   thousand rows. Sweep the boundaries rather than pinning the one case that
+   happened to bite. */
+for (const s of [1259.9963, 1260, 599.999, 3599.999, 0, 963.95]) {
+  const out = S.fmt(s);
+  ok(!/:(\d{3}|60\.)/.test(out), 'fmt(' + s + ') carries into the minutes — got ' + out);
+}
+{
+  let bad = 0;
+  for (let c = 0; c <= 300000; c++) if (/:(\d{3}|60\.)/.test(S.fmt(c / 100))) bad++;
+  eq(bad, 0, 'no seconds field of 60 across 50 minutes of hundredths');
+}
+/* Scoped to the seed block, not the file. The first version grepped the whole
+   of index.html and failed the moment a snapshot's --why reason quoted the
+   malformed mark it was written to explain. A test that reads more than the
+   thing it is testing fails on prose. */
+ok(!rows.some(r => /[0-9]:60\.[0-9][0-9]/.test(r.mark)),
+  'the shipped seed carries no 60-second mark');
+
 /* ---------- round trip ---------- */
 const built = S.buildSeed(rows.map(r => ({ ...r, seconds: r.mark, date: '' })), board);
 eq(built.dropped.dist, 0, 'nothing dropped for distance');
