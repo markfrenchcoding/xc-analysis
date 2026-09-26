@@ -194,10 +194,28 @@ for (const g of ['M', 'F']) {
     + sameString + ' pairs that merely PRINT the same');
 }
 
-/* ---------- 6. the baseline: what every number on the page says today ---------- */
+/* ---------- 6. the baseline: what every number on the page says today ----------
+
+   THE KEY IS THE ATHLETE ID, NOT THEIR ROW. Everything above works off the
+   index into d-athletes, which is right inside one run and wrong across two:
+   the page sorts its roster, so one athlete joining shifts every row after
+   them. The first pull that added somebody reported six marks "gone" and two
+   career bests four minutes SLOWER - which cannot happen, and was the baseline
+   holding Ian Leininger's time up against Hudson Keil's.
+
+   A baseline only ever runs across pulls. Keyed by a number that moves between
+   pulls it reports noise, and noise in a guard is worse than no guard, because
+   the one real move is now hiding in a list of thirty that are not. */
+const aid = (i) => (A[+i] ? A[+i].id : 'row' + i);
 const snapshot = {};
-for (const [kk, v] of careerR) snapshot['career|' + kk] = fmt(toH(v));
-for (const [key, v] of fromResults) snapshot['season|' + key] = fmt(toH(v));
+for (const [kk, v] of careerR) {
+  const [a, k] = kk.split('|');
+  snapshot['career|' + aid(a) + '|' + k] = fmt(toH(v));
+}
+for (const [key, v] of fromResults) {
+  const [a, y, k] = key.split('|');
+  snapshot['season|' + aid(a) + '|' + y + '|' + k] = fmt(toH(v));
+}
 
 if (process.argv.includes('--baseline')) {
   fs.writeFileSync(BASE, JSON.stringify(snapshot));
@@ -211,11 +229,32 @@ if (process.argv.includes('--baseline')) {
   }
   for (const k of Object.keys(snapshot)) if (!(k in was)) added.push(k);
   /* A number that moves is not automatically wrong - removing drift is
-     supposed to move some of them - but it is never allowed to move quietly. */
-  console.log('\nagainst the baseline: ' + moved.length + ' values changed, '
+     supposed to move some of them - but it is never allowed to move quietly.
+
+     THE DIRECTION IS THE WHOLE SIGNAL. A pull that adds races can only make
+     a best faster. One that got slower means a race the page used to carry
+     is gone, or a date has moved a mark into a different season, which is
+     the shape of the meet-id bug this project already had once. So the two
+     are printed apart: the faster ones are the news, a slower one is a
+     question, and they should never have shared a list. */
+  const secOf = (t) => {
+    const m = String(t).match(/^(?:(\d+):)?(\d+(?:\.\d+)?)$/);
+    return m ? (+(m[1] || 0)) * 60 + +m[2] : null;
+  };
+  const faster = [], slower = [];
+  for (const m of moved) {
+    const hit = m.match(/: (\S+) -> (\S+)$/);
+    const a = hit ? secOf(hit[1]) : null, b = hit ? secOf(hit[2]) : null;
+    (a != null && b != null && b > a ? slower : faster).push(m);
+  }
+  console.log('\nagainst the baseline: ' + moved.length + ' values changed ('
+    + faster.length + ' faster, ' + slower.length + ' slower), '
     + gone.length + ' gone, ' + added.length + ' new');
-  if (moved.length) console.log('  ' + moved.slice(0, 12).join('\n  '));
-  if (moved.length > 12) console.log('  ...and ' + (moved.length - 12) + ' more');
+  if (faster.length) console.log('  ' + faster.slice(0, 8).join('\n  '));
+  if (faster.length > 8) console.log('  ...and ' + (faster.length - 8) + ' more faster');
+  if (slower.length) console.log('  SLOWER, which adding races cannot do:\n    '
+    + slower.slice(0, 12).join('\n    '));
+  if (gone.length) console.log('  GONE: ' + gone.slice(0, 8).join(', '));
 }
 
 /* ---------- report ---------- */

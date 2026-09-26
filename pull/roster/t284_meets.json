@@ -7,7 +7,7 @@
   "solid": 2004,
   "pulled": "2026-09-26",
   "sports": {
-    "xc": 8876,
+    "xc": 8919,
     "tfo": 15905
   },
   "fieldMarksSkipped": 2687,
@@ -880,6 +880,10 @@
     "xc|258447": {
       "date": "2025-11-08",
       "name": "OSAA State XC Championships"
+    },
+    "xc|269957": {
+      "date": "2026-09-26",
+      "name": "Nike Portland XC"
     },
     "xc|270629": {
       "date": "2026-08-28",

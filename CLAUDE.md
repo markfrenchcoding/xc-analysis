@@ -1717,9 +1717,21 @@ worth exactly one athlete in Tualatin's boys, which is the difference between
 
 **A cohort is counted once its senior autumn is over.** The latest school year
 in the data is in progress, so including it understates that class. Both the
-page and `roster.js` now use "strictly before the latest school year", and both
-print the same number. Two places computing the same statistic differently is
-how a dashboard ends up disagreeing with its own source.
+page and `roster.js` use "strictly before the latest school year".
+
+**They do not print the same number, and this file used to say they did.** The
+rule is shared; the population is not. `roster.js` sums every cohort in the
+archive and the page sums `V.everyone(g, 'dist')` - the 748 athletes with a
+mark at 800m or longer, which is what the dashboard is about. So the pull
+reports **34% and 30%** where the page reports **45% and 50%**, and both are
+right about their own question.
+
+Worth the correction because the wrong sentence is the expensive kind: a
+routine data pull printed 34% against a file promising 45%, which reads
+exactly like a pull that has just lost a third of the record. Ten minutes went
+on proving nothing was broken. A statistic takes a population as a parameter -
+the rule the whole page is built on - and a note comparing two numbers has to
+say which population each one is over.
 
 ### The URL is the state
 
@@ -2077,6 +2089,25 @@ printing. `pull/test_page.js` reads the built page's own blocks and asserts the
 season block has five columns and none of them is a time, so a block that grows
 one back fails before a reader sees it.
 
+**The baseline is keyed by athlete id, and used to be keyed by their row.**
+Everything inside the audit works off the index into `d-athletes`, which is
+right within one run and wrong across two - the page sorts its roster, so one
+athlete joining shifts every row after them. The Sep 26 pull added **Daniel
+Zumwalt** at row 731 and the baseline duly reported six marks *gone* and two
+career bests four minutes **slower**, which adding races cannot do. It was
+holding Ian Leininger's time up against Hudson Keil's.
+
+A baseline only ever runs across pulls. Keyed by a number that moves between
+pulls it reports noise, and noise in a guard is worse than no guard: the one
+real move is now hiding in a list of thirty that are not. Re-keyed, the same
+pull reads **31 faster, 0 slower, 0 gone, 19 new**.
+
+**The direction is the whole signal, so the report splits on it.** A pull that
+adds races can only make a best faster. A slower one means a race the page used
+to carry is gone, or a date has moved a mark into a different season - the shape
+of the meet-id bug above. Faster ones are news and get eight lines; a slower one
+is a question and gets its own heading.
+
 ### Meet ids are per sport, like division ids
 
 Meet 31671 is a cross country race on 2010-09-08 **and** a track dual called
@@ -2117,6 +2148,37 @@ median +3.56 to +3.50, over 265 athlete-seasons rather than 264: season bests
 are now derived by the calendar school year from corrected meet dates, so one
 more season pairs up. Everything else held — 427 athletes, 45% and 50%
 completion, 77s over four years, Caleb Lakeman first.
+
+### Refreshing the dashboard
+
+Two commands, and the second one is not optional:
+
+```
+node pull/roster.js 284 --name Tualatin    # the archive
+node pull/build_dash.js 284                # the page
+node pull/test_page.js                     # what moved, and which way
+```
+
+**The track side is served from a cache and that is fine in season.**
+`pull/roster/t284_bio.jsonl` holds every athlete's parsed track races, so a
+re-run pays one request only for athletes it has never seen - the Sep 26 pull
+made **one** live bio call out of 1,580 and finished in under two minutes
+against twenty-odd for a cold one. It is right in autumn, when no track is being
+run. **Delete that file before the first pull after a track season**, or the
+spring will be missing and look exactly like a spring nobody raced.
+
+**Sep 26, 2026: Nike Portland XC.** 43 results, 42 of them 5,000m and one 3,000m.
++1 athlete, +1 athlete-season, 16,020 marks to 16,063. Fifteen personal bests,
+the largest Annabelle Webster at 31:38.06 to 29:27.66; eight athletes got a
+first 5,000m. Nothing else moved: four-year completion held at 45% and 50%, the
+school record and the top three held.
+
+**An athlete can be on the page with no mark on any ruler.** Daniel Zumwalt ran
+that meet's 3,000m, which is cross country and therefore not the `tf3000`
+ruler, and nothing is ever converted between distances. He is on the roster, in
+the results and absent from all three boards, which is correct and which the
+athlete page already renders - the tile says "no ranked ruler" rather than a
+dash where a number should be.
 
 ### Metres, and a phone that fills
 
