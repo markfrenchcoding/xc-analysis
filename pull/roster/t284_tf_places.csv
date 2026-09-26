@@ -1,4 +1,13 @@
 athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
+877,David Shriver,11,378863,2003-05-24,OSAA State Championships,5,1500 Meters,0,0,10,4:01.51a
+15649900,Meghan Armstrong,11,378863,2003-05-24,OSAA State Championships,23,1500 Meters,0,0,1,4:35.84a
+15649900,Meghan Armstrong,11,378863,2003-05-24,OSAA State Championships,24,3000 Meters,0,0,1,9:59.19a
+15649900,Meghan Armstrong,11,378863,2003-05-24,OSAA State Championships,24,3000 Meters,0,0,1,9:59.19a
+1762070,Shaun Donaghue,12,378863,2003-05-24,OSAA State Championships,14,Javelin,1,0,19,157-05
+868,Megan Danilson,11,378863,2003-05-24,OSAA State Championships,35,Long Jump,1,0,2,17-02.75
+868,Megan Danilson,11,378863,2003-05-24,OSAA State Championships,35,Long Jump,1,0,5,17-02.75
+1762008,Krieg Holland,12,378863,2003-05-24,OSAA State Championships,18,Triple Jump,1,0,8,43-11.50
+868,Megan Danilson,11,378863,2003-05-24,OSAA State Championships,36,Triple Jump,1,0,16,34-10.25
 841,Kevin Dickson,11,428,2004-05-29,OSAA 4A State Championships Day 2,1,100 Meters,0,0,7,11.52a
 877,David Shriver,12,428,2004-05-29,OSAA 4A State Championships Day 2,4,800 Meters,0,0,6,1:58.48a
 877,David Shriver,12,428,2004-05-29,OSAA 4A State Championships Day 2,5,1500 Meters,0,0,6,3:58.91a
@@ -139,6 +148,7 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 14426,Melanie Schafer,11,9014,2006-05-19,PAC 9 District,36,Triple Jump,1,0,4,33'0
 887,Kyle Shriver,12,7801,2006-05-26,OSAA 4A State Championships Day 1,3,400 Meters,0,0,4,50.64a
 892,Larry Floyd,12,7801,2006-05-26,OSAA 4A State Championships Day 1,17,Long Jump,1,0,6,21'4.5
+887,Kyle Shriver,12,7719,2006-05-27,OSAA 4A State Championships Day 2,3,400 Meters,0,0,8,51.80a
 175489,Brandon Kelly,9,29386,2007-05-04,Pacific JV District,1,100 Meters,0,0,1,12.07a
 113420,Sean Acosta,9,29386,2007-05-04,Pacific JV District,1,100 Meters,0,0,4,12.60a
 113427,Terrence Lowery,9,29386,2007-05-04,Pacific JV District,1,100 Meters,0,0,5,12.77a
@@ -211,8 +221,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 140029,Jared Richtor,9,29386,2007-05-04,Pacific JV District,14,Javelin,1,0,1,126'7
 118470,Glesty Waters,9,29386,2007-05-04,Pacific JV District,14,Javelin,1,0,6,101'0
 113491,Nate Perkins,11,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,3,5'2
-116366,Evan Miller,12,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,4,5'0
 113490,Keenan Lopez,11,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,4,5'0
+116366,Evan Miller,12,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,4,5'0
 86596,Chase Thompson,9,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,5,4'9
 113496,Nathan Andrews,9,29386,2007-05-04,Pacific JV District,16,Pole Vault,1,0,2,9'0
 86596,Chase Thompson,9,29386,2007-05-04,Pacific JV District,16,Pole Vault,1,0,6,7'6
@@ -454,8 +464,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 747811,Malory Turner,9,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,6,13.92a
 825099,Olivia Patton,11,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,16,14.52a
 755135,Megan Moran,9,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,17,14.58a
-755146,Dellsamae Kingsley,10,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,18,14.65a
 747817,Heather Wisner,9,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,18,14.65a
+755146,Dellsamae Kingsley,10,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,18,14.65a
 300005,Svetlana Jarmer,10,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,21,14.70a
 747828,Krista Collins,10,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,22,14.73a
 747832,Mary Howard,10,63322,2009-05-08,Pacific JV District Meet,19,100 Meters,0,0,23,14.90a
@@ -490,8 +500,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 113429,Courtney Thomas,11,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,8,29.47a
 747811,Malory Turner,9,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,9,30.23a
 825099,Olivia Patton,11,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,10,30.41a
-747828,Krista Collins,10,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,14,31.05a
 747857,Anna-Sofia Knieling,12,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,14,31.05a
+747828,Krista Collins,10,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,14,31.05a
 763408,Alee Sha Ochoa-Bass,9,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,17,31.23a
 755360,Marlene Stockenhuber,12,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,18,31.35a
 139512,Jordan Taylor,11,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,19,31.50a
@@ -1487,8 +1497,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 6424809,Mallory Reser,11,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,32,Javelin,1,0,19,74-09
 5161293,Tegan Bracha,11,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,27,High Jump,1,0,6,4-08.00
 6424755,Kyla Boswell,12,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,27,High Jump,1,0,12,4-06.00
-5161300,Cole Gerke,11,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,16,Pole Vault,1,0,12,10-00.00
 5161299,Zach Eberle,11,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,16,Pole Vault,1,0,12,10-00.00
+5161300,Cole Gerke,11,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,16,Pole Vault,1,0,12,10-00.00
 2928620,Logan Work,12,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,16,Pole Vault,1,0,14,9-06.00
 3944341,Jordan Wilson,11,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,17,Long Jump,1,0,2,20-09.25
 6424819,Taylor Ballard,10,199045,2014-05-15,6A-4 Pacific Conference District Meet Day 1,17,Long Jump,1,0,14,18-03.75
@@ -1558,6 +1568,11 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 3944341,Jordan Wilson,11,199046,2014-05-16,6A-4 Pacific Conference District Meet Day 2,18,Triple Jump,1,0,7,38-10.50
 5155018,Karina Moreland,10,199046,2014-05-16,6A-4 Pacific Conference District Meet Day 2,36,Triple Jump,1,0,2,36-10.00
 5182730,Emily Leonard,10,199046,2014-05-16,6A-4 Pacific Conference District Meet Day 2,36,Triple Jump,1,0,9,31-09.50
+2928609,Ryan Wisner,12,198923,2014-05-24,OSAA 6A State Championships,9,High Jump,1,0,2,6-06.00
+2928601,Laura Taylor,12,198923,2014-05-24,OSAA 6A State Championships,34,Pole Vault,1,0,1,12-08.00
+3944341,Jordan Wilson,11,198923,2014-05-24,OSAA 6A State Championships,17,Long Jump,1,0,12,19-02.75
+2928601,Laura Taylor,12,198923,2014-05-24,OSAA 6A State Championships,35,Long Jump,1,0,11,16-03.50
+5155018,Karina Moreland,10,198923,2014-05-24,OSAA 6A State Championships,36,Triple Jump,1,0,5,36-09.50
 6425001,Carter Rudisill,10,227563,2015-05-08,TRL Novice District,1,100 Meters,0,0,6,11.88a
 7859469,Henry Foster,9,227563,2015-05-08,TRL Novice District,1,100 Meters,0,0,17,12.33a
 7859446,Nick Savage,9,227563,2015-05-08,TRL Novice District,1,100 Meters,0,0,28,12.74a
@@ -1790,14 +1805,14 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 7859539,Naomi White,10,227563,2015-05-08,TRL Novice District,32,Javelin,1,0,21,42-03
 12955688,Kameron Harvey,9,227563,2015-05-08,TRL Novice District,9,High Jump,1,0,2,5-04.00
 7859446,Nick Savage,9,227563,2015-05-08,TRL Novice District,9,High Jump,1,0,6,5-02.00
-7859449,Pedro Ponce,9,227563,2015-05-08,TRL Novice District,9,High Jump,1,0,16,4-10.00
 7859459,Jabril Green,9,227563,2015-05-08,TRL Novice District,9,High Jump,1,0,16,4-10.00
+7859449,Pedro Ponce,9,227563,2015-05-08,TRL Novice District,9,High Jump,1,0,16,4-10.00
 7859592,Sierra Jones,9,227563,2015-05-08,TRL Novice District,27,High Jump,1,0,3,4-04.00
 7859585,Sophie Moreland,9,227563,2015-05-08,TRL Novice District,27,High Jump,1,0,6,4-00.00
 7859570,Kelsey Downing,10,227563,2015-05-08,TRL Novice District,27,High Jump,1,0,11,3-10.00
 7859439,Ranger Valdes,9,227563,2015-05-08,TRL Novice District,16,Pole Vault,1,0,2,10-00.00
-7859480,Britton Blanchard,9,227563,2015-05-08,TRL Novice District,16,Pole Vault,1,0,9,9-00.00
 7859469,Henry Foster,9,227563,2015-05-08,TRL Novice District,16,Pole Vault,1,0,9,9-00.00
+7859480,Britton Blanchard,9,227563,2015-05-08,TRL Novice District,16,Pole Vault,1,0,9,9-00.00
 7433602,Lucas Kropp,9,227563,2015-05-08,TRL Novice District,16,Pole Vault,1,0,17,8-00.00
 7859500,Anna Williams,11,227563,2015-05-08,TRL Novice District,34,Pole Vault,1,0,5,7-06.00
 7859524,Sol Palou,11,227563,2015-05-08,TRL Novice District,34,Pole Vault,1,0,11,7-00.00
@@ -1907,6 +1922,15 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 3944341,Jordan Wilson,12,226983,2015-05-15,6A-4 Three Rivers District Meet Day 2,18,Triple Jump,1,0,12,37-08.50
 5155018,Karina Moreland,11,226983,2015-05-15,6A-4 Three Rivers District Meet Day 2,36,Triple Jump,1,0,1,36-05.00
 6424936,Jordan Anderson,10,226983,2015-05-15,6A-4 Three Rivers District Meet Day 2,36,Triple Jump,1,0,8,31-07.25
+5837393,Kate Intile,10,226153,2015-05-23,OSAA 6A State Championships,23,1500 Meters,0,0,11,4:50.77a
+6424936,Jordan Anderson,10,226153,2015-05-23,OSAA 6A State Championships,25,4x100 Relay,0,1,10,49.36a
+7859616,Makenna Bailey,9,226153,2015-05-23,OSAA 6A State Championships,25,4x100 Relay,0,1,10,49.36a
+5182730,Emily Leonard,11,226153,2015-05-23,OSAA 6A State Championships,25,4x100 Relay,0,1,10,49.36a
+5155018,Karina Moreland,11,226153,2015-05-23,OSAA 6A State Championships,25,4x100 Relay,0,1,10,49.36a
+8035512,Tabitha Shippy,9,226153,2015-05-23,OSAA 6A State Championships,30,Shot Put,1,0,15,32-00.75
+3944341,Jordan Wilson,12,226153,2015-05-23,OSAA 6A State Championships,17,Long Jump,1,0,10,20-07.25
+5155018,Karina Moreland,11,226153,2015-05-23,OSAA 6A State Championships,35,Long Jump,1,0,7,17-01.00
+5155018,Karina Moreland,11,226153,2015-05-23,OSAA 6A State Championships,36,Triple Jump,1,0,3,38-03.50
 9399949,Jake Anderson,9,251668,2016-05-06,TRL Novice District Championship,1,100 Meters,0,0,2,11.49a
 7859469,Henry Foster,10,251668,2016-05-06,TRL Novice District Championship,1,100 Meters,0,0,4,11.71a
 9433536,Mack Matthews,11,251668,2016-05-06,TRL Novice District Championship,1,100 Meters,0,0,29,12.34a
@@ -2892,6 +2916,84 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 9399971,Isaiah Coronado,11,318038,2018-05-09,6A-4 TRL District Championship Day 1,18,Triple Jump,1,0,8,40-01.50
 7859592,Sierra Jones,12,318038,2018-05-09,6A-4 TRL District Championship Day 1,36,Triple Jump,1,0,1,35-07.00
 11098794,Maggie Graham,10,318038,2018-05-09,6A-4 TRL District Championship Day 1,36,Triple Jump,1,0,9,32-08.00
+16296541,Kwabena Lynn,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,1,100 Meters,0,0,1,10.88a
+7859592,Sierra Jones,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,19,100 Meters,0,0,3,12.87a
+19659836,Corona Parker,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,19,100 Meters,0,0,8,13.57a
+16296541,Kwabena Lynn,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,2,200 Meters,0,0,3,22.26a
+14378002,Gennavieve Marion,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,20,200 Meters,0,0,7,26.63a
+17562144,Andrew McDade,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,3,400 Meters,0,0,5,51.79a
+7859616,Makenna Bailey,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,21,400 Meters,0,0,3,59.31a
+14378002,Gennavieve Marion,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,21,400 Meters,0,0,5,59.61a
+9399833,Keara Bingham,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,21,400 Meters,0,0,6,1:01.28a
+10208896,Andrew Payton,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,5,1500 Meters,0,0,1,3:59.16a
+12496504,Adam Klein,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,5,1500 Meters,0,0,6,4:09.38a
+10454028,Sam Smith,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,5,1500 Meters,0,0,19,4:28.05a
+11135840,Hannah Olson,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,23,1500 Meters,0,0,6,4:51.45a
+12181936,Olivia Seits,9,318039,2018-05-11,6A-4 TRL District Championship Day 2,23,1500 Meters,0,0,9,4:55.37a
+11098792,Kaitlyn Gearin,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,23,1500 Meters,0,0,10,4:55.90a
+12496504,Adam Klein,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,6,3000 Meters,0,0,7,9:14.38a
+9400021,Alex Pegis,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,6,3000 Meters,0,0,13,9:25.12a
+10454028,Sam Smith,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,6,3000 Meters,0,0,21,9:53.54a
+11098792,Kaitlyn Gearin,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,24,3000 Meters,0,0,2,10:23.05a
+11135840,Hannah Olson,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,24,3000 Meters,0,0,3,10:23.89a
+12181936,Olivia Seits,9,318039,2018-05-11,6A-4 TRL District Championship Day 2,24,3000 Meters,0,0,7,10:42.69a
+9123995,Rachel Krill,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,28,100m Hurdles,0,0,3,16.09a
+16812249,Savannah Taft,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,28,100m Hurdles,0,0,5,16.57a
+10149205,Katie Bayford,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,28,100m Hurdles,0,0,6,16.58a
+5683202,Jalen Hale,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,10,110m Hurdles,0,0,5,15.85a
+14378003,Luke Marion,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,10,110m Hurdles,0,0,7,16.07a
+9123995,Rachel Krill,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,29,300m Hurdles,0,0,5,47.51a
+11234230,Kainoa Sayre,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,7,4x100 Relay,0,1,2,43.09a
+16296541,Kwabena Lynn,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,7,4x100 Relay,0,1,2,43.09a
+14378003,Luke Marion,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,7,4x100 Relay,0,1,2,43.09a
+11094529,Joshua Boespflug,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,7,4x100 Relay,0,1,2,43.09a
+7859592,Sierra Jones,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,25,4x100 Relay,0,1,3,50.00a
+7859616,Makenna Bailey,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,25,4x100 Relay,0,1,3,50.00a
+19659836,Corona Parker,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,25,4x100 Relay,0,1,3,50.00a
+12052074,Jessica Olson,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,25,4x100 Relay,0,1,3,50.00a
+9123970,Davis Payton,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,8,4x400 Relay,0,1,3,3:29.11a
+9401652,Derek Leneve,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,8,4x400 Relay,0,1,3,3:29.11a
+17562144,Andrew McDade,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,8,4x400 Relay,0,1,3,3:29.11a
+16296541,Kwabena Lynn,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,8,4x400 Relay,0,1,3,3:29.11a
+9123995,Rachel Krill,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,26,4x400 Relay,0,1,2,4:03.77a
+9399833,Keara Bingham,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,26,4x400 Relay,0,1,2,4:03.77a
+14378002,Gennavieve Marion,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,26,4x400 Relay,0,1,2,4:03.77a
+7859616,Makenna Bailey,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,26,4x400 Relay,0,1,2,4:03.77a
+7875683,Gerald Saina,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,12,Shot Put,1,0,2,50-10.00
+16278177,Mariano Kis,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,12,Shot Put,1,0,6,46-08.00
+9400051,Nick Sarka,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,12,Shot Put,1,0,7,46-04.00
+7859575,Alyssa Workman,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,30,Shot Put,1,0,3,38-07.25
+8035512,Tabitha Shippy,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,30,Shot Put,1,0,6,35-09.75
+11136026,Mackenzie Mickles,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,30,Shot Put,1,0,11,31-05.75
+16278177,Mariano Kis,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,13,Discus,1,0,1,168-10
+9400051,Nick Sarka,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,13,Discus,1,0,3,138-08
+7875683,Gerald Saina,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,13,Discus,1,0,5,129-08.50
+7859575,Alyssa Workman,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,31,Discus,1,0,2,134-08
+11136026,Mackenzie Mickles,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,31,Discus,1,0,10,89-08
+8035512,Tabitha Shippy,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,31,Discus,1,0,14,80-01
+5683202,Jalen Hale,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,14,Javelin,1,0,1,178-00
+7859464,Taylor Goodhue,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,14,Javelin,1,0,18,133-03
+7859596,Maija Girardi,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,32,Javelin,1,0,4,112-09.50
+10149205,Katie Bayford,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,32,Javelin,1,0,19,77-05
+12955688,Kameron Harvey,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,9,High Jump,1,0,4,6-00.00
+12939386,Ellie Hammond,9,318039,2018-05-11,6A-4 TRL District Championship Day 2,27,High Jump,1,0,2,5-01.00
+9399890,Sydney Oleson,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,27,High Jump,1,0,3,5-00.00
+16812249,Savannah Taft,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,27,High Jump,1,0,5,4-10.00
+7859439,Ranger Valdes,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,16,Pole Vault,1,0,6,13-04.50
+22452623,Sam Katsuda,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,16,Pole Vault,1,0,9,12-06.00
+9399890,Sydney Oleson,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,34,Pole Vault,1,0,6,8-02.00
+8026156,Maile Johnson,9,318039,2018-05-11,6A-4 TRL District Championship Day 2,34,Pole Vault,1,0,8,8-02.00
+12955688,Kameron Harvey,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,17,Long Jump,1,0,2,21-06.00
+9399949,Jake Anderson,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,17,Long Jump,1,0,5,20-07.75
+9399971,Isaiah Coronado,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,17,Long Jump,1,0,10,19-06.75
+7859469,Henry Foster,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,17,Long Jump,1,0,14,18-08.75
+7859592,Sierra Jones,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,35,Long Jump,1,0,7,15-11.25
+7859593,Teagan James,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,35,Long Jump,1,0,9,15-03.75
+11098794,Maggie Graham,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,35,Long Jump,1,0,19,14-09.75
+12955688,Kameron Harvey,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,18,Triple Jump,1,0,1,45-07.25
+9399971,Isaiah Coronado,11,318039,2018-05-11,6A-4 TRL District Championship Day 2,18,Triple Jump,1,0,8,40-01.50
+7859592,Sierra Jones,12,318039,2018-05-11,6A-4 TRL District Championship Day 2,36,Triple Jump,1,0,1,35-07.00
+11098794,Maggie Graham,10,318039,2018-05-11,6A-4 TRL District Championship Day 2,36,Triple Jump,1,0,9,32-08.00
 16296541,Kwabena Lynn,11,318299,2018-05-19,OSAA 6A State Championships,1,100 Meters,0,0,5,10.87a
 16296541,Kwabena Lynn,11,318299,2018-05-19,OSAA 6A State Championships,2,200 Meters,0,0,8,22.48a
 10208896,Andrew Payton,10,318299,2018-05-19,OSAA 6A State Championships,5,1500 Meters,0,0,6,3:59.83a
@@ -3097,8 +3199,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 13028268,Zachary Hoekstra,9,352490,2019-05-10,Three Rivers League JV District,9,High Jump,1,0,4,5-04.00
 9197882,Koll Kindle,11,352490,2019-05-10,Three Rivers League JV District,9,High Jump,1,0,12,5-00.00
 10626431,Connor Steele,10,352490,2019-05-10,Three Rivers League JV District,9,High Jump,1,0,12,5-00.00
-12939323,Justin Pham,10,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
 10626431,Connor Steele,10,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
+12939323,Justin Pham,10,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
 14876517,JT Gile,11,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
 10392304,Ashley Dwyer,11,352490,2019-05-10,Three Rivers League JV District,34,Pole Vault,1,0,2,7-00.00
 14684330,Justin Thompson,9,352490,2019-05-10,Three Rivers League JV District,17,Long Jump,1,0,1,19-05.00
@@ -4344,6 +4446,26 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 27512178,Nahla McCrae,9,573129,2025-05-23,6A-5 Three Rivers League Championships,36,Triple Jump,1,0,1,11.38m
 22443139,Emily Rufener,11,573129,2025-05-23,6A-5 Three Rivers League Championships,36,Triple Jump,1,0,3,10.82m
 22443062,Lauren Rufener,11,573129,2025-05-23,6A-5 Three Rivers League Championships,36,Triple Jump,1,0,7,10.17m
+30305985,Vincent Sadighi,12,563295,2025-05-31,OSAA State Track & Field Championships,2,200 Meters,0,0,5,21.86a
+30149904,Lauren Gerlach,10,563295,2025-05-31,OSAA State Track & Field Championships,24,3000 Meters,0,0,6,10:07.80a
+30044414,Campbell Brintnall,12,563295,2025-05-31,OSAA State Track & Field Championships,28,100m Hurdles,0,0,1,14.18a
+26897429,Brock Estes,9,563295,2025-05-31,OSAA State Track & Field Championships,10,110m Hurdles,0,0,3,14.84a
+30044414,Campbell Brintnall,12,563295,2025-05-31,OSAA State Track & Field Championships,29,300m Hurdles,0,0,1,42.30a
+24784029,Cole Hachmeister,10,563295,2025-05-31,OSAA State Track & Field Championships,7,4x100 Relay,0,1,6,42.40a
+24784020,Ethan Coddington,11,563295,2025-05-31,OSAA State Track & Field Championships,7,4x100 Relay,0,1,6,42.40a
+28138590,Zhaiel Smith,12,563295,2025-05-31,OSAA State Track & Field Championships,7,4x100 Relay,0,1,6,42.40a
+30305985,Vincent Sadighi,12,563295,2025-05-31,OSAA State Track & Field Championships,7,4x100 Relay,0,1,6,42.40a
+22443139,Emily Rufener,11,563295,2025-05-31,OSAA State Track & Field Championships,25,4x100 Relay,0,1,7,48.57a
+30044414,Campbell Brintnall,12,563295,2025-05-31,OSAA State Track & Field Championships,25,4x100 Relay,0,1,7,48.57a
+27512178,Nahla McCrae,9,563295,2025-05-31,OSAA State Track & Field Championships,25,4x100 Relay,0,1,7,48.57a
+19962232,Mara Leenders,9,563295,2025-05-31,OSAA State Track & Field Championships,25,4x100 Relay,0,1,7,48.57a
+28139400,Ainsley Hutchinson,9,563295,2025-05-31,OSAA State Track & Field Championships,26,4x400 Relay,0,1,10,4:03.67a
+22463869,Ciena Harmon,11,563295,2025-05-31,OSAA State Track & Field Championships,26,4x400 Relay,0,1,10,4:03.67a
+19962232,Mara Leenders,9,563295,2025-05-31,OSAA State Track & Field Championships,26,4x400 Relay,0,1,10,4:03.67a
+30044414,Campbell Brintnall,12,563295,2025-05-31,OSAA State Track & Field Championships,26,4x400 Relay,0,1,10,4:03.67a
+22432939,Quinn Bowker,11,563295,2025-05-31,OSAA State Track & Field Championships,14,Javelin,1,0,15,48.44m
+27512178,Nahla McCrae,9,563295,2025-05-31,OSAA State Track & Field Championships,35,Long Jump,1,0,3,5.54m
+27512178,Nahla McCrae,9,563295,2025-05-31,OSAA State Track & Field Championships,36,Triple Jump,1,0,6,11.02m
 30847761,Grant Otte,11,624244,2026-05-15,2026 TRL JV District Championships,1,100 Meters,0,0,3,11.53a
 32615059,Joshua Guerrero,11,624244,2026-05-15,2026 TRL JV District Championships,1,100 Meters,0,0,17,11.99a
 30962647,Samuel Owenius-Dore,9,624244,2026-05-15,2026 TRL JV District Championships,1,100 Meters,0,0,26,12.18a

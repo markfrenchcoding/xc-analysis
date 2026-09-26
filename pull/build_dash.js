@@ -164,7 +164,7 @@ const wBlock = block(wwRows.map((r) => r.map((v) => (v == null ? '' : v)).join('
 
 const info = {
   teamId, label: meta.label, from: meta.from, to: meta.to,
-  horizon: meta.horizon, pulled: meta.pulled,
+  horizon: meta.horizon, solid: meta.solid || meta.horizon, pulled: meta.pulled,
   sports: { xc: results.filter((r) => r.sport === 'xc').length,
     tfo: results.filter((r) => r.sport === 'tfo').length },
   fieldMarksSkipped: meta.fieldMarksSkipped || 0,

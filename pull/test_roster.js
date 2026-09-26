@@ -247,7 +247,14 @@ ok(seasons.length > 3000, 'and real athlete-seasons — ' + seasons.length);
 ok(seasons.some(s => s.sport === 'xc') && seasons.some(s => s.sport === 'tfo'),
   'from both sports');
 ok(seasons.some(s => s.best1500), 'with track distances of their own');
-eq(meta.horizon, R.FIRST_SEASON, 'the horizon is recorded beside the data');
+/* THE HORIZON IS MEASURED, NOT DECLARED. FIRST_SEASON is where the season
+   pulls start asking; the bio endpoint reaches further back than that, so the
+   recorded horizon has to be whatever the data actually holds or the page
+   prints a start date it is already contradicting. `solid` is the first
+   season with enough in it to reason about. */
+ok(meta.horizon <= R.FIRST_SEASON, 'the horizon is measured from the data, not declared');
+ok(meta.solid >= meta.horizon, 'and the first solid season is at or after it');
+ok(meta.solid <= 2006, 'which for this school is the middle of the decade');
 
 const disputed = athletes.filter(a => a.classOfConflict === '1');
 ok(disputed.length / athletes.length < 0.02,
@@ -298,18 +305,24 @@ for (const [name, times] of TRUST) {
 ok(!byName.has('melissa arndofer'), 'the sheet\'s spelling is not what the database holds');
 
 /* Meghan Peyton was the one athlete of the nineteen cross country could not
-   find at all, and adding track found her: two marks in the spring of 2004,
-   which is the first season athletic.net has for this school. She is
-   unknown-gap rather than observed, correctly - 2004 carries almost no
-   freshman results, so there is no evidence either way about how she started.
+   find at all. Adding track found her with two marks in 2004; taking every
+   race rather than every season best found her whole career - fourteen
+   results back to 2001, INCLUDING HER FRESHMAN YEAR.
 
-   This is the horizon working rather than a bug, and it is the argument for
-   both sports in one sentence: a record built on autumns alone is missing
-   every athlete whose season was a spring. */
+   She used to be unknown-gap at the edge of coverage, which was the honest
+   answer on two rows and is the wrong one on fourteen. The season pulls start
+   at FIRST_SEASON and the bio endpoint does not, so this record reaches three
+   years further back than the horizon this project had always printed.
+
+   It is the argument for both sports and for every race in one athlete: a
+   record built on autumns alone missed her completely, and a record built on
+   season bests had her as a senior who came from nowhere. */
 const mp = byName.get('meghan peyton');
 ok(mp, 'Meghan Peyton is in the pull once track is included');
 eq(mp.classOf, '2004', 'class of 2004, at the very edge of coverage');
-eq(mp.entry, 'unknown-gap', 'and her entry is unknown rather than guessed');
+eq(mp.entry, 'observed', 'and every race finds the freshman year that was missing');
+eq(mp.entryGrade, '9', 'she started in grade 9 after all');
+eq(mp.firstSeason, '2001', 'THREE YEARS BEFORE the horizon the season pulls declare');
 
 /* ---------- the two who looked like late entries, and were not ----------
    With cross country alone both first appear in grade 10, and the

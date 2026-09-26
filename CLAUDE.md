@@ -987,7 +987,11 @@ freshman year**: 306 observed freshman entries against 239 confirmed late ones,
 completion rate reads — the figure below is completion among freshman entrants,
 and there is a second, larger population it says nothing about.
 
-**Four-year completion, distance athletes: boys 46%, girls 44%.** It was 42%
+**Four-year completion, distance athletes: boys 45%, girls 50%.** The girls
+moved six points when every track race replaced the season bests, and that is
+the same effect as adding track in the first place, one level deeper: a
+freshman who raced one heat and never set a season best was invisible, and now
+she is a freshman entry. Every figure below predates that change. It was 42%
 and 44% on cross country alone; track lifts the boys by finding freshman years
 that were springs. As far as I can tell nobody has published this for any
 program in the sport. Five things it is not: it counts athletes who *raced a recorded 5k* as a freshman rather than
@@ -1013,16 +1017,26 @@ over unless the page says so.
 
 The freshman-to-sophomore step being the largest survives in every population.
 
-### The horizon
+### The horizon, which is measured now and used to be declared
 
-athletic.net's Tualatin coverage stops before 2004 and thins before about 2008.
-`FIRST_SEASON` records it and it is written into `t284_meets.json`, because an
-"all-time" board that is silently a "since 2005" board is the same failure as a
-stale `DATA_DATE`. The 47 unknown-gap entries cluster at the front of the record,
-which is the horizon showing up honestly rather than being papered over.
+An "all-time" board that is silently a "since 2005" board is the same failure as
+a stale `DATA_DATE`, so the horizon is recorded in `t284_meets.json` and printed
+on the page. It used to be `FIRST_SEASON`, the year the pull starts asking. That
+is not the same thing as the year the record begins, and the difference bit the
+moment every track race came in: **the bio endpoint reaches back to 2001**, three
+years past the 2004 the page had always printed.
 
-Meghan Peyton is outside it under either name. That is a test, so a later pull
-reaching further back fails here rather than surprising somebody.
+**Two numbers, because one misleads.** `horizon` is the earliest season with
+anything in it — 2001. `solid` is the first season with enough in it to reason
+about — 2004. Before that the record is 27 results over 13 athletes, which is a
+scattering rather than a squad, and the footer says so in those words.
+
+**Meghan Peyton is inside it now, and that is the whole argument in one
+athlete.** Cross country could not find her at all. Season bests found her as a
+senior who came from nowhere, entry `unknown-gap`. Every race gives her fourteen
+results back to 2001 **including her freshman year**, so she is `observed` with
+an entry grade of 9. The test asserts the new answer and says why the old one
+was honest on two rows and wrong on fourteen.
 
 ### Track, through a different door
 
@@ -1124,6 +1138,30 @@ somebody did not run.
 
 **The pace is 300ms and was measured, not guessed.** 25 for 25 clean at 300ms;
 **10 of 25 refused at 120ms**.
+
+### What every race changed, and what it cost
+
+**15,905 track races against 5,263 season bests.** Mark French: 49 individual
+races over four years and 12 in his senior season, where the old pull showed
+four. 4,705 championship placings over 74 meets, against 1,602 over 43 — the
+meet universe was previously whatever meets happened to host a season best.
+
+**Two published numbers moved and both moved for the right reason.** Four-year
+completion went 46% to 45% for the boys and **44% to 50% for the girls**;
+late entry 28% to 29%. More track seasons resolve more `classOf` votes and more
+entry grades, and a freshman who raced one heat without setting a season best
+now counts as having been here.
+
+**Twenty-seven athletes left the record, and that is a correction rather than a
+loss.** They are throwers, jumpers and hurdlers whose only flat-run "times"
+were relay splits — and the season-bests endpoint does not distinguish a split
+from an open race, so their 4x400 legs had been published as open 400m marks
+all along. A relay leg is not a solo run, which this project already knew and
+could not previously enforce.
+
+**It cost 115KB of data on disk, 31KB gzipped.** That is the whole growth; the
+page's own code did not change size for it. A complete track record is worth
+more than the bytes.
 
 ### eventMetres refused three names it should not have
 
@@ -1874,8 +1912,8 @@ units renders at about 10px on a 375px column, which is too small. `--axt` is
 
 ### What it says
 
-Over distance athletes, four-year completion is **46% boys, 44% girls**, and
-**28% of the boys joined after grade 9**. The girls' senior year is **negative**
+Over distance athletes, four-year completion is **45% boys, 50% girls**, and
+**29% of the boys joined after grade 9** — 41% of the girls. The girls' senior year is **negative**
 across every population on the cross country ruler, and the boys' turns negative
 too once you switch to the track 3,000m. None of that is visible on any board,
 in any poll, or in any result athletic.net publishes.

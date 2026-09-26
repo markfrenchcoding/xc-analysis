@@ -637,6 +637,36 @@ function main() {
       + ' like a season somebody did not run.');
     process.exit(2);
   }
+  /* THE BIO ROWS CARRY NO IDENTITY, and the first version of this shipped
+     without noticing: a result row has an AthleteID and nothing else, so 956
+     of 1,552 athletes came out with no gender at all and fell off both boards
+     silently. "Athletes on record" went from 427 to 339 and every one of the
+     missing was still in the file.
+
+     The identity is already known - the cross country grid and the season-best
+     records both carry the name and the gender on every row, and the id list
+     the bio stage walked was built from exactly those two. So it is a lookup
+     rather than another request. Anything a race row cannot say about who ran
+     it comes from here. */
+  const who = new Map();
+  for (const r of [...xc.rows, ...tf.rows]) {
+    if (!r.athleteId) continue;
+    const o = who.get(r.athleteId) || {};
+    if (!o.gender && r.gender) o.gender = r.gender;
+    if (!o.first && r.first) o.first = r.first;
+    if (!o.last && r.last) o.last = r.last;
+    who.set(r.athleteId, o);
+  }
+  let noName = 0;
+  for (const r of races.rows) {
+    const o = who.get(r.athleteId);
+    if (!o || !o.gender) { noName++; continue; }
+    r.gender = r.gender || o.gender;
+    r.first = r.first || o.first || '';
+    r.last = r.last || o.last || '';
+  }
+  if (noName) log('    ' + noName + ' race rows whose athlete is not in the roster');
+
   tf.rows = races.rows;
   // merge without clobbering: a named meet beats an unnamed one either way round
   for (const [mid, m] of Object.entries(races.meets))
@@ -691,7 +721,25 @@ function main() {
     [...seasons.values()].sort((a, b) => a.athleteId - b.athleteId || a.schoolYear - b.schoolYear)));
 
   fs.writeFileSync(stem + 'meets.json', JSON.stringify({
-    teamId, label, from, to, horizon: FIRST_SEASON,
+    teamId, label, from, to,
+    /* THE HORIZON IS MEASURED, NOT DECLARED. FIRST_SEASON is where the pull
+       starts asking; it is not where the record begins. The bio endpoint
+       reaches back further than the season pulls do - Meghan Peyton's
+       freshman year is 2001, three years before the 2004 this project has
+       always printed - and a page that says "the record starts in 2004" while
+       holding a 2001 race is the same failure as a stale DATA_DATE.
+
+       Two numbers, because one would mislead. `horizon` is the earliest
+       season with anything in it at all. `solid` is the first season with
+       enough in it to reason about, which is what most of the page's
+       statistics actually rest on; before it the record is a scattering. */
+    horizon: Math.min(...rows.map((r) => r.season)),
+    solid: (() => {
+      const n = {};
+      for (const r of rows) n[r.season] = (n[r.season] || 0) + 1;
+      const ys = Object.keys(n).map(Number).sort((a, b) => a - b);
+      return ys.find((y) => n[y] >= 100) || ys[0];
+    })(),
     pulled: new Date().toISOString().slice(0, 10),
     sports: { xc: xc.rows.length, tfo: tf.rows.length },
     fieldMarksSkipped: tf.field,
