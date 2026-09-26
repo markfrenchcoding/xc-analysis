@@ -73,17 +73,39 @@ const results = allResults.filter((r) => distIds.has(r.athleteId));
 
 const ai = new Map(athletes.map((a, i) => [a.athleteId, i]));
 
-// meets, ordered by date so the index is also a rough chronology
-const meetIds = [...new Set(results.map((r) => r.meetId))].filter(Boolean);
+/* Meets, keyed sport|id because an id means nothing without its sport, and
+   ordered by date so the index is also a rough chronology.
+
+   THE DATE COMES FROM THE RACES, NOT FROM THE MEET RECORD. athletic.net gives
+   a meet an EndDate, and a two-day championship has one of those and two days
+   of racing - so 147 track results were stamped a day or two after the day
+   the athlete actually ran. The meet's date is the earliest of its own
+   results, and anybody who raced later carries the offset in days. That is
+   one extra character on 200 rows out of 24,781 and exact for all of them. */
+const key = (r) => r.sport + '|' + r.meetId;
+const meetIds = [...new Set(results.filter((r) => r.meetId).map(key))];
 const meetInfo = new Map();
 for (const r of results) {
-  if (r.meetId && !meetInfo.has(r.meetId)) {
-    meetInfo.set(r.meetId, (meta.meets[r.meetId] || { date: r.date, name: '' }));
+  if (!r.meetId || !r.date) continue;
+  const k = key(r);
+  const was = meetInfo.get(k);
+  if (!was || r.date < was.date) {
+    meetInfo.set(k, { date: r.date, name: (meta.meets[k] || {}).name || '' });
   }
+}
+for (const k of meetIds) {
+  if (!meetInfo.has(k)) meetInfo.set(k, { date: '', name: (meta.meets[k] || {}).name || '' });
 }
 meetIds.sort((x, y) => ((meetInfo.get(x) || {}).date || '')
   .localeCompare((meetInfo.get(y) || {}).date || ''));
 const mi = new Map(meetIds.map((m, i) => [m, i]));
+const DAY = 86400000;
+const dayOffset = (r) => {
+  const m = meetInfo.get(key(r));
+  if (!m || !m.date || !r.date || r.date === m.date) return '';
+  const d = Math.round((Date.parse(r.date) - Date.parse(m.date)) / DAY);
+  return d > 0 && d < 30 ? d : '';
+};
 
 const events = [...new Set(results.map((r) => r.event).filter(Boolean))].sort();
 const ei = new Map(events.map((e, i) => [e, i]));
@@ -125,17 +147,34 @@ const aBlock = block(athletes.map((a) => [
   a.classOfConflict, a.entryGrade || '', Math.max(0, ENTRY.indexOf(a.entry)),
 ].join(',')));
 
+/* INTEGER HUNDREDTHS, BOTH BLOCKS, AND THE SEASON BLOCK CARRIES NO TIMES.
+
+   These two writers used to round differently - results to hundredths, the
+   season block to nothing at all - so one race was 963.95 in one block and
+   963.949 in the other, and the page's formatter rounds to tenths, which the
+   two straddle. Tyler Williams' 5,000m printed as 16:04.0 on the Board and
+   16:03.9 on his own page.
+
+   Rounding both the same way would fix the symptom and leave the cause: two
+   places storing one number. So the season block stops storing times. It
+   keeps the grade and the race count, which are the things only it knows, and
+   the page derives every best from the results the way it already derives a
+   career best. One source, and no way back to two.
+
+   Verified lossless before the change: seconds x 100 is an exact float
+   integer for all 16,020 result rows. */
+const H = (v) => Math.round(+v * 100);
+
 const sBlock = block(seasons
   .filter((s) => ai.has(s.athleteId))
   .map((s) => [ai.get(s.athleteId), s.schoolYear, Math.max(0, SPORT.indexOf(s.sport)),
-    s.grade || '', s.nRaces, s.best800 || '', s.best1500 || '', s.best3000 || '',
-    s.best5000 || ''].join(',')));
+    s.grade || '', s.nRaces].join(',')));
 
 const rBlock = block(results
-  .filter((r) => ai.has(r.athleteId) && mi.has(r.meetId))
-  .map((r) => [ai.get(r.athleteId), mi.get(r.meetId), Math.max(0, SPORT.indexOf(r.sport)),
-    r.event ? ei.get(r.event) : '', r.dist, Math.round(+r.seconds * 100) / 100,
-    r.place || ''].join(',')));
+  .filter((r) => ai.has(r.athleteId) && mi.has(key(r)))
+  .map((r) => [ai.get(r.athleteId), mi.get(key(r)), Math.max(0, SPORT.indexOf(r.sport)),
+    r.event ? ei.get(r.event) : '', r.dist, H(r.seconds),
+    r.place || '', dayOffset(r)].join(',')));
 
 const mBlock = block(meetIds.map((m) => {
   const o = meetInfo.get(m) || {};

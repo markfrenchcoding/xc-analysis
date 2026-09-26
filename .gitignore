@@ -19,3 +19,6 @@ pull/whoswho/raw/
 
 # the bio cache is a resume file, not data
 pull/roster/*_bio.jsonl
+
+# the audit baseline is a working file, regenerated with --baseline
+pull/roster/.page-baseline.json

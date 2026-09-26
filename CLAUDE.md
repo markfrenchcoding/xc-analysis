@@ -1879,6 +1879,73 @@ Escape puts the tooltip away. The `aria-label` says how many marks there are and
 that the arrows work. Program went to 26 stops, Plan to 9, Athlete to 13. The
 Board keeps 109, and should: a hundred of those are real links to real people.
 
+### One source for every time
+
+The page shipped two answers for one race. `d-results` rounded to hundredths
+and `d-seasons` wrote the raw float — two adjacent lines in `build_dash.js` —
+so Tyler Williams' 5,000m was `963.95` in one block and `963.949` in the other,
+and the formatter rounded to tenths, which the two straddle: **16:04.0 on the
+Board and 16:03.9 on his own page.**
+
+**The season block carries no times at all now.** It keeps the grade and the
+race count, which are the two things only it knows, and every best is derived
+from the results the way career bests already were. Rounding both writers the
+same way would have fixed the symptom and left the cause: two places storing
+one number.
+
+**Times are integer hundredths in the block**, and `sec` is derived from that
+integer in exactly one place, so two values from one race are the same float by
+construction. Verified lossless first: `seconds × 100` is an exact float
+integer for all 16,020 rows.
+
+**The audit compares stored values, never rounded ones.** My first version
+rounded before comparing and reported that the two sources agreed on all 1,112
+athlete-rulers — true at hundredths, and silent about what the page was
+printing. `pull/test_page.js` reads the built page's own blocks and asserts the
+season block has five columns and none of them is a time, so a block that grows
+one back fails before a reader sees it.
+
+### Meet ids are per sport, like division ids
+
+Meet 31671 is a cross country race on 2010-09-08 **and** a track dual called
+"Newberg vs Tualatin" on 2007-04-11. The two meet tables were merged on the
+bare id, the track entry won, and 53 cross country results were stamped with a
+track meet's name and a date three years wrong — which put Mary Howard's 2010
+season best in her 2011 season, because the page works out the school year from
+the date. Keyed `sport|id` now.
+
+**A meet's date is the earliest of its own races.** athletic.net gives a meet
+an `EndDate`, and a two-day championship has one of those and two days of
+racing, so 147 track results were stamped a day or two after the day the
+athlete ran. Anyone who raced later carries the offset in days: one extra
+character on 200 rows of 24,781, and exact for all of them.
+
+### The precision that exists, and no more
+
+`mmss` rounded to tenths, which is nobody's rule. Asked directly, athletic.net
+gives these times as **24:37**, **24:33.8** and **16:03.95** — it prints
+whatever the timing produced and invents nothing. So does this page now.
+
+Rounding to tenths did real damage beyond the drift: Tyler Williams and Nathan
+Love are a hundredth apart and both printed 16:04.0, so the board ranked them 9
+and 10 for no visible reason.
+
+**A measured time and a modelled one are different kinds of number.** `secs()`
+prints what a stopwatch produced; `est()` is for the times the page works out
+for itself — an expectation, a projection — and rounds to the tenth, because
+"17:08.02" claims a hundredth that came out of a fit over forty team-mates.
+
+**One tie rule.** Equal to the hundredth is equal and shares a place: T-9, T-9,
+then 11. Anything finer is not a difference this data can defend — athletic.net
+stores hundredths and a cross country course is not measured to the centimetre.
+
+**Two ruler-gap figures moved**, and the cause is the fix rather than a new
+choice. The track-against-cross-country offset for boys went +3.63 to +3.62,
+median +3.56 to +3.50, over 265 athlete-seasons rather than 264: season bests
+are now derived by the calendar school year from corrected meet dates, so one
+more season pairs up. Everything else held — 427 athletes, 45% and 50%
+completion, 77s over four years, Caleb Lakeman first.
+
 ### Metres, and a phone that fills
 
 **"1500m", never "1.5k".** Nobody at a track meet says "the 1.5k" and nobody

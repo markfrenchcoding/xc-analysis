@@ -154,7 +154,7 @@ function main() {
   const meets = new Map();
   for (const r of results) {
     if (r.sport !== 'tfo' || !r.meetId) continue;
-    const m = meta.meets[r.meetId];
+    const m = meta.meets['tfo|' + r.meetId] || meta.meets[r.meetId];
     if (!m || !CHAMP.test(m.name || '')) continue;
     meets.set(r.meetId, m);
   }

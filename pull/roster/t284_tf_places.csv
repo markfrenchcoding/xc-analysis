@@ -221,14 +221,14 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 140029,Jared Richtor,9,29386,2007-05-04,Pacific JV District,14,Javelin,1,0,1,126'7
 118470,Glesty Waters,9,29386,2007-05-04,Pacific JV District,14,Javelin,1,0,6,101'0
 113491,Nate Perkins,11,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,3,5'2
-113490,Keenan Lopez,11,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,4,5'0
 116366,Evan Miller,12,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,4,5'0
+113490,Keenan Lopez,11,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,4,5'0
 86596,Chase Thompson,9,29386,2007-05-04,Pacific JV District,9,High Jump,1,0,5,4'9
 113496,Nathan Andrews,9,29386,2007-05-04,Pacific JV District,16,Pole Vault,1,0,2,9'0
 86596,Chase Thompson,9,29386,2007-05-04,Pacific JV District,16,Pole Vault,1,0,6,7'6
 16247,Emily Teters,12,29386,2007-05-04,Pacific JV District,34,Pole Vault,1,0,3,7'0
-113423,Jane Dominick,9,29386,2007-05-04,Pacific JV District,34,Pole Vault,1,0,5,6'6
 113418,Stephanie Tate,10,29386,2007-05-04,Pacific JV District,34,Pole Vault,1,0,5,6'6
+113423,Jane Dominick,9,29386,2007-05-04,Pacific JV District,34,Pole Vault,1,0,5,6'6
 113491,Nate Perkins,11,29386,2007-05-04,Pacific JV District,17,Long Jump,1,0,2,18'6.25
 175489,Brandon Kelly,9,29386,2007-05-04,Pacific JV District,17,Long Jump,1,0,6,17'3.5
 113422,Alexa Derby,9,29386,2007-05-04,Pacific JV District,35,Long Jump,1,0,1,14'2.5
@@ -500,8 +500,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 113429,Courtney Thomas,11,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,8,29.47a
 747811,Malory Turner,9,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,9,30.23a
 825099,Olivia Patton,11,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,10,30.41a
-747857,Anna-Sofia Knieling,12,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,14,31.05a
 747828,Krista Collins,10,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,14,31.05a
+747857,Anna-Sofia Knieling,12,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,14,31.05a
 763408,Alee Sha Ochoa-Bass,9,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,17,31.23a
 755360,Marlene Stockenhuber,12,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,18,31.35a
 139512,Jordan Taylor,11,63322,2009-05-08,Pacific JV District Meet,20,200 Meters,0,0,19,31.50a
@@ -528,8 +528,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 747810,Erin Olson,9,63322,2009-05-08,Pacific JV District Meet,22,800 Meters,0,0,11,3:07.47a
 82766,William Peters,11,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,1,4:40.14a
 289000,Jason Cross,10,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,6,4:56.49a
-288998,Riley Compton,10,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,9,5:01.73a
 237627,Matthew Veteto,10,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,9,5:01.73a
+288998,Riley Compton,10,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,9,5:01.73a
 516230,Nathan Love,9,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,1,4:37.47a
 763410,Dylan Moore,9,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,5,4:56.06a
 755141,Casey Davis,9,63322,2009-05-08,Pacific JV District Meet,5,1500 Meters,0,0,16,5:35.85a
@@ -614,8 +614,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 763407,Hayden Anderson,9,63322,2009-05-08,Pacific JV District Meet,14,Javelin,1,0,1,108-00
 747825,Alyssa Boring,10,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,7,77-06
 755140,Celeste Cota-Wockenfoss,9,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,8,77-01
-769045,Adriana Stone,9,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,15,64-10
 830312,Cori Dion,11,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,15,64-10
+769045,Adriana Stone,9,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,15,64-10
 747845,Jamie Andrews,10,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,18,63-09
 747803,Madison Frazier,9,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,19,63-04
 769047,Leticia Tafolla,9,63322,2009-05-08,Pacific JV District Meet,32,Javelin,1,0,22,56-07
@@ -2163,12 +2163,12 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 7859449,Pedro Ponce,10,251668,2016-05-06,TRL Novice District Championship,9,High Jump,1,0,5,5-04.00
 9400006,Jackson Metler,9,251668,2016-05-06,TRL Novice District Championship,9,High Jump,1,0,19,4-08.00
 7859570,Kelsey Downing,11,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,12,4-00.00
-9399936,Megan Sweeney,9,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,12,4-00.00
 9399885,Paige Melton,9,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,12,4-00.00
+9399936,Megan Sweeney,9,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,12,4-00.00
 8668729,Natasha Arnan,9,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,12,4-00.00
+7859582,Tatum Steele,10,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,20,3-10.00
 7859585,Sophie Moreland,10,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,20,3-10.00
 6424954,Candace Doss,11,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,20,3-10.00
-7859582,Tatum Steele,10,251668,2016-05-06,TRL Novice District Championship,27,High Jump,1,0,20,3-10.00
 7859464,Taylor Goodhue,10,251668,2016-05-06,TRL Novice District Championship,16,Pole Vault,1,0,1,10-03.00
 9399949,Jake Anderson,9,251668,2016-05-06,TRL Novice District Championship,16,Pole Vault,1,0,2,9-06.00
 7433602,Lucas Kropp,10,251668,2016-05-06,TRL Novice District Championship,16,Pole Vault,1,0,4,9-06.00
@@ -2794,8 +2794,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 12978316,Naroa Mentxaka,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,32,Javelin,1,0,32,48-09
 11135813,Duncan Taft,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,9,High Jump,1,0,2,5-06.00
 9197882,Koll Kindle,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,9,High Jump,1,0,6,5-06.00
-12979188,Noah Da Costa,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,9,High Jump,1,0,12,5-00.00
 14378128,Malcolm Tatum Jr,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,9,High Jump,1,0,12,5-00.00
+12979188,Noah Da Costa,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,9,High Jump,1,0,12,5-00.00
 12979312,Ryan Janetsky,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,9,High Jump,1,0,17,4-10.00
 7433602,Lucas Kropp,12,344974,2018-05-04,TRL JV District Meet at Tualatin HS,16,Pole Vault,1,0,2,10-06.00
 12172519,Phillip Pierce,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,16,Pole Vault,1,0,8,8-06.00
@@ -2804,8 +2804,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 9614852,Tyler Goodell,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,16,Pole Vault,1,0,25,7-00.00
 13016110,Kiana Jones,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,34,Pole Vault,1,0,9,7-00.00
 19289443,Cate Phipps Louis,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,34,Pole Vault,1,0,10,6-06.00
-10392304,Ashley Dwyer,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,34,Pole Vault,1,0,20,6-00.00
 11135831,Jenifer Pascual,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,34,Pole Vault,1,0,20,6-00.00
+10392304,Ashley Dwyer,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,34,Pole Vault,1,0,20,6-00.00
 13113835,Ty Mazelin,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,17,Long Jump,1,0,6,18-05.00
 9197882,Koll Kindle,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,17,Long Jump,1,0,11,17-08.50
 12979318,Kyle Kamp,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,17,Long Jump,1,0,11,17-08.50
@@ -2824,10 +2824,10 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 11098813,Zoey Merriman,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,8,13-07.00
 13238259,Kaylene Arriola,12,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,10,13-00.00
 11098779,Lauren Cangelosi,12,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,12,12-10.50
-12978025,Alyssa Buckler,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,16,12-08.50
 9399823,Victoria Anderson,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,16,12-08.50
-9399897,Pamela Pappoe,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,22,12-01.50
+12978025,Alyssa Buckler,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,16,12-08.50
 13016110,Kiana Jones,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,22,12-01.50
+9399897,Pamela Pappoe,11,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,22,12-01.50
 12939396,Annabelle Nguyen,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,27,11-11.00
 12939360,Jessica Atkins,9,344974,2018-05-04,TRL JV District Meet at Tualatin HS,35,Long Jump,1,0,33,10-10.00
 13862266,Samuel Pereda,10,344974,2018-05-04,TRL JV District Meet at Tualatin HS,18,Triple Jump,1,0,1,40-02.75
@@ -3199,8 +3199,8 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 13028268,Zachary Hoekstra,9,352490,2019-05-10,Three Rivers League JV District,9,High Jump,1,0,4,5-04.00
 9197882,Koll Kindle,11,352490,2019-05-10,Three Rivers League JV District,9,High Jump,1,0,12,5-00.00
 10626431,Connor Steele,10,352490,2019-05-10,Three Rivers League JV District,9,High Jump,1,0,12,5-00.00
-10626431,Connor Steele,10,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
 12939323,Justin Pham,10,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
+10626431,Connor Steele,10,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
 14876517,JT Gile,11,352490,2019-05-10,Three Rivers League JV District,16,Pole Vault,1,0,9,8-06.00
 10392304,Ashley Dwyer,11,352490,2019-05-10,Three Rivers League JV District,34,Pole Vault,1,0,2,7-00.00
 14684330,Justin Thompson,9,352490,2019-05-10,Three Rivers League JV District,17,Long Jump,1,0,1,19-05.00
@@ -3834,15 +3834,15 @@ athleteId,athlete,grade,meetId,date,meet,eventId,event,isField,relay,place,mark
 22444008,Makayla Dye,9,490032,2023-05-12,TRL JV Districts,32,Javelin,1,0,23,40' 10
 19965522,Declan Hedlund,12,490032,2023-05-12,TRL JV Districts,9,High Jump,1,0,1,5' 4
 22416079,Elijah Pratt,9,490032,2023-05-12,TRL JV Districts,9,High Jump,1,0,6,5' 0
-15936686,Isabella Hernandez,9,490032,2023-05-12,TRL JV Districts,27,High Jump,1,0,2,4' 2
 22443062,Lauren Rufener,9,490032,2023-05-12,TRL JV Districts,27,High Jump,1,0,2,4' 2
+15936686,Isabella Hernandez,9,490032,2023-05-12,TRL JV Districts,27,High Jump,1,0,2,4' 2
 22443021,Dasha Gordienko,9,490032,2023-05-12,TRL JV Districts,27,High Jump,1,0,7,4' 0
 22344338,Logan Nebling,9,490032,2023-05-12,TRL JV Districts,16,Pole Vault,1,0,1,8' 6
 19952815,Damian Long,11,490032,2023-05-12,TRL JV Districts,16,Pole Vault,1,0,13,6' 6
 22442929,Samantha Page,9,490032,2023-05-12,TRL JV Districts,34,Pole Vault,1,0,4,6' 6
 22442935,Olivia Casals,10,490032,2023-05-12,TRL JV Districts,34,Pole Vault,1,0,6,6' 6
-19983629,Sophia Lawrence,10,490032,2023-05-12,TRL JV Districts,34,Pole Vault,1,0,7,6' 0
 22340689,Evelyn Rusnac,9,490032,2023-05-12,TRL JV Districts,34,Pole Vault,1,0,7,6' 0
+19983629,Sophia Lawrence,10,490032,2023-05-12,TRL JV Districts,34,Pole Vault,1,0,7,6' 0
 22433217,Dane Bakke,9,490032,2023-05-12,TRL JV Districts,17,Long Jump,1,0,14,15' 10
 22433190,Braden Sovey,9,490032,2023-05-12,TRL JV Districts,17,Long Jump,1,0,22,15' 6.5
 26923431,Jack Baxter,9,490032,2023-05-12,TRL JV Districts,17,Long Jump,1,0,25,15' 3.75

@@ -676,7 +676,21 @@ function main() {
      country, which is strictly more evidence for the same inference - an
      athlete who ran one autumn and three springs now resolves. */
   const rows = [...xc.rows, ...tf.rows];
-  const meets = { ...xc.meets, ...tf.meets };
+  /* MEET IDS ARE PER SPORT, the same way division ids are, and merging the two
+     tables on the bare id silently destroys one of every colliding pair.
+
+     Meet 31671 is a cross country race on 2010-09-08 AND a track dual called
+     "Newberg vs Tualatin" on 2007-04-11. The track entry won the spread, so 53
+     cross country results were stamped with a track meet's name and a date
+     three years wrong - which then put Mary Howard's 2010 season best in her
+     2011 season, because the page works out the school year from the date.
+
+     One line of damage, and it is the same lesson already recorded for
+     DivisionHome/GetTree: an id means nothing without the sport it belongs
+     to. Keyed sport|id from here on. */
+  const meets = {};
+  for (const [id, m] of Object.entries(xc.meets)) meets['xc|' + id] = m;
+  for (const [id, m] of Object.entries(tf.meets)) meets['tfo|' + id] = m;
   const empty = xc.empty;
 
   const athletes = entryOf(buildAthletes(rows), rows);
