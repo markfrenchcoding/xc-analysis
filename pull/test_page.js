@@ -200,6 +200,32 @@ for (const g of ['M', 'F']) {
     + sameString + ' pairs that merely PRINT the same');
 }
 
+/* ---------- 5b. a grade that is not a high school grade ----------
+   byGrade has bins for 9, 10, 11 and 12 and nothing else, so any other grade
+   reaching it is bins[undefined].push(...) and the athlete's whole page
+   renders empty. gradeMap's fallback path has always tested the range and its
+   lookup path never did.
+
+   Seventeen athletes across the two schools carry one - grade 8, 7 and 6 are
+   middle-schoolers who raced up, 13 and 21 are upstream nonsense - and every
+   one of their pages was blank. Nobody had clicked one until somebody clicked
+   Evylee Bugher, who ran a track season here in grade 8.
+
+   The rule is LIFTED FROM THE PAGE BY TEXT rather than restated here, the way
+   test_crawl.js lifts the crawl's write guard, so this fails if the clamp is
+   taken out rather than passing against a stale copy of it. */
+const gmAt = html.indexOf('function gradeMap(');
+const gmBody = gmAt < 0 ? '' : html.slice(gmAt, gmAt + 900);
+ok(/const HS_GRADE=/.test(html), 'the page defines a high-school grade clamp');
+ok(gmBody.indexOf('if(got)return HS_GRADE(got);') >= 0,
+  'and gradeMap clamps the grade it looked up, not just the one it derived');
+ok(gmBody.indexOf('return HS_GRADE(12-(a.classOf-sy));') >= 0,
+  'and the derived one too');
+const oddGrades = S.filter((x) => x.grade && (x.grade < 9 || x.grade > 12));
+ok(true, 'season rows with a grade outside 9-12: ' + oddGrades.length
+  + ' over ' + new Set(oddGrades.map((x) => x.a)).size + ' athletes'
+  + ' (kept in the archive, clamped out of the four-year curve)');
+
 /* ---------- 6. the baseline: what every number on the page says today ----------
 
    THE KEY IS THE ATHLETE ID, NOT THEIR ROW. Everything above works off the

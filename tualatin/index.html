@@ -24186,6 +24186,20 @@ const YEAR_NAME={9:'Freshman',10:'Sophomore',11:'Junior',12:'Senior'};
 const YEAR_ABBR={9:'Fr',10:'So',11:'Jr',12:'Sr'};
 const schoolYearOf=d=>+d.slice(0,4)+(+d.slice(5,7)>=7?1:0);
 
+/* NINE TO TWELVE, ON BOTH PATHS. The fallback below has always tested the
+   range and the lookup above never did, so a season row carrying any other
+   grade was returned as-is - and byGrade only has bins for 9, 10, 11 and 12,
+   so the next line was bins[8].push(...) on undefined and the athlete's whole
+   page rendered empty.
+
+   Seventeen athletes across the two schools had one: grade 8, 7 and 6 are
+   middle-schoolers who raced with the high school, which is real and worth
+   keeping in the archive; 13 and 21 are upstream nonsense. Neither belongs in
+   a four-year development curve, and neither should take a page down.
+
+   Found by clicking Evylee Bugher, who raced a track season here in grade 8.
+   It has been broken since gradeMap was written; nobody had clicked one. */
+const HS_GRADE=g=>(g>=9&&g<=12)?g:null;
 function gradeMap(i){
   const o=byA[i],a=A[i],by=new Map();
   for(const sn of o.seasons)if(sn.grade)by.set(sn.y+'|'+sn.sport,sn.grade);
@@ -24193,10 +24207,9 @@ function gradeMap(i){
     if(!r.date)return null;
     const sy=schoolYearOf(r.date);
     const got=by.get(sy+'|'+r.sport);
-    if(got)return got;
+    if(got)return HS_GRADE(got);
     if(a.classOf==null)return null;
-    const g=12-(a.classOf-sy);
-    return (g>=9&&g<=12)?g:null;
+    return HS_GRADE(12-(a.classOf-sy));
   };
 }
 

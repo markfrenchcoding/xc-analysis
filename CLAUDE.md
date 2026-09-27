@@ -2538,6 +2538,36 @@ committed data until the re-pull landed, which is what an assertion is for.
 The same check drops the grade 6 and grade 8 rows, which are middle-schoolers
 in an open race rather than a cohort.
 
+### A grade that is not a high school grade
+
+`byGrade` has bins for 9, 10, 11 and 12 and nothing else, so any other grade
+reaching it is `bins[undefined].push(...)` and the athlete's **whole page
+renders empty**. `gradeMap`'s fallback path had always tested the range; its
+lookup path never did.
+
+**Seventeen athletes across the two schools had one.** Grade 8, 7 and 6 are
+middle-schoolers who raced up, which is real and stays in the archive; 13 and
+21 are upstream nonsense. Every one of those pages was blank and had been
+since `gradeMap` was written. Nobody had clicked one until somebody clicked
+**Evylee Bugher**, who ran a track season here in grade 8.
+
+Both paths go through one `HS_GRADE` clamp now. The audit lifts that rule out
+of the page **by text** rather than restating it, the way `test_crawl.js`
+lifts the crawl's write guard, and it was verified non-vacuous the same way:
+put the bug back and the suite fails.
+
+Worth generalising past this one line. The bug was a *missing* check sitting
+two lines above an identical check that was present - the same shape as
+`bioRow` reading the grade map raw while `gridRow` and `recordRow` both went
+through `gradeOf`. **When one branch validates and its neighbour does not, the
+neighbour is the bug**, and neither of these announced itself: one produced a
+class of 1938, the other produced nothing at all.
+
+And the thing that actually caught them both was a reader clicking a name.
+3,482 athlete pages across the two sites now open under a headless browser
+with zero empty and zero thrown, which is a check worth re-running after
+anything that touches `drawAthlete`.
+
 ### ID_ALIAS: one person, two profiles
 
 athletic.net carries duplicate athlete records and the page reads each id as a
