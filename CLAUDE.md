@@ -1717,10 +1717,19 @@ fitted by alternating least squares over the squad's own 5,000m results with
 thin meets shrunk toward no effect. The largest positive residual is the best
 race.
 
-**Cross country only, and not for want of trying.** athletic.net serves track as
-season bests rather than as every race, so there is one mark per athlete per
-event per season and nothing to take a residual against. A best is already the
-best day. The page says this where the panel would otherwise look missing.
+**It covers track now, and the sentence that said it could not was stale.**
+This used to read "cross country only, and not for want of trying: athletic.net
+serves track as season bests, so there is one mark per athlete per event per
+season and nothing to take a residual against". That was true when it was
+written and stopped being true the day the bio endpoint replaced the
+season-bests one. Nobody went back to it, and a reader asking "is there no way
+to have an expected time for track times?" is what finally did.
+
+Measured, the track side is the better conditioned of the two: 3,248 of
+Tualatin's 4,180 athlete-season-event groups have two or more races against
+1,174 of 1,231 on cross country, and there are four times as many cells.
+**4,724 of 7,215 track races carry an expectation at Tualatin and 8,197 of
+11,011 at Sherwood**, concentrated where the page cares - 1500m, 800m, 3000m.
 
 **The meet term is not a course rating and must never be shown as one.** Course,
 weather and where the race fell in the season are hopelessly confounded in data
@@ -2460,6 +2469,167 @@ check and the page would still be served.
 **Each school keeps its own baseline.** `pull/test_page.js [slug]` reads
 `.page-baseline-<slug>.json`, because a baseline is a statement about one
 page's numbers and two schools share none of them.
+
+### An expected time for a track race
+
+`log(time) = the athlete's form that season + what the race did to everyone in
+it` is the same fit cross country has always used. **What changes is what
+counts as one race.** Cross country has a single event, so a meet is a race.
+Track does not: the 1500 and the 100 at one meet share a date and nothing else,
+and wind down the home straight is not even the same sign for both.
+
+So the cell is **meet + distance + division + round + clock**, and each of
+those four earns its place:
+
+- **Distance**, because a meet effect on a 100m says nothing about a 1500m.
+- **Division**, because the JV 1500 and the varsity 1500 are two races run in
+  different company. Sharing an effect lets the varsity field set the
+  expectation for the JV one. Twenty-nine distinct division strings turn up,
+  including meet-specific heat names like "Thursday Twilight" and "Coach Moen";
+  they fragment the cells, which costs coverage and never costs correctness.
+- **Round**, because a prelim is a heat run to qualify. An athlete easing off
+  the last hundred to place fourth is not having a bad day, and giving prelims
+  their own cell is what lets the fit say so: the cell absorbs "everyone here
+  was jogging" and the residual comes out near zero. That is a modelling
+  choice rather than a mechanical one and it is the one most worth arguing
+  with.
+- **Clock**, because a hand time runs about a quarter of a second fast. That is
+  nothing on a 5,000m and most of the spread on a 100m. Tualatin has **2,173**
+  hand-timed marks, so this is not a rounding concern.
+
+Exhibitions are dropped outright rather than given a cell: there is no day for
+a mark taken deliberately outside the competition to be measured against.
+
+**The worked example.** Mark French's district double, 13 May 2016: a 1500m in
+3:59.63 against an expected 4:02.0, and a 3000m an hour later in 8:33.45
+against 8:45.6 - twelve seconds up. Those were the two best races of his senior
+track season and nothing on the page could previously say so.
+
+**`bestRace` is still cross country only**, deliberately. Residuals are
+unitless so they compare arithmetically, but the spread of a 100m residual is
+not the spread of a 5,000m one, and whichever event is noisiest would win.
+
+### Four fields the bio row was throwing away
+
+`Round`, `FAT`, `Exhibition` and `Division` are all on the raw result and were
+all being discarded. They are written to the results block as **deviations
+from the ordinary case** - a final, on an automatic clock, not an exhibition,
+in the modal division is the empty string - because the ordinary case is most
+of twenty thousand rows. Cross country is empty there by nature.
+
+`Wind` is on the row too and is not kept. For a sprint it is the single largest
+thing a meet effect currently absorbs, and it is the obvious next refinement.
+
+### The grade that was never checked
+
+athletic.net's "grade unknown" sentinel is **99**, and
+`classOf = schoolYear + (12 - grade)` turns that into a class of **1938**.
+`bioRow` read the grade map raw where `gridRow` and `recordRow` had both always
+gone through `gradeOf`. Seven athletes shipped on Tualatin's live page with
+class years between 1917 and 1938, and one of them was not a person at all:
+**"Relay Team"**, athletic.net's placeholder for a relay entry, published as an
+athlete with a class of 1925.
+
+A reader spotted Evylee Bugher on Sherwood before any test did. There are three
+assertions now - no class year outside the record, no entry grade outside 9 to
+12, and no relay entry published as a person - and they were red against the
+committed data until the re-pull landed, which is what an assertion is for.
+
+The same check drops the grade 6 and grade 8 rows, which are middle-schoolers
+in an open race rather than a cohort.
+
+### ID_ALIAS: one person, two profiles
+
+athletic.net carries duplicate athlete records and the page reads each id as a
+separate career - two athletes who each stopped after a year rather than one
+who did not. That is counted in the retention figures.
+
+The puller **reports collisions and never resolves them**, because a name is
+not an identity: two brothers share a surname and a transfer shares nothing.
+`ID_ALIAS` is four decisions somebody made by looking, each written down with
+its evidence:
+
+| stray | keeps | why |
+|---|---|---|
+| 21091465 | 30367518 | Evylee Bugher, Sherwood - 3 marks against 73, overlapping in 2025 |
+| 5699195 | 289980 | Kanya Sesser, Tualatin - 3 against 58 |
+| 22188148 | 22081316 | Caroline Fischer, Sherwood - grade 9 in 2023, grade 10 in 2024, same sprints |
+| 15115875 | 30847929 | Eli King, Sherwood - one 100m at 12.27 inside the other profile's 12.23-12.91 |
+
+Applied at **one choke point**, where every row is first in one place, rather
+than inside the three row parsers. The tests assert what is testable: that no
+stray id still carries results and that `canonId` moves each one.
+
+### The cache holds the response, not what we made of it
+
+It used to hold parsed rows. That survives a dropped connection, which is what
+it was built for, and it does not survive a change to the parser - and the
+parser is the thing that actually changes. Three parser changes in one
+afternoon meant three cold pulls of about an hour a school, for data already
+sitting on disk.
+
+It stores the raw response now, and `parseBio` is shared by the cache and the
+wire so a resumed run and a cold one cannot diverge. **A parser change is a
+re-parse: seconds, no network.** It earned the four minutes back within the
+hour, when the shrink guard refused a write and both schools re-ran from cache.
+
+A cache line with no `raw` is the old format and is treated as absent, so the
+first run after the change is cold and every run after it is not.
+
+### Depth: what the page needs against what the archive keeps
+
+The expensive half of a pull is one request an athlete, and **about half those
+athletes are sprinters the dashboard never shows**. Which is which is known
+before a request is spent: `GetTeamAthleteRecords` returns a season best per
+event, so anybody who has ever contested 800m or longer has a row saying so.
+Nobody is guessed at.
+
+Tualatin went from 1,643 requests to **794**, Sherwood from 1,703 to **953**.
+
+**Nobody is dropped from the archive.** What changes is depth: a distance
+athlete gets every race, a sprint-only athlete keeps the season bests the
+roster call already returned, which is what the archive held for everybody
+before the bio endpoint existed. `--deep` restores the old behaviour.
+
+**And the shrink guard had to learn about it.** It compares total rows against
+the previous pull and fired on the first shallow one: 24,824 to 18,797, a
+quarter gone, which is exactly the shape of a partial crawl. Lowering the
+threshold would have blinded it to the real thing it catches. So the pull
+records its `depth` and the guard compares like with like - same depth, same
+question; different depth, and the row count is not evidence either way, so it
+falls back on the roster count, because people do not disappear because you
+asked for less detail about some of them.
+
+A meets file with no `depth` on it predates the idea and means **deep**.
+Reading a missing field as "same as now" is how the guard went on firing after
+it had been taught not to.
+
+### The horizon is a school year
+
+It was the minimum athletic.net **season label**, which is the same number for
+track and one less for cross country. Tualatin's single 1982 race - run on the
+4th of December - put the horizon at 1982 while the earliest row in the seasons
+table said 1983, so the page advertised a start date with nothing behind it.
+Both `horizon` and `solid` are school years now.
+
+### What the deeper floor found
+
+**Tualatin: 1983-2026, 790 athletes** (was 748 over 2001-2026), 16,189 marks.
+**Sherwood: 1969-2026, 951 athletes**, 22,295 marks.
+
+**Meghan Peyton's freshman autumn is first-hand now.** Every earlier version of
+this pull started at 2004, the bio endpoint reaches 2001, and both had her
+starting in a spring with the autumn before it inferred. The cross country grid
+actually holds it - **19:21.0 on 2000-11-04, grade 9** - and nobody had ever
+asked it for a season that early. The inference was right and the evidence for
+it is now direct.
+
+**Two published figures moved and both moved for a reason.** Tualatin's girls'
+four-year completion went 50% to **51%**, one athlete, from the deeper floor.
+And one season best got *slower*: Mason Siewert's 2027 cross country best was
+23:46.04 at the **Steens Mountain uphill camp 5k**, which the summer rule now
+drops, leaving his real best of 24:18.46. The audit flagged it as a slower
+value, which is exactly why it splits the report by direction.
 
 ## How the simulation works
 

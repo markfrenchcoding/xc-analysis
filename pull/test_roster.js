@@ -265,6 +265,44 @@ eq(meta.horizon, earliest, 'the horizon is the earliest season in the data');
 ok(meta.horizon >= R.FIRST_SEASON, 'and the pull cannot hold a season it never asked for'
   + ' — horizon ' + meta.horizon + ', asked from ' + R.FIRST_SEASON);
 ok(meta.solid >= meta.horizon, 'solid is at or after the horizon');
+
+/* A CLASS YEAR OUTSIDE THE RECORD IS A GRADE THAT WAS NEVER CHECKED.
+   athletic.net's "unknown" grade is 99, and classOf = schoolYear + (12 - grade)
+   turns that into a class of 1938. bioRow read the grade map raw where its two
+   siblings had always gone through gradeOf, so seven athletes shipped on
+   Tualatin's live page with class years between 1917 and 1938 - and a reader
+   spotted Evylee Bugher on Sherwood before any test did. */
+const badYear = athletes.filter((a) => a.classOf && (+a.classOf < meta.horizon - 4 || +a.classOf > 2040));
+eq(badYear.length, 0, 'no athlete has a class year outside the record'
+  + (badYear.length ? ' — ' + badYear.slice(0, 4).map((a) => a.first + ' ' + a.last + ' ' + a.classOf).join(', ') : ''));
+const badGrade = athletes.filter((a) => a.entryGrade && (+a.entryGrade < 9 || +a.entryGrade > 12));
+eq(badGrade.length, 0, 'and no entry grade outside 9 to 12'
+  + (badGrade.length ? ' — ' + badGrade.slice(0, 4).map((a) => a.first + ' ' + a.last + ' g' + a.entryGrade).join(', ') : ''));
+ok(!athletes.some((a) => /^relay team$/i.test((a.first + ' ' + a.last).trim())),
+  'and a relay entry is not published as a person');
+
+/* ONE PERSON, ONE ID. ID_ALIAS is four decisions somebody made by looking, so
+   the test that matters is not that the map is right - it cannot be - but that
+   applying it left nothing behind: no stray id still carrying results, and no
+   name still held by two ids among the ones we claimed to have merged. */
+for (const stray of Object.keys(R.ID_ALIAS)) {
+  ok(!athletes.some((a) => +a.athleteId === +stray),
+    'a merged profile is gone from the roster — id ' + stray);
+  ok(R.canonId(+stray) !== +stray, 'and canonId moves it');
+}
+const stillDouble = (() => {
+  const by = new Map();
+  for (const a of athletes) {
+    const k = (a.first + ' ' + a.last).toLowerCase().trim();
+    if (!k) continue;
+    if (!by.has(k)) by.set(k, []);
+    by.get(k).push(a);
+  }
+  return [...by.values()].filter((v) => v.length > 1);
+})();
+ok(true, 'names still held by more than one id: ' + stillDouble.length
+  + (stillDouble.length ? ' — ' + stillDouble.map((v) => v[0].first + ' ' + v[0].last).join(', ') : '')
+  + ' (reported, not merged)');
 ok(meta.solid >= meta.horizon, 'and the first solid season is at or after it');
 ok(meta.solid <= 2006, 'which for this school is the middle of the decade');
 
@@ -334,7 +372,13 @@ ok(mp, 'Meghan Peyton is in the pull once track is included');
 eq(mp.classOf, '2004', 'class of 2004, at the very edge of coverage');
 eq(mp.entry, 'observed', 'and every race finds the freshman year that was missing');
 eq(mp.entryGrade, '9', 'she started in grade 9 after all');
-eq(mp.firstSeason, '2001', 'THREE YEARS BEFORE the horizon the season pulls declare');
+/* 2000, and it was 2001 until the season floor went back to 1969.
+   The bio endpoint reaches 2001 and stops, so every earlier version of this
+   pull had her starting in a spring and inferred the autumn before it. The
+   cross country grid actually holds her freshman November - 19:21.0 on
+   2000-11-04, grade 9 - and nobody had ever asked it for a season that early.
+   The inference was right and the evidence for it is now first-hand. */
+eq(mp.firstSeason, '2000', 'and her freshman AUTUMN is in the record now, not inferred');
 
 /* ---------- the two who looked like late entries, and were not ----------
    With cross country alone both first appear in grade 10, and the

@@ -120,6 +120,41 @@ const NAME_BY_ID = {
   // 0: { first: 'Meghan', last: 'Peyton' },
 };
 
+/* ---------- one person, two profiles ----------
+   athletic.net carries duplicate athlete records, and the page reads each id
+   as a separate career: two athletes who each stopped after a year rather than
+   one who did not. That is not cosmetic - it is counted in the retention
+   figures and in every cohort.
+
+   The puller REPORTS collisions and never resolves them, because a name is not
+   an identity: two brothers share a surname and a transfer shares nothing. So
+   every entry here is a decision somebody made by looking, written down with
+   the evidence, in the same spirit as the Who's Who athlete corrections.
+
+   stray id -> the id to keep. The evidence in each case:
+
+   - Evylee Bugher, Sherwood. 21091465 holds three marks at one meet in April
+     2025; 30367518 holds seventy-three across 2023-2026 and covers that same
+     spring. Same school, same sport, overlapping.
+   - Kanya Sesser, Tualatin. 5699195 holds three marks in 2011; 289980 holds
+     fifty-eight across 2008-2011.
+   - Caroline Fischer, Sherwood. 22081316 is her grade 9 sprint season in 2023;
+     22188148 is grade 10 in 2024, same events, same 100/200/400 range. Both
+     class of 2026, consecutive grades.
+   - Eli King, Sherwood. 15115875 is a single 100m on 2026-04-29 at 12.27;
+     30847929 holds seven sprints across the same 2026 season, grade 10, class
+     of 2028, running 12.23 to 12.91. The stray mark sits inside that range.
+
+   The first two were found by the grade-99 bug and the second two are ordinary
+   duplicates that had nothing to do with it. */
+const ID_ALIAS = {
+  21091465: 30367518,   // Evylee Bugher, Sherwood
+  5699195: 289980,      // Kanya Sesser, Tualatin
+  22188148: 22081316,   // Caroline Fischer, Sherwood
+  15115875: 30847929,   // Eli King, Sherwood
+};
+const canonId = (id) => ID_ALIAS[id] || id;
+
 /* SUMMER IS NOT THE SEASON, which the statewide seed has always known and
    this puller never did. `Seed.SEASON_START` is 08-15, where OSAA practice
    opens; spring track finishes in June. So the weeks between are school
@@ -349,6 +384,7 @@ function buildAthletes(rows) {
   const by = new Map();
   for (const r of rows) {
     if (!r.athleteId) continue;
+    if (NOT_A_PERSON.test(((r.first || '') + ' ' + (r.last || '')).trim())) continue;
     let a = by.get(r.athleteId);
     if (!a) {
       a = {
@@ -568,6 +604,11 @@ function bioEventMetres(ev) {
 }
 
 /* One resultsTF row -> the same shape every other result on this page has. */
+/* athletic.net files a relay under a placeholder athlete literally named
+   "Relay Team", with grade 99 and a distance like 2400 Meters. It is an entry,
+   not a person, and it was being published as one on both pages. */
+const NOT_A_PERSON = /^(relay team|unattached|unknown)$/i;
+
 function bioRow(raw, evById, grades, teamId) {
   if (+raw.SchoolID !== +teamId) return null;          // their college is not this team
   const ev = evById[raw.EventID];
@@ -583,10 +624,30 @@ function bioRow(raw, evById, grades, teamId) {
   const season = idSeason > 10000 ? idSeason - 10000 : idSeason;   // indoor is +10000
   if (!season) return null;
   const place = parseInt(raw.Place, 10);
+  /* FOUR FIELDS THE ROW CARRIES THAT THIS USED TO THROW AWAY, and every one of
+     them is the difference between a residual that means something and one
+     that does not:
+
+     Round - "P" is a heat run to qualify and nothing else. An athlete jogging
+     the back straight to place fourth reads as a bad day and was not one.
+     FAT - fully automatic timing. A hand time is about a quarter of a second
+     fast, which is noise on a 5,000m and most of the spread on a 100m.
+     Exhibition - a mark deliberately outside the competition.
+     Division - the JV 1500 and the varsity 1500 at one meet are two races run
+     in different company; sharing a meet effect between them would let the
+     varsity field set the expectation for the JV one. */
   return {
     athleteId: +raw.AthleteID || 0,
     first: '', last: '', gender: '',
-    grade: grades ? (grades[teamId + '_' + idSeason] || grades[teamId + '_' + season] || null) : null,
+    /* THROUGH gradeOf, LIKE ITS TWO SIBLINGS. gridRow and recordRow have both
+       always validated the grade and this one read the map raw, so
+       athletic.net's "unknown" sentinel of 99 went straight through - and
+       classOf = schoolYear + (12 - grade) turned it into a class of 1938.
+       Seven athletes on Tualatin's live page carried class years between 1917
+       and 1938 because of it, and Evylee Bugher on Sherwood was the one a
+       reader noticed. The same check also drops the grade 6 and grade 8 rows,
+       which are middle-schoolers in an open race rather than a cohort. */
+    grade: gradeOf(grades ? (grades[teamId + '_' + idSeason] || grades[teamId + '_' + season]) : null),
     place: place > 0 ? place : null,
     dist, seconds: sec,
     event: (ev && ev.Event) || '',
@@ -595,6 +656,10 @@ function bioRow(raw, evById, grades, teamId) {
     date: String(raw.ResultDate || '').slice(0, 10),
     season, sport: 'tfo',
     indoor: idSeason > 10000 ? 1 : 0,
+    round: String(raw.Round || '').trim().slice(0, 2).toUpperCase(),
+    fat: raw.FAT ? 1 : 0,
+    exh: raw.Exhibition ? 1 : 0,
+    division: String(raw.Division || '').trim(),
   };
 }
 
@@ -634,22 +699,65 @@ function pullTrack(teamId, from, to) {
    the caller checks `failed` and does not write. Half a track record is worse
    than none, because the gaps are invisible: a missing race just looks like a
    season somebody did not run. */
+/* One response in, one athlete's races out. Pulled out of the fetch loop so
+   the resume cache and the wire go through exactly the same code. If they
+   did not, a resumed run and a cold one would disagree, which is the whole
+   failure this cache exists to avoid. */
+function parseBio(j, id, teamId) {
+  const evById = {};
+  for (const e of j.eventsTF || []) evById[e.IDEvent] = e;
+  /* The response carries its own meet table, keyed by id, with the name and
+     the date on it. Taking only the meetId off the result row and leaving the
+     name blank is how the page ended up with unnamed meets once before - a
+     race at "" is a race nobody can place. */
+  const mine = { id, seen: (j.resultsTF || []).length, rows: [], meets: {} };
+  for (const [mid, m] of Object.entries(j.meets || {}))
+    mine.meets[mid] = { date: String(m.EndDate || '').slice(0, 10), name: m.MeetName || '' };
+  for (const raw of j.resultsTF || []) {
+    const r = bioRow(raw, evById, j.grades, teamId);
+    if (!r) continue;
+    r.meetName = (mine.meets[r.meetId] || {}).name || '';
+    mine.rows.push(r);
+  }
+  return mine;
+}
+
 function pullRaces(teamId, ids, cacheFile) {
   const rows = [], meets = {}, failed = [];
   let n = 0, seen = 0, fromCache = 0, dropped = 0;
   const t0 = Date.now();
 
-  /* A forty-minute pull that loses everything to one dropped connection is a
-     pull nobody will run twice. Each athlete's parsed races are appended as a
-     line of JSON the moment they arrive, and a re-run skips whatever is
-     already there. Delete the file to force a clean pull. */
+  /* THE CACHE HOLDS THE RESPONSE, NOT WHAT WE MADE OF IT, and that is the
+     whole point of it.
+
+     It used to hold parsed rows. That survives a dropped connection, which is
+     what it was built for, and it does not survive a change to the parser -
+     and the parser is the thing that actually changes. Adding Round, FAT,
+     Exhibition and Division, and sending the grade through gradeOf, each
+     invalidated every line on disk and cost a cold pull of about an hour a
+     school. Three parser changes in one afternoon, three cold pulls, for data
+     that had already been downloaded and was sitting right there.
+
+     Storing the raw response makes a parser change a re-parse: seconds, no
+     network, and the same answer a cold pull would give. The file is bigger -
+     raw is three or four times parsed - and it is gitignored, so that is disk
+     nobody ships.
+
+     A line with no `raw` is from the old format and is treated as absent, so
+     the first run after this change is cold and every run after it is not. */
   const done = new Map();
+  let stale = 0;
   if (cacheFile && fs.existsSync(cacheFile)) {
     for (const line of fs.readFileSync(cacheFile, 'utf8').split('\n')) {
       if (!line.trim()) continue;
-      try { const o = JSON.parse(line); done.set(+o.id, o); } catch (e) { /* half a line */ }
+      try {
+        const o = JSON.parse(line);
+        if (o && o.raw) done.set(+o.id, o.raw); else stale++;
+      } catch (e) { /* half a line */ }
     }
     if (done.size) log('    resuming: ' + done.size + ' athletes already read');
+    if (stale) log('    ' + stale + ' cached athletes are in the old parsed format '
+      + 'and will be fetched again, once');
   }
 
   const take = (o) => {
@@ -668,7 +776,7 @@ function pullRaces(teamId, ids, cacheFile) {
 
   for (const id of ids) {
     n++;
-    if (done.has(id)) { take(done.get(id)); fromCache++; continue; }
+    if (done.has(id)) { take(parseBio(done.get(id), id, teamId)); fromCache++; continue; }
     let j = null;
     try { j = ask(API + BIO + id); }
     catch (e) { failed.push(id); GAP_BIO = Math.min(GAP_BIO_MAX, GAP_BIO + 300); sleep(GAP_BIO); continue; }
@@ -678,27 +786,8 @@ function pullRaces(teamId, ids, cacheFile) {
       sleep(GAP_BIO); continue;
     }
     if (GAP_BIO > GAP_BIO_MIN) GAP_BIO -= 20;      // ease back down after a clean one
-    const evById = {};
-    for (const e of j.eventsTF || []) evById[e.IDEvent] = e;
-    /* The response carries its own meet table, keyed by id, with the name and
-       the date on it. Taking only the meetId off the result row and leaving
-       the name blank is how the page ended up with unnamed meets once
-       before - a race at "" is a race nobody can place. */
-    for (const [mid, m] of Object.entries(j.meets || {})) {
-      if (meets[mid] && meets[mid].name) continue;
-      meets[mid] = { date: String(m.EndDate || '').slice(0, 10), name: m.MeetName || '' };
-    }
-    const mine = { id: id, seen: j.resultsTF.length, rows: [], meets: {} };
-    for (const [mid, m] of Object.entries(j.meets || {}))
-      mine.meets[mid] = { date: String(m.EndDate || '').slice(0, 10), name: m.MeetName || '' };
-    for (const raw of j.resultsTF) {
-      const r = bioRow(raw, evById, j.grades, teamId);
-      if (!r) continue;
-      r.meetName = (mine.meets[r.meetId] || {}).name || '';
-      mine.rows.push(r);
-    }
-    if (cacheFile) fs.appendFileSync(cacheFile, JSON.stringify(mine) + '\n');
-    take(mine);
+    if (cacheFile) fs.appendFileSync(cacheFile, JSON.stringify({ id, raw: j }) + '\n');
+    take(parseBio(j, id, teamId));
     if (n % 100 === 0 || n === ids.length) {
       const live = n - fromCache;
       const per = live ? (Date.now() - t0) / live / 1000 : 1;
@@ -732,16 +821,45 @@ function main() {
   /* Every athlete who has ever appeared here, in either sport. The bio call
      needs a list and this is it: the cross country grid knows the autumn
      athletes and the records call knows the spring ones. */
-  const ids = [...new Set([...xc.rows, ...tf.rows].map(r => r.athleteId).filter(Boolean))]
+  const everyone = [...new Set([...xc.rows, ...tf.rows].map(r => r.athleteId).filter(Boolean))]
     .sort((a, b) => a - b);
-  log('  track, every race, one request an athlete (' + ids.length + '):');
+
+  /* ---------- who gets every race, and who keeps their season bests ----------
+     The expensive half of this pull is one request an athlete, and about
+     forty-five percent of those athletes are sprinters the dashboard never
+     shows: it keeps anybody with a mark at 800m or longer, because VDOT does
+     not take a 100m and a development curve over that group is noise wearing
+     a number.
+
+     We already know which is which before spending a request. The two cheap
+     season calls have run, and GetTeamAthleteRecords returns a season best
+     PER EVENT - so anybody who has ever contested an 800m or longer has a row
+     saying so. Nobody is guessed at.
+
+     THE ARCHIVE STILL KEEPS EVERYONE, and that matters: a roster that quietly
+     drops people is what this whole project argues against. What changes is
+     the depth. A distance athlete gets every race they ever ran; a
+     sprint-only athlete keeps the season bests the roster call already
+     returned, which is exactly what the archive held for everybody before the
+     bio endpoint existed. Two levels of detail, both recorded, and the report
+     says how many are on each.
+
+     --deep pulls every race for everybody, which is the old behaviour and the
+     right thing if the archive is ever the point rather than the page. */
+  const DEEP_FLOOR = 800;
+  const deepAll = process.argv.includes('--deep');
+  const far = new Set([...xc.rows, ...tf.rows]
+    .filter(r => +r.dist >= DEEP_FLOOR && r.athleteId)
+    .map(r => r.athleteId));
+  const ids = deepAll ? everyone : everyone.filter(id => far.has(id));
+  const skipped = everyone.length - ids.length;
+  log('  track, every race, one request an athlete (' + ids.length
+    + (skipped ? ' of ' + everyone.length + '; ' + skipped
+      + ' sprint-only athletes keep their season bests instead' : '') + '):');
   const races = pullRaces(teamId, ids, path.join(OUT, 't' + teamId + '_bio.jsonl'));
   log('    ' + races.rows.length + ' races kept of ' + races.seen + ' results read'
     + (races.failed.length ? ', ' + races.failed.length + ' athletes failed' : ''));
 
-  /* The season-best rows have done their job - they named the roster. Every
-     one of them is inside the race list, so keeping both would double-count
-     the best race of every season. */
   if (races.failed.length > ids.length / 50) {
     log('\n  REFUSING TO WRITE: ' + races.failed.length + ' of ' + ids.length
       + ' athletes did not answer. A track record with holes in it looks exactly'
@@ -778,7 +896,15 @@ function main() {
   }
   if (noName) log('    ' + noName + ' race rows whose athlete is not in the roster');
 
-  tf.rows = races.rows;
+  /* The season-best rows have done their job for anybody we pulled in full -
+     every one of those marks is inside the race list, and keeping both would
+     double-count the best race of every season. For anybody we skipped they
+     are the only track record there is, so they stay. */
+  const deep = new Set(ids);
+  const kept = tf.rows.filter(r => !deep.has(r.athleteId));
+  tf.rows = [...races.rows, ...kept];
+  if (kept.length) log('    ' + kept.length + ' season-best marks kept for the '
+    + skipped + ' athletes not pulled in full');
   // merge without clobbering: a named meet beats an unnamed one either way round
   for (const [mid, m] of Object.entries(races.meets))
     if (!tf.meets[mid] || !tf.meets[mid].name) tf.meets[mid] = m;
@@ -787,6 +913,18 @@ function main() {
      country, which is strictly more evidence for the same inference - an
      athlete who ran one autumn and three springs now resolves. */
   const rows = [...xc.rows, ...tf.rows];
+  /* ONE CHOKE POINT, not three. Rewriting the id inside gridRow, recordRow and
+     bioRow would be three copies of one rule, which is the drift this file
+     keeps predicting. Every row is here and nothing downstream has run yet, so
+     this is the last moment an id means anything and the first moment they are
+     all in one place. */
+  let aliased = 0;
+  for (const r of rows) {
+    const c = canonId(r.athleteId);
+    if (c !== r.athleteId) { r.athleteId = c; aliased++; }
+  }
+  if (aliased) log('  ' + aliased + ' rows moved onto a canonical athlete id, '
+    + 'from ' + Object.keys(ID_ALIAS).length + ' known duplicate profiles');
   /* MEET IDS ARE PER SPORT, the same way division ids are, and merging the two
      tables on the bare id silently destroys one of every colliding pair.
 
@@ -815,10 +953,45 @@ function main() {
      Same rule as crawl.js: exit 0 wrote, 2 refused, 3 nothing changed. */
   const prev = fs.existsSync(stem + 'results.csv')
     ? fs.readFileSync(stem + 'results.csv', 'utf8').split('\n').length - 2 : 0;
+  /* THE SHRINK GUARD HAS TO COMPARE LIKE WITH LIKE, and depth is the thing
+     that makes two pulls unlike.
+
+     It fired on the first pull after sprint-only athletes stopped being pulled
+     in full: results fell from 24,824 to 18,797, a quarter of them gone, which
+     is exactly the shape of a partial crawl and exactly what the guard is for.
+     It was also entirely expected, because 849 athletes had deliberately been
+     read at season-best depth instead of every-race depth.
+
+     Lowering the threshold would have been the wrong fix - it blinds the guard
+     to the real thing it catches. So the pull records its depth and the guard
+     compares against the previous pull's. Same depth, same question as before.
+     Different depth, and the row count is not evidence either way, so it falls
+     back on what is still comparable: how many athletes came back. People do
+     not disappear because you asked for less detail about some of them. */
+  const prevMeta = fs.existsSync(stem + 'meets.json')
+    ? (() => { try { return JSON.parse(fs.readFileSync(stem + 'meets.json', 'utf8')); }
+      catch (e) { return {}; } })() : {};
+  const depth = ids.length < everyone.length ? 'page' : 'deep';
+  /* A meets file with no depth on it predates the idea, and every pull before
+     it was a deep one - so that is what a missing field means. Reading it as
+     "same as whatever we are doing now" is how the guard went on firing after
+     it had been taught not to. */
+  const prevDepth = prevMeta.depth || 'deep';
+  const sameDepth = prevDepth === depth;
+  const prevAthletes = +prevMeta.athletes || 0;
+
   const refuse = [];
   if (!rows.length) refuse.push('no results at all');
-  if (prev && rows.length < prev * 0.9) {
+  if (prev && sameDepth && rows.length < prev * 0.9) {
     refuse.push('results fell from ' + prev + ' to ' + rows.length);
+  }
+  if (prev && !sameDepth) {
+    log('  depth changed from ' + prevDepth + ' to ' + depth + ', so the row count '
+      + '(' + prev + ' to ' + rows.length + ') is not comparable; checking the roster instead');
+    if (prevAthletes && athletes.size < prevAthletes * 0.9) {
+      refuse.push('athletes fell from ' + prevAthletes + ' to ' + athletes.size
+        + ', which a change of depth does not explain');
+    }
   }
   if (conflict.length > athletes.size * 0.05) {
     refuse.push(conflict.length + ' of ' + athletes.size + ' athletes have a disputed class year');
@@ -831,8 +1004,14 @@ function main() {
 
   fs.writeFileSync(stem + 'results.csv', csv(
     ['athleteId', 'season', 'sport', 'event', 'date', 'dist', 'seconds', 'place',
-      'grade', 'meetId'],
-    rows.map(r => ({ ...r, grade: r.grade || '', place: r.place || '' }))));
+      'grade', 'meetId', 'round', 'fat', 'exh', 'division'],
+    /* Cross country has no rounds, no heats and one timing method, so those
+       columns are simply blank on an xc row rather than invented. */
+    rows.map(r => ({
+      ...r, grade: r.grade || '', place: r.place || '',
+      round: r.round || '', fat: r.fat == null ? '' : r.fat,
+      exh: r.exh == null ? '' : r.exh, division: r.division || '',
+    }))));
 
   fs.writeFileSync(stem + 'athletes.csv', csv(
     ['athleteId', 'first', 'last', 'alsoKnownAs', 'gender', 'classOf', 'classOfConflict',
@@ -858,15 +1037,26 @@ function main() {
        season with anything in it at all. `solid` is the first season with
        enough in it to reason about, which is what most of the page's
        statistics actually rest on; before it the record is a scattering. */
-    horizon: Math.min(...rows.map((r) => r.season)),
+    /* THE HORIZON IS A SCHOOL YEAR, because everything that reads it is.
+       It used to be the minimum athletic.net SEASON LABEL, which is the same
+       number for track and one less for cross country - so Tualatin's single
+       1982 race, run on the 4th of December, put the horizon at 1982 while the
+       earliest row in the seasons table said 1983. The page prints the horizon
+       and keys everything else on the school year, so it was advertising a
+       start date with nothing behind it. */
+    horizon: Math.min(...[...seasons.values()].map((v) => v.schoolYear)),
     solid: (() => {
       const n = {};
-      for (const r of rows) n[r.season] = (n[r.season] || 0) + 1;
+      for (const v of seasons.values()) n[v.schoolYear] = (n[v.schoolYear] || 0) + (v.nRaces || 1);
       const ys = Object.keys(n).map(Number).sort((a, b) => a - b);
       return ys.find((y) => n[y] >= 100) || ys[0];
     })(),
     pulled: new Date().toISOString().slice(0, 10),
     sports: { xc: xc.rows.length, tfo: tf.rows.length },
+    /* what the next pull's shrink guard needs to know it is comparing like
+       with like, and what a reader needs to know the archive is not uniform */
+    depth, athletes: athletes.size,
+    deepAthletes: ids.length, shallowAthletes: everyone.length - ids.length,
     fieldMarksSkipped: tf.field,
     emptySeasons: empty, meets,
   }, null, 2));
@@ -889,6 +1079,28 @@ function main() {
     + ', at meets that name themselves a series, a camp or an all-comers:');
   for (const [k, v] of Object.entries(droppedSummer).sort((a, b) => b[1] - a[1]))
     log('      ' + String(v).padStart(4) + '  ' + k);
+  /* TWO IDS, ONE NAME, ONE SCHOOL. athletic.net carries duplicate profiles -
+     Evylee Bugher has 21091465 with three marks and 30367518 with seventy-odd,
+     overlapping in 2025. They are almost certainly one person and this file
+     will not say so: the rule here has always been to map an id to a name and
+     never a name to a name, because two brothers share a surname and a
+     transfer shares nothing. So it is reported, and a human decides. */
+  const byName = new Map();
+  for (const a of athletes.values()) {
+    const k = (a.first + ' ' + a.last).toLowerCase().trim();
+    if (!k) continue;
+    if (!byName.has(k)) byName.set(k, []);
+    byName.get(k).push(a);
+  }
+  const dupes = [...byName.entries()].filter(([, v]) => v.length > 1);
+  if (dupes.length) {
+    log('  ' + dupes.length + ' name' + (dupes.length === 1 ? '' : 's')
+      + ' held by more than one athlete id - reported, never merged:');
+    for (const [k, v] of dupes)
+      log('      ' + v[0].first + ' ' + v[0].last + '  '
+        + v.map(a => a.athleteId + ' (' + a.n + ' marks, ' + a.firstSeason
+          + '-' + a.lastSeason + ')').join('  vs  '));
+  }
   log('  class year disputed for ' + conflict.length + ' athlete'
     + (conflict.length === 1 ? '' : 's'));
   log('  entry: ' + ['observed', 'late-entry', 'unknown-gap', 'ungraded']
@@ -902,7 +1114,7 @@ module.exports = {
   gradeOf, schoolYear, classOf, gridRow, eventMetres, recordRow,
   bioEventMetres, bioRow, BIO,
   buildAthletes, entryOf, buildSeasons,
-  cohorts, csv, NAME_BY_ID, paceBounds, FIRST_SEASON,
+  cohorts, csv, NAME_BY_ID, ID_ALIAS, canonId, paceBounds, FIRST_SEASON,
 };
 
 if (require.main === module) main();

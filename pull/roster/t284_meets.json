@@ -1,17 +1,46 @@
 {
   "teamId": 284,
   "label": "Tualatin",
-  "from": 2004,
+  "from": 1969,
   "to": 2026,
-  "horizon": 2001,
+  "horizon": 1983,
   "solid": 2004,
-  "pulled": "2026-09-26",
+  "pulled": "2026-09-27",
   "sports": {
-    "xc": 8919,
-    "tfo": 15905
+    "xc": 8974,
+    "tfo": 9823
   },
-  "fieldMarksSkipped": 2687,
-  "emptySeasons": [],
+  "depth": "page",
+  "athletes": 1640,
+  "deepAthletes": 794,
+  "shallowAthletes": 849,
+  "fieldMarksSkipped": 2843,
+  "emptySeasons": [
+    1969,
+    1970,
+    1971,
+    1972,
+    1973,
+    1974,
+    1975,
+    1976,
+    1977,
+    1978,
+    1979,
+    1980,
+    1981,
+    1983,
+    1984,
+    1985,
+    1986,
+    1987,
+    1988,
+    1989,
+    1990,
+    1991,
+    1992,
+    1995
+  ],
   "meets": {
     "xc|3": {
       "date": "2005-11-05",
@@ -165,6 +194,10 @@
       "date": "2008-10-23",
       "name": "Pacific District Conference Championship"
     },
+    "xc|11429": {
+      "date": "2000-11-04",
+      "name": "OSAA 4A State Championships"
+    },
     "xc|11473": {
       "date": "2008-10-08",
       "name": "McMinnville vs. Tualatin"
@@ -172,6 +205,18 @@
     "xc|11474": {
       "date": "2008-10-15",
       "name": "Canby, Tualatin vs. Tigard"
+    },
+    "xc|11503": {
+      "date": "2003-11-01",
+      "name": "OSAA 4A State Championships"
+    },
+    "xc|11504": {
+      "date": "2002-11-02",
+      "name": "OSAA 4A State Championships"
+    },
+    "xc|11505": {
+      "date": "2001-11-03",
+      "name": "OSAA 4A State Championships"
     },
     "xc|12537": {
       "date": "2008-10-01",
@@ -248,6 +293,50 @@
     "xc|32567": {
       "date": "2010-11-06",
       "name": "OSAA 6A State Championships"
+    },
+    "xc|33386": {
+      "date": "2003-09-01",
+      "name": "03 season bests"
+    },
+    "xc|33387": {
+      "date": "2002-09-01",
+      "name": "02 bests"
+    },
+    "xc|33388": {
+      "date": "2001-09-01",
+      "name": "01 bests"
+    },
+    "xc|33391": {
+      "date": "2000-09-01",
+      "name": "'00 bests"
+    },
+    "xc|33419": {
+      "date": "1999-09-01",
+      "name": "'99 bests"
+    },
+    "xc|33420": {
+      "date": "1998-09-01",
+      "name": "'98 bests"
+    },
+    "xc|33422": {
+      "date": "1997-09-01",
+      "name": "'97 bests"
+    },
+    "xc|33424": {
+      "date": "1996-09-01",
+      "name": "'96 bests"
+    },
+    "xc|33426": {
+      "date": "1994-09-01",
+      "name": "'94 bests"
+    },
+    "xc|33427": {
+      "date": "1993-09-01",
+      "name": "'93 bests"
+    },
+    "xc|43611": {
+      "date": "1999-11-14",
+      "name": "Nike BorderClash 1"
     },
     "xc|44252": {
       "date": "2011-11-05",
@@ -865,6 +954,10 @@
       "date": "2025-08-29",
       "name": "Night Meet"
     },
+    "xc|253697": {
+      "date": "1982-12-04",
+      "name": "1982 Kinney West Regional Championships"
+    },
     "xc|254501": {
       "date": "2025-09-12",
       "name": "Meriwether Cross Country Classic "
@@ -1045,10 +1138,6 @@
       "date": "2006-04-07",
       "name": "Laker Invite"
     },
-    "tfo|16302": {
-      "date": "2006-05-05",
-      "name": "Jesuit Relays"
-    },
     "tfo|16945": {
       "date": "2006-04-11",
       "name": "Canby Invite"
@@ -1185,6 +1274,34 @@
       "date": "2000-03-01",
       "name": "'00 Records"
     },
+    "tfo|45168": {
+      "date": "1999-03-01",
+      "name": "'99 Records"
+    },
+    "tfo|45169": {
+      "date": "1998-03-01",
+      "name": "'98 Records"
+    },
+    "tfo|45170": {
+      "date": "1997-03-01",
+      "name": "'97 Records"
+    },
+    "tfo|45171": {
+      "date": "1996-03-01",
+      "name": "'96 Records"
+    },
+    "tfo|45172": {
+      "date": "1995-03-01",
+      "name": "'95 Records"
+    },
+    "tfo|45173": {
+      "date": "1994-03-01",
+      "name": "'94 Records"
+    },
+    "tfo|45174": {
+      "date": "1993-03-01",
+      "name": "'93 Records"
+    },
     "tfo|61044": {
       "date": "2009-04-25",
       "name": "Oregon Relays"
@@ -1261,14 +1378,6 @@
       "date": "2009-04-30",
       "name": "Tualatin @ Newberg"
     },
-    "tfo|70357": {
-      "date": "2009-05-09",
-      "name": "USATF Developmental Meet: Sherwood"
-    },
-    "tfo|70365": {
-      "date": "2009-07-11",
-      "name": "Region 13 JO Championships "
-    },
     "tfo|73622": {
       "date": "2009-04-15",
       "name": "McMinnville @ Tigard"
@@ -1329,17 +1438,9 @@
       "date": "2010-04-07",
       "name": "Tualatin at Forest Grove"
     },
-    "tfo|109241": {
-      "date": "2010-04-10",
-      "name": "CYO Developmental Meet 1D"
-    },
     "tfo|111308": {
       "date": "2010-06-05",
       "name": "BorderDuel Track Classic"
-    },
-    "tfo|112246": {
-      "date": "2010-06-12",
-      "name": "NW Youth Championships"
     },
     "tfo|113157": {
       "date": "2010-06-12",
@@ -1348,10 +1449,6 @@
     "tfo|113762": {
       "date": "2011-04-13",
       "name": "Newberg at Tualatin"
-    },
-    "tfo|114333": {
-      "date": "2011-04-09",
-      "name": "The Willamette Falls Invitational"
     },
     "tfo|115051": {
       "date": "2011-04-23",
@@ -1373,10 +1470,6 @@
       "date": "2011-04-29",
       "name": "Jesuit Twilight Invitational"
     },
-    "tfo|115400": {
-      "date": "2011-05-04",
-      "name": "Woodburn @ Silverton"
-    },
     "tfo|115420": {
       "date": "2011-04-23",
       "name": "Oregon Relays Day 2"
@@ -1392,18 +1485,6 @@
     "tfo|115814": {
       "date": "2011-04-01",
       "name": "Laker Classic invitational"
-    },
-    "tfo|115879": {
-      "date": "2011-04-20",
-      "name": "Crescent Valley @ Woodburn"
-    },
-    "tfo|116178": {
-      "date": "2011-04-06",
-      "name": "Lebanon @ Woodburn"
-    },
-    "tfo|116492": {
-      "date": "2011-03-30",
-      "name": "Woodburn @ Corvallis"
     },
     "tfo|116505": {
       "date": "2011-05-06",
@@ -1425,45 +1506,9 @@
       "date": "2011-04-06",
       "name": "Tualatin @ Hillsboro"
     },
-    "tfo|117534": {
-      "date": "2011-04-22",
-      "name": "Cotton Invitational"
-    },
-    "tfo|118925": {
-      "date": "2011-06-04",
-      "name": "BorderDuel Track Classic"
-    },
-    "tfo|119109": {
-      "date": "2011-04-13",
-      "name": "Woodburn @ South Albany"
-    },
-    "tfo|120085": {
-      "date": "2011-03-16",
-      "name": "West Albany @ Woodburn"
-    },
-    "tfo|120088": {
-      "date": "2011-04-27",
-      "name": "Dallas @ Woodburn"
-    },
     "tfo|122600": {
       "date": "2011-05-04",
       "name": "Cent/FG/Glencoe at Tual. (Varsity only)"
-    },
-    "tfo|127101": {
-      "date": "2011-05-10",
-      "name": "Mid Willamette Conference"
-    },
-    "tfo|127103": {
-      "date": "2011-05-11",
-      "name": "Mid Willamette Conference"
-    },
-    "tfo|137644": {
-      "date": "2011-04-30",
-      "name": "CYO Developmental Meet 4A"
-    },
-    "tfo|137646": {
-      "date": "2011-05-14",
-      "name": "CYO Meet of Champions"
     },
     "tfo|139150": {
       "date": "2012-05-26",
@@ -1484,14 +1529,6 @@
     "tfo|142024": {
       "date": "2012-04-18",
       "name": "McMinnville at Tualatin"
-    },
-    "tfo|142517": {
-      "date": "2010-05-16",
-      "name": "CYO Meet of Champions"
-    },
-    "tfo|142546": {
-      "date": "2012-06-02",
-      "name": "BorderDuel Track Classic - OR"
     },
     "tfo|142841": {
       "date": "2012-05-11",
@@ -1529,10 +1566,6 @@
       "date": "2012-03-21",
       "name": "Sherwood Coed Relays"
     },
-    "tfo|145929": {
-      "date": "2011-12-17",
-      "name": "WSTC Christmas Meet"
-    },
     "tfo|146615": {
       "date": "2012-04-25",
       "name": "JV only Tualatin @ Century"
@@ -1549,17 +1582,9 @@
       "date": "2012-04-21",
       "name": "Sherwood Ice Breaker"
     },
-    "tfo|167320": {
-      "date": "2012-07-14",
-      "name": "Junior Olympics Regional Championships"
-    },
     "tfo|168248": {
       "date": "2013-05-25",
       "name": "OSAA 6A State Championships - Day 2"
-    },
-    "tfo|168255": {
-      "date": "2013-06-01",
-      "name": "BorderDuel Track Classic"
     },
     "tfo|168279": {
       "date": "2013-04-17",
@@ -1584,10 +1609,6 @@
     "tfo|168435": {
       "date": "2013-04-24",
       "name": "JV Meet Century,Newberg,Tigard,Forest Grove"
-    },
-    "tfo|168496": {
-      "date": "2013-04-27",
-      "name": "49th Centennial Invitational"
     },
     "tfo|168715": {
       "date": "2013-05-01",
@@ -1629,17 +1650,9 @@
       "date": "2013-03-13",
       "name": "Tualatin,Horizon Christian at West Linn"
     },
-    "tfo|177125": {
-      "date": "2012-12-15",
-      "name": "WSTC Christmas Competition"
-    },
     "tfo|180229": {
       "date": "2013-03-13",
       "name": "Tigard, Portland Christian @ Oregon City"
-    },
-    "tfo|182393": {
-      "date": "2013-07-07",
-      "name": "USATF Region 13 Junior Olympic T&F Championships"
     },
     "tfo|182712": {
       "date": "2013-04-20",
@@ -1661,10 +1674,6 @@
       "date": "2013-05-11",
       "name": "Tigard USATF Developmental"
     },
-    "tfo|186461": {
-      "date": "2013-06-08",
-      "name": "Emerald Valley USATF Developmental"
-    },
     "tfo|186465": {
       "date": "2013-06-22",
       "name": "Oregon USATF JO Championships"
@@ -1672,14 +1681,6 @@
     "tfo|198174": {
       "date": "2013-06-15",
       "name": "USATF NW Club Championships"
-    },
-    "tfo|198923": {
-      "date": "2014-05-24",
-      "name": "OSAA 6A State Championships"
-    },
-    "tfo|198924": {
-      "date": "2014-04-26",
-      "name": "50th Centennial Invitational"
     },
     "tfo|199037": {
       "date": "2014-04-09",
@@ -1700,10 +1701,6 @@
     "tfo|199690": {
       "date": "2014-01-24",
       "name": "New Balance Boise Indoor"
-    },
-    "tfo|199691": {
-      "date": "2014-01-25",
-      "name": "New Balance Boise Indoor - Day 2"
     },
     "tfo|199741": {
       "date": "2014-03-19",
@@ -1741,10 +1738,6 @@
       "date": "2014-04-18",
       "name": "Canby Invite"
     },
-    "tfo|202382": {
-      "date": "2014-02-02",
-      "name": "UW Invitational (High School)"
-    },
     "tfo|203291": {
       "date": "2014-02-16",
       "name": "UW Open"
@@ -1761,17 +1754,9 @@
       "date": "2014-05-10",
       "name": "CYO Roadrunner Championships"
     },
-    "tfo|215361": {
-      "date": "2014-06-07",
-      "name": "Border Duel"
-    },
     "tfo|220279": {
       "date": "2014-04-19",
       "name": "Trinity Relays"
-    },
-    "tfo|220355": {
-      "date": "2015-04-11",
-      "name": "Aloha Preview"
     },
     "tfo|220492": {
       "date": "2014-04-26",
@@ -1785,21 +1770,9 @@
       "date": "2014-05-17",
       "name": "Tigard Youth Track USATF Developmental"
     },
-    "tfo|220729": {
-      "date": "2014-06-14",
-      "name": "Oregon Club Invite"
-    },
-    "tfo|220730": {
-      "date": "2014-06-22",
-      "name": "Oregon USATF JO State Meet"
-    },
     "tfo|220732": {
       "date": "2014-07-06",
       "name": "USATF Region 13 JO Meet"
-    },
-    "tfo|221919": {
-      "date": "2014-05-10",
-      "name": "Albina USATF Developmental Meet"
     },
     "tfo|223535": {
       "date": "2014-06-19",
@@ -1832,22 +1805,6 @@
     "tfo|227580": {
       "date": "2015-05-02",
       "name": "39th Annual Lake Washington Girls Invite"
-    },
-    "tfo|227585": {
-      "date": "2015-04-01",
-      "name": "Tigard @ Canby"
-    },
-    "tfo|227586": {
-      "date": "2015-04-08",
-      "name": "Newberg @ Tigard"
-    },
-    "tfo|227587": {
-      "date": "2015-04-15",
-      "name": "Lake Oswego and St. Mary's @ Tigard"
-    },
-    "tfo|227588": {
-      "date": "2015-04-29",
-      "name": "West Linn @ Tigard"
     },
     "tfo|227589": {
       "date": "2015-05-06",
@@ -1932,10 +1889,6 @@
     "tfo|246942": {
       "date": "2016-04-02",
       "name": "Franzke Invitational"
-    },
-    "tfo|247240": {
-      "date": "2015-04-18",
-      "name": "inner city steppers"
     },
     "tfo|247244": {
       "date": "2015-04-25",
@@ -2045,10 +1998,6 @@
       "date": "2016-05-11",
       "name": "WRL - Athey Creek, Wood @ Hazelbrook"
     },
-    "tfo|266825": {
-      "date": "2016-02-14",
-      "name": "2016 UW Open"
-    },
     "tfo|267149": {
       "date": "2016-05-18",
       "name": "WRL - District Championships (6th)"
@@ -2060,10 +2009,6 @@
     "tfo|267183": {
       "date": "2016-04-19",
       "name": "WRL - Rosemont, Sherwood @ Hazelbrook"
-    },
-    "tfo|267185": {
-      "date": "2016-04-21",
-      "name": "WRL - Athey Creek, Gardiner @ Kraxberger"
     },
     "tfo|267188": {
       "date": "2016-04-28",
@@ -2120,10 +2065,6 @@
     "tfo|284568": {
       "date": "2017-04-19",
       "name": "WRL League Meet"
-    },
-    "tfo|285335": {
-      "date": "2017-06-04",
-      "name": "Portland Track Festival Youth Meet"
     },
     "tfo|285561": {
       "date": "2017-04-28",
@@ -2265,17 +2206,9 @@
       "date": "2018-05-11",
       "name": "6A-4 TRL District Championship Day 2"
     },
-    "tfo|318089": {
-      "date": "2018-04-14",
-      "name": "Oregon Relays"
-    },
     "tfo|318299": {
       "date": "2018-05-19",
       "name": "OSAA 6A State Championships"
-    },
-    "tfo|318659": {
-      "date": "2018-04-21",
-      "name": "54th Centennial Invitational"
     },
     "tfo|318734": {
       "date": "2018-04-27",
@@ -2284,10 +2217,6 @@
     "tfo|318799": {
       "date": "2018-02-03",
       "name": "Nike Boise Indoor"
-    },
-    "tfo|319090": {
-      "date": "2018-04-06",
-      "name": "Laker Classic Invitational"
     },
     "tfo|319145": {
       "date": "2018-04-11",
@@ -2317,17 +2246,9 @@
       "date": "2018-03-21",
       "name": "Sherwood Opener"
     },
-    "tfo|320972": {
-      "date": "2018-04-11",
-      "name": "LO, Tigard @ Sherwood"
-    },
     "tfo|320974": {
       "date": "2018-04-18",
       "name": "SMA, Tualatin @ Sherwood"
-    },
-    "tfo|321475": {
-      "date": "2018-04-04",
-      "name": "St. Mary's & Lake Oswego @ West Linn"
     },
     "tfo|321978": {
       "date": "2018-04-20",
@@ -2336,14 +2257,6 @@
     "tfo|323788": {
       "date": "2018-04-18",
       "name": "Centennial @ David Douglas"
-    },
-    "tfo|324102": {
-      "date": "2018-05-05",
-      "name": "Sherwood Youth Track Club \"Ice Breaker\""
-    },
-    "tfo|330096": {
-      "date": "2018-04-28",
-      "name": "BYTC Blast"
     },
     "tfo|330108": {
       "date": "2018-03-22",
@@ -2373,10 +2286,6 @@
       "date": "2018-04-19",
       "name": "WRL-LRMS, SMS, LOJ, Hazelbrook@Sherwood HS"
     },
-    "tfo|335441": {
-      "date": "2018-05-12",
-      "name": "ICS USATF Developmental Meet"
-    },
     "tfo|336498": {
       "date": "2018-05-09",
       "name": "Lakeridge Junior High Meet"
@@ -2384,10 +2293,6 @@
     "tfo|337583": {
       "date": "2018-05-03",
       "name": "WRL - MCMS, Hazelbrook, Wood, Sherwood @ WVHS"
-    },
-    "tfo|338548": {
-      "date": "2018-07-29",
-      "name": "USATF Hershey National Junior Olympic Championships"
     },
     "tfo|344974": {
       "date": "2018-05-04",
@@ -2473,21 +2378,9 @@
       "date": "2019-05-17",
       "name": "6A-5 Three Rivers League Championship Meet"
     },
-    "tfo|357552": {
-      "date": "2019-06-01",
-      "name": "2019 Oregon HS Hammer Championships & Open Hammer Meet"
-    },
     "tfo|357721": {
       "date": "2019-07-28",
       "name": "USATF National Junior Olympic Championships"
-    },
-    "tfo|358750": {
-      "date": "2019-04-25",
-      "name": "WRL - Lakeridge @ Kraxberger"
-    },
-    "tfo|358756": {
-      "date": "2019-04-11",
-      "name": "WRL Laurel Ridge, Lakeridge, Meridian @ Athey Creek"
     },
     "tfo|359323": {
       "date": "2019-05-11",
@@ -2504,14 +2397,6 @@
     "tfo|362680": {
       "date": "2019-04-11",
       "name": "WRL - Hazelbrook, LOJ @ LO HS"
-    },
-    "tfo|362681": {
-      "date": "2019-05-02",
-      "name": "WRL - Lakeridge, Laurel Ridge, LOJ @ LO HS"
-    },
-    "tfo|364253": {
-      "date": "2019-05-18",
-      "name": "Tigard Youth Track Development Meet"
     },
     "tfo|365114": {
       "date": "2019-05-08",
@@ -2533,10 +2418,6 @@
       "date": "2019-07-07",
       "name": "USATF Region 13 Junior Olympic Championships"
     },
-    "tfo|374263": {
-      "date": "2019-05-09",
-      "name": "WRL - Athey Creek, Sherwood @Lakeridge Junior High"
-    },
     "tfo|374497": {
       "date": "2019-04-18",
       "name": "LRMS-SMS-Meridian-Hazelbrook@Sherwood HS"
@@ -2548,6 +2429,10 @@
     "tfo|378863": {
       "date": "2003-05-24",
       "name": "OSAA State Championships"
+    },
+    "tfo|379532": {
+      "date": "2002-05-25",
+      "name": "OSAA 4A/3A State Championships"
     },
     "tfo|385436": {
       "date": "2020-02-08",
@@ -2569,33 +2454,9 @@
       "date": "2020-08-08",
       "name": "Oregon State Pole Vault Championship, HS"
     },
-    "tfo|416752": {
-      "date": "2021-03-23",
-      "name": "WOU vs Humboldt & Pacific"
-    },
-    "tfo|417928": {
-      "date": "2021-04-10",
-      "name": "John Knight Twilight"
-    },
-    "tfo|417932": {
-      "date": "2021-05-15",
-      "name": "GNAC Outdoor Championships"
-    },
-    "tfo|418662": {
-      "date": "2021-04-22",
-      "name": "Sunset @ Beaverton"
-    },
     "tfo|419973": {
       "date": "2021-04-21",
       "name": "Tualatin at Lakeridge"
-    },
-    "tfo|420318": {
-      "date": "2021-04-14",
-      "name": "St. Mary's/Southridge @ Lake Oswego"
-    },
-    "tfo|420547": {
-      "date": "2021-03-27",
-      "name": "42nd Annual Aztec Invitational (Day 3)"
     },
     "tfo|420934": {
       "date": "2021-06-20",
@@ -2621,21 +2482,9 @@
       "date": "2021-04-14",
       "name": "Tualatin @ Oregon City"
     },
-    "tfo|424033": {
-      "date": "2021-04-29",
-      "name": "Southridge vs Westview"
-    },
-    "tfo|424047": {
-      "date": "2021-05-06",
-      "name": "Southridge vs Aloha"
-    },
     "tfo|425424": {
       "date": "2021-05-07",
       "name": "Friday Night Lights @ Newberg"
-    },
-    "tfo|427266": {
-      "date": "2021-05-13",
-      "name": "Southridge, Aloha @ Mountainside"
     },
     "tfo|428199": {
       "date": "2021-07-03",
@@ -2648,10 +2497,6 @@
     "tfo|430951": {
       "date": "2021-05-15",
       "name": "TRL District Championships"
-    },
-    "tfo|432135": {
-      "date": "2021-05-19",
-      "name": "Metro League Culminating Week Meet"
     },
     "tfo|437066": {
       "date": "2021-05-22",
@@ -2669,10 +2514,6 @@
       "date": "2022-01-16",
       "name": "Spokane HS Invitational Presented by Idaho Central Credit Union"
     },
-    "tfo|441781": {
-      "date": "2022-03-17",
-      "name": "Jim Barks Grizzly Bear Open"
-    },
     "tfo|441783": {
       "date": "2022-04-01",
       "name": "Laker Classic Invitational"
@@ -2680,18 +2521,6 @@
     "tfo|441992": {
       "date": "2022-04-15",
       "name": "Chehalem Field and Track Classic"
-    },
-    "tfo|442000": {
-      "date": "2022-04-09",
-      "name": "Sherwood \"Need For Speed\" Classic"
-    },
-    "tfo|442165": {
-      "date": "2022-04-16",
-      "name": "Wilsonville Invitational"
-    },
-    "tfo|442330": {
-      "date": "2022-04-12",
-      "name": "Oregon City at Lakeridge "
     },
     "tfo|442408": {
       "date": "2022-04-23",
@@ -2701,17 +2530,9 @@
       "date": "2022-04-23",
       "name": "Oregon Relays presented by AthleticNET"
     },
-    "tfo|442721": {
-      "date": "2022-03-29",
-      "name": "Canby at Lakeridge"
-    },
     "tfo|442722": {
       "date": "2022-04-26",
       "name": "JV Quad - SMA/TUAL/WL at Lakeridge"
-    },
-    "tfo|443077": {
-      "date": "2022-04-05",
-      "name": "Lakeridge at Tigard"
     },
     "tfo|443080": {
       "date": "2022-04-19",
@@ -2724,10 +2545,6 @@
     "tfo|444406": {
       "date": "2021-12-10",
       "name": "Strive for Greatness Indoor Meet"
-    },
-    "tfo|444540": {
-      "date": "2022-04-19",
-      "name": "Lakeridge @ Lake Oswego"
     },
     "tfo|445143": {
       "date": "2021-03-06",
@@ -2772,14 +2589,6 @@
     "tfo|451477": {
       "date": "2022-04-06",
       "name": "Lake Oswego @Tualatin"
-    },
-    "tfo|451704": {
-      "date": "2022-04-18",
-      "name": "WRL @ Inza R Wood (Wood, Meridian, Tumwata)"
-    },
-    "tfo|451711": {
-      "date": "2022-04-25",
-      "name": "WRL @ Meridian Creek (Meridian Creek, Tumwata)"
     },
     "tfo|451715": {
       "date": "2022-04-28",
@@ -2853,10 +2662,6 @@
       "date": "2022-06-26",
       "name": "USATF Oregon Association Junior Olympic Championships"
     },
-    "tfo|472422": {
-      "date": "2022-05-07",
-      "name": "Linfield Open"
-    },
     "tfo|473088": {
       "date": "2023-04-22",
       "name": "Oregon Relays presented by AthleticNET"
@@ -2865,17 +2670,9 @@
       "date": "2023-04-28",
       "name": "Nike/Jesuit Twilight Relays"
     },
-    "tfo|473369": {
-      "date": "2022-05-14",
-      "name": "GNAC Outdoor Championships"
-    },
     "tfo|473922": {
       "date": "2022-05-14",
       "name": "St. Francis Fighting Chance Invitational"
-    },
-    "tfo|475111": {
-      "date": "2023-04-21",
-      "name": "John Oliver Invitational"
     },
     "tfo|475140": {
       "date": "2022-05-27",
@@ -2893,10 +2690,6 @@
       "date": "2023-01-15",
       "name": "2023 Spokane HS Invitational presented by Idaho Central Credit Union"
     },
-    "tfo|476491": {
-      "date": "2023-03-04",
-      "name": "STCU West Coast Indoor Track & Field Championships"
-    },
     "tfo|479281": {
       "date": "2023-05-05",
       "name": "Dean Nice Invitational"
@@ -2905,17 +2698,9 @@
       "date": "2023-04-07",
       "name": "Therapeutic Associates Chehalem Classic"
     },
-    "tfo|479692": {
-      "date": "2023-04-04",
-      "name": "Lakeridge, Valley Catholic @ Tigard"
-    },
     "tfo|479984": {
       "date": "2023-03-12",
       "name": "2023 Nike Indoor Nationals"
-    },
-    "tfo|480724": {
-      "date": "2023-03-23",
-      "name": "Pacer Relays"
     },
     "tfo|481810": {
       "date": "2023-04-18",
@@ -2929,41 +2714,13 @@
       "date": "2023-05-02",
       "name": "Tigard @Tualatin"
     },
-    "tfo|482980": {
-      "date": "2022-12-03",
-      "name": "Section VI C/D Inter-Divisional"
-    },
-    "tfo|483393": {
-      "date": "2023-05-02",
-      "name": "Lake Oswego/SMA @ Lakeridge"
-    },
-    "tfo|483582": {
-      "date": "2022-12-10",
-      "name": "Section VI B/D Inter-Divisional"
-    },
     "tfo|483840": {
       "date": "2023-04-07",
       "name": "Whitworth Peace Invite"
     },
-    "tfo|483940": {
-      "date": "2023-04-11",
-      "name": "Lakeridge @ West Linn"
-    },
-    "tfo|484284": {
-      "date": "2022-12-17",
-      "name": "Section VI Inter-Divisional A/D"
-    },
     "tfo|484422": {
       "date": "2023-06-04",
       "name": "Portland Track Festival Youth Meet presented by Stumptown Running"
-    },
-    "tfo|484771": {
-      "date": "2023-03-25",
-      "name": "44th Annual Aztec Invitational (Day 3)"
-    },
-    "tfo|484855": {
-      "date": "2023-04-15",
-      "name": "L&C Larry Byerly Invite"
     },
     "tfo|485126": {
       "date": "2023-04-25",
@@ -2973,33 +2730,13 @@
       "date": "2023-04-13",
       "name": "WRL @ Hazelbrook (Tualatin HS)"
     },
-    "tfo|485490": {
-      "date": "2023-04-18",
-      "name": "WRL @ Wood"
-    },
     "tfo|485823": {
       "date": "2023-04-12",
       "name": "St. Mary's & Tualatin @ Oregon City"
     },
-    "tfo|485825": {
-      "date": "2023-04-26",
-      "name": "Lakeridge @ Oregon City"
-    },
-    "tfo|486494": {
-      "date": "2023-04-29",
-      "name": "PIL MS Invitational"
-    },
-    "tfo|486823": {
-      "date": "2023-05-06",
-      "name": "Linfield Open"
-    },
     "tfo|487209": {
       "date": "2023-01-14",
       "name": "Sean Brady Alumni Invitational"
-    },
-    "tfo|487237": {
-      "date": "2023-01-14",
-      "name": "Section VI Indoor Track & Field Inter-Divisional B-D"
     },
     "tfo|487460": {
       "date": "2023-05-27",
@@ -3008,10 +2745,6 @@
     "tfo|488442": {
       "date": "2023-04-27",
       "name": "WRL @ Athey Creek"
-    },
-    "tfo|488898": {
-      "date": "2023-04-13",
-      "name": "Canby MS Meet #1"
     },
     "tfo|489022": {
       "date": "2023-05-19",
@@ -3029,14 +2762,6 @@
       "date": "2023-05-12",
       "name": "TRL JV Districts"
     },
-    "tfo|490410": {
-      "date": "2023-02-04",
-      "name": "Section VI 9/10 Grade Championships & PV/Throws Invitational"
-    },
-    "tfo|491046": {
-      "date": "2023-05-04",
-      "name": "WRL @ Meridian Creek"
-    },
     "tfo|491050": {
       "date": "2023-05-04",
       "name": "WRL @ Wood"
@@ -3044,10 +2769,6 @@
     "tfo|491350": {
       "date": "2023-05-06",
       "name": "BYTC Blast"
-    },
-    "tfo|491663": {
-      "date": "2023-05-11",
-      "name": "WRL @ Meridian Creek"
     },
     "tfo|491664": {
       "date": "2023-05-11",
@@ -3057,33 +2778,9 @@
       "date": "2023-05-16",
       "name": "WRL District Meet"
     },
-    "tfo|491832": {
-      "date": "2023-02-11",
-      "name": "Section VI Team Championships"
-    },
-    "tfo|492060": {
-      "date": "2023-03-14",
-      "name": "LHS Intrasquad"
-    },
-    "tfo|493039": {
-      "date": "2023-02-19",
-      "name": "Section VI State Qualifier"
-    },
     "tfo|493784": {
       "date": "2023-04-29",
       "name": "USATF Oregon Youth Developmental T&F Meet"
-    },
-    "tfo|495977": {
-      "date": "2023-06-10",
-      "name": " Phil Walden Inaugural Albina-Vancouver Roadrunners Invitational"
-    },
-    "tfo|497972": {
-      "date": "2023-04-25",
-      "name": "WRL @ Gladstone HS "
-    },
-    "tfo|499019": {
-      "date": "2023-03-18",
-      "name": "Cardinal Classic"
     },
     "tfo|501160": {
       "date": "2023-06-25",
@@ -3101,49 +2798,13 @@
       "date": "2023-05-20",
       "name": "Tigard HS (Friday) / Sherwood MS (Saturday) - Development Meet"
     },
-    "tfo|509472": {
-      "date": "2023-04-22",
-      "name": "Depew Wildcat Invitational"
-    },
-    "tfo|511530": {
-      "date": "2023-04-29",
-      "name": "WSW Early Bird Classic"
-    },
-    "tfo|513615": {
-      "date": "2023-05-06",
-      "name": "Pioneer Invitational"
-    },
-    "tfo|514161": {
-      "date": "2023-05-13",
-      "name": "2023 BYU Cougar Invitational"
-    },
-    "tfo|514630": {
-      "date": "2023-05-13",
-      "name": "Williamsville South Invitational"
-    },
-    "tfo|515381": {
-      "date": "2023-05-20",
-      "name": "ECIC Track & Field Championships/Small Schools"
-    },
     "tfo|515668": {
       "date": "2024-05-02",
       "name": "WRL Hazelbrook, Canby @ Meridian Creek MS"
     },
-    "tfo|515670": {
-      "date": "2024-05-09",
-      "name": "WRL @ Meridian Creek MS"
-    },
     "tfo|516010": {
       "date": "2023-05-26",
       "name": "NAIA Outdoor Track & Field Championships"
-    },
-    "tfo|516047": {
-      "date": "2023-05-27",
-      "name": "Section 6 Class A Championships"
-    },
-    "tfo|516652": {
-      "date": "2023-06-03",
-      "name": "Section VI Track & Field State Qualifier"
     },
     "tfo|516658": {
       "date": "2024-04-13",
@@ -3160,18 +2821,6 @@
     "tfo|518152": {
       "date": "2024-04-26",
       "name": "Nike/Jesuit Twilight Relays"
-    },
-    "tfo|518660": {
-      "date": "2024-01-21",
-      "name": "2024 SPOKANE HS INVITATIONAL"
-    },
-    "tfo|518661": {
-      "date": "2024-03-03",
-      "name": "2024 STCU West Coast Championships"
-    },
-    "tfo|519591": {
-      "date": "2024-06-15",
-      "name": "2024 Nike Outdoor Nationals"
     },
     "tfo|519689": {
       "date": "2024-01-13",
@@ -3265,10 +2914,6 @@
       "date": "2024-04-11",
       "name": "WRL @ Hazelbrook (Tualatin HS)"
     },
-    "tfo|526649": {
-      "date": "2023-12-16",
-      "name": "Section VI A/C Inter-Divisional"
-    },
     "tfo|526958": {
       "date": "2024-04-18",
       "name": "WRL @ Wood MS"
@@ -3285,10 +2930,6 @@
       "date": "2024-04-09",
       "name": "Lakeridge @ Tualatin"
     },
-    "tfo|529012": {
-      "date": "2024-01-06",
-      "name": "Section VI Varsity Select #1"
-    },
     "tfo|529034": {
       "date": "2024-04-27",
       "name": "Oregon State High Performance"
@@ -3296,10 +2937,6 @@
     "tfo|529411": {
       "date": "2021-01-23",
       "name": "John Gartland Invitational"
-    },
-    "tfo|529458": {
-      "date": "2024-06-09",
-      "name": "2nd Annual Phil Walden, Albina-Vancouver Roadrunners Invitational"
     },
     "tfo|530214": {
       "date": "2021-02-20",
@@ -3333,10 +2970,6 @@
       "date": "2024-04-18",
       "name": "WRL - Tumwata, Hazelbrook @ LOJ"
     },
-    "tfo|534303": {
-      "date": "2024-02-03",
-      "name": "Section VI Indoor Track & Field Varsity Select #3"
-    },
     "tfo|534323": {
       "date": "2024-04-25",
       "name": "WRL Hazelbrook @ Athey Creek"
@@ -3349,22 +2982,6 @@
       "date": "2024-03-02",
       "name": "NAIA Indoor Championships"
     },
-    "tfo|535897": {
-      "date": "2024-02-10",
-      "name": "Section VI Team Championships"
-    },
-    "tfo|537870": {
-      "date": "2024-05-11",
-      "name": "Tigard Youth developmental meet"
-    },
-    "tfo|538115": {
-      "date": "2024-03-16",
-      "name": "Arizona Spring Break Fiesta"
-    },
-    "tfo|538485": {
-      "date": "2024-02-17",
-      "name": "Section VI State Qualifier"
-    },
     "tfo|538919": {
       "date": "2024-05-11",
       "name": "BIG West Conference Championships"
@@ -3373,25 +2990,13 @@
       "date": "2024-04-13",
       "name": "2024 Bryan Clay Invitational"
     },
-    "tfo|539340": {
-      "date": "2024-07-28",
-      "name": "USATF National Junior Olympic Championships"
-    },
     "tfo|540133": {
       "date": "2024-05-01",
       "name": "Lakeridge @ Sherwood"
     },
-    "tfo|540705": {
-      "date": "2024-03-02",
-      "name": "NYSPHSAA Indoor Championship"
-    },
     "tfo|541053": {
       "date": "2024-03-16",
       "name": "2024 Hornet Invite"
-    },
-    "tfo|541577": {
-      "date": "2024-03-09",
-      "name": "LCC Open 2024"
     },
     "tfo|541700": {
       "date": "2024-04-20",
@@ -3404,10 +3009,6 @@
     "tfo|542625": {
       "date": "2024-06-23",
       "name": "USATF Oregon Association Junior Olympic Championships"
-    },
-    "tfo|542668": {
-      "date": "2024-07-07",
-      "name": "USATF Region 13 Junior Olympic Championships"
     },
     "tfo|542903": {
       "date": "2024-05-14",
@@ -3425,41 +3026,13 @@
       "date": "2024-03-16",
       "name": "PLU Open"
     },
-    "tfo|551664": {
-      "date": "2024-06-08",
-      "name": "NYSPHSAA New York Outdoor State Championship"
-    },
-    "tfo|556331": {
-      "date": "2024-05-11",
-      "name": "2024 Big 12 Outdoors"
-    },
-    "tfo|556671": {
-      "date": "2024-04-20",
-      "name": "Depew Wildcat Invitational"
-    },
-    "tfo|559458": {
-      "date": "2024-04-27",
-      "name": "West Seneca West Warhawks Track Classic"
-    },
-    "tfo|559661": {
-      "date": "2024-05-11",
-      "name": "NWAC Southern Region"
-    },
     "tfo|561522": {
       "date": "2024-05-02",
       "name": "TSSAA D-1 AAA Section 3 North-Subsectional"
     },
-    "tfo|562113": {
-      "date": "2025-04-19",
-      "name": "The Willamette Falls Invitational"
-    },
     "tfo|562544": {
       "date": "2024-05-10",
       "name": "TSSAA D-1 AAA Section 3"
-    },
-    "tfo|563094": {
-      "date": "2024-05-21",
-      "name": "NWAC Championships"
     },
     "tfo|563240": {
       "date": "2025-04-25",
@@ -3477,14 +3050,6 @@
       "date": "2025-04-12",
       "name": "T Smith Need For Speed Invitational "
     },
-    "tfo|563608": {
-      "date": "2025-05-03",
-      "name": "59th Centennial Invitational"
-    },
-    "tfo|563731": {
-      "date": "2024-05-23",
-      "name": "Section 6 Class A Championships"
-    },
     "tfo|563859": {
       "date": "2025-05-02",
       "name": "Cardinal Varsity Invite"
@@ -3497,10 +3062,6 @@
       "date": "2025-05-16",
       "name": "Oregon Middle School Meet of Champions"
     },
-    "tfo|564138": {
-      "date": "2024-06-01",
-      "name": "Section 6 Track & Field State Qualifier"
-    },
     "tfo|564269": {
       "date": "2025-04-05",
       "name": "Oregon Relays presented by AthleticNET"
@@ -3509,33 +3070,9 @@
       "date": "2025-04-18",
       "name": "Sunset Team Challenge Sponsored by Asics"
     },
-    "tfo|564436": {
-      "date": "2025-04-12",
-      "name": "Wilsonville Invitational"
-    },
-    "tfo|566405": {
-      "date": "2025-01-25",
-      "name": "Dr. Sander Scorcher"
-    },
-    "tfo|566722": {
-      "date": "2025-03-16",
-      "name": "Nike Indoor Nationals"
-    },
-    "tfo|568202": {
-      "date": "2025-01-26",
-      "name": "2025 Spokane HS Invitational"
-    },
     "tfo|568204": {
       "date": "2025-02-23",
       "name": "2025 STCU West Coast Championships"
-    },
-    "tfo|568450": {
-      "date": "2025-04-16",
-      "name": "Sunset @ Beaverton"
-    },
-    "tfo|568453": {
-      "date": "2025-05-23",
-      "name": "6A-2 Metro League Championships"
     },
     "tfo|568467": {
       "date": "2025-01-11",
@@ -3544,10 +3081,6 @@
     "tfo|568692": {
       "date": "2025-06-22",
       "name": "Nike Outdoor Nationals"
-    },
-    "tfo|569614": {
-      "date": "2025-05-03",
-      "name": "Oregon State High Performance"
     },
     "tfo|569895": {
       "date": "2025-01-17",
@@ -3561,61 +3094,21 @@
       "date": "2025-04-08",
       "name": "Tualatin @ Tigard"
     },
-    "tfo|570193": {
-      "date": "2025-05-13",
-      "name": "Lake Oswego @ Tigard"
-    },
     "tfo|570194": {
       "date": "2025-05-16",
       "name": "TRL JV District Championships"
-    },
-    "tfo|570209": {
-      "date": "2025-04-08",
-      "name": "Lakeridge/St. Mary's at West Linn"
     },
     "tfo|570242": {
       "date": "2025-04-29",
       "name": "Lakeridge at Tualatin"
     },
-    "tfo|570263": {
-      "date": "2025-04-19",
-      "name": "65th Mt. SAC Relays"
-    },
     "tfo|570597": {
       "date": "2025-04-11",
       "name": "Southridge JV Invite"
     },
-    "tfo|570795": {
-      "date": "2025-03-19",
-      "name": "Beaverton @ Southridge"
-    },
-    "tfo|570987": {
-      "date": "2025-04-08",
-      "name": "Oregon City at Lake Oswego"
-    },
-    "tfo|570995": {
-      "date": "2025-04-29",
-      "name": "West Linn at Lake Oswego"
-    },
-    "tfo|570996": {
-      "date": "2025-05-06",
-      "name": "Lakeridge, St. Mary's at Lake Oswego"
-    },
-    "tfo|571197": {
-      "date": "2025-04-09",
-      "name": "Beaverton @ Mountainside"
-    },
     "tfo|571199": {
       "date": "2025-04-10",
       "name": "WRL @ Hazelbrook (Tualatin HS)"
-    },
-    "tfo|571270": {
-      "date": "2025-04-16",
-      "name": "Mountainside @ Aloha"
-    },
-    "tfo|571692": {
-      "date": "2025-04-30",
-      "name": "Beaverton @ Westview"
     },
     "tfo|571707": {
       "date": "2025-04-15",
@@ -3625,21 +3118,9 @@
       "date": "2025-02-22",
       "name": "2025 MPSF Indoor T&F Championships"
     },
-    "tfo|571842": {
-      "date": "2025-04-16",
-      "name": "West Linn @ Oregon City"
-    },
     "tfo|571843": {
       "date": "2025-05-07",
       "name": "Tualatin @ Oregon City"
-    },
-    "tfo|572131": {
-      "date": "2025-05-07",
-      "name": "Jesuit @ Beaverton"
-    },
-    "tfo|572330": {
-      "date": "2025-05-14",
-      "name": "Aloha @ Beaverton"
     },
     "tfo|572363": {
       "date": "2025-04-26",
@@ -3649,17 +3130,9 @@
       "date": "2025-06-08",
       "name": "Portland Track Festival Youth Meet presented by Stumptown Running"
     },
-    "tfo|572855": {
-      "date": "2025-05-06",
-      "name": "Tigard @ West Linn"
-    },
     "tfo|572939": {
       "date": "2025-07-06",
       "name": "USATF Region 13 Junior Olympic Championship"
-    },
-    "tfo|573024": {
-      "date": "2025-04-12",
-      "name": "John Knight Invite"
     },
     "tfo|573129": {
       "date": "2025-05-23",
@@ -3684,14 +3157,6 @@
     "tfo|573962": {
       "date": "2024-12-07",
       "name": "Warrior Invitational"
-    },
-    "tfo|574094": {
-      "date": "2024-12-07",
-      "name": "Section VI Limited Select #1"
-    },
-    "tfo|574417": {
-      "date": "2024-12-12",
-      "name": "BYU December Invitational"
     },
     "tfo|574573": {
       "date": "2025-03-01",
@@ -3729,25 +3194,9 @@
       "date": "2025-05-22",
       "name": "NAIA Outdoor National Championships"
     },
-    "tfo|575537": {
-      "date": "2024-12-20",
-      "name": "Section VI C/D Inter-Divisional"
-    },
     "tfo|576112": {
       "date": "2025-06-29",
       "name": "USATF Oregon Association Junior Olympic Championships"
-    },
-    "tfo|576837": {
-      "date": "2025-03-22",
-      "name": "2025 Willie Williams Classic"
-    },
-    "tfo|577461": {
-      "date": "2025-01-11",
-      "name": "Section VI A/D Inter-Divisional"
-    },
-    "tfo|578198": {
-      "date": "2025-03-18",
-      "name": "West Linn/Tigard Icebreaker"
     },
     "tfo|578460": {
       "date": "2025-04-19",
@@ -3757,14 +3206,6 @@
       "date": "2025-04-22",
       "name": "Tigard JV Meet"
     },
-    "tfo|578734": {
-      "date": "2025-01-18",
-      "name": "Section VI Varsity Select #1"
-    },
-    "tfo|578977": {
-      "date": "2025-06-14",
-      "name": "3rd Annual Phil Walden, Albina-Vancouver Roadrunners Invitational"
-    },
     "tfo|579026": {
       "date": "2025-03-08",
       "name": "Maui UH Intrasquad/Open Track & Field Meet"
@@ -3772,10 +3213,6 @@
     "tfo|579705": {
       "date": "2025-05-03",
       "name": "Steve Scott Invite"
-    },
-    "tfo|579911": {
-      "date": "2025-01-24",
-      "name": "Section VI Varsity Select #2"
     },
     "tfo|580789": {
       "date": "2025-04-17",
@@ -3797,29 +3234,9 @@
       "date": "2025-02-15",
       "name": "Crossroads League Indoor Championships"
     },
-    "tfo|584680": {
-      "date": "2025-02-15",
-      "name": "Don Kirby Collegiate Elite"
-    },
-    "tfo|585157": {
-      "date": "2025-02-15",
-      "name": "CHSAA Intersectional Championship"
-    },
-    "tfo|586338": {
-      "date": "2025-03-08",
-      "name": "NYPHSAA Indoor State Championships"
-    },
     "tfo|586926": {
       "date": "2025-04-18",
       "name": "Bryan Clay Invitational"
-    },
-    "tfo|587462": {
-      "date": "2025-03-29",
-      "name": "Willamette Invitational"
-    },
-    "tfo|587627": {
-      "date": "2025-05-10",
-      "name": "NWAC Southern Regional Championships"
     },
     "tfo|588095": {
       "date": "2025-03-01",
@@ -3841,21 +3258,9 @@
       "date": "2025-03-22",
       "name": "Hornet Invitational"
     },
-    "tfo|595359": {
-      "date": "2025-03-29",
-      "name": "97th Clyde Littlefield Texas Relays presented by Truist"
-    },
-    "tfo|597870": {
-      "date": "2025-04-12",
-      "name": "Utah Spring Classic"
-    },
     "tfo|598065": {
       "date": "2025-04-05",
       "name": "Stanford Invitational"
-    },
-    "tfo|600859": {
-      "date": "2025-04-11",
-      "name": "Weber State Spring Classic"
     },
     "tfo|602600": {
       "date": "2025-05-17",
@@ -3865,25 +3270,9 @@
       "date": "2026-03-15",
       "name": "Nike Indoor Nationals"
     },
-    "tfo|608672": {
-      "date": "2025-07-27",
-      "name": "USATF National Junior Olympic Championships"
-    },
-    "tfo|612931": {
-      "date": "2025-05-20",
-      "name": "2025 NWAC TF Championships"
-    },
     "tfo|612997": {
       "date": "2026-05-02",
       "name": "Oregon State High Performance"
-    },
-    "tfo|613735": {
-      "date": "2025-05-15",
-      "name": "Big 12 Outdoor Championships"
-    },
-    "tfo|614129": {
-      "date": "2025-05-31",
-      "name": "West DI First-Round - NCAA Outdoor Championships"
     },
     "tfo|615709": {
       "date": "2026-05-30",
@@ -3896,14 +3285,6 @@
     "tfo|617763": {
       "date": "2026-05-15",
       "name": "Oregon Middle School Meet of Champions"
-    },
-    "tfo|618704": {
-      "date": "2008-02-17",
-      "name": "2008 UW Indoor Open"
-    },
-    "tfo|619039": {
-      "date": "2025-12-13",
-      "name": "2025 Spokane Invitational"
     },
     "tfo|619041": {
       "date": "2026-01-10",
@@ -3933,10 +3314,6 @@
       "date": "2026-04-04",
       "name": "Oregon Relays presented by AthleticNET"
     },
-    "tfo|619940": {
-      "date": "2026-04-11",
-      "name": "John Knight Twilight"
-    },
     "tfo|620607": {
       "date": "2026-03-07",
       "name": "Linfield Erik Anderson Memorial Icebreaker Invitational"
@@ -3945,29 +3322,9 @@
       "date": "2026-04-10",
       "name": "McKay Frosh-Soph Twilight"
     },
-    "tfo|620952": {
-      "date": "2026-02-28",
-      "name": "Umpqua Opener"
-    },
-    "tfo|621020": {
-      "date": "2026-05-22",
-      "name": "6A-2 Metro League Championships"
-    },
-    "tfo|621626": {
-      "date": "2026-05-06",
-      "name": "Beaverton @ Jesuit"
-    },
     "tfo|621819": {
       "date": "2026-02-28",
       "name": "Wildwood Miles for Girls + Women - Portland"
-    },
-    "tfo|621856": {
-      "date": "2026-04-22",
-      "name": "Beaverton vs Southridge"
-    },
-    "tfo|621857": {
-      "date": "2026-04-29",
-      "name": "Beaverton vs Westview"
     },
     "tfo|621953": {
       "date": "2026-04-28",
@@ -3981,10 +3338,6 @@
       "date": "2026-04-09",
       "name": "WRL- Wood at Hazelbrook @ Tualatin"
     },
-    "tfo|624193": {
-      "date": "2026-03-21",
-      "name": "L&C - Electric Forest Open"
-    },
     "tfo|624232": {
       "date": "2026-04-18",
       "name": "Larry Byerly Invitational"
@@ -3996,10 +3349,6 @@
     "tfo|624244": {
       "date": "2026-05-15",
       "name": "2026 TRL JV District Championships"
-    },
-    "tfo|624389": {
-      "date": "2026-05-13",
-      "name": "Beaverton @ Aloha"
     },
     "tfo|624445": {
       "date": "2026-04-14",
@@ -4041,10 +3390,6 @@
       "date": "2026-04-26",
       "name": "2026 NorthWest Conference Championship"
     },
-    "tfo|627181": {
-      "date": "2026-04-25",
-      "name": "2026 Nancy & Norm Berney Classic"
-    },
     "tfo|627589": {
       "date": "2026-04-18",
       "name": "Bryan Clay Invitational"
@@ -4061,17 +3406,9 @@
       "date": "2026-05-09",
       "name": "Tigard Youth Club Meet"
     },
-    "tfo|628211": {
-      "date": "2026-01-24",
-      "name": "2026 Mark Colligan Memorial"
-    },
     "tfo|628298": {
       "date": "2026-05-12",
       "name": "West Linn, St Mary’s @ Tualatin"
-    },
-    "tfo|628618": {
-      "date": "2026-06-13",
-      "name": "4TH Annual Phil Walden, Albina-Vancouver Roadrunners Invitational"
     },
     "tfo|628951": {
       "date": "2026-05-22",
@@ -4085,17 +3422,9 @@
       "date": "2026-05-11",
       "name": "WRL District Track & Field Meet"
     },
-    "tfo|634131": {
-      "date": "2026-05-10",
-      "name": "NWAC Southern Regional Championships"
-    },
     "tfo|636395": {
       "date": "2026-02-14",
       "name": "Battle Born Classic"
-    },
-    "tfo|636484": {
-      "date": "2026-02-14",
-      "name": "Don Kirby Elite Invitational"
     },
     "tfo|638681": {
       "date": "2026-04-25",
@@ -4117,25 +3446,13 @@
       "date": "2026-05-02",
       "name": "Raptors Youth Club @ Rex Putnam"
     },
-    "tfo|644030": {
-      "date": "2026-08-02",
-      "name": "2026 USATF National Junior Olympic Track & Field Championships"
-    },
     "tfo|644392": {
       "date": "2026-04-18",
       "name": "Raider Invitational"
     },
-    "tfo|645034": {
-      "date": "2026-04-18",
-      "name": "Oregon Team Invitational"
-    },
     "tfo|645105": {
       "date": "2026-04-30",
       "name": "WRL Meridian Creek, Hazelbrook @ Tumwata"
-    },
-    "tfo|648419": {
-      "date": "2026-03-28",
-      "name": "Susquehanna Jim Taylor Duals"
     },
     "tfo|648568": {
       "date": "2026-04-04",
@@ -4145,24 +3462,12 @@
       "date": "2026-06-28",
       "name": "USATF Oregon Association Junior Olympic"
     },
-    "tfo|653459": {
-      "date": "2026-04-12",
-      "name": "Big Red Invitational"
-    },
-    "tfo|657367": {
-      "date": "2026-05-19",
-      "name": "2026 NWAC T&F Championships"
-    },
     "tfo|663441": {
       "date": "2026-06-13",
       "name": "Rose City Mile"
     },
     "tfo|672192": {
       "date": "2024-08-31",
-      "name": "World Athletics U20 Championships"
-    },
-    "tfo|673387": {
-      "date": "2026-08-09",
       "name": "World Athletics U20 Championships"
     }
   }

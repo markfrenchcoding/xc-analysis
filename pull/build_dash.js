@@ -189,11 +189,39 @@ const sBlock = block(seasons
   .map((s) => [ai.get(s.athleteId), s.schoolYear, Math.max(0, SPORT.indexOf(s.sport)),
     s.grade || '', s.nRaces].join(',')));
 
+/* ---------- how a track race was run ----------
+   Four columns the page needs to fit an expected time and cannot get any
+   other way: which round it was, whether the clock was automatic, whether the
+   mark was an exhibition, and which division ran it.
+
+   THEY ARE WRITTEN AS DEVIATIONS FROM THE ORDINARY CASE, because the ordinary
+   case is most of twenty thousand rows. A final, fully automatic, not an
+   exhibition, in the modal division is the empty string; anything else spells
+   out what it was. Cross country has no rounds and one clock, so its rows are
+   empty here by nature rather than by omission. */
+const divCount = {};
+for (const r of results) if (r.sport === 'tfo' && r.division) divCount[r.division] = (divCount[r.division] || 0) + 1;
+const MODAL_DIV = Object.entries(divCount).sort((a, b) => b[1] - a[1])[0];
+const modalDiv = MODAL_DIV ? MODAL_DIV[0] : '';
+const divs = [...new Set(results.map((r) => r.division).filter((d) => d && d !== modalDiv))].sort();
+const di = new Map(divs.map((d, i) => [d, i]));
+const howRun = (r) => {
+  if (r.sport !== 'tfo') return '';
+  const bits = [];
+  if (r.round && r.round !== 'F') bits.push(r.round);
+  if (String(r.fat) === '0') bits.push('h');          // hand time
+  if (String(r.exh) === '1') bits.push('x');          // exhibition
+  if (r.division && r.division !== modalDiv && di.has(r.division)) bits.push('d' + di.get(r.division));
+  return bits.join('');
+};
+
 const rBlock = block(results
   .filter((r) => ai.has(r.athleteId) && mi.has(key(r)))
   .map((r) => [ai.get(r.athleteId), mi.get(key(r)), Math.max(0, SPORT.indexOf(r.sport)),
     r.event ? ei.get(r.event) : '', r.dist, H(r.seconds),
-    r.place || '', dayOffset(r)].join(',')));
+    r.place || '', dayOffset(r), howRun(r)].join(',')));
+
+const dBlock = block(divs);
 
 const mBlock = block(meetIds.map((m) => {
   const o = meetInfo.get(m) || {};
@@ -227,6 +255,13 @@ const info = {
     tfo: results.filter((r) => r.sport === 'tfo').length },
   fieldMarksSkipped: meta.fieldMarksSkipped || 0,
   distFloor: DIST_FLOOR,
+  modalDiv,
+  /* the archive is not uniform and the page should be able to say so: every
+     athlete is here, and the ones who never raced 800m or longer are here at
+     season-best depth rather than every-race depth */
+  depth: meta.depth || 'deep',
+  deepAthletes: meta.deepAthletes || null,
+  shallowAthletes: meta.shallowAthletes || 0,
   archived: { athletes: allAthletes.length, results: allResults.length },
   /* what the Who's Who ranks are out of, so the page can say "of 446" rather
      than leaving a rank floating with nothing behind it */
@@ -250,6 +285,7 @@ put('d-seasons', sBlock);
 put('d-results', rBlock);
 put('d-meets', mBlock);
 put('d-events', eBlock);
+put('d-divs', dBlock);
 put('d-ww', wBlock);
 put('d-tf', tBlock);
 put('d-tfmeets', tnBlock);
