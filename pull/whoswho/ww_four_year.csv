@@ -128,7 +128,7 @@ M,68,42,Switch,Jedaiah Wasson,,,East Linn,2015,2018
 F,68,22,3-2-1A,Nyika Corbett,,,Myrtle Point,2002,2005
 M,69,43,3-2-1A,Andrew Perri,,,Oakridge,2001,2004
 F,69,22,6A,Payton Schutte,,,Jesuit,2007,2010
-M,70,43,3-2-1A,Aram Donegan,,,"Elgin,",1989,1992
+M,70,43,3-2-1A,Aram Donegan,,,Elgin,1989,1992
 F,70,22,4A,Raelyn Robinson,,,Siuslaw,2007,2010
 M,71,43,3-2-1A,David Sherman,,,McKenzie,2003,2006
 F,71,22,5A,Hannah Tobiason,,,Summit,2014,2017
@@ -178,9 +178,9 @@ M,94,53,3-2-1A,Cooper Roach,,,Valley Catholic,2010,2013
 F,94,27,3-2-1A,Shannon Mitchell,,,Union,2000,2003
 M,95,53,3-2-1A,Jack Hayes,,,Union,1988,1991
 F,95,27,6A,Lucy Huelskamp,,,Sunset,2016,2019
-M,96,53,3-2-1A,Jason Carter,,,Canyonville Chr.,1991,1994
+M,96,53,3-2-1A,Jason Carter,,,Canyonville Chr,1991,1994
 F,96,28,5A,Jenna Mattox,,,Bend,2009,2012
-M,97,54,6A,Clinton Hall,,,"Redmond,",1979,1982
+M,97,54,6A,Clinton Hall,,,Redmond,1979,1982
 F,97,28,3-2-1A,Stephanie Upshaw,,,Union,1998,2001
 M,98,54,6A,Jim Smith,,,Tigard,1979,1982
 F,98,29,6A,Gracie Todd,,,Sheldon,2011,2014
@@ -194,12 +194,12 @@ M,102,56,3-2-1A,Andrew Hinkel,,,Portland Lutherian,2010,2013
 F,102,29,4A,Ronda Groshong,,,Tillamook,1983,1986
 M,103,56,4A,Jeff Ponsness,,,Tillamook,1971,1974
 F,103,30,Switch,Alice De Jaeger,,,Salem Academy,1983,1986
-M,104,56,6A,Reilly Bloomer,,,"South Eugene,",2011,2014
+M,104,56,6A,Reilly Bloomer,,,South Eugene,2011,2014
 F,104,30,6A,Nicole Griffins,,,Sunset,2012,2015
 M,105,56,6A,Will Sheaffer,,,Jesuit,2015,2018
 F,105,30,3-2-1A,Stephanie Croy,,,Cascade Christian,2010,2013
 M,106,57,3-2-1A,Alec Bromka,,,Catlin Gabel,2001,2004
-F,106,31,3-2-1A,Reyna Quiroz,,,Canyonville Chr.,1999,2002
+F,106,31,3-2-1A,Reyna Quiroz,,,Canyonville Chr,1999,2002
 M,107,57,4A,Conner Kasler,,,Hidden Valley,2005,2008
 F,107,31,3-2-1A,Ellyse Tingelstad,,,Enterprise,2016,2019
 M,108,57,6A,Erik Heinonen,,,South Eugene,1997,2000
@@ -391,7 +391,7 @@ M,203,92,4A,Jon Morse,,,Coquille,1985,1988
 F,203,58,4A,Ingrid Hellesto,,,Phiolomath,2019,2022
 M,204,92,4A,Grant Boehannon,,,Hidden Valley,2019,2022
 F,204,58,4A,Kiah Carlson,,,La Grande,2020,2023
-M,205,93,3-2-1A,Bob Drummond,,,"Waldport,",1978,1981
+M,205,93,3-2-1A,Bob Drummond,,,Waldport,1978,1981
 F,205,59,4A,Ashley Gilkey,,,N.Valley/Hid.Valley,2004,2007
 M,206,93,6A,Brendan Hughes,,,Lakeridge,1989,1992
 F,206,59,3-2-1A,Bridget Donohue,,,Kennedy,2008,2011
@@ -508,7 +508,7 @@ F,262,71,6A,Cindy Pokorney,,,Centennial,1979,1982
 M,263,111,4A,Bill Morris,,,Reedsport,1971,1974
 F,263,71,4A,Ellie Enos,,,Brookings-Harbor,1995,1998
 M,264,111,4A,Dale Coats,,,Crook County,1975,1978
-F,264,71,6A,Lucy Whipps,,,St.Marys Aca.,2006,2009
+F,264,71,6A,Lucy Whipps,,,St.Marys Aca,2006,2009
 M,265,111,4A,Dan Flora,,,North Bend,2005,2008
 F,265,71,4A,Ellieana Massey,,,North Bend,2022,2025
 M,266,111,4A,Logan Veasey,,,La Salle,2010,2013
@@ -698,7 +698,7 @@ F,360,100,5A,Jadyn Kipe,,,Wilsonville,2021,2024
 M,361,148,4A,Ryan Murphy,,,Phoenix,1993,1996
 F,361,101,3-2-1A,Megan Klech,,,Union,1992,1995
 M,362,148,6A,Tom McKillip,,,Wilson,1980,1983
-F,362,101,Switch,Maya Wells,,,"Siuslaw,",2021,2024
+F,362,101,Switch,Maya Wells,,,Siuslaw,2021,2024
 M,363,149,3-2-1A,Cherokee Walker,,,Union,1995,1998
 F,363,102,6A,Alexa Kerns,,,St.Marys Academy,2006,2009
 M,364,149,4A,Jasper Devereaux,,,Astoria,1995,1998
@@ -710,7 +710,7 @@ F,366,102,3-2-1A,Nora Barrons,,,Blanchet Christian,1999,2002
 M,367,150,3-2-1A,Nathan Griffith,,,Oaridge,1994,1997
 F,367,102,Switch,Addison McNeill,,,Siuslaw,2021,2024
 M,368,150,5A,Isaac Sanchez,,,Hermiston,2014,2017
-F,368,103,5A,Claire Krizan,,,"Crescent Valley,",2007,2010
+F,368,103,5A,Claire Krizan,,,Crescent Valley,2007,2010
 M,369,151,4A,Dan Poet,,,Pleasant Hill,1984,1987
 F,369,103,4A,Kim McClure,,,Salem Academy,1981,1984
 M,370,151,4A,Joey Pollard,,,Phoenix,1983,1986
@@ -790,7 +790,7 @@ M,409,171,4A,Nick Jenkins,,,Scappoose,1999,2002
 F,409,112,4A,Sarah Hagy,,,Phoenix,2007,2010
 F,410,112,3-2-1A,Tanager Stanhope,,,Elgin,1994,1997
 M,411,172,3-2-1A,Jeremiah Cullett,,,Canyonville,1991,1994
-F,411,113,3-2-1A,Andrea Gauger,,,Canyonville Chr.,1987,1990
+F,411,113,3-2-1A,Andrea Gauger,,,Canyonville Chr,1987,1990
 M,412,172,4A,Ted Cook,,,Gladstone,1976,1979
 F,412,113,6A,Dana Stamper,,,North Bend,1978,1981
 M,413,172,4A,Benedict Welch,,,La Grande,2015,2018
@@ -824,7 +824,7 @@ M,427,181,4A,Sam Lynass,,,North Bend,2006,2009
 F,427,116,Switch,Monica Anderson,,,Marist,2009,2012
 M,428,181,3A,Kale Jensen,,,Siuslaw,2022,2025
 F,428,116,3-2-1A,Peggy Ebenshade,,,Siletz,1975,1978
-M,429,183,3-2-1A,Josh Cunningham,,,New Hope Chr.,2002,2005
+M,429,183,3-2-1A,Josh Cunningham,,,New Hope Chr,2002,2005
 F,429,116,3-2-1A,Sara Seiwald,,,Valley Catholic,2007,2010
 M,430,185,6A,Seth Berdahl,,,Forest Grove,2011,2014
 F,430,116,4A,Ella Zilli,,,Astoria,2019,2022
@@ -853,7 +853,7 @@ F,441,120,3-2-1A,Candace Carmichael,,,Vale,2006,2009
 M,442,192,5A,Connor Devereaux,,,Marshfield,2009,2012
 F,442,120,4A,Rebekah Duby,,,Baker,1999,2002
 M,443,192,4A,Jon Brauer,,,Siuslaw,1975,1978
-F,443,122,5A,Aiyanna Cameron-Lewis,,,Cres.Val.,2010,2013
+F,443,122,5A,Aiyanna Cameron-Lewis,,,Cres.Val,2010,2013
 M,444,192,3-2-1A,Leonel Jines,,,Kennedy,2007,2010
 M,445,193,4A,Andrew Damitio,,,Philomath,2011,2014
 F,445,122,6A,Lauren Brownrigg,,,Tualatin,1996,1999
@@ -880,7 +880,7 @@ F,455,127,6A,Heather Spinney,,,Sheldon,2001,2004
 M,456,195,3-2-1A,Drew Church,,,Regis,2001,2004
 F,456,127,4A,Sigi Knoll,,,Silverton,1987,1990
 M,457,195,3-2-1A,Jim Rankin,,,Griswald,1971,1974
-F,457,127,3-2-1A,McKenzie Collins,,,East Linn Chr.,2011,2013
+F,457,127,3-2-1A,McKenzie Collins,,,East Linn Chr,2011,2013
 M,458,195,6A,JJ Campbell,,,West Salem,2006,2009
 F,458,128,3-2-1A,Emily Sandoz,,,Catlin Gabel,1998,2001
 M,459,198,4A,Boone McCoy-Crisp,,,Philomath,2008,2011
@@ -1008,10 +1008,10 @@ F,523,157,4A,Julie Martin,,,Henley,1983,1986
 M,524,261,6A,Dash Lipsey,,,West Linn,2016,2019
 F,524,158,6A,Andrea Casey,,,Jesuit,1993,1996
 M,525,262,4A,Will Mitchell,,,Vale,1984,1987
-M,526,266,5A,Matt McConnell,,,"Madison,",2007,2010
+M,526,266,5A,Matt McConnell,,,Madison,2007,2010
 F,526,158,4A,Susan Leavitt,,,Oakridge,1974,1977
 M,527,269,3-2-1A,Kyle Kinyon,,,Kennedy,2012,2015
-F,527,158,6A,Tricia Sliger,,,"Oregon City,",1979,1982
+F,527,158,6A,Tricia Sliger,,,Oregon City,1979,1982
 M,528,269,3-2-1A,Kyler Martin,,,Pleasant Hill,2014,2017
 F,528,158,6A,Hannah Aquirre,,,Forest Grove,2015,2018
 M,529,271,6A,Matthew Lovos,,Matther Lovos,Tualatin,2011,2014
@@ -1019,7 +1019,7 @@ F,529,159,3-2-1A,Alej Basl,,,Regis,1994,1997
 M,530,272,4A,Cody Lomica,,,Hidden Valley,2014,2017
 F,530,159,4A,Anne Wartnik,,,Siuslaw,2016,2019
 M,531,273,3-2-1A,Garrick Kalmeta,,,Westside Christian,2009,2012
-F,531,160,6A,Annette Mosey,,,St.Marys Aca.,1996,1999
+F,531,160,6A,Annette Mosey,,,St.Marys Aca,1996,1999
 M,532,274,6A,Erik Landeen,,,Oregon City,2011,2014
 F,532,160,Switch,Dakota Steen,,,Redmond/Ridgeview,2010,2013
 M,533,274,4A,Gabe Mariman,,,Philomath,1995,1998
@@ -1045,7 +1045,7 @@ F,543,162,5A,Alexa Hague,,,Ashland,2015,2018
 M,544,290,6A,Morgan Reed,,,Sandy,1994,1997
 F,544,163,Switch,Amelia Yaeger,,,Crescent Valley,2004,2007
 M,545,291,4A,Phil McKnight,,,Sweet Home,1992,1995
-F,545,163,5A,Kylie Thalhofer,,,"Sherwood,",2008,2011
+F,545,163,5A,Kylie Thalhofer,,,Sherwood,2008,2011
 M,546,299,4A,Zach Reichenberger,,,North Bend,2006,2009
 F,546,163,3-2-1A,Cassie Traeger,,,Kennedy,2017,2020
 M,547,299,4A,Donald Sweet,,,La Grande,2018,2021
@@ -1136,7 +1136,7 @@ F,599,188,6A,Sara Hennigan,,,McMinnville,1992,1995
 F,600,189,6A,Courtney Hochstetler,,,South Salem,2007,2010
 F,601,189,6A,Devon Frazier,,,Tualatin,2004,2007
 F,602,189,6A,Gitte Lonigan,,,Sprague,2021,2024
-F,603,190,6A,Emily Wilson,,,"Lakeridge,",1999,2002
+F,603,190,6A,Emily Wilson,,,Lakeridge,1999,2002
 F,604,190,3-2-1A,Katelin Renfro,,,East Linn Christian,2007,2010
 F,605,190,4A,Katelyn Anderson,,,Baker,2001,2004
 F,606,190,4A,Madison Boettner,,,Sisters,2011,2014
@@ -1226,7 +1226,7 @@ F,692,237,6A,Kate Patterson,,,St.Marys Academy,2012,2015
 F,693,237,4A,Heidi Taylor,,,Phoenix,2018,2021
 F,694,238,3-2-1A,Ashley Parker,,,Regis,1999,2002
 F,695,238,6A,Stephenie Meduna,,,Centennial,1992,1995
-F,696,239,6A,Annie Dacis,,,"Lincoln,",1994,1997
+F,696,239,6A,Annie Dacis,,,Lincoln,1994,1997
 F,697,240,6A,Joanne Shpiller,,,North Salem,1992,1995
 F,698,240,5A,Olivia Decker,,,Corvallis,2016,2019
 F,699,241,Switch,Kristen Chester,,,Wilsonville,2005,2008

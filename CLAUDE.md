@@ -2258,6 +2258,209 @@ every population, which is the one finding here that has not moved under any
 amount of re-cutting.
 
 
+## A second school
+
+`sherwood/index.html` is the same page for Sherwood, built from the same
+tooling by the same two commands. It exists because the answer to "could you
+do this for another school" turned out to be mostly yes already: everything
+that does the work had been written to take the school as an argument, and
+what was hardcoded was the output path, one filter string and six literals in
+the copy.
+
+```
+node pull/roster.js 159 --name Sherwood    # Sherwood is athletic.net team 159
+node pull/tfmeets.js 159                   # championship track placings
+node pull/build_dash.js 159                # writes sherwood/index.html
+node pull/test_page.js sherwood            # its own baseline
+```
+
+**The team id came from the call the crawl already makes.** One `GetTree` on
+Oregon division 87377 returns every school with its `SchoolID`: Sherwood is
+**159**, and the same response gives Tualatin as 284, which is how the number
+was checked rather than trusted.
+
+**`SCHOOLS` in `build_dash.js` is two lines and should stay small.** At three
+schools this wants the school to be its own file and the slug to come off it.
+Factoring on the second copy guesses at which parts vary; the second copy is
+what tells you, and here it said: the path, the Who's Who filter, and the
+palette. Nothing else.
+
+### The school's name is data, and the page was typing it anyway
+
+Six literal "Tualatin"s sat in the title, the meta description, the wordmark
+and three sentences of prose while `INFO.label` sat two lines from the top of
+the script holding the same string. That is the fault the How tab already had
+on record - a sentence that should have read from `RECORD` was typed instead
+and went stale - repeated in a place nobody had looked.
+
+`SCHOOL = INFO.label` now, and the title, description and wordmark are written
+from it on load. The head keeps a literal so a reader with no JavaScript still
+sees a name. **The wordmark is set with `textContent`, not `innerHTML` and not
+`esc()`** - `esc` is declared two hundred lines further down and would be in
+its temporal dead zone, which is the same shadowing trap `ord` and `T` fell
+into on the athlete page.
+
+It is what makes the second school a copy rather than a rewrite: the whole diff
+between the two pages is the head fallbacks and the palette.
+
+### Sherwood's colours, measured the same way and coming out different
+
+Maroon and black, the Bowmen. `shs.sherwood.k12.or.us` paints with
+**#A91E2F**, which is the true colour and fills wherever there is light behind
+it.
+
+Same rule, different answer. #A91E2F on the dark ground is **2.74:1** - better
+than Tualatin's #880000 at 1.93:1 and still nowhere near readable - so the
+maroon fills and a lifted crimson writes. On the light ground it needs no help
+at all: **6.88:1**, so it is its own accent there, and white on it is 7.21:1.
+
+**The lift keeps the hue and the saturation.** Mixing a maroon toward white
+turns it pink, which is a different colour rather than a lighter one. The
+accent is Sherwood's own hue (353) at its own saturation (70%) carried up in
+lightness until it clears: **#E05262 at 5.22:1**.
+
+**`--on-accent` is near-black here and white on the Tualatin page**, and that
+is measured rather than a house style. Ink on #E05262 is 4.98:1 where white
+would be 3.78:1; on Tualatin's #EE5566 white is 3.43:1, which is the weaker of
+the two and was there first.
+
+Sherwood's hue is 353 and Tualatin's lifted accent is also 353, so the two
+sites read as siblings. That is the two schools' colours, not a shortcut.
+
+**The favicon is a data URI and cannot read a custom property**, so each page
+writes its own three circles by hand - the same trap the app's favicon has
+carried since the start, now present in three files rather than two.
+
+### Two bugs a second school found, both invisible with one
+
+**`roster.js` could not see a 429.** Its `curl` asked for the body and the
+status and never for the headers, while `crawl.js`'s has always passed `-D -`.
+Two copies of one helper, one of which could read the rate limit and one of
+which could not - the drift this file keeps predicting whenever a thing is
+written out twice.
+
+The cost was not theoretical. Sherwood's first pull stalled at 100 of 1,632
+athletes: each 429 burned its athlete after four retries spaced 1.4 to 3.5
+seconds, and the run was heading for the one-in-fifty failure floor that makes
+it refuse to write at all. **A 429 is not a failure, it is an instruction** -
+it gets its own ladder now, waits what the server asks for with a margin, and
+does not spend the ordinary retry budget, because "the bucket is empty" says
+nothing about whether this athlete's record exists.
+
+Worth knowing: this endpoint mostly does **not** send `Retry-After`. The header
+is read when it is there and the fallback is 23 seconds, so the fix that
+actually matters is the long wait and not burning the athlete. Do not record
+this as "it reads Retry-After now" - it reads it when offered.
+
+**Eleven schools carry a trailing comma in the Who's Who four-year list.**
+Crescent Valley, Elgin, Lakeridge, Lincoln, Madison, Oregon City, Redmond,
+Sherwood, Siuslaw, South Eugene and Waldport. The source line runs
+`... Kylie Thalhofer, Sherwood, 2008-2011` and the name/school split keeps the
+separator.
+
+Tualatin has no such row, which is the only reason this survived: the page
+filters on an exact string and `"Sherwood,"` is not `"Sherwood"`, so the first
+other school picked up dropped an athlete on it - Kylie Thalhofer, 545th
+all-time. Silent, and permanent. `school()` strips trailing punctuation and
+nineteen rows were corrected.
+
+**A co-op is left exactly as published.** `Sherwood/Jesuit`, `Bend/Mt.View`,
+`Grant/Central Catholic` and the rest are two real schools, and deciding which
+one owns the athlete is a guess. The rule here has always been that an entry
+which does not match is reported rather than guessed at, so Bailey Schuttle
+stays under `Sherwood/Jesuit` and off both boards.
+
+### What Sherwood holds
+
+**953 athletes on the page**, 2,830 athlete-seasons, 22,293 results, 638 meets,
+from an archive of 1,702 athletes - the other 748 are sprint-only and stay in
+the CSVs for the same reason they do at Tualatin. 1,039KB on disk.
+
+**Fourteen Who's Who honours.** Both teams ranked all-time: the girls **34th in
+Oregon** off 28 trips to State, the boys 95th off 15. Eight four-year State
+qualifiers. Four all-time State-meet bests, of which **James Crabtree is 11th in
+Oregon** at 15:04.
+
+### FIRST_SEASON was a Tualatin-shaped constant
+
+It was 2004, carrying the note that "athletic.net's Tualatin coverage thins out
+before this and stops entirely before 2004". Measured, that is wrong in both
+halves, and a reader asking whether one athlete made the board is what found it.
+
+**Sherwood answers back to 1969** - sparsely, one to eight athletes a season
+through the seventies and eighties, and continuously from 2001. 94 pre-2004
+athlete-seasons that a 2004 floor drops on the floor.
+
+**Ross Krempley is the worked example.** Class of 1997: a 16:41.0 cross country
+5,000m in November 1995 and five track marks in his senior spring, including a
+**48.83 400m** and a 1:54.03 800m. He clears the page's 800m floor, so he
+belongs on the board, and he would have been silently absent from it.
+
+**Tualatin has the same hole and still has it.** Measured the same way: results
+in both sports back to **1993** - thin in cross country, and 12 to 29 track
+athletes a season through 1993-2003 that the pull has never asked for. Kate
+Alexander raced cross country in 2002 and the live page has her starting in
+2005. The floor is 1969 for every school now; Tualatin needs a re-pull to
+collect what that reaches, and it will move published numbers.
+
+**The horizon assertion was passing for the wrong reason.** `test_roster.js`
+had `horizon <= FIRST_SEASON`, which held because the constant was too *late*:
+the bio endpoint reached 2001 and the pull started asking at 2004. Lowering the
+constant broke it, which is the test doing its job about a claim that had gone
+stale. It now asserts the horizon equals the earliest school year the data
+actually holds, and that a pull cannot hold a season it never asked for.
+
+### Summer is not the season, except when it is
+
+The statewide seed has always cut at `SEASON_START`, 08-15, because athletic.net
+files July camp time trials under the season. `roster.js` never learned it, and
+Sherwood surfaced it as **seven races landing on no season row at all** -
+counting toward a career best while carrying no grade, which `test_page.js`
+caught on the first build. Tualatin has five of the same thing and they never
+orphaned, because its summer races happen to fall in a school year it also
+raced cross country in. Luck, not correctness.
+
+**The first fix was too blunt and deleted a national championship.** Dropping
+everything between July 1 and August 15 took 70 track rows off Sherwood, and
+four of them were **The Outdoor Nationals Presented by Nike** - where Jeffery
+Rogers ran 3:58.81, one of the better 1500s this programme has. The outdoor
+season's tail genuinely falls in early July. What does not belong is the thing
+that runs every week all summer.
+
+So the window is **necessary and not sufficient**: inside it, a meet is dropped
+when it names itself a series, an all-comers meet, a camp, an intrasquad or a
+time trial. `tfmeets.js`'s `CHAMP` regex was the obvious authority and is the
+wrong one - it knows district, state, league and OSAA, which is Oregon high
+school, and Nike Outdoor Nationals is none of those.
+
+A name test is the fragile kind of rule this file keeps warning about, so **the
+pull prints every meet it drops this way**, with counts. Steens Mountain's
+uphill 5k appears three times under three different capitalisations, which is
+the sort of thing that list is for.
+
+**The filter sits where rows enter the list, not where they are fetched.** The
+resume cache on disk was written before the rule existed and still holds July
+rows; filtering only what comes off the wire would let a cached athlete keep
+theirs, so a resumed run and a cold one would disagree.
+
+### Three projects share one .vercelignore
+
+The trap is unchanged and now has one more way to spring. The file is applied
+at **upload** time, before any project narrows to its root directory, so
+listing `sherwood/` there to keep the page off chutexc would strip it from the
+Sherwood project's own upload and deploy it empty - every path 404, which is
+what `X-Vercel-Error: NOT_FOUND` means rather than `DEPLOYMENT_NOT_FOUND`.
+
+So the split runs the other way round, as it already did: the school folders
+ship to every project and chutexc's own `vercel.json` redirects `/tualatin/*`
+and `/sherwood/*` to `/`. Redirects are matched in the routing phase before
+static files; a rewrite would not work, because those run after the filesystem
+check and the page would still be served.
+
+**Each school keeps its own baseline.** `pull/test_page.js [slug]` reads
+`.page-baseline-<slug>.json`, because a baseline is a statement about one
+page's numbers and two schools share none of them.
+
 ## How the simulation works
 
 One "season" is: draw times → score seven league meets → allocate 14 automatic

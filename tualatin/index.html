@@ -22006,7 +22006,7 @@ Three Rivers League JV District
 <div class="wrap">
 <header>
   <div class="brand">
-    <h1>Tualatin <em>Distance</em></h1>
+    <h1><span id="wordmark">Tualatin</span> <em>Distance</em></h1>
     <span class="sub" id="hdr"></span>
     <button class="themer" id="themer" type="button">Light</button>
   </div>
@@ -22243,6 +22243,25 @@ const INFO={"teamId":284,"label":"Tualatin","from":2004,"to":2026,"horizon":2001
    Set this to false and every enrolled athlete reverts to "Jayden A." within
    one rebuild. Alumni are named either way. */
 const SHOW_CURRENT=true;
+
+/* THE SCHOOL'S NAME IS DATA. The page carried six copies of "Tualatin" in its
+   own title, meta, wordmark and prose while INFO.label sat two lines away
+   holding the same string - the same fault the How tab had, where a sentence
+   that should have read from RECORD was typed instead and went stale.
+
+   The head keeps a literal so a reader with no JavaScript still sees a name,
+   and everything below rewrites from INFO, so the two cannot disagree. */
+const SCHOOL=INFO.label;
+document.title=SCHOOL+' distance \u2014 the whole record';
+{
+  const m=document.querySelector('meta[name="description"]');
+  if(m)m.setAttribute('content','Every athlete who has ever run for '+SCHOOL
+    +', cross country and track, and what happened to them.');
+  /* textContent, not innerHTML, and not esc() either - esc is declared two
+     hundred lines below this and would be in its temporal dead zone. */
+  const w=document.getElementById('wordmark');
+  if(w)w.textContent=SCHOOL;
+}
 
 /* VDOT, straight off the table in TRUST Plan Data: [VDOT, 1500s, 3000s, 5000s].
    One row per VDOT, seconds falling as VDOT rises. */
@@ -23607,7 +23626,7 @@ function packs(g){
 /* ---------- honours earned on the course ----------
    Who's Who records what a career added up to. This records what happened on
    particular afternoons, and it is already sitting in the race table: every
-   State and district championship Tualatin has run since 2004, with the place
+   State and district championship the school has run since 2004, with the place
    each athlete crossed the line in.
 
    ALL-STATE in Oregon cross country is the top twenty-one at the State
@@ -24268,7 +24287,7 @@ function bestTruth(i){
   const n=races.length,yrs=new Set(o.seasons.map(x=>x.y)).size;
   return {tag:'On the record',
     head:n+' race'+(n===1?'':'s'),
-    sub:'over '+yrs+' season'+(yrs===1?'':'s')+' for Tualatin, every one of them '
+    sub:'over '+yrs+' season'+(yrs===1?'':'s')+' for '+SCHOOL+', every one of them '
       +'in the record for good.'};
 }
 
@@ -26023,7 +26042,7 @@ function drawProgram(){
             +INFO.solid+'</span>':''),html:true},
         ord(f.rank)])):'')
     +(marks.length?'<p class="why" style="margin:16px 0 6px">Fastest ever run by a '
-      +(pG==='M'?'Tualatin boy':'Tualatin girl')+' at the State meet, against every '
+      +SCHOOL+(pG==='M'?' boy':' girl')+' at the State meet, against every '
       +'Oregon '+(pG==='M'?'boy':'girl')+' in the record.</p>'
       +TBL([{k:'Athlete',a:'l',name:true},{k:'Time',w:'20%'},{k:'Year',w:'16%'},
         {k:'In Oregon',w:'24%'}],
@@ -26398,7 +26417,7 @@ function drawAthlete(i){
   const bestCard=bestRace?'<div class="card"><h2>Best race</h2>'
     +'<p class="why">Not the fastest time. The race furthest ahead of what was '
     +'expected of them that afternoon.</p>'
-    +'<p class="why"><b>Where the expectation comes from.</b> Every Tualatin runner '
+    +'<p class="why"><b>Where the expectation comes from.</b> Every '+SCHOOL+' runner '
     +'at a meet ran the same course on the same day, so the squad\u2019s times split '
     +'into two parts: how fit each runner was that season, and how hard that '
     +'particular afternoon was for everybody on it. Both are worked out from the '

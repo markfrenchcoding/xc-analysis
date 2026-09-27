@@ -1,17 +1,19 @@
-# Shared by BOTH Vercel projects, and that is the trap.
+# Shared by ALL THREE Vercel projects, and that is the trap.
 #
-# This file is applied at UPLOAD time, before either project narrows to its
-# root directory. Listing `tualatin/` here to keep it off chutexc therefore
-# stripped it from the tualatinxctf upload as well, and that project deployed
-# empty - every path 404, including files that plainly exist. An hour lost to
-# it. A path excluded here is excluded from every project in the repo, full
-# stop.
+# This file is applied at UPLOAD time, before any project narrows to its root
+# directory. Listing `tualatin/` here to keep it off chutexc therefore stripped
+# it from the tualatinxctf upload as well, and that project deployed empty -
+# every path 404, including files that plainly exist. An hour lost to it. A
+# path excluded here is excluded from every project in the repo, full stop.
 #
-# So the split is enforced the other way round: tualatin/ ships to both, and
-# chutexc's own vercel.json redirects /tualatin/* to / so the page is not
-# served on the projections domain. tualatinxctf has root directory tualatin/
-# and serves it at its own root.
+# So the split is enforced the other way round: the school folders ship to
+# every project, and chutexc's own vercel.json redirects /tualatin/* and
+# /sherwood/* to / so neither page is served on the projections domain. Each
+# school project has its own root directory and serves its page at that root.
 #
-# pull/roster/ is safe to list. Neither site needs it - the page embeds
-# everything - and it sits above tualatinxctf's root anyway.
+# DO NOT ADD sherwood/ OR tualatin/ HERE. It is the one change that looks
+# obviously right and breaks the school sites silently.
+#
+# pull/roster/ is safe to list. No site needs it - each page embeds everything
+# - and it sits above every school project's root anyway.
 pull/roster/

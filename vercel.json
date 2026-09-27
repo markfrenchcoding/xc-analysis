@@ -3,7 +3,10 @@
   "redirects": [
     { "source": "/tualatin", "destination": "/", "permanent": false },
     { "source": "/tualatin/", "destination": "/", "permanent": false },
-    { "source": "/tualatin/(.*)", "destination": "/", "permanent": false }
+    { "source": "/tualatin/(.*)", "destination": "/", "permanent": false },
+    { "source": "/sherwood", "destination": "/", "permanent": false },
+    { "source": "/sherwood/", "destination": "/", "permanent": false },
+    { "source": "/sherwood/(.*)", "destination": "/", "permanent": false }
   ],
   "headers": [
     {

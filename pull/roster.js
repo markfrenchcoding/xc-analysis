@@ -56,7 +56,7 @@ const Seed = require('./seed.js');
 const API = 'https://www.athletic.net/api/v1/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
   + '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
-const GAP_GET = 700, TRIES = 4;
+const GAP_GET = 700, TRIES = 4, LIMIT_TRIES = 8;
 /* THE BIO ENDPOINT'S BUDGET IS A BUCKET, AND A SHORT PROBE CANNOT SEE IT.
    Twenty-five requests at 300ms came back 25 for 25, so 300ms looked like the
    pace. Sustained, it 429s within the first hundred: the bucket drains faster
@@ -69,11 +69,24 @@ const GAP_GET = 700, TRIES = 4;
 let GAP_BIO = 900;
 const GAP_BIO_MIN = 900, GAP_BIO_MAX = 6000;
 
-// athletic.net's Tualatin coverage thins out before this and stops entirely
-// before 2004. An "all-time" board that is silently a "since 2005" board is
-// the same failure as a stale DATA_DATE, so the horizon is recorded in the
-// meets file and belongs on any page built from this.
-const FIRST_SEASON = 2004;
+// WHERE THE PULL STARTS ASKING, WHICH IS NOT THE SAME AS WHERE THE RECORD
+// BEGINS. This was 2004, on the note that "athletic.net's Tualatin coverage
+// thins out before this and stops entirely before 2004". Measured, that is
+// wrong in both halves.
+//
+// Tualatin has results in BOTH sports back to 1993 - thin in cross country
+// (one to fourteen athletes a season) and not thin at all in track, which runs
+// 12 to 29 athletes a season from 1993 to 2003 and was never asked for. Kate
+// Alexander raced cross country in 2002 and the page had her starting in 2005.
+// Sherwood reaches back to 1969.
+//
+// So the floor is the earliest season athletic.net answers for any school,
+// and the per-school horizon stays MEASURED from what actually came back and
+// recorded in the meets file. A season with nothing in it costs two GETs and
+// contributes nothing, which is the right price for not silently starting a
+// programme's history in the middle. An "all-time" board that is quietly a
+// "since 2005" board is the same failure as a stale DATA_DATE.
+const FIRST_SEASON = 1969;
 
 /* Plausible pace, in seconds per metre.
 
@@ -107,22 +120,110 @@ const NAME_BY_ID = {
   // 0: { first: 'Meghan', last: 'Peyton' },
 };
 
+/* SUMMER IS NOT THE SEASON, which the statewide seed has always known and
+   this puller never did. `Seed.SEASON_START` is 08-15, where OSAA practice
+   opens; spring track finishes in June. So the weeks between are school
+   competition's one genuine gap, and what athletic.net files there is camps
+   and all-comers series - "Sherwood Summer Series Week 4", "Summer Social
+   Distance Track Series", the Steens Mountain uphill 5k.
+
+   It surfaced as seven orphaned races on Sherwood: a July 2016 race is school
+   year 2017 under the July boundary, the athlete's track season was 2016, and
+   the result landed on no season row at all - counting toward a career best
+   while carrying no grade. Tualatin has five of the same thing and they did
+   not orphan, because its summer races happen to fall in a school year it also
+   raced cross country in, which is luck rather than correctness.
+
+   Dropping them is what the seed does and it is the same judgement: a camp
+   time trial in July is not a season a school ran. */
+const SUMMER_END = Seed.SEASON_START;          // '08-15'
+const inSummerWindow = (date) => {
+  const md = String(date || '').slice(5, 10);
+  return md >= '07-01' && md < SUMMER_END;
+};
+
+/* AND A DATE ALONE IS NOT ENOUGH, which the first version of this got wrong.
+   Dropping everything in the window took 70 track rows off Sherwood and four
+   of them were "The Outdoor Nationals Presented by Nike" - a national
+   championship, and Jeffery Rogers' 3:58.81 there is one of the better 1500s
+   this programme has. The outdoor season's tail really does fall in early
+   July; what does not belong is the thing that runs every week all summer.
+
+   So the window is necessary and not sufficient: inside it, a meet is dropped
+   when it names itself a series, an all-comers meet, a camp, an intrasquad or
+   a time trial. tfmeets.js's CHAMP regex was the obvious authority and is the
+   wrong one - it knows district, state, league and OSAA, which is Oregon high
+   school, and Nike Outdoor Nationals is none of those.
+
+   A name test is the fragile kind of rule this file keeps warning about, so
+   the pull reports every meet it drops this way and the count, which is what
+   makes it auditable rather than merely quiet. */
+const SUMMER_MEET = /series|all[- ]?comers|\bcamp\b|intrasquad|time trial|\bweek \d/i;
+const droppedSummer = {};
+const isSummerMeet = (date, name) => {
+  if (!inSummerWindow(date)) return false;
+  if (!SUMMER_MEET.test(String(name || ''))) return false;
+  const k = String(name || '(unnamed)');
+  droppedSummer[k] = (droppedSummer[k] || 0) + 1;
+  return true;
+};
+
 const log = (...a) => console.log(...a);
 const sleep = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
+/* -D - SO THE 429 CAN BE READ, which is the entire reason this file talks
+   through curl rather than fetch. crawl.js has always asked for the headers;
+   this copy never did, so it saw "not 200" and guessed at how long to wait.
+   Two curl helpers, one of which could read the rate limit and one of which
+   could not - the drift this project keeps predicting when a thing is written
+   out twice.
+
+   The cost was not theoretical. Sherwood's first pull stalled at 100 of 1,632
+   athletes: every 429 burned its athlete after four retries spaced 1.4 to 3.5
+   seconds, against a Retry-After the server was stating outright, and the run
+   was heading for the one-in-fifty failure floor that makes it refuse to
+   write at all. */
 function curl(url) {
-  const out = execFileSync('curl', ['-sS', '-m', '60', '-w', '\n%{http_code}',
+  const out = execFileSync('curl', ['-sS', '-m', '60', '-D', '-', '-w', '\n%{http_code}',
     '-H', 'User-Agent: ' + UA, '-H', 'Accept: application/json, text/plain, */*', url],
     { encoding: 'utf8', maxBuffer: 1 << 28 });
   const i = out.lastIndexOf('\n');
-  return { status: out.slice(i + 1).trim(), body: out.slice(0, i) };
+  const status = out.slice(i + 1).trim();
+  let rest = out.slice(0, i), retryAfter = 0;
+  /* headers and body arrive together, and a redirect can produce more than one
+     header block, so walk them all and keep the last. */
+  for (;;) {
+    const cut = rest.indexOf('\r\n\r\n') >= 0 ? rest.indexOf('\r\n\r\n') + 4
+      : rest.indexOf('\n\n') >= 0 ? rest.indexOf('\n\n') + 2 : -1;
+    if (cut < 0 || !/^HTTP\//.test(rest)) break;
+    const head = rest.slice(0, cut);
+    const ra = head.match(/^retry-after:\s*(\d+)/im);
+    if (ra) retryAfter = +ra[1];
+    rest = rest.slice(cut);
+  }
+  return { status, retryAfter, body: rest };
 }
 
+/* A 429 IS NOT A FAILURE, IT IS AN INSTRUCTION. It gets its own ladder: wait
+   what the server asked for, with a margin, and try again - and it does not
+   spend the ordinary retry budget, because "the bucket is empty" says nothing
+   about whether this athlete's record exists. Anything else keeps the short
+   ladder it had, since a 500 or a dropped connection really is a failure. */
 function ask(url) {
+  let limited = 0;
   for (let i = 0; i < TRIES; i++) {
     try {
       const r = curl(url);
       if (r.status === '200') return JSON.parse(r.body);
+      if (r.status === '429' && limited < LIMIT_TRIES) {
+        const wait = Math.min(120, (r.retryAfter || 20) + 3);
+        limited++;
+        log('    429, waiting ' + wait + 's' + (r.retryAfter ? ' as asked' : ' (no Retry-After)'));
+        GAP_BIO = Math.min(GAP_BIO_MAX, GAP_BIO + 300);
+        sleep(wait * 1000);
+        i--;                       // the limit is not this athlete's fault
+        continue;
+      }
       log('    status ' + r.status + ', retrying');
     } catch (e) {
       log('    ' + String(e.message).slice(0, 60) + ', retrying');
@@ -393,6 +494,7 @@ const csv = (head, rows) => [head.join(','),
 function pull(teamId, from, to) {
   const rows = [], meets = {}, seen = new Set();
   const empty = [];
+  let summer = 0;
   for (let y = from; y <= to; y++) {
     let j;
     try { j = ask(API + 'TeamHome/GetResultsGrid?teamId=' + teamId + '&seasonId=' + y); }
@@ -410,13 +512,14 @@ function pull(teamId, from, to) {
       if (seen.has(k)) continue;
       seen.add(k);
       r.date = (meets[r.meetId] || {}).date || '';
+      if (isSummerMeet(r.date, (meets[r.meetId] || {}).name)) { summer++; continue; }
       rows.push(r); n++;
     }
     log('  ' + y + '  ' + String(n).padStart(4) + ' results, ' + (j.meets || []).length + ' meets');
     if (!n) empty.push(y);
     sleep(GAP_GET);
   }
-  return { rows, meets, empty };
+  return { rows, meets, empty, summer };
 }
 
 /* ---------- every track race, not every season best ----------
@@ -501,7 +604,7 @@ function bioRow(raw, evById, grades, teamId) {
    results it returns are thrown away; pullRaces fetches the real ones. */
 function pullTrack(teamId, from, to) {
   const rows = [], meets = {}, empty = [];
-  let field = 0;
+  let field = 0, summer = 0;
   for (let y = from; y <= to; y++) {
     let j;
     try {
@@ -512,6 +615,7 @@ function pullTrack(teamId, from, to) {
     for (const raw of all) {
       const r = recordRow(raw, y);
       if (!r) { if (String(raw.Type || '').toUpperCase() === 'F') field++; continue; }
+      if (isSummerMeet(r.date, r.meetName)) { summer++; continue; }
       if (r.meetId && !meets[r.meetId]) meets[r.meetId] = { date: r.date, name: r.meetName };
       rows.push(r); n++;
     }
@@ -519,7 +623,7 @@ function pullTrack(teamId, from, to) {
     if (!n) empty.push(y);
     sleep(GAP_GET);
   }
-  return { rows, meets, empty, field };
+  return { rows, meets, empty, field, summer };
 }
 
 /* One request an athlete, and the whole of their track career comes back.
@@ -532,7 +636,7 @@ function pullTrack(teamId, from, to) {
    season somebody did not run. */
 function pullRaces(teamId, ids, cacheFile) {
   const rows = [], meets = {}, failed = [];
-  let n = 0, seen = 0, fromCache = 0;
+  let n = 0, seen = 0, fromCache = 0, dropped = 0;
   const t0 = Date.now();
 
   /* A forty-minute pull that loses everything to one dropped connection is a
@@ -551,7 +655,14 @@ function pullRaces(teamId, ids, cacheFile) {
   const take = (o) => {
     for (const [mid, m] of Object.entries(o.meets || {}))
       if (!meets[mid] || !meets[mid].name) meets[mid] = m;
-    for (const r of o.rows || []) rows.push(r);
+    /* HERE, NOT AT FETCH TIME. The resume cache on disk was written before
+       this rule existed and still holds July rows; filtering only what comes
+       off the wire would let a cached athlete keep theirs, so a resumed run
+       and a cold one would disagree. */
+    for (const r of o.rows || []) {
+      if (isSummerMeet(r.date, r.meetName)) { dropped++; continue; }
+      rows.push(r);
+    }
     seen += o.seen || 0;
   };
 
@@ -597,7 +708,7 @@ function pullRaces(teamId, ids, cacheFile) {
     }
     sleep(GAP_BIO);
   }
-  return { rows, meets, failed, seen };
+  return { rows, meets, failed, seen, dropped };
 }
 
 function main() {
@@ -773,6 +884,11 @@ function main() {
     + tf.rows.length + ' track), ' + athletes.size + ' athletes, '
     + seasons.size + ' athlete-seasons, ' + Object.keys(meets).length + ' meets');
   log('  ' + tf.field + ' field marks skipped, which are distances rather than times');
+  const sumN = xc.summer + tf.summer + (races.dropped || 0);
+  log('  ' + sumN + ' summer marks dropped, July to ' + Seed.SEASON_START
+    + ', at meets that name themselves a series, a camp or an all-comers:');
+  for (const [k, v] of Object.entries(droppedSummer).sort((a, b) => b[1] - a[1]))
+    log('      ' + String(v).padStart(4) + '  ' + k);
   log('  class year disputed for ' + conflict.length + ' athlete'
     + (conflict.length === 1 ? '' : 's'));
   log('  entry: ' + ['observed', 'late-entry', 'unknown-gap', 'ungraded']

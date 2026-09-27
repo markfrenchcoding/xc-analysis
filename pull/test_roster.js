@@ -247,12 +247,24 @@ ok(seasons.length > 3000, 'and real athlete-seasons — ' + seasons.length);
 ok(seasons.some(s => s.sport === 'xc') && seasons.some(s => s.sport === 'tfo'),
   'from both sports');
 ok(seasons.some(s => s.best1500), 'with track distances of their own');
-/* THE HORIZON IS MEASURED, NOT DECLARED. FIRST_SEASON is where the season
-   pulls start asking; the bio endpoint reaches further back than that, so the
-   recorded horizon has to be whatever the data actually holds or the page
-   prints a start date it is already contradicting. `solid` is the first
-   season with enough in it to reason about. */
-ok(meta.horizon <= R.FIRST_SEASON, 'the horizon is measured from the data, not declared');
+/* THE HORIZON IS MEASURED, NOT DECLARED, and this is the assertion that says
+   so rather than a comment claiming it. It used to read
+   `horizon <= FIRST_SEASON`, which was true for the wrong reason: FIRST_SEASON
+   was 2004, the bio endpoint reached back to 2001, and the inequality held
+   because the constant was too LATE. Lowering the constant to the season
+   athletic.net actually answers from broke it, which is the test doing its
+   job about a claim that had gone stale.
+
+   What has to be true is that the recorded horizon is the earliest school
+   year the data actually holds - not a constant pasted into the meets file,
+   and not later than the earliest row, which is how a page ends up printing
+   a start date it contradicts three panels down. `solid` is the first season
+   with enough in it to reason about. */
+const earliest = Math.min(...seasons.map((s) => +s.schoolYear).filter(Boolean));
+eq(meta.horizon, earliest, 'the horizon is the earliest season in the data');
+ok(meta.horizon >= R.FIRST_SEASON, 'and the pull cannot hold a season it never asked for'
+  + ' — horizon ' + meta.horizon + ', asked from ' + R.FIRST_SEASON);
+ok(meta.solid >= meta.horizon, 'solid is at or after the horizon');
 ok(meta.solid >= meta.horizon, 'and the first solid season is at or after it');
 ok(meta.solid <= 2006, 'which for this school is the middle of the decade');
 

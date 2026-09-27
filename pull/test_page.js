@@ -1,5 +1,9 @@
-// node pull/test_page.js            run the audit
-// node pull/test_page.js --baseline write pull/roster/.page-baseline.json
+// node pull/test_page.js [slug]             run the audit on <slug>/index.html
+// node pull/test_page.js [slug] --baseline  write its baseline
+//
+// The slug defaults to tualatin. Each school keeps its own baseline, because
+// a baseline is a statement about one page's numbers and two schools share
+// none of them.
 //
 // THE CROSS-VIEW AUDIT. Every time on the dashboard should come from one
 // place, and this is what proves it. It reads the built page's own data
@@ -19,8 +23,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const PAGE = path.join(__dirname, '..', 'tualatin', 'index.html');
-const BASE = path.join(__dirname, 'roster', '.page-baseline.json');
+const SLUG = process.argv.slice(2).find((a) => !a.startsWith('--')) || 'tualatin';
+const PAGE = path.join(__dirname, '..', SLUG, 'index.html');
+const BASE = path.join(__dirname, 'roster', '.page-baseline-' + SLUG + '.json');
+if (!fs.existsSync(PAGE)) throw new Error('no page at ' + SLUG + '/index.html');
 const html = fs.readFileSync(PAGE, 'utf8');
 
 let pass = 0;
@@ -259,5 +265,6 @@ if (process.argv.includes('--baseline')) {
 
 /* ---------- report ---------- */
 for (const f of fails) console.log('  FAIL  ' + f);
-console.log(pass + ' passed' + (fails.length ? ', ' + fails.length + ' FAILED' : ''));
+console.log(SLUG + ': ' + pass + ' passed'
+  + (fails.length ? ', ' + fails.length + ' FAILED' : ''));
 process.exit(fails.length ? 1 : 0);

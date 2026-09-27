@@ -55,8 +55,23 @@ const ATHLETE_ALIAS = {
   'meghan armstrong|tualatin': { name: 'Meghan Armstrong', alsoKnownAs: 'Meghan Peyton' },
 };
 
+/* A TRAILING COMMA IS PUNCTUATION, NOT PART OF A SCHOOL'S NAME, and eleven
+   schools in the four-year list carry one: Crescent Valley, Elgin, Lakeridge,
+   Lincoln, Madison, Oregon City, Redmond, Sherwood, Siuslaw, South Eugene and
+   Waldport. The source line runs "... Kylie Thalhofer, Sherwood, 2008-2011"
+   and the name/school split keeps the separator.
+
+   It went unnoticed for as long as this only ever ran on Tualatin, which has
+   no such row. The first other school picked up dropped an athlete on it -
+   Kylie Thalhofer, 545th all-time - because the page filters on an exact
+   string match and "Sherwood," is not "Sherwood". Silent, and permanent.
+
+   A co-op or a switch - "Sherwood/Jesuit", "Bend/Mt.View" - is left exactly as
+   published. Those are two real schools and deciding which one owns the
+   athlete is a guess; the rule here has always been that an entry which does
+   not match is reported rather than guessed at. */
 const school = (s) => {
-  const k = String(s || '').trim().replace(/\s+/g, ' ');
+  const k = String(s || '').trim().replace(/\s+/g, ' ').replace(/[,;.]+$/, '').trim();
   return SCHOOL_ALIAS[k.toLowerCase()] || k;
 };
 

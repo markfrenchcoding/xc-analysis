@@ -1,6 +1,7 @@
 // node pull/build_dash.js [teamId]
 //
-// Fills tualatin/index.html's data blocks from pull/roster/t<id>_*.csv.
+// Fills <slug>/index.html's data blocks from pull/roster/t<id>_*.csv, where the
+// slug comes from the SCHOOLS table below: 284 is Tualatin, 159 is Sherwood.
 //
 // Same shape as Seed.patchIndex: the page is the artifact and is editable by
 // hand, the data is a block inside it that a script rewrites. One file, no
@@ -21,13 +22,31 @@ const path = require('path');
 
 const teamId = +(process.argv[2] || 284);
 const DIR = path.join(__dirname, 'roster');
+
+/* ONE ENTRY A SCHOOL, AND DELIBERATELY NOT MORE MACHINERY THAN THAT.
+   Everything that does the actual work already takes the school as an
+   argument - roster.js takes a team id, whoswho.js takes a --school, and
+   every statistic on the page takes a population. What was hardcoded was the
+   output path and the name to filter the Who's Who rows on, which is this
+   table and nothing else.
+
+   Two schools is the right size for a literal. At three this wants to be the
+   school's own file and the page's slug to come off it, but factoring on the
+   second copy guesses at which parts vary; the second copy is what tells you. */
+const SCHOOLS = {
+  284: { slug: 'tualatin', name: 'Tualatin' },
+  159: { slug: 'sherwood', name: 'Sherwood' },
+};
+const school = SCHOOLS[teamId];
+if (!school) throw new Error('team ' + teamId + ' is not in SCHOOLS - add it, '
+  + 'and make sure pull/<slug>/ has a page to write into');
 /* tualatin/index.html rather than roster.html at the root, because it is its
    own Vercel project: chutexc serves the statewide projections and this is a
    Tualatin programme tool, and one deployment carrying both would put a page
    about 749 named local kids on the same domain strangers visit for the odds.
    A second project with its root directory set to tualatin/ serves this at
    tualatinxctf.vercel.app and cannot see anything above it. */
-const PAGE = path.join(__dirname, '..', 'tualatin', 'index.html');
+const PAGE = path.join(__dirname, '..', school.slug, 'index.html');
 const stem = path.join(DIR, 't' + teamId + '_');
 
 const readCsv = (f) => {
@@ -127,7 +146,7 @@ const wwRead = (f) => (fs.existsSync(path.join(WW, f)) ? readCsv(path.join(WW, f
 const wwTeams = wwRead('ww_team_rankings.csv');
 const wwFour = wwRead('ww_four_year.csv');
 const wwBest = wwRead('ww_state_best.csv');
-const SCHOOL = 'Tualatin';
+const SCHOOL = school.name;
 
 const wwRows = [
   ...wwTeams.filter((r) => r.school === SCHOOL)
@@ -243,7 +262,7 @@ fs.writeFileSync(PAGE, html);
 const kb = (n) => (n / 1024).toFixed(0) + 'KB';
 console.log('  ' + (allAthletes.length - athletes.length) + ' sprint-only athletes left in '
   + 'the CSVs and out of the page');
-console.log('tualatin/index.html: ' + athletes.length + ' athletes, ' + seasons.length
+console.log(school.slug + '/index.html: ' + athletes.length + ' athletes, ' + seasons.length
   + ' athlete-seasons, ' + (rBlock.split('\n').length - 2) + ' results, '
   + meetIds.length + ' meets, ' + events.length + ' track events');
 console.log('  ' + wwRows.length + ' Who\'s Who honours for ' + SCHOOL
