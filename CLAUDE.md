@@ -1263,7 +1263,10 @@ restating it.
 `tualatin/index.html` is the second page, built from `pull/roster/` by
 `node pull/build_dash.js 284`. Same shape as the app: one self-contained file,
 data in a `<script type="text/plain">` block that a script rewrites, no build
-step and no fetch. 427KB on disk, **130KB gzipped**, still smaller than the app.
+step and no fetch. **933KB on disk, 277KB gzipped**, which passed the app some
+time ago - the every-race track pull is most of it and the crest is 15KB of
+it. The 427KB/130KB this file used to quote was true before track went from
+season bests to every race, and was left behind by it.
 
 **The page is narrower than the archive, on purpose.** `roster.js` keeps the
 whole running programme because a roster that quietly drops people is what this
@@ -2199,8 +2202,11 @@ Two commands, and the second one is not optional:
 ```
 node pull/roster.js 284 --name Tualatin    # the archive
 node pull/build_dash.js 284                # the page
-node pull/test_page.js                     # what moved, and which way
+node pull/test_page.js tualatin            # what moved, and which way
 ```
+
+`pull/crest.js` is not part of this. It writes a committed data URI and only
+needs re-running if a school changes its mascot.
 
 **The track side is served from a cache and that is fine in season.**
 `pull/roster/t284_bio.jsonl` holds every athlete's parsed track races, so a
@@ -2309,6 +2315,94 @@ tooltips.
 Same 200-unit viewBox lesson as the How tab's diagrams: a label written at 6
 units renders at about 10px on a 375px column, which is too small. `--axt` is
 6.5 and `--lbl` is 7.
+
+### Standing, drawn
+
+A hundred rows of rank, name and time say who is faster and never by how much,
+so a two-second gap and a two-minute one look identical going down the list.
+Every board row carries the same bar the growth board and the Who's Who
+honours already use - **a length is a standing** - scaled over the times
+actually on screen, so a search that leaves three names still draws three
+lengths that mean something against each other. A floor of 4%, because a row
+with no bar reads as a row with no time.
+
+It is softer than the growth board's, where the bar *is* the headline. Here
+the time is, and a hundred rows of full-strength accent under a hundred names
+is a second headline arguing with the first. The top three keep it.
+
+The record book's ten get it too, for nothing: ten rows rather than a hundred,
+and the shape of a record book - one name clear, then a pack - is worth
+seeing.
+
+**`display:block` is load-bearing, and finding that out is the whole reason
+this was worth doing.** `.standing` sets a height and its `<i>` takes
+`height:100%`. That works on the honours card, where it is a `<div>`. Inside a
+board row it is a `<span>` - an inline box, which `height` does not apply to -
+so the fill asked for 100% of nothing and drew **0.0px**. The Most improved
+board has been shipping an invisible bar since it was written and nobody
+noticed, because a bar that is not there looks exactly like a board that never
+had one. Anything that sets a height has to set a display to go with it.
+
+### The leverage, drawn
+
+The Plan card says it in words - so many seconds outside the five, so many a
+median year is worth - and the whole tab turns on the distance between those
+two numbers. Three marks now: where they are, where a median year puts them,
+and the line they are trying to cross.
+
+**Faster is to the right**, the same way the Wall reads, because two places on
+one page disagreeing about which way fast points is worse than either choice
+on its own. Every mark is named underneath rather than left to be guessed at,
+which is the rule the app's leading-card glow failed.
+
+Absolutely positioned percentages rather than an SVG: it is repeated five
+times at any column width, and a viewBox that small puts its own type under
+the page's 10px floor.
+
+### The crest, and the way home
+
+The app already carries all 230 Oregon crests - `LOGO`, rebuilt free on every
+crawl from the same `GetTree` call that finds the team ids - and a school page
+needs exactly one of them.
+
+**It is embedded, not linked.** The dashboard's CSP is `img-src 'self' data:`
+with no googleusercontent in it, deliberately, and the page is one
+self-contained file that fetches nothing. Linking the image would widen the
+policy *and* make the page depend on somebody else's CDN staying up. A data
+URI keeps both promises. `s96` rather than `s128`: a 32px crest on a 3x phone
+wants 96 real pixels, and the base64 is 15KB against 23KB on a page that gzips
+to 130.
+
+`pull/crest.js` writes a **committed** artifact, so `build_dash.js` stays
+offline like the rest of the build. It checks the magic number and the size,
+because a CDN that has decided to say no returns a perfectly valid 60-byte
+HTML page and "it wrote a file" is not the same as "it worked". Re-run it only
+when a school changes its mascot.
+
+```
+node pull/crest.js 284 Tualatin
+node pull/crest.js 159 Sherwood
+node pull/build_dash.js 284        # picks it up from INFO.crest
+```
+
+**The masthead is the way home.** Somebody three athletes deep had no way back
+to the board except the tab bar, and the wordmark is the thing every reader on
+the web already tries. Crest and wordmark are one link to `#/board`, which
+resolves to the default view because a missing parameter means the default.
+
+### The class chip stands down at 320px
+
+318 of 351 board rows ellipsised the name at 320px, and "CLASS OF 2022" was
+the reason - it takes half the column before the name has finished. Measured
+while adding the standing bar and not caused by it: the count is identical
+with the bar, with it inline, and with it removed altogether.
+
+The class year has a whole view of its own - the athlete page, the slug, the
+palette - so it is the one thing on that row that can go, which is the call
+the app already makes about the league abbreviation below 430px. The "running
+now" chip stays: it is short, and it is the one fact on that row you cannot
+get anywhere else at a glance. 318 down to 43, and the 43 are long names
+rather than chips.
 
 ### An empty grade has to say why it is empty
 

@@ -173,6 +173,20 @@ h1{font-family:'Anton',var(--disp);font-weight:400;letter-spacing:.01em;
 h1 em{font-style:normal;background:linear-gradient(100deg,var(--maroon) 0%,var(--accent) 62%);
   -webkit-background-clip:text;background-clip:text;color:transparent}
 [data-theme="light"] h1 em{background:none;color:var(--maroon)}
+/* ---------- the crest, and the way home ----------
+   The crest is the school's own mascot, embedded rather than linked: the CSP
+   is `img-src 'self' data:` and the page fetches nothing, and both of those
+   are promises worth more than 15KB. */
+.home{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;
+  border-radius:var(--r1)}
+.home:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.crest{width:32px;height:32px;object-fit:contain;flex:none;
+  transition:width .18s var(--ease),height .18s var(--ease)}
+body.condensed .crest{width:24px;height:24px}
+/* The underline belongs to the wordmark and is drawn once on load, so it must
+   not re-run every time the link is hovered - it is an entrance, not a state.
+   Hover lifts the crest instead, which is a property nothing else owns. */
+.home:hover .crest{filter:brightness(1.12)}
 .sub{color:var(--muted);font-size:13px;margin-left:6px}
 .themer{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);
   border-radius:var(--rp);padding:5px 13px;font:600 12px/1 var(--disp);letter-spacing:.06em;
@@ -255,6 +269,9 @@ input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 @media(max-width:560px){.row .cl{display:none}}
 .row{min-height:42px;text-decoration:none}
 .row .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 318 of 351 names ellipsised at 320px, and the class chip was the reason.
+   It has a whole view of its own; a truncated name does not. */
+@media(max-width:360px){.row .chip.past{display:none}}
 .row{align-items:center}
 
 .chip{display:inline-block;font:700 9.5px/1 var(--disp);letter-spacing:.1em;
@@ -655,7 +672,45 @@ details>summary:hover{color:var(--text)}
 
 /* a rank shown as a position in a field, which reads as standing rather than
    as a score out of something */
-.standing{height:5px;border-radius:var(--r1);background:var(--raised);overflow:hidden;margin-top:9px}
+/* DISPLAY:BLOCK IS LOAD-BEARING. This is a <span> inside a board row and a
+   <div> on the honours card, and `height` does not apply to an inline box -
+   so the row version drew at 0.0px and the growth board's bar had never once
+   been seen. Anything that sets a height has to set a display to go with it. */
+.standing{display:block;height:5px;border-radius:var(--r1);background:var(--raised);
+  overflow:hidden;margin-top:9px}
+/* the board's variant: a hundred rows multiply every pixel of row height, so
+   it is thinner and sits closer than the one on a card */
+/* Softer than the growth board's, where the bar IS the headline. Here the
+   time is, and a hundred rows of full-strength accent under a hundred names
+   is a second headline arguing with the first. The top three keep it. */
+.standing.sm{height:3px;margin-top:6px;max-width:280px;background:var(--line)}
+.standing.sm i{opacity:.55}
+.row.gold .standing.sm i{opacity:.95}
+
+/* ---------- the leverage gauge ----------
+   Where they are, where a median year puts them, and the fifth runner's line.
+   Absolutely positioned percentages rather than an SVG: this is repeated five
+   times at any column width, and a viewBox that small puts its own type under
+   the page's 10px floor. The marks are named in .g-key underneath. */
+.gauge{position:relative;height:10px;margin:13px 0 0;border-radius:var(--r1);
+  background:var(--raised)}
+.gauge i{position:absolute;display:block}
+.g-run{left:var(--l);width:var(--gw);top:0;bottom:0;border-radius:var(--r1);
+  background:var(--accent);opacity:.42}
+.g-five{left:var(--five);top:-4px;bottom:-4px;width:2px;margin-left:-1px;
+  background:var(--text)}
+.g-now,.g-aft{top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;
+  border:1.5px solid var(--surface)}
+.g-now{left:var(--now);background:var(--steel)}
+.g-aft{left:var(--aft);background:var(--accent)}
+.g-key{display:flex;flex-wrap:wrap;gap:6px 15px;margin-top:8px;
+  font:600 10px/1.3 var(--num);letter-spacing:.02em;color:var(--dim);
+  font-variant-numeric:tabular-nums}
+.g-key span{display:inline-flex;align-items:center;gap:6px}
+.g-key span::before{content:'';width:8px;height:8px;border-radius:50%;
+  background:var(--steel);flex:none}
+.g-key .k-aft::before{background:var(--accent)}
+.g-key .k-five::before{width:2px;height:11px;border-radius:0;background:var(--text)}
 .standing i{display:block;height:100%;background:var(--accent);transform-origin:left;
   animation:sweep .9s cubic-bezier(.22,1,.36,1) both}
 @keyframes sweep{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -22620,7 +22675,13 @@ Three Rivers League JV District
 <div class="wrap">
 <header>
   <div class="brand">
-    <h1><span id="wordmark">Tualatin</span> <em>Distance</em></h1>
+    <!-- The masthead is the way home. Somebody three athletes deep has no
+         other way back to the board, and the wordmark is the thing every
+         reader on the web already tries. -->
+    <a class="home" id="home" href="#/board">
+      <img class="crest" id="crest" alt="" width="32" height="32" hidden>
+      <h1><span id="wordmark">Tualatin</span> <em>Distance</em></h1>
+    </a>
     <span class="sub" id="hdr"></span>
     <button class="themer" id="themer" type="button">Light</button>
   </div>
@@ -22851,7 +22912,7 @@ Three Rivers League JV District
 
 <script>
 'use strict';
-const INFO={"teamId":284,"label":"Tualatin","from":1969,"to":2026,"horizon":1983,"solid":2004,"pulled":"2026-09-27","sports":{"xc":8974,"tfo":7219},"fieldMarksSkipped":2843,"distFloor":800,"modalDiv":"Varsity","depth":"page","deepAthletes":794,"shallowAthletes":849,"archived":{"athletes":1640,"results":18797},"tfPlacings":1626,"ww":{"teams":446,"fourYear":1323,"best":140,"since":{"teamsM":1960,"teamsF":1974,"fourYear":1963}}};
+const INFO={"teamId":284,"label":"Tualatin","from":1969,"to":2026,"horizon":1983,"solid":2004,"pulled":"2026-09-27","sports":{"xc":8974,"tfo":7219},"fieldMarksSkipped":2843,"crest":"data:image/png;base64,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","distFloor":800,"modalDiv":"Varsity","depth":"page","deepAthletes":794,"shallowAthletes":849,"archived":{"athletes":1640,"results":18797},"tfPlacings":1626,"ww":{"teams":446,"fourYear":1323,"best":140,"since":{"teamsM":1960,"teamsF":1974,"fourYear":1963}}};
 
 /* ---------- everyone is named ----------
    Including athletes still at school. The head coach asked for it on
@@ -25486,12 +25547,21 @@ function drawRecords(){
   const classes=[...new Set(A.filter(a=>a.g===g&&a.classOf).map(a=>a.classOf))]
     .filter(y=>(y+'-06-10')>=first&&(y+'-06-10')<=last).sort((a,b)=>b-a).slice(0,6);
 
+  /* The same standing mark the speed board carries, over these ten. Ten rows
+     rather than a hundred, so the height it costs is nothing and the shape of
+     a record book - one name clear, then a pack - is worth seeing. */
+  const hs=top.map(r=>r.h).filter(v=>v!=null);
+  const hFast=Math.min(...hs),hSlow=Math.max(...hs);
+  const hStand=v=>(hSlow===hFast?100
+    :Math.max(4,(hSlow-v)/(hSlow-hFast)*100)).toFixed(1);
   const row=(r,n)=>{
     const a=A[r.i];
     return '<a class="row'+(n<3?' gold':'')+'" data-i="'+r.i+'" data-k="'+r.i+'"'
       +' href="#/athlete/'+esc(SLUG.get(r.i)||'')+'">'
       +'<span class="rk">'+(n+1)+'</span>'
-      +'<span class="nm">'+esc(nameOf(a))+statusChip(a)+'</span>'
+      +'<span class="nm">'+esc(nameOf(a))+statusChip(a)
+        +'<span class="standing sm"><i style="width:'+hStand(r.h)
+        +'%;animation-delay:'+(n*22)+'ms"></i></span></span>'
       +'<span class="cl">'+r.date+'</span>'
       +'<span class="tm">'+secs(r.h/100)+'</span></a>';
   };
@@ -26646,6 +26716,15 @@ function drawBoard(){
     +'<span class="cl"></span>'
     +'<span class="tm">'+(YOU.h==null?'':secs(YOU.h/100))+'</span></div>';
 
+  /* The scale is the fastest and slowest ON SCREEN, so a search that leaves
+     three names still draws three lengths that mean something against each
+     other. A floor of 4%, because a row with no bar at all reads as a row
+     with no time. */
+  const ts=rows.map(r=>byA[r.a.i].best[bR]).filter(v=>v!=null);
+  const tFast=Math.min(...ts),tSlow=Math.max(...ts);
+  const stand=v=>(tSlow===tFast?100
+    :Math.max(4,(tSlow-v)/(tSlow-tFast)*100)).toFixed(1);
+
   el.innerHTML=rows.map(({a,rank,tied},n)=>{
     const o=byA[a.i],m=MEETS[o.bestAt[bR]]||{};
     const before=(mine&&!q&&rank===mine.rank&&n===rows.findIndex(x=>x.rank===mine.rank))
@@ -26655,7 +26734,15 @@ function drawBoard(){
       +'<span class="rk'+(tied?' tie':'')+'"'
       +(tied?' title="shares this place" data-tip="Equal to the hundredth, so they share the place"':'')
       +'>'+(tied?'T-':'')+rank+'</span>'
-      +'<span class="nm">'+esc(nameOf(a))+statusChip(a)+'</span>'
+      /* STANDING, DRAWN. A hundred rows of rank, name and time say who is
+         faster and never by how much, so a two-second gap and a two-minute
+         one look identical going down the list. The bar is the mark the
+         growth board and the Who's Who honours already use - a length is a
+         standing - scaled over the times actually on screen, which is what
+         "this is a view, not the data" looks like as a picture. */
+      +'<span class="nm">'+esc(nameOf(a))+statusChip(a)
+        +'<span class="standing sm"><i style="width:'+stand(o.best[bR])
+        +'%;animation-delay:'+Math.min(n*11,430)+'ms"></i></span></span>'
       /* Just the meet. The class year moved into the status chip beside the
          name, and printing it twice on one row is noise. */
       +'<span class="cl" title="'+esc(m.name||'')+'" data-tip="'+esc(m.name||'')
@@ -27864,6 +27951,33 @@ function drawPack(cv,rows,fifth){
   if(!done)setTimeout(()=>{if(!done){done=true;CV.paint(cv);}},DUR+400);
 }
 
+/* ---------- the leverage, drawn ----------
+   The card says it in words - so many seconds outside the five, so many a
+   median year is worth - and the whole tab turns on the distance between
+   those two numbers. Three marks: where they are, where a median year puts
+   them, and the line they are trying to cross.
+
+   Faster is to the RIGHT, the same way the Wall reads, because two places on
+   one page disagreeing about which way fast points is worse than either
+   choice on its own. Every mark is named underneath rather than left to be
+   guessed at, which is the rule the leading card's glow failed. */
+function janGauge(r,fifth){
+  if(r.t==null||r.after==null||fifth==null)return '';
+  const lo0=Math.min(r.t,r.after,fifth),hi0=Math.max(r.t,r.after,fifth);
+  const pad=Math.max(2,(hi0-lo0)*0.22),lo=lo0-pad,hi=hi0+pad;
+  const at=v=>(hi-v)/(hi-lo)*100;
+  const now=at(r.t),aft=at(r.after),fv=at(fifth);
+  return '<div class="gauge" aria-hidden="true" style="--l:'
+    +Math.min(now,aft).toFixed(1)+'%;--gw:'+Math.abs(aft-now).toFixed(1)
+    +'%;--now:'+now.toFixed(1)+'%;--aft:'+aft.toFixed(1)+'%;--five:'
+    +fv.toFixed(1)+'%">'
+    +'<i class="g-run"></i><i class="g-five"></i>'
+    +'<i class="g-now"></i><i class="g-aft"></i></div>'
+    +'<div class="g-key"><span class="k-now">'+secs(r.t)+' now</span>'
+    +'<span class="k-aft">'+est(r.after)+' after a median year</span>'
+    +'<span class="k-five">'+est(fifth)+' \u00b7 the scoring five</span></div>';
+}
+
 /* ---------- January, rendered ---------- */
 let jG='M',jR='xc5000';
 function drawJanuary(){
@@ -27906,7 +28020,7 @@ function drawJanuary(){
         +'<div><div class="who">'+esc(nameOf(r.a))+'<span class="dimv" '
           +'style="font:500 12px var(--num);margin-left:8px">grade '+r.grade+' \u00b7 '
           +secs(r.t)+' \u2192 '+est(r.after)+'</span></div>'
-        +'<div class="why2">'+why+'</div></div>'
+        +'<div class="why2">'+why+'</div>'+janGauge(r,R1.fifth)+'</div>'
         +'<div class="amt">'+amt+'</div></div>';
     }).join('');
     const st=five[0].step;
@@ -28477,6 +28591,15 @@ addEventListener('resize',()=>{
 addEventListener('hashchange',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
 addEventListener('popstate',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
 applyRoute(parseRoute(location.hash));
+/* The crest, if this school has one in the app's map. `hidden` until it
+   does, so a school without one gets a masthead rather than a broken image. */
+(function(){
+  const im=document.getElementById('crest');
+  if(!im||!INFO.crest)return;
+  im.src=INFO.crest;
+  im.alt=SCHOOL+' crest';
+  im.hidden=false;
+})();
 ribbon();
 if(!location.hash)writeHash();
 </script>

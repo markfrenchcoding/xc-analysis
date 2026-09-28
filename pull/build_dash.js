@@ -254,6 +254,11 @@ const info = {
   sports: { xc: results.filter((r) => r.sport === 'xc').length,
     tfo: results.filter((r) => r.sport === 'tfo').length },
   fieldMarksSkipped: meta.fieldMarksSkipped || 0,
+  /* The school's mascot as a data URI, written by pull/crest.js and committed,
+     so this build stays offline and the page goes on fetching nothing. Absent
+     is fine: the masthead simply has no crest. */
+  crest: fs.existsSync(path.join(DIR, 't' + teamId + '_crest.txt'))
+    ? fs.readFileSync(path.join(DIR, 't' + teamId + '_crest.txt'), 'utf8').trim() : '',
   distFloor: DIST_FLOOR,
   modalDiv,
   /* the archive is not uniform and the page should be able to say so: every
