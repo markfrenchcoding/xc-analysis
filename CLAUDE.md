@@ -2290,10 +2290,13 @@ so no label ellipses. Full size from about 410px up.
 **Add 320 to any width sweep.** Every layout bug found in this pass lived
 below 375.
 
-**One thing knowingly left.** The pack network's names render at 9.6px at
-320px against a 10.2px floor - `--axt` at 5.8 units in a 170-unit viewBox
-scaled to a 282px column. Fixing it means moving `CH.setW`'s floor, which
-changes every chart at every width for 0.6px on one of them.
+**One thing knowingly left, and later not left.** The pack network's names
+rendered at 9.6px at 320px against a 10.2px floor - `--axt` at 5.8 units in a
+170-unit viewBox scaled to a 282px column - and the note here said fixing it
+meant moving `CH.setW`'s floor and changing every chart at every width for
+0.6px on one of them. That was the wrong place to fix it: the face is set on
+that one chart, so raising it there costs nothing anywhere else. See the
+revamp below.
 
 ### Charts carry the shape, tables carry the numbers
 
@@ -2306,6 +2309,144 @@ tooltips.
 Same 200-unit viewBox lesson as the How tab's diagrams: a label written at 6
 units renders at about 10px on a 375px column, which is too small. `--axt` is
 6.5 and `--lbl` is 7.
+
+### The revamp: a bar, a ribbon and a rail
+
+Both pages were a single 600px column of identical rounded cards with every
+section heading set at 13px uppercase, on a phone that four readers in five are
+holding. Nothing was allowed to be more important than anything else, so there
+was nothing to scroll to.
+
+**Section headings are headings now.** `--d1` is `clamp(26px,7.4vw,38px)` and
+carries an eyebrow number - `counter(sec)` in `h2::before` - which is what gives
+a stack of sections a spine. A section's first paragraph is a standfirst at
+`--d2` and everything after it drops to 14px detail. Three sizes where there
+was one.
+
+**Sections came off the card.** Eight identical boxes on one background is a
+list of rectangles, and the border plus its padding cost 36px of a 375px screen
+while carrying no information. A hairline and space instead. Charts keep 5px of
+padding rather than going flush: a rotated y-axis label sits at x=0 of its own
+viewBox, and a chart drawn to the glass writes it into the bezel.
+
+**The bar spans the glass and condenses.** The masthead and the controls for
+whichever panel is open stack into one app bar, so four thousand pixels down you
+still know it is the boys on the 5,000m. At rest it is 139px of an 812px phone -
+seventeen per cent of the screen given permanently to chrome - so past 110px of
+scroll `body.condensed` shrinks the wordmark, drops the counts and tightens the
+tab row: **139px to 80px**. The wordmark *shrinks* rather than disappearing,
+because `.themer` lives inside `.brand` and hiding the row takes the only theme
+control on the page with it.
+
+**`--vw` is measured, not `100vw`.** A full-bleed rule written in `vw` includes
+the scrollbar, which is how a desktop page starts scrolling sideways by fifteen
+pixels. It comes from `clientWidth`, re-set on resize. `--hdr-h` is measured the
+same way by a `ResizeObserver` on the header, which is what lets the condensing
+bar move the sticky control row without being told.
+
+**The board's two fields are a second control row and deliberately not sticky.**
+Three segments and two inputs came to 160px that never scrolled away - more
+chrome than the board underneath it. The switches say what you are looking at
+and have to stay; a search box is somewhere you go once.
+
+**The masthead ribbon is decoration that is not decoration.** One tick a school
+year, height by athletes on record, muted before `INFO.solid` and lit for the
+season in progress. It says how far back the record goes and where it thickens,
+which is the first thing to know about an archive and the thing a date range
+cannot show. Built from the same seasons table every number comes from, so it
+cannot drift from what the page says.
+
+**The stat tiles are a hairline strip on a phone.** Two columns put every pair
+on one grid row and a grid row is as tall as its tallest cell, so the four-year
+tile's seven-line note left its neighbour carrying 85px of dead space.
+Shortening the note was the other fix and it is the wrong one - that note is the
+tile saying what it means. Below 560px they stop being a grid: number on the
+right, label and note on the left with 200px to run in, every row its own
+height.
+
+### The desktop rail, and why it is a float
+
+Above 1,080px a section is two columns - eyebrow, heading and standfirst in a
+336px rail, the evidence beside it. A 1,008px column running a 66ch measure had
+left four hundred pixels of nothing down the right of every section with a
+heading wrapping at seventeen characters beside it, which is a phone page
+stretched rather than a desktop one.
+
+`:has(>h2)` is load-bearing: only a section with a heading gets a rail, and an
+engine without `:has()` drops the whole block and keeps the single column, which
+is the right thing to fall back to.
+
+**It was a grid first and the grid separated a heading from its own
+standfirst by six hundred pixels.** Heading in the rail's row 1, standfirst in
+its row 2 - and a grid row is as tall as its tallest cell, so on the athlete
+page the standfirst waited for a 600px career chart in the content column and
+landed below the bottom of the figure it was introducing. A float has no rows:
+the two rail items stack against the top-left corner and everything else clears
+them by a margin. The newspaper sidebar, which is what this layout is.
+
+**A percentage width resolves against the card, not against what is left of
+it.** `width:100%` beside a 392px rail margin is 392px off the right of the
+screen whatever the float is doing. The 760px rule hands figures back exactly
+that, and the pack canvas carried it as an **inline** style, which no stylesheet
+rule can reach - 356px of sideways page scroll at 1080. The canvas's width moved
+into the stylesheet and the content column takes an explicit
+`calc(100% - var(--rail) - var(--railgap))`.
+
+**And the rail is not part of the chart's column.** `sizeCharts()` measured the
+panel, which was right until a section became two columns: at 1440px the athlete
+page and all three History views drew a 545-unit viewBox into a 616px box, a
+scale of 1.13, every axis label at **7.3px** against the page's 10.2px floor.
+The same fault as the original 200-unit viewBox arriving from the other
+direction, and invisible unless measured - the charts looked fine, only small.
+`colWidth()` subtracts `--rail` and `--railgap`, read out of the stylesheet
+rather than written down twice. It is safe because every chart-bearing card on
+both sites has a heading, which was checked rather than assumed.
+
+**The rail is not sticky, and a tall section leaves it empty.** Making it stick
+means the heading and its standfirst have to be one element, which is a markup
+change across a dozen render paths. Left as it is.
+
+### Three more things the revamp turned up
+
+**The section treatment reached seven of nine views and the two it missed were
+the ones people land on.** The athlete page and all three History views render
+into `#ath` and `#h-out`, so `[role=tabpanel] > .card` walked straight past them
+and every board row led to a page still wearing 13px labels inside boxes. The
+selector is `:is([role=tabpanel],#ath,#h-out)>.card` now. Found by opening an
+athlete page, not by reading the selector.
+
+**A status is not the headline.** "Running now" was a solid maroon chip with
+white ink, louder than the rank, the name and the time on a board that is about
+the time. It is the outlined chip the graduated years wear, in the school's
+colour instead of grey: still the first thing you can pick out down the column.
+Measured at 5.0:1 or better in both themes on both sites.
+
+**Four label collisions, found by measuring every pair of `<text>` boxes in
+every chart rather than by looking at screenshots.**
+
+- The waterfall's "steps sum to" ran inside the measured-total outline, because
+  it was anchored at the far end of its own rule. It ends at the outline's left
+  edge now, shortens to "sum 58s off", and is gated on the room that is actually
+  there - a column width minus half a bar, in the chart's own units - rather
+  than on the chart's overall pixel width, which says nothing about the gap the
+  label has to live in.
+- The record-over-time axis ticked every four years, which is a number rather
+  than a measurement: forty-four seasons is eleven labels in about 170 units and
+  five pairs overlapped at 320px. The step comes off the room and off round
+  years, so the axis reads 1990, 2000, 2010.
+- The lean scatter's name boxes ran from the baseline upwards only, so two
+  labels eight units apart could still touch below the line. The box holds the
+  descenders now and the width estimate went from 0.58em to 0.62em.
+- The pack network's names were 5.8px, which renders at 9.8px on a 320px phone.
+  6.2px, with the collision test's width estimate raised to match - raising the
+  face without raising the estimate leaves a stale test. **This retires the "one
+  thing knowingly left" above.**
+
+**Verified at 320, 375, 414, 768, 1080, 1200, 1440 and 1920, both themes, both
+sites, all seven views**: no horizontal page scroll, nothing past the content
+column, no console errors, no SVG text under 10.1px or over 22px, and no two
+chart labels overlapping anywhere. Both page audits read 0 values changed -
+nothing here touches a number.
 
 ### What it says
 

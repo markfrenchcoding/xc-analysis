@@ -272,7 +272,15 @@ input[type=search]:focus{outline:2px solid var(--dim);outline-offset:1px}
 .chip{display:inline-block;font:700 9.5px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;padding:4px 7px;border-radius:var(--r1);vertical-align:2px;
   margin-left:9px;white-space:nowrap}
-.chip.live{background:var(--maroon);color:#fff}
+/* A STATUS IS NOT THE HEADLINE. This was a solid maroon chip with white ink,
+   which made "running now" the loudest thing in the row - louder than the rank,
+   the name and the time, on a board that is about the time. It is the same
+   outlined chip the graduated years wear, in the school's colour instead of
+   grey: still the first thing you can pick out down the column, no longer
+   shouting over the number the reader came for. */
+.chip.live{background:color-mix(in srgb,var(--accent) 13%,transparent);
+  color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);
+  letter-spacing:.06em}
 .chip.past{background:transparent;color:var(--faint);border:1px solid var(--line);
   letter-spacing:.06em}
 .row .tm{font:700 18px/1 var(--num);font-variant-numeric:tabular-nums;min-width:66px;text-align:right}
@@ -762,6 +770,246 @@ circle.tw-o{fill:var(--steel);stroke:none}
 @media (min-width:760px){.ln-cols{grid-template-columns:1fr 1fr;gap:26px}}
 
 @media (prefers-reduced-motion:reduce){.bgame{transition:none}}
+
+/* ==========================================================================
+   THE REVAMP. Mobile first, because four readers in five are on a phone.
+   Five structural ideas and nothing cosmetic:
+
+   1. A REAL SCALE. Every section heading on this page was 13px - a label,
+      not a heading - so nothing was allowed to be more important than
+      anything else, and a phone showing one and a half cards at a time had
+      no landmarks to scroll to.
+   2. SECTIONS ARE NOT BOXES. Eight identical cards on one background is a
+      list of rectangles. The card's 36px of horizontal border and padding
+      also cost a tenth of a 375px screen and carried no information.
+      Sections are separated by space and a hairline instead.
+   3. THE BAR SPANS THE GLASS. The header and the controls for the panel you
+      are on stack into one app bar that stays put, so you always know
+      whether you are looking at boys or girls, and on which ruler, four
+      thousand pixels down.
+
+   4. THE TILES ARE A STRIP. Below 560px they stop being a two-column grid,
+      because a grid row is as tall as its tallest cell and one tile's note
+      runs to seven lines.
+   5. THE RAIL. Above 1,080px a section is a heading and a standfirst in a
+      336px column with the evidence beside them, because a 1,008px column
+      running a 66ch measure is a phone page stretched.
+
+   Nothing here changes a number. Both audits read 0 values changed.
+   ========================================================================== */
+:root{
+  /* the gutter the wrap already uses, named so things can break out of it */
+  --gut:calc(16px + env(safe-area-inset-left,0px));
+  /* the viewport width WITHOUT the scrollbar. 100vw includes it, and a
+     full-bleed rule written in vw is how a desktop page starts scrolling
+     sideways by fifteen pixels. JS keeps this exact. */
+  --vw:100vw;
+  --hdr-h:104px;
+  /* the desktop rail, named because sizeCharts() has to subtract it and two
+     copies of a number is two numbers waiting to disagree */
+  --rail:336px;--railgap:56px;
+  --d1:clamp(26px,7.4vw,38px);   /* a section heading */
+  --d2:clamp(16.5px,4.5vw,19px); /* the standfirst under it */
+}
+
+/* ---------- the app bar ---------- */
+/* Full bleed: pull out to the glass, then put the gutter back as padding so
+   the content still lines up with everything below it. */
+.bleed{
+  margin-left:calc(50% - var(--vw)/2);
+  margin-right:calc(50% - var(--vw)/2);
+  padding-left:max(var(--gut),calc(var(--vw)/2 - 520px + var(--gut)));
+  padding-right:max(var(--gut),calc(var(--vw)/2 - 520px + var(--gut)));
+}
+header{
+  margin-left:calc(50% - var(--vw)/2);
+  margin-right:calc(50% - var(--vw)/2);
+  padding-left:max(var(--gut),calc(var(--vw)/2 - 520px + var(--gut)));
+  padding-right:max(var(--gut),calc(var(--vw)/2 - 520px + var(--gut)));
+  padding-top:14px;margin-bottom:0;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:blur(18px) saturate(1.3);
+  border-bottom:0;
+}
+/* the controls for whichever panel is open ride directly under it */
+[role=tabpanel]:not([hidden])>.ctl:first-child{
+  position:sticky;top:calc(var(--hdr-h) - 1px);z-index:9;
+  margin-left:calc(50% - var(--vw)/2);
+  margin-right:calc(50% - var(--vw)/2);
+  padding:9px max(var(--gut),calc(var(--vw)/2 - 520px + var(--gut)));
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:blur(18px) saturate(1.3);
+  border-bottom:1px solid var(--line);
+  margin-bottom:6px;gap:6px;
+}
+/* the seg pills shrink a little inside the bar so three rows still fit */
+[role=tabpanel]:not([hidden])>.ctl:first-child .seg button{padding:6px 9px}
+
+/* ---------- the masthead ribbon ----------
+   Decoration that is not decoration: one tick a school year, its height the
+   number of athletes on record that year, the current season in the accent.
+   It says at a glance how far back the record goes and where it thickens -
+   which is the first thing anybody should know about an archive, and the
+   thing a date range alone cannot show. */
+#ribbon{display:block;width:100%;height:34px;margin:2px 0 0}
+#ribbon rect{fill:var(--line)}
+#ribbon rect.solid{fill:var(--steel)}
+#ribbon rect.now{fill:var(--accent)}
+.ribwrap{margin-bottom:26px;padding-bottom:0}
+.ribcap{display:flex;justify-content:space-between;
+  font:500 10.5px/1 var(--num);color:var(--faint);letter-spacing:.04em;
+  margin-top:5px;text-transform:uppercase}
+
+/* ---------- sections ---------- */
+/* The three containers a section can be written into. #ath and #h-out are
+   render targets rather than layout, so a child combinator off the panel
+   misses every card inside them - which is the athlete page and all three
+   History views, seven of nine of the page's destinations between them. */
+:is([role=tabpanel],#ath,#h-out)>.card{
+  background:none;border:0;box-shadow:none;border-radius:0;
+  padding:34px 0 36px;margin:0;
+  border-top:1px solid var(--line);
+}
+:is([role=tabpanel],#ath,#h-out)>.card:first-of-type{border-top:0;padding-top:22px}
+
+/* an eyebrow number, which is what gives a stack of sections a spine */
+:is([role=tabpanel],#ath,#h-out)>.card>h2{
+  font:700 var(--d1)/1.04 var(--disp);letter-spacing:-.018em;
+  text-transform:none;color:var(--text);margin:0 0 12px;max-width:17ch;
+  scroll-margin-top:calc(var(--hdr-h) + 62px);
+}
+:is([role=tabpanel],#ath,#h-out)>.card>h2::before{
+  content:counter(sec,decimal-leading-zero);counter-increment:sec;
+  display:block;font:600 10.5px/1 var(--num);letter-spacing:.18em;
+  color:var(--accent);margin-bottom:9px;
+}
+[role=tabpanel]:not([hidden]){counter-reset:sec}
+
+/* the standfirst carries the finding; everything after it is detail */
+:is([role=tabpanel],#ath,#h-out)>.card>.why:first-of-type{
+  font:400 var(--d2)/1.5 var(--body);color:var(--muted);
+  max-width:36ch;margin:0 0 20px;
+}
+:is([role=tabpanel],#ath,#h-out)>.card>.why~.why{
+  font:400 14px/1.62 var(--body);color:var(--dim);max-width:42ch;margin:16px 0 0;
+}
+:is([role=tabpanel],#ath,#h-out)>.card>.why b,:is([role=tabpanel],#ath,#h-out)>.card>.why strong{color:var(--text)}
+
+/* charts break the gutter: they are the argument, not an illustration of it */
+:is([role=tabpanel],#ath,#h-out)>.card>figure{
+  margin-left:calc(-1*var(--gut));margin-right:calc(-1*var(--gut));
+  width:calc(100% + var(--gut)*2);
+  /* not quite to the glass: a rotated y-axis label sits at x=0 of its own
+     viewBox, and a chart drawn flush writes it into the bezel */
+  padding:0 5px;
+}
+/* the second control row scrolls away with the page */
+.ctl-find{margin:0 0 4px}
+@media(min-width:760px){
+  :is([role=tabpanel],#ath,#h-out)>.card>figure{margin-left:0;margin-right:0;width:100%}
+}
+
+/* tiles were already the best thing here - give them room and a hairline */
+#pack-cv{width:100%;display:block}
+.tiles{gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r2)}
+
+/* ---------- restraint ----------
+   The accent was on pills, links, bar fills, headline numbers and chart lines
+   at once, so it had stopped meaning anything. It keeps the active state, the
+   eyebrow and the one number a section is about. */
+.dtab>summary{color:var(--faint)}
+.dtab>summary:hover{color:var(--muted)}
+
+
+/* ---------- the bar condenses ----------
+   Header and controls together are 139px of an 812px phone: seventeen per cent
+   of the screen given to chrome, permanently. So it shrinks once you are past
+   the masthead. The wordmark drops to a running head, the counts go, the tab
+   row tightens, and the bar lands near 100px.
+
+   The wordmark SHRINKS rather than disappearing, and the brand row stays. The
+   obvious version hides the whole row, which takes the only theme control on
+   the page with it - .themer lives inside .brand. */
+header,.brand h1,nav button{transition:font-size .18s var(--ease),padding .18s var(--ease)}
+@media(prefers-reduced-motion:reduce){header,.brand h1,nav button{transition:none}}
+body.condensed header{padding-top:6px}
+body.condensed .brand h1{font-size:clamp(15px,4.2vw,20px)}
+body.condensed .brand .sub{display:none}
+body.condensed nav button{padding-top:9px;padding-bottom:9px}
+
+/* ---------- the stat tiles are a strip on a phone ----------
+   Two columns of tiles put every pair on one grid row, and a grid row is as
+   tall as its tallest cell: the four-year tile's note runs seven lines at
+   165px wide, so its neighbour carried 85px of dead space. Shortening the
+   note was the other fix and it is the wrong one - that note is the tile
+   saying what it means, which is the rule these tiles exist to follow.
+
+   So on a phone they stop being a grid and become one hairline-ruled strip:
+   the number on the right, the label and its note on the left with 200px to
+   run in. Every row is its own height, so nothing can be ragged, and a note
+   that wanted seven lines gets three. */
+@media(max-width:559px){
+  .tiles{grid-template-columns:1fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+  .tile{border:0;border-radius:0;padding:11px 13px;
+    display:grid;grid-template-columns:1fr auto;column-gap:14px;align-items:center}
+  .tile .k{grid-column:1;grid-row:1;align-self:end}
+  .tile .n{grid-column:1;grid-row:2;margin-top:3px}
+  .tile .v{grid-column:2;grid-row:1/span 2;margin-top:0;text-align:right;
+    font-size:clamp(23px,6.6vw,29px);line-height:1}
+  .tile .v.small{font-size:clamp(20px,5.6vw,25px)}
+}
+
+
+/* ---------- the desktop rail ----------
+   The phone layout is the one that was designed and four readers in five see
+   it. But a 1,008px column running a 66ch measure leaves four hundred pixels
+   of nothing down the right of every section, with a section heading wrapping
+   at seventeen characters beside it - a phone page stretched, not a desktop
+   one.
+
+   So above 1,080px a section becomes two columns: the eyebrow, the heading and
+   the standfirst in a rail, the evidence beside them. Everything else - the
+   charts, the tables, the switches, the detail prose - keeps its place in the
+   flow and simply sits in the second column.
+
+   :has() is doing the load-bearing work: only a section that HAS a heading
+   gets a rail, because a section without one has nothing to put in it. In an
+   engine without :has() the whole block is invalid and dropped, which leaves
+   the single-column layout - the right thing to fall back to. */
+@media(min-width:1080px){
+  /* A FLOAT, NOT A GRID, AND THE DIFFERENCE IS SIX HUNDRED PIXELS. The grid
+     version put the heading in the rail's row 1 and the standfirst in its row
+     2 - and a grid row is as tall as its tallest cell, so on the athlete page
+     the standfirst waited for a 600px career chart in the content column and
+     landed below the bottom of the figure it was introducing. A float has no
+     rows: the two rail items stack against the top-left corner and everything
+     else clears them by a margin. */
+  :is([role=tabpanel],#ath,#h-out)>.card:has(>h2){display:flow-root}
+  :is([role=tabpanel],#ath,#h-out)>.card:has(>h2)>h2,
+  :is([role=tabpanel],#ath,#h-out)>.card:has(>h2)>.why:first-of-type{
+    float:left;clear:left;width:var(--rail);max-width:none;
+    margin-right:var(--railgap);
+  }
+  :is([role=tabpanel],#ath,#h-out)>.card:has(>h2)>:not(h2):not(.why:first-of-type){
+    margin-left:calc(var(--rail) + var(--railgap));
+    /* An explicit width, because a percentage resolves against the CARD and
+       knows nothing about the margin: the 760px rule hands figures back a
+       width:100%, and 100% of the card plus the rail's margin is four hundred
+       pixels off the right of the screen. This is the same number the margin
+       already is, so it is what `auto` would give anything that has not been
+       told otherwise. */
+    width:calc(100% - var(--rail) - var(--railgap));max-width:none;
+  }
+  /* a heading with a whole column to itself does not need to wrap at 17ch */
+  :is([role=tabpanel],#ath,#h-out)>.card>h2{max-width:none}
+  /* charts stop pretending they are in a 375px column */
+  :is([role=tabpanel],#ath,#h-out)>.card>figure{padding:0}
+  /* and the bar has room to be one line again */
+  header{padding-top:16px}
+}
+
 </style>
 </head>
 <body>
@@ -29707,12 +29955,20 @@ TriValley Districts (Prelims)
     <button role="tab" id="t-history" aria-selected="false" aria-controls="p-history">History</button>
   </nav>
 </header>
+<div class="ribwrap bleed" id="ribwrap"></div>
 
 <section id="p-board" role="tabpanel">
   <div class="ctl">
     <div class="seg" id="g-board"><button aria-pressed="true" data-g="M">Boys</button><button aria-pressed="false" data-g="F">Girls</button></div>
     <div class="seg" id="r-board"></div>
     <div class="seg" id="n-board"><button aria-pressed="true" data-n="100">Top 100</button><button aria-pressed="false" data-n="0">Everyone</button><button aria-pressed="false" data-n="-1">Most improved</button></div>
+  </div>
+  <!-- The two fields are a SECOND control row, and deliberately not part of the
+       sticky bar. Three segments and two inputs stacked to 160px of an 812px
+       phone that never scrolled away, which is more chrome than the board it
+       sat on top of. The switches say what you are looking at and have to
+       stay; a search box is somewhere you go once. -->
+  <div class="ctl ctl-find">
     <input type="search" id="q-board" placeholder="Find a name" aria-label="Find a name">
     <input type="text" id="you-in" class="you-in" inputmode="decimal"
       placeholder="Your time" aria-label="Type a time to see where it lands"
@@ -29888,7 +30144,10 @@ TriValley Districts (Prelims)
     outlined, which is the same mark the odds site uses — five score, everybody
     runs. The gaps are to scale, so the shape of this picture is the shape of the
     team.</p>
-    <canvas id="pack-cv" style="width:100%;display:block"></canvas>
+    <!-- width lives in the stylesheet, not here: an inline width:100% is a
+         width the desktop rail cannot override, and a percentage beside a
+         rail margin overflows by exactly the rail -->
+    <canvas id="pack-cv"></canvas>
     <p class="why" id="pack-cap" style="margin:12px 0 0"></p>
   </div>
 
@@ -30613,6 +30872,77 @@ const OBS=('IntersectionObserver' in window)?new IntersectionObserver(es=>{
    headings and navigation with them. No column is hidden - each is a fact
    somebody might want. Here rather than at each table, so a later one gets it
    without remembering. */
+
+/* ---------- the two measurements the bar needs ----------
+   --vw is the viewport WITHOUT the scrollbar, because a full-bleed rule
+   written in vw includes it and a desktop page then scrolls sideways by
+   fifteen pixels - which is the exact bug this page just finished fixing.
+   --hdr-h is how far down the panel's own controls have to sit. Both are
+   measured rather than assumed, and both are re-measured on resize. */
+(function(){
+  const root=document.documentElement;
+  const hdr=document.querySelector('header');
+  const set=()=>{
+    root.style.setProperty('--vw',root.clientWidth+'px');
+    if(hdr)root.style.setProperty('--hdr-h',Math.round(hdr.getBoundingClientRect().height)+'px');
+  };
+  set();
+  addEventListener('resize',set,{passive:true});
+  if('ResizeObserver'in window&&hdr)new ResizeObserver(set).observe(hdr);
+  /* the nav can change height when a label wraps, and the tab bar changes
+     which controls are on screen, so re-measure after a switch too */
+  addEventListener('hashchange',()=>nextFrame(set));
+})();
+
+/* ---------- the masthead ribbon ----------
+   One tick a school year: height by how many athletes are on record that
+   year, muted before `solid` and lit for the season in progress. It is built
+   from the same seasons table every number on this page comes from, so it
+   cannot drift from what the page says. */
+function ribbon(){
+  const host=document.getElementById('ribwrap');
+  if(!host)return;
+  const per=new Map();
+  for(const s of S){
+    if(!per.has(s.y))per.set(s.y,new Set());
+    per.get(s.y).add(s.a);
+  }
+  const ys=[...per.keys()].sort((a,b)=>a-b);
+  if(!ys.length)return;
+  const lo=ys[0],hi=ys[ys.length-1],n=hi-lo+1;
+  const max=Math.max(...[...per.values()].map(v=>v.size));
+  const W=1000,H=34,gap=n>60?0.6:1.4;
+  const w=(W-gap*(n-1))/n;
+  let bars='';
+  for(let i=0;i<n;i++){
+    const y=lo+i,c=(per.get(y)||{size:0}).size||0;
+    const h=c?Math.max(2,Math.round(c/max*H)):1;
+    const cls=y===hi?'now':(y>=INFO.solid?'solid':'');
+    bars+='<rect class="'+cls+'" x="'+(i*(w+gap)).toFixed(2)+'" y="'+(H-h)
+      +'" width="'+w.toFixed(2)+'" height="'+h+'" rx="'+(w>3?1:0)+'"><title>'
+      +y+': '+c+' athlete'+(c===1?'':'s')+'</title></rect>';
+  }
+  host.innerHTML='<svg id="ribbon" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" '
+    +'role="img" aria-label="'+esc('Athletes on record each school year, '+lo+' to '+hi
+      +'. The record is thin before '+INFO.solid+'.')+'">'+bars+'</svg>'
+    +'<div class="ribcap"><span>'+lo+'</span><span>'
+    +esc('thin until '+INFO.solid)+'</span><span>'+hi+'</span></div>';
+}
+
+
+/* The bar condenses past the masthead. The ResizeObserver already watching the
+   header re-measures --hdr-h for free, so the panel's own control row follows
+   it up without being told about any of this. */
+(function(){
+  let on=false;
+  const test=()=>{
+    const want=scrollY>110;
+    if(want!==on){on=want;document.body.classList.toggle('condensed',on);}
+  };
+  addEventListener('scroll',test,{passive:true});
+  test();
+})();
+
 function wrapTables(scope){
   for(const t of (scope||document).querySelectorAll('table')){
     if(t.parentElement&&t.parentElement.classList.contains('tscroll'))continue;
@@ -30997,10 +31327,31 @@ function waterfall(c,h,opt){
         /* "steps sum to +59s" is 40 units of text over a 34-unit column, so
            on a phone it was written across the bar's own figure. The rule
            stays - it is the thing worth seeing - and the caption underneath
-           already says the number in words. */
-        +((small||f.x1-f.x0<170)?''
-          :'<text x="'+(cx(3)+bw/2)+'" y="'+(y(sum)-2.5).toFixed(1)
-            +'" class="axt" text-anchor="end">steps sum to '+s0(sum)+'</text>');
+           already says the number in words.
+
+           IT ENDS BEFORE THE DASHED BAR, NOT AT ITS FAR EDGE. Anchored at the
+           right end of the rule it was written inside the measured-total
+           outline, which is the one place on this chart where a second number
+           reads as belonging to the bar it is sitting in. Ending it at the
+           outline's left edge runs it back over the empty ground above the
+           third bar, and the label shortens to fit the gap that leaves. */
+        +(function(){
+           /* A WIDTH IN PIXELS IS NOT THE TEST. The old gate was the chart's
+              own width, which says nothing about the gap this label has to
+              live in: the room is whatever is left between the third bar's
+              own figure and the left edge of the measured-total outline, and
+              that is a column width minus half a bar. At 414px it is twenty
+              units against a forty-unit label, so it was written through
+              "6s off". Measured in the chart's own units, it fits on a
+              desktop column and is left off on a phone. */
+           const txt='sum '+s0(sum),ch=3.5;
+           const mine=txt.length*ch;
+           const nbr=(cum[2]&&cum[2].v!=null?s0(cum[2].v).length:6)*ch/2;
+           const room=(cx(3)-bw/2-1.5)-(cx(2)+nbr);
+           return (small||room<mine)?''
+             :'<text x="'+(cx(3)-bw/2-1.5).toFixed(1)+'" y="'+(y(sum)-2.5).toFixed(1)
+               +'" class="axt" text-anchor="end">'+txt+'</text>';
+         })();
   }
 
   /* The labels shorten when the column does. "grade 9 → 10" wants about 45
@@ -32462,7 +32813,15 @@ function recordChart(g,k,date){
 
   let d='',g2=CH.gridY(f,y,CH.timeTicks(lo,hi,4),ms)
     +CH.unitY(f,RULERS[k].label+' \u00b7 up is faster');
-  for(let yr=new Date(t0).getFullYear();yr<=new Date(t1).getFullYear();yr+=4){
+  /* EVERY FOUR YEARS IS A NUMBER, NOT A MEASUREMENT. Forty-four seasons at a
+     tick every four is eleven labels, and a 320px phone gives this axis about
+     a hundred and seventy units - so "1986" through "2002" were written into
+     each other five times over. The step comes off the room instead, and off
+     round years, so the axis reads 1990, 2000, 2010 rather than 1983, 1987. */
+  const yA=new Date(t0).getFullYear(),yB=new Date(t1).getFullYear();
+  const fit=Math.max(2,Math.floor((f.x1-f.x0)/17));
+  const yStep=[2,4,5,10,20,25].find(s=>Math.floor((yB-yA)/s)+1<=fit)||25;
+  for(let yr=Math.ceil(yA/yStep)*yStep;yr<=yB;yr+=yStep){
     const px=x(Date.parse(yr+'-01-01'));
     if(px<f.x0||px>f.x1)continue;
     g2+='<line class="ax" x1="'+px.toFixed(1)+'" x2="'+px.toFixed(1)+'" y1="'+f.y0
@@ -33498,9 +33857,27 @@ const WALL=(()=>{
 /* The column a chart will live in, measured from the panel it is going into.
    Called before anything is built, because the width is baked into the
    strings. */
+/* THE RAIL IS NOT PART OF THE COLUMN. Above RAIL_AT a section is two columns
+   and every chart lands in the second one, so the panel's own width overstates
+   the box by the rail and the gap. The two figures are read out of the
+   stylesheet rather than written here again; RAIL_AT is the one number that
+   has to match the media query by hand, and it is asserted against the
+   measured layout by the resize rebuild either way.
+
+   Every card that carries a chart on either site has a heading, which is what
+   makes this safe: :has(>h2) is exactly the set of sections that get a rail. */
+const RAIL_AT=1080;
+function colWidth(el){
+  const w=el.clientWidth;
+  if(!w||!matchMedia('(min-width:'+RAIL_AT+'px)').matches)return w;
+  const cs=getComputedStyle(document.documentElement);
+  const rail=parseFloat(cs.getPropertyValue('--rail'))||336;
+  const gap=parseFloat(cs.getPropertyValue('--railgap'))||56;
+  return Math.max(260,w-rail-gap);
+}
 function sizeCharts(id){
   const el=document.getElementById(id);
-  if(el&&el.clientWidth)CH.setW(el.clientWidth);
+  if(el&&el.clientWidth)CH.setW(colWidth(el));
 }
 
 /* And per chart, because a panel is not one column. The Program tab puts two
@@ -34466,19 +34843,22 @@ function fitScatter(F,g){
   /* Measured, not assumed: at 0.52em two names still touched at 1440px. The
      numeric face sets wider than that and a label needs a gap as well as its
      own width, so the estimate is 0.58 plus three units of air. */
-  const CH_W=6.2*0.58;
+  const CH_W=6.2*0.62;
   const order=pts.slice().sort((a,b)=>(b.x+b.y)-(a.x+a.y));
   for(const q of order){
     const px=x(q.x),py=y(q.y);
     const name=nameOf(q.r.a).split(' ')[0]+' '
       +((nameOf(q.r.a).split(' ')[1]||'')[0]||'');
-    const w=name.length*CH_W+3,h=6.8;
+    /* The box has to hold the DESCENDERS too. It ran from the baseline
+       upwards only, so two labels eight units apart could still touch below
+       the line - which is exactly the pair left overlapping at 375px. */
+    const w=name.length*CH_W+4,h=7.4;
     const spots=[[px+4,py-2,'start'],[px-4-w,py-2,'start'],
                  [px+4,py+6,'start'],[px-4-w,py+6,'start']];
     let placed=null;
     for(const [lx,ly,an] of spots){
       if(lx<f.x0-2||lx+w>f.x1+2||ly-h<f.y0||ly>f.y1+6)continue;
-      const box={a:lx,b:lx+w,c:ly-h,d:ly};
+      const box={a:lx,b:lx+w,c:ly-h,d:ly+2};
       if(put.some(o=>!(box.b<o.a||box.a>o.b||box.d<o.c||box.c>o.d)))continue;
       put.push(box);placed=[lx,ly,an];break;
     }
@@ -34583,7 +34963,10 @@ function packNet(g,k){
      fit is left off rather than printed over its neighbour. Every node keeps
      its dot, its tooltip and its row in the table underneath, so nothing is
      lost by dropping a label - only by drawing one nobody can read. */
-  const CHW=5.8*0.52;
+  /* 5.8px in a viewBox this wide renders at 9.8px on a 320px phone, under
+     the 10.2px floor the rest of the page holds to. Raising the face means
+     raising the width estimate with it or the collision test goes stale. */
+  const CHW=6.2*0.52;
   const rows=[[],[]];
   for(const n of node){
     const px=x(n.t);
@@ -34599,7 +34982,7 @@ function packNet(g,k){
     }
     if(put<0)continue;
     g2+='<text x="'+px.toFixed(1)+'" y="'+(base+7+put*8.6)+'" class="axt" '
-      +'text-anchor="middle" style="font-size:5.8px">'+esc(nm)+'</text>';
+      +'text-anchor="middle" style="font-size:6.2px">'+esc(nm)+'</text>';
   }
   return '<div class="pnet">'+CH.open(H,'Who already races together',g2)+'</div>';
 }
@@ -35362,6 +35745,7 @@ addEventListener('resize',()=>{
 addEventListener('hashchange',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
 addEventListener('popstate',()=>{if(!SUPPRESS)applyRoute(parseRoute(location.hash));});
 applyRoute(parseRoute(location.hash));
+ribbon();
 if(!location.hash)writeHash();
 </script>
 </body>

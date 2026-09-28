@@ -23,3 +23,6 @@ pull/roster/*_bio.jsonl
 # the audit baseline is a working file, regenerated with --baseline, and
 # there is one per school now
 pull/roster/.page-baseline*.json
+
+# screenshots taken while checking a layout; regenerated on demand
+look/
