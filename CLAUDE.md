@@ -2310,6 +2310,55 @@ Same 200-unit viewBox lesson as the How tab's diagrams: a label written at 6
 units renders at about 10px on a 375px column, which is too small. `--axt` is
 6.5 and `--lbl` is 7.
 
+### An empty grade has to say why it is empty
+
+`everyRace` draws one ruler over four grade columns and skipped the cohort
+band for a grade with no races in it - correctly - while `gradeBands` went on
+printing the grade's name underneath. So Mark French's cross country chart
+carried a **Freshman** column with nothing in it, beside three full ones,
+which reads as a year missing from the record. It is not missing. He raced
+track that spring, which this page knows and could not say, and the owner read
+the blank as a data fault. The one thing on that chart there was nothing to
+say about was the only thing it was inviting anybody to look at.
+
+The column says what the year was instead: **track that year**, **cross
+country that year**, **no 5,000m** when they raced the right sport at the
+wrong distance, and **no season** for a genuine gap. It wraps against the
+measured column, because "cross country that year" wants eighty units and a
+phone gives each grade thirty-eight.
+
+**Only grades inside the athlete's own record are annotated.** A sophomore's
+senior year is empty because it has not happened, and writing "no season"
+across it would be a claim about the future - the same reasoning that stops
+the twins chart drawing past the record, and the same rule `TWINS_SHOW_FUTURE`
+exists for. Checked rather than asserted: 2,106 charts across the two sites,
+1,192 notes, **none outside its athlete's own first and last grade**.
+
+### A counter that grows re-wraps the paragraph around it
+
+`countTo` writes `fmt(0)` and counts up, so its text goes from one character
+to four while it runs. That was harmless while the figure had a line to
+itself. The tile strip put it in a grid cell sized `auto` beside a `1fr`
+column of prose, so every frame of the count resized the column and re-wrapped
+the note - the owner's words were that the animations looked glitchy because
+the text kept changing which line it was on, which is exactly what it was
+doing.
+
+The number is the thing that is supposed to move. So `countTo` writes the
+**final** value first, measures it, and holds that width for the length of the
+count: one forced layout per counter, a dozen on the busiest tab. Verified by
+sampling every counter's box and its containing block three times mid-flight
+across both sites and both widths - nothing changes size any more, on any tab.
+
+### The bar is the width of the glass, so the controls are too
+
+The sticky switches sat at their own content width against the left edge. On a
+1440 desktop that is 745px of a 1,008px bar with **479px empty to the right**,
+and on a phone it leaves one row filling and the next stopping short. The
+groups grow to fill the row they land on and their buttons grow with them, so
+every row ends where the bar ends. Measured at 375 and 1440 on all five tabs:
+every row now spans the full inner width.
+
 ### The revamp: a bar, a ribbon and a rail
 
 Both pages were a single 600px column of identical rounded cards with every

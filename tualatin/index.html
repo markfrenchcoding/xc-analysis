@@ -833,6 +833,17 @@ header{
 /* the seg pills shrink a little inside the bar so three rows still fit */
 [role=tabpanel]:not([hidden])>.ctl:first-child .seg button{padding:6px 9px}
 
+/* THE BAR IS THE WIDTH OF THE GLASS AND THE CONTROLS SHOULD BE TOO. They sat
+   at their own content width against the left edge, which on a 1440 desktop
+   is 745px of a 1,008px bar with 479 empty to the right of it, and on a phone
+   leaves a ragged edge under a row that does fill. The groups grow to fill
+   the row they land on and their buttons grow with them, so every row of the
+   bar ends where the bar ends. */
+[role=tabpanel]:not([hidden])>.ctl:first-child .seg,
+.ctl-find input{flex:1 1 auto;min-width:0}
+[role=tabpanel]:not([hidden])>.ctl:first-child .seg button{flex:1 1 auto}
+[role=tabpanel]:not([hidden])>.ctl:first-child input{flex:1 1 auto;min-width:0}
+
 /* ---------- the masthead ribbon ----------
    Decoration that is not decoration: one tick a school year, its height the
    number of athletes on record that year, the current season in the accent.
@@ -23462,6 +23473,18 @@ function nextFrame(fn){
 
 function countTo(el,to,fmt,ms){
   if(REDUCED||!el){if(el)el.textContent=fmt(to);return;}
+  /* RESERVE THE FINAL WIDTH BEFORE COUNTING. This starts at nought and counts
+     up, so the text grows from one character to four while it runs - and a
+     figure that sits inside a sentence re-wraps the whole paragraph on every
+     frame. The number is the thing that is supposed to move; the words around
+     it are not. Write the final value, measure it, and hold that width for
+     the length of the count. One forced layout per counter, and there are a
+     dozen on the busiest tab. */
+  el.style.display='inline-block';
+  el.style.whiteSpace='nowrap';
+  el.textContent=fmt(to);
+  const w=el.getBoundingClientRect().width;
+  if(w)el.style.minWidth=w.toFixed(2)+'px';
   const t0=performance.now(),dur=ms||560;
   let settled=false;
   const land=()=>{if(!settled){settled=true;el.textContent=fmt(to);}};
@@ -24914,6 +24937,49 @@ function everyRace(i,K){
   g+='<g class="er-ax">'+CH.gridY(f,y,CH.timeTicks(ylo,yhi,4),ms)
     +CH.unitY(f,ru.label+' \u00b7 up is faster')+'</g>';
   g+='<g class="er-ax2">'+gradeBands(f,x,H)+'</g>';
+
+  /* A GRADE WITH NOTHING IN IT STILL GETS A COLUMN, so the column has to say
+     why it is empty. Mark French has no freshman cross country - he raced
+     track that spring, which this page knows - and the chart drew a blank
+     Freshman band beside three full ones. That reads as a year missing from
+     the record rather than a year spent on the other ruler, and it is the
+     one thing on the chart there was nothing to say about.
+
+     Only grades INSIDE the athlete's own record are annotated. A sophomore's
+     senior year is empty because it has not happened yet, and writing "no
+     season" across it would be a claim about the future. Same reasoning as
+     the twins chart stopping its axis where the record stops. */
+  const sg=s=>{
+    const q=s.grade||(A[i].classOf!=null?12-(A[i].classOf-s.y):null);
+    return q==null?null:HS_GRADE(q);
+  };
+  const own=o.seasons.map(sg).filter(q=>q!=null);
+  if(own.length){
+    const g0=Math.min(...own),g1=Math.max(...own);
+    for(const q of GRADES){
+      if(has.has(q)||q<g0||q>g1)continue;
+      const at=o.seasons.filter(s=>sg(s)===q);
+      const note=!at.length?'no season'
+        :at.some(s=>s.sport===ru.sport)?'no '+ru.label.replace(/^(XC|Track) /,'')
+        :(ru.sport==='xc'?'track that year':'cross country that year');
+      const a0=x(q-9),a1=x(q-8),room=(a1-a0)*0.92;
+      /* The column is 38 units wide on a phone and "cross country that year"
+         wants eighty, so it wraps against the measured column rather than
+         being written through its neighbours. */
+      const ln=[];let cur='';
+      for(const wd of note.split(' ')){
+        const t=cur?cur+' '+wd:wd;
+        if(cur&&t.length*3.4>room){ln.push(cur);cur=wd;}else cur=t;
+      }
+      if(cur)ln.push(cur);
+      const y0=(f.y0+f.y1)/2-(ln.length-1)*4;
+      ln.forEach((s,n)=>{
+        g+='<text x="'+((a0+a1)/2).toFixed(1)+'" y="'+(y0+n*8).toFixed(1)
+          +'" class="axt" text-anchor="middle" style="fill:var(--faint)">'
+          +esc(s)+'</text>';
+      });
+    }
+  }
 
   // the season best, as a step: it holds until a faster one replaces it
   const best=new Map();
