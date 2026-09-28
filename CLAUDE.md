@@ -2316,6 +2316,81 @@ Same 200-unit viewBox lesson as the How tab's diagrams: a label written at 6
 units renders at about 10px on a 375px column, which is too small. `--axt` is
 6.5 and `--lbl` is 7.
 
+### The audit, and the four things it found
+
+Scripted rather than eyeballed, because every one of these had been looked at
+and none of them had been seen: 32 controls clicked on every tab of both
+sites, all 1,741 athlete pages rendered, every route round-tripped through the
+hash, 612 parked scroll positions, and every text style on seven views in both
+themes composited against what is actually behind it.
+
+**A condensing bar cannot have one threshold.** Parked anywhere near 110px the
+bar toggled up to **91 times in a second and a half**, on every tab of both
+sites - the owner reported it as flicker that would not stop at just the right
+position. The loop is short: condensing takes up to 87px out of the header at
+320px wide, Chrome's scroll anchoring then moves `scrollY` by that same amount
+to keep the visible content still, and the new `scrollY` lands back the other
+side of the one threshold. Expand, anchor, condense, for ever.
+
+So there are two thresholds and the gap between them is wider than the height
+the bar can gain or lose. Both come off the header's own measured height
+rather than being written down, because that height runs 117px at 1440 to
+170px at 320 and a constant that works at one width is a bug at the other:
+`hi = tall + 12`, `lo = hi * 0.35`, band always 65% of `hi`.
+
+Disabling scroll anchoring was the other fix and it is the wrong one - the
+anchoring is what stops the page lurching 87px under the reader's thumb. The
+threshold was wrong, not the browser. **Anything that resizes the page in
+response to scroll position needs hysteresis**; 612 parked positions across
+both sites now show none.
+
+**Most of the bracket was black on black.** `.bgame` is a `<button>`, and a
+button does not inherit `color` - the UA hands it `buttontext`. The bracket
+set a colour on the winning side's year and on nothing else, so on the dark
+theme **44 of 53 scores and 22 of 54 years were `rgb(0,0,0)` on `rgb(11,10,12)`
+at 1.06:1**, and seven athlete links were rendering in the browser's default
+`#0000EE` at 2.10:1. `--card` was the other half: `.bgame{background:var(--card)}`
+and this page has never defined `--card`, so the games had no background for
+the byes' 45% to dim against.
+
+It survived a screenshot because I knew what the numbers said. It took
+compositing every layer and reading the computed colour to see it. **A
+`<button>` used as a surface needs `color` as well as `background`**, and a
+token that resolves to nothing fails silently.
+
+**"Drag the slider and the board rearranges itself" waited for the release.**
+The deferral had a comment giving its reason - a full redraw is "a lot of
+work" - and measured, `drawRecords` is **0.4ms median, 1.0ms worst**. The
+premise was wrong. But a full redraw is still the wrong call for a reason
+nobody wrote down: it rebuilds `#h-out` wholesale, which destroys the range
+input the reader has hold of and ends the drag. So the drag writes the three
+things a date changes - the sentence, the ten, the upright rule on the chart -
+and leaves the controls alone; letting go still does the full rebuild and
+writes the URL. `recordSentence` and `recordTen` moved to module scope to do
+it, because two copies of a generated sentence is two sentences waiting to
+disagree.
+
+**Tualatin's ink on its own accent was 3.43:1, and this file already said
+so.** The colour section recorded it - "on Tualatin's #EE5566 white is 3.43:1,
+which is the weaker of the two and was there first" - and nothing was done, so
+every selected segment pill and every primary button on the dark theme sat
+under AA. Sherwood made the same call correctly on the day it was built. Dark
+ink is 5.50:1 there. The 13% accent tint under accent ink was 4.30:1 on
+Sherwood and is 8% now, which is 4.56 and looks no different.
+
+A number written down in these notes and not acted on is worse than one
+nobody measured: it reads as settled.
+
+**And the probe itself was wrong twice before it was right.** The first pass
+treated the first non-empty background as opaque, which turned a 13% chip tint
+into a solid and produced false findings. The second read
+`color(srgb 0.98 0.97 0.98 / 0.82)` as an `rgb()` triple, so the sticky bar's
+white glass came back as near-black and four more were invented. **A measuring
+tool gets audited before what it measures**: 24 findings became 14 became 4,
+and the 4 were all real.
+
+Every text style on seven views, both themes, both sites now clears WCAG AA.
+
 ### Standing, drawn
 
 A hundred rows of rank, name and time say who is faster and never by how much,
@@ -2665,10 +2740,13 @@ turns it pink, which is a different colour rather than a lighter one. The
 accent is Sherwood's own hue (353) at its own saturation (70%) carried up in
 lightness until it clears: **#E05262 at 5.22:1**.
 
-**`--on-accent` is near-black here and white on the Tualatin page**, and that
-is measured rather than a house style. Ink on #E05262 is 4.98:1 where white
-would be 3.78:1; on Tualatin's #EE5566 white is 3.43:1, which is the weaker of
-the two and was there first.
+**`--on-accent` is near-black on both pages now**, and that is measured rather
+than a house style. Ink on #E05262 is 4.98:1 where white would be 3.78:1, and
+on Tualatin's #EE5566 dark ink is 5.50:1 where white was **3.43:1** - under
+AA, on every selected pill and every primary button of the dark theme. This
+paragraph used to record that 3.43 and call it "the weaker of the two and was
+there first", which is a measurement standing in for a decision. See the audit
+section.
 
 Sherwood's hue is 353 and Tualatin's lifted accent is also 353, so the two
 sites read as siblings. That is the two schools' colours, not a shortcut.
