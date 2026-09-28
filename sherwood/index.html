@@ -204,9 +204,19 @@ h1 em{font-style:normal;background:linear-gradient(100deg,var(--maroon) 0%,var(-
    turns being visible is four things to keep in step. */
 nav{--tabs:4;position:relative;display:grid;grid-template-columns:repeat(var(--tabs),1fr);
   margin-top:var(--s4);border-bottom:1px solid var(--line)}
+/* FIVE TABS HAVE TO FIT THE NARROWEST PHONE. At a flat 14px with .07em
+   tracking, PROGRAM wants about 75px and a fifth of a 320px screen is 64,
+   so HISTORY hung 26px off the edge and the whole page scrolled sideways -
+   on the Board, the first thing anybody opens. It arrived with the fifth tab
+   and nothing was testing 320.
+
+   Scaled rather than broken at a breakpoint, the same way the app sizes a
+   team name: full size from about 410px up, and never smaller than 10.5px. */
 nav button{background:none;border:0;color:var(--muted);
-  font:600 14px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
-  padding:var(--s3) var(--s2);cursor:pointer;text-align:center}
+  font:600 clamp(10.5px,3.4vw,14px)/1 var(--disp);
+  letter-spacing:clamp(0em,.22vw,.07em);text-transform:uppercase;
+  padding:var(--s3) clamp(1px,1vw,var(--s2));cursor:pointer;text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 nav button[aria-selected="true"]{color:var(--text)}
 nav button:hover{color:var(--text)}
 nav::after{content:'';position:absolute;left:0;bottom:-1px;height:2px;
@@ -317,9 +327,37 @@ figure{margin:0}
 .dtab>summary:hover{color:var(--text)}
 .dtab table{margin-top:6px}
 /* the table scrolls, the page does not */
-.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;max-width:100%}
-.tscroll>table{min-width:100%}
+/* contain:inline-size IS WHAT KEEPS THE PAGE STILL. Without it the table's
+   width propagates up - not to this scroller, which clips it, but to whatever
+   is sizing the column above, and every card on the tab inherits the widest
+   table on it. The Program tab grew 35px and the whole page scrolled
+   sideways, which is the one thing this layout is not allowed to do.
+
+   It says the scroller's inline size does not depend on its contents, which
+   is exactly true of a thing whose whole job is to scroll them. */
+.tscroll{contain:inline-size;width:100%;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
+/* A TABLE THAT CANNOT EXCEED ITS WRAPPER CANNOT SCROLL, it can only squeeze.
+   This was min-width:100% against a table already at width:100% with
+   table-layout:fixed, so the scroller was decorative and eight columns were
+   crushed into a 337px phone instead: dates broke as "201 / 6- / 05- / 21",
+   Track became "Tr / ac / k", and 8:44.73 rendered as "8:4 / 4.7 / 3".
+
+   So the floor is per column, and the table overflows when the columns will
+   not fit. A three-column table still sits at 100% and nothing scrolls,
+   because max() picks the wider of the two. */
+/* AND table-layout:auto INSIDE THE SCROLLER. Fixed layout hands each column a
+   share of the width and lets nowrap content spill over its neighbour, which
+   swapped a broken number for an overlapping one - "3000 Meters" printed
+   through "8:44.73". Auto sizes each column to what is in it, which is only
+   affordable because the scroller means the table no longer has to fit. */
+.tscroll>table{table-layout:auto;min-width:max(100%,calc(var(--cols,4) * 62px))}
+.tscroll td.name{min-width:8.5em}
+/* AND A NUMBER NEVER BREAKS MID-DIGIT. The name column still wraps - a meet
+   name is prose and wants the room - but every other cell is a date, a time,
+   a place or a count, and half of one of those is not a smaller number, it is
+   a different one. */
+.tscroll td:not(.name),.tscroll th{white-space:nowrap}
 /* a fade at the right edge, so a cut-off column reads as scrollable */
 @media(max-width:700px){
   .tscroll{position:relative;
@@ -30669,7 +30707,9 @@ const tickAt=(i,n,every)=>{
 function TBL(cols,rows,cls){
   const C=cols.map(c=>typeof c==='string'?{k:c,a:'c'}:Object.assign({a:'c'},c));
   const wide=C.some(c=>!c.w);
-  return '<table'+(cls?' class="'+cls+'"':'')+'><colgroup>'
+  /* the column count travels with the table so the scroller can work out how
+     narrow is too narrow - see .tscroll>table */
+  return '<table style="--cols:'+C.length+'"'+(cls?' class="'+cls+'"':'')+'><colgroup>'
     +C.map(c=>'<col'+(c.w?' style="width:'+c.w+'"':'')+'>').join('')+'</colgroup>'
     +'<thead><tr>'+C.map(c=>'<th class="'+c.a+'">'+esc(c.k)+'</th>').join('')+'</tr></thead>'
     +'<tbody>'+rows.map(r=>'<tr>'+r.map((v,n)=>{

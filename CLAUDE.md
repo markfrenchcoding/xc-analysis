@@ -2242,6 +2242,59 @@ landscape notch still gets its inset.
 **Drag-to-zoom on the every-race chart is gone.** It did not work well enough
 to keep.
 
+### A number never breaks mid-digit
+
+The "Every mark" table is eight columns. On a 375px phone that is 42px each
+under `table-layout:fixed`, and every cell wrapped wherever it liked: dates
+broke as "201 / 6- / 05- / 21", Track became "Tr / ac / k", and **8:44.73
+rendered as "8:4 / 4.7 / 3"**. Half of a number is not a smaller number, it is
+a different one.
+
+This file already said "a table scrolls itself; the page never does". The
+scroller was there and could never fire: `.tscroll>table` was `min-width:100%`
+against a table already at `width:100%`, so the table could never exceed its
+wrapper and the only thing left to give was the cells. **A table that cannot
+exceed its wrapper cannot scroll, it can only squeeze.**
+
+Three changes, and the third is the one that is easy to miss:
+
+- the floor is **per column** - `max(100%, cols * 62px)`, with the count
+  travelling on the table as `--cols`. A three-column table still sits at 100%
+  and nothing scrolls, because `max()` picks the wider.
+- `table-layout:auto` inside the scroller, because fixed layout hands each
+  column a share and lets `nowrap` content spill over its neighbour. That
+  swapped a broken number for an overlapping one, with "3000 Meters" printed
+  through "8:44.73".
+- **`contain:inline-size` on the scroller.** Without it the table's width
+  propagates up - not to the scroller, which clips it, but to whatever sizes
+  the column above - and every card on the tab inherits the widest table on
+  it. The Program tab grew 35px and the page scrolled sideways, which is the
+  one thing this layout may not do. The property says the scroller's inline
+  size does not depend on its contents, which is exactly true of a thing whose
+  job is to scroll them.
+
+Only the name column still wraps. A meet name is prose and wants the room;
+everything else is a date, a time, a place or a count.
+
+### Five tabs have to fit the narrowest phone
+
+At a flat 14px with .07em tracking, PROGRAM wants about 75px and a fifth of a
+320px screen is 64, so HISTORY hung 26px off the edge and the page scrolled
+sideways - on the Board, the first thing anybody opens. It arrived with the
+fifth tab and **nothing was testing 320**; the sweeps ran 375, 768 and 1440.
+
+Scaled rather than broken at a breakpoint, the way the app sizes a team name:
+`clamp(10.5px, 3.4vw, 14px)` with the tracking collapsing faster than the type
+so no label ellipses. Full size from about 410px up.
+
+**Add 320 to any width sweep.** Every layout bug found in this pass lived
+below 375.
+
+**One thing knowingly left.** The pack network's names render at 9.6px at
+320px against a 10.2px floor - `--axt` at 5.8 units in a 170-unit viewBox
+scaled to a 282px column. Fixing it means moving `CH.setW`'s floor, which
+changes every chart at every width for 0.6px on one of them.
+
 ### Charts carry the shape, tables carry the numbers
 
 Three series in a grouped bar leaves about fifteen viewBox units a bar, and
