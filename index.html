@@ -903,39 +903,8 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .dg-num{font-size:11px;fill:var(--text);font-family:var(--num);font-weight:700}
 .dg-big{font-size:17px;fill:var(--accent);font-family:var(--num);font-weight:700}
 
-/* ---------- the road to Lane ----------
-   The diagram animates the process rather than labelling a picture of it: two
-   runners light up in each league, a wire carries them across, and sixteen
-   seats fill at Lane - fourteen in order, then two more a beat later with a
-   ring around them, because those two were chosen rather than earned.
-   Everything here animates transform, opacity or stroke-dashoffset, and only
-   while .run is set - at rest the drawing is complete, so a reader who never
-   triggers it still sees the whole thing. */
-.ql{cursor:pointer}
-.ql-lane{fill:var(--raised);stroke:var(--line)}
-.ql-node{fill:var(--surface);stroke:var(--line)}
-.ql-node.wild{stroke-dasharray:3 2.5}
-.ql-lane-box{fill:var(--surface);stroke:var(--accent);stroke-width:1.2}
-.ql-in{fill:var(--accent)}
-.ql-out{fill:var(--line)}
-.ql-wire{fill:none;stroke:var(--accent);stroke-width:1.1;opacity:.55}
-.ql-seat{fill:var(--accent)}
-.ql-seat.wild{fill:var(--surface);stroke:var(--accent);stroke-width:1.4;stroke-dasharray:2.4 1.8}
-.ql-n{font-family:var(--num);font-weight:700;font-size:13px;fill:var(--text)}
-.ql-t{font-size:5.8px;fill:var(--dim);letter-spacing:.02em}
-.ql-hd{font-family:var(--disp);font-weight:600;font-size:7px;fill:var(--accent);
-  letter-spacing:.12em}
-.ql-again{display:block;margin-top:5px;font-size:10px;color:var(--dim);
-  letter-spacing:.06em;text-transform:uppercase}
-
-.ql.run .ql-in,.ql.run .ql-seat{transform-box:fill-box;transform-origin:center;
-  animation:qlPop .42s var(--ease) both;animation-delay:var(--d,0ms)}
 @keyframes qlPop{from{transform:scale(0);opacity:0}60%{transform:scale(1.35)}to{transform:scale(1);opacity:1}}
-.ql.run .ql-wire{stroke-dasharray:60;stroke-dashoffset:60;
-  animation:qlDraw .5s var(--ease) both;animation-delay:var(--d,0ms)}
 @keyframes qlDraw{to{stroke-dashoffset:0}}
-.ql.run .ql-lane-box{animation:qlGlow 1.1s var(--ease) 1.5s both}
-@keyframes qlGlow{0%,100%{stroke-width:1.2}45%{stroke-width:2.6}}
 
 /* ---------- the other two, same rule: complete at rest ---------- */
 .pcd.run circle{transform-box:fill-box;transform-origin:center;
@@ -1090,7 +1059,6 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 #p-doc .doc figcaption{font-size:13.5px;line-height:1.55;color:var(--muted);
   margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}
 #p-doc .doc figcaption b{color:var(--text);font-weight:600}
-#p-doc .ql-again{font-size:11px;color:var(--accent);letter-spacing:.08em;margin-top:8px}
 
 /* stats and the scorecard: ruled lists, the figure on the right */
 #p-doc .doc .stats,#p-doc .rec-tiles{display:grid;grid-template-columns:1fr;gap:0;margin:22px 0 26px}
@@ -10384,39 +10352,9 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
       <h3>A season is not one race</h3>
       <p>Line every runner up at their season best and you learn who is fastest on paper. You do not learn how likely anything is, and paper does not run in November.</p>
 
-      <figure class="ql" tabindex="0" role="img"
-        aria-label="Seven leagues send their top two teams straight to Lane, fourteen in all. A committee adds two more from the teams that finished third. Sixteen race at Lane in November.">
-        <svg viewBox="0 0 200 92">
-          <rect class="ql-lane" x="2" y="5" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:0ms" cx="8.5" cy="9" r="2.3"/><circle class="ql-in" style="--d:40ms" cx="15" cy="9" r="2.3"/><circle class="ql-out" cx="21.5" cy="9" r="1.9"/><circle class="ql-out" cx="28" cy="9" r="1.9"/><circle class="ql-out" cx="34.5" cy="9" r="1.9"/><circle class="ql-out" cx="41" cy="9" r="1.9"/><path class="ql-wire" style="--d:0ms" d="M44 9 H 52"/><rect class="ql-lane" x="2" y="16" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:80ms" cx="8.5" cy="20" r="2.3"/><circle class="ql-in" style="--d:120ms" cx="15" cy="20" r="2.3"/><circle class="ql-out" cx="21.5" cy="20" r="1.9"/><circle class="ql-out" cx="28" cy="20" r="1.9"/><circle class="ql-out" cx="34.5" cy="20" r="1.9"/><circle class="ql-out" cx="41" cy="20" r="1.9"/><path class="ql-wire" style="--d:80ms" d="M44 20 H 52"/><rect class="ql-lane" x="2" y="27" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:160ms" cx="8.5" cy="31" r="2.3"/><circle class="ql-in" style="--d:200ms" cx="15" cy="31" r="2.3"/><circle class="ql-out" cx="21.5" cy="31" r="1.9"/><circle class="ql-out" cx="28" cy="31" r="1.9"/><circle class="ql-out" cx="34.5" cy="31" r="1.9"/><circle class="ql-out" cx="41" cy="31" r="1.9"/><path class="ql-wire" style="--d:160ms" d="M44 31 H 52"/><rect class="ql-lane" x="2" y="38" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:240ms" cx="8.5" cy="42" r="2.3"/><circle class="ql-in" style="--d:280ms" cx="15" cy="42" r="2.3"/><circle class="ql-out" cx="21.5" cy="42" r="1.9"/><circle class="ql-out" cx="28" cy="42" r="1.9"/><circle class="ql-out" cx="34.5" cy="42" r="1.9"/><circle class="ql-out" cx="41" cy="42" r="1.9"/><path class="ql-wire" style="--d:240ms" d="M44 42 H 52"/><rect class="ql-lane" x="2" y="49" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:320ms" cx="8.5" cy="53" r="2.3"/><circle class="ql-in" style="--d:360ms" cx="15" cy="53" r="2.3"/><circle class="ql-out" cx="21.5" cy="53" r="1.9"/><circle class="ql-out" cx="28" cy="53" r="1.9"/><circle class="ql-out" cx="34.5" cy="53" r="1.9"/><circle class="ql-out" cx="41" cy="53" r="1.9"/><path class="ql-wire" style="--d:320ms" d="M44 53 H 52"/><rect class="ql-lane" x="2" y="60" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:400ms" cx="8.5" cy="64" r="2.3"/><circle class="ql-in" style="--d:440ms" cx="15" cy="64" r="2.3"/><circle class="ql-out" cx="21.5" cy="64" r="1.9"/><circle class="ql-out" cx="28" cy="64" r="1.9"/><circle class="ql-out" cx="34.5" cy="64" r="1.9"/><circle class="ql-out" cx="41" cy="64" r="1.9"/><path class="ql-wire" style="--d:400ms" d="M44 64 H 52"/><rect class="ql-lane" x="2" y="71" width="42" height="8" rx="4"/><circle class="ql-in" style="--d:480ms" cx="8.5" cy="75" r="2.3"/><circle class="ql-in" style="--d:520ms" cx="15" cy="75" r="2.3"/><circle class="ql-out" cx="21.5" cy="75" r="1.9"/><circle class="ql-out" cx="28" cy="75" r="1.9"/><circle class="ql-out" cx="34.5" cy="75" r="1.9"/><circle class="ql-out" cx="41" cy="75" r="1.9"/><path class="ql-wire" style="--d:480ms" d="M44 75 H 52"/>
-          <path class="ql-wire" style="--d:600ms" d="M52 9 V 75"/>
-          <path class="ql-wire" style="--d:700ms" d="M52 29 H 60"/>
-          <path class="ql-wire" style="--d:740ms" d="M52 70 H 60"/>
-
-          <rect class="ql-node" x="60" y="20" width="50" height="18" rx="5"/>
-          <text class="ql-n" x="69" y="33" text-anchor="middle">14</text>
-          <text class="ql-t" x="80" y="28">straight</text>
-          <text class="ql-t" x="80" y="35">through</text>
-
-          <rect class="ql-node wild" x="60" y="61" width="50" height="18" rx="5"/>
-          <text class="ql-n" x="69" y="74" text-anchor="middle">2</text>
-          <text class="ql-t" x="80" y="69">chosen</text>
-          <text class="ql-t" x="80" y="76">from 3rd</text>
-
-          <path class="ql-wire" style="--d:820ms" d="M110 29 H 118"/>
-          <path class="ql-wire" style="--d:860ms" d="M110 70 H 118"/>
-          <path class="ql-wire" style="--d:900ms" d="M118 29 V 70"/>
-          <path class="ql-wire" style="--d:960ms" d="M118 48 H 126"/>
-
-          <rect class="ql-lane-box" x="126" y="12" width="72" height="72" rx="7"/>
-          <text class="ql-hd" x="162" y="24" text-anchor="middle">AT LANE</text>
-          <circle class="ql-seat" style="--d:1020ms" cx="140" cy="32" r="3.6"/><circle class="ql-seat" style="--d:1078ms" cx="156" cy="32" r="3.6"/><circle class="ql-seat" style="--d:1136ms" cx="172" cy="32" r="3.6"/><circle class="ql-seat" style="--d:1194ms" cx="188" cy="32" r="3.6"/><circle class="ql-seat" style="--d:1252ms" cx="140" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1310ms" cx="156" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1368ms" cx="172" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1426ms" cx="188" cy="44" r="3.6"/><circle class="ql-seat" style="--d:1484ms" cx="140" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1542ms" cx="156" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1600ms" cx="172" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1658ms" cx="188" cy="56" r="3.6"/><circle class="ql-seat" style="--d:1716ms" cx="140" cy="68" r="3.6"/><circle class="ql-seat" style="--d:1774ms" cx="156" cy="68" r="3.6"/><circle class="ql-seat wild" style="--d:1832ms" cx="172" cy="68" r="3.6"/><circle class="ql-seat wild" style="--d:1890ms" cx="188" cy="68" r="3.6"/>
-          <text class="ql-t" x="162" y="80" text-anchor="middle">16 teams, one race</text>
-        </svg>
-        <figcaption><b>Getting there is a path, not a time.</b> Every league runs its own
-          championship and the top two go straight through. A committee then picks two
-          more from the teams that finished third. That is the whole field.
-          <span class="ql-again">tap to watch it again</span></figcaption>
-      </figure>
+      <p><b>Getting there is a path, not a time.</b> Every league runs its own
+        championship and the top two go straight through. A committee then picks two
+        more from the teams that finished third. That is the whole field.</p>
 
       <h3>Runners have days</h3>
       <p>Nobody races the same twice. Some days the legs are there and some days they are not. Chute treats that as the main event, because on race day it usually is.</p>
@@ -12200,13 +12138,13 @@ function fwdTeam(b,name,k){
    motion on, sees the finished drawing rather than an empty box waiting for an
    observer that may never fire. */
 function armFigures(){
-  const figs=document.querySelectorAll(".ql, .pcd, .curve");
+  const figs=document.querySelectorAll(".pcd, .curve");
   if(!figs.length)return;
   /* .run parks the parts at scale(0) so they can pop in, which means that
      while it is set the drawing is INCOMPLETE. If the animation never runs -
      a throttled tab, a frozen clock, an engine that skips it - the figure
      would sit empty for good. So the class comes off on a timer that is
-     longer than the longest animation in any of the three: the entrance
+     longer than the longest animation in either of the two: the entrance
      plays, and either way the figure ends up back at its resting state, which
      is the complete one. A timer fires when a frame callback might not.
      Never leave content depending on an animation to become visible. */

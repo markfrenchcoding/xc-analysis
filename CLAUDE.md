@@ -3854,6 +3854,15 @@ repeat what the preview's own title already says.
 
 ## The How tab diagrams
 
+**The qualification diagram ("the road to Lane") was removed on Sep 30, at the
+owner's request: it never looked right.** Its caption carried the actual rule -
+top two per league straight through, the committee picks two more from the
+thirds - and survives as a paragraph under "A season is not one race". The two
+notes below about its bracket and its animation are history, kept so nobody
+rebuilds it from them. `qlPop` and `qlDraw` stay: the dots and the curve use
+them. Two diagrams remain, the hundred dots and the lopsided curve.
+
+
 **The bracket is a bracket now, and what it was before is worth recording.** The
 seven wires were each drawn as `M46 y H 54 V 29`: every one ran to the same
 point and then along it, so six drew over each other down a column that also sat
