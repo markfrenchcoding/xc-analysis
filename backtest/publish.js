@@ -73,7 +73,7 @@ const SIG_SEPT = horizon[0].best, SIG_LATE = horizon[2].best;
    looking at the board in October is five or four weeks out, and deserves the
    figures for where the board actually is. */
 const byHorizon = horizon.map((h, ci) => {
-  let found = 0, field = 0, champ = 0, n = 0; const ps = [];
+  let found = 0, field = 0, champ = 0, n = 0; const ps = [], picks = [];
   for (const year of YEARS) for (const g of ['M', 'F']) {
     const r = L.odds(year, g, L.cutoffs(year)[ci] + VARIANT, h.best, HSEASONS);
     field += r.order.length;
@@ -81,13 +81,15 @@ const byHorizon = horizon.map((h, ci) => {
     const fav = r.teams.reduce((x, y) => (y.win > x.win ? y : x));
     if (fav.name === r.order[0]) champ++;
     n++;
+    // each season's favourite at this distance, so the season table can show it
+    picks.push({ year: +year, g, fav: fav.name, hit: fav.name === r.order[0] });
     for (const t of r.teams) ps.push([t.p, t.actual]);
   }
   const b = L.brier(ps), base = ps.reduce((s, p) => s + p[1], 0) / ps.length;
   const bref = L.brier(ps.map(p => [base, p[1]]));
   console.log('    ' + h.weeks + 'w out: found ' + found + '/' + field + ', ' + champ + ' of ' + n + ' champions');
   return { weeks: h.weeks, sigma: h.best, found, ofField: field, champHit: champ, champOf: n,
-           skill: Math.round(100 * (1 - b / bref)) };
+           skill: Math.round(100 * (1 - b / bref)), picks };
 });
 
 /* ---------- the September pass, board by board ---------- */
