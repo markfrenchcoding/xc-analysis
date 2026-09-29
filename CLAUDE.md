@@ -85,7 +85,11 @@ unknown - which is true of every 5k on the board too.
   than as the default, and the backtest, the Track record and every snapshot
   run with it off.
 - **A converted time is never shown.** `sbRaw` is what the athlete ran and
-  `sbMi` says it was 3 miles; `best()` prints `15:58.7 3mi`.
+  `sbMi` says it was 3 miles. `miTag()` puts a gold **3MI CONVERSION** pill
+  beside it. It was a bare "3mi" suffix first, and the owner read that as the
+  3-mile time being raced against 5ks directly. On a phone every row that
+  carries it truncates from the right, so the pill leads the Runners subtitle
+  and takes its own line under the name in the team overlay and What if.
 - It locks with the dials, reports in the collapsed summary, marks every board
   in the Next-season slot, and rides in the hash as `/3mi` so a shared link
   shows the same board. The Dream Team does not read it.
@@ -3397,6 +3401,21 @@ the dark card is 8.3:1. The light theme's gold had to be walked down from
 
 **The favicon is a data URI and cannot read a custom property.** Its accent is
 hardcoded twice in that one string. Change `--accent` and change those too.
+
+**The micro-labels were 7 and 8px, and a phone pass on Sep 29 raised them.**
+Scripted at 320, 375, 414 and 1280, every view: the labels under a card's
+headline numbers, the Runners column labels and the OSAA chip's "OSAA" were 8px
+or 7px, which is fine print on a phone. They are 9.5px now (the chip 8.5, to
+stay inside its fixed 56px), the How diagrams' small labels 5.8 units rather
+than 5.4. **5.8 is the ceiling there**: the two-line labels sit 7 units apart,
+and at 6.2 their boxes touch on desktop.
+
+Two narrow-width trades, both giving up something the row repeats elsewhere
+rather than the name: **below 430px the Runners rows drop the crest** (the
+school is on the line under the name; at 375 that took truncated names from 27
+to 1), and **below 360px** the figure columns narrow to 42px and the team
+overlay drops its gap column, which is best and sim subtracted. At 320 the
+overlay had given a name 44px.
 
 **Oswald sets wider than Anton at the same size.** Nine team names started
 truncating on a phone the moment the face changed. Two fixes: the name scales

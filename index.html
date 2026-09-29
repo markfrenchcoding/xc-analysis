@@ -611,10 +611,10 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   border:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
 .poll b,.poll{color:var(--text)}
 .poll u{color:var(--dim)}
-.poll u{text-decoration:none;font-size:7px;letter-spacing:.09em;opacity:.75;
+.poll u{text-decoration:none;font-size:8.5px;letter-spacing:.09em;opacity:.75;
   align-self:center}
 .poll.rv{border-color:var(--line);color:var(--dim);font-size:10px;padding:4px 6px}
-.poll.rv u{font-size:7px}
+.poll.rv u{font-size:8.5px}
 
 /* Three numbers across, at the size a scoreboard would set them. The specificity
    here is deliberate - .tcard .tc-big b beats the .odd b further down the sheet
@@ -625,7 +625,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .tcard .tc-big b{font-family:var(--num);font-weight:700;
   font-size:clamp(27px,8.4vw,34px);line-height:.9;letter-spacing:-.025em;
   font-variant-numeric:tabular-nums;display:block}
-.tcard .tc-big i{font-style:normal;display:block;font-size:8px;letter-spacing:.11em;
+.tcard .tc-big i{font-style:normal;display:block;font-size:9.5px;letter-spacing:.11em;
   text-transform:uppercase;color:var(--dim);margin-top:4px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tcard .tc-big .title b{color:var(--accent);
@@ -668,7 +668,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rrow.p2 .rpl{background:var(--t2);border-color:var(--t2e)}.rrow.p2 .rpl u{color:#1B1D21}
 .rrow.p3 .rpl{background:var(--t3);border-color:var(--t3e)}.rrow.p3 .rpl u{color:#fff}
 .rlab{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:6px;height:18px;
-  font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+  font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
   transition:transform .45s var(--ease)}
 .rlab i{width:14px;height:3px;border-radius:3px;background:var(--line);flex:none}
 .rlab.a1 i{background:var(--t1)}
@@ -684,9 +684,9 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
 .rfig b{display:block;font-weight:inherit;font-size:inherit}
 .rfig.spin b{color:var(--muted)}
-.rfig i{display:block;font-style:normal;font-size:8px;color:var(--dim);font-weight:400;
+.rfig i{display:block;font-style:normal;font-size:9.5px;color:var(--dim);font-weight:400;
   font-family:'Barlow',sans-serif}
-.rhead{display:flex;gap:8px;padding:0 2px 5px 11px;font-size:8.5px;letter-spacing:.06em;
+.rhead{display:flex;gap:8px;padding:0 2px 5px 11px;font-size:9.5px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--dim)}
 .rhead span:first-child{width:28px;flex:none}
 .rhead span:nth-child(2){flex:1}
@@ -696,8 +696,11 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 @media (max-width:430px){
   .rrow .rfig:last-child,.rhead span:last-child{display:none}
   .rnm em{line-height:1.3}
+  /* and the crest: the school is on the line under the name, and at 375 the
+     crest's width was the difference between 27 names truncated and one */
+  .rrow .rnm .crest{display:none}
 }
-.td-hd{display:flex;gap:8px;padding:3px 17px 5px;font-size:8.5px;letter-spacing:.06em;
+.td-hd{display:flex;gap:8px;padding:3px 17px 5px;font-size:9.5px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--dim)}
 .td-hd span:first-child{width:16px;flex:none}
 .td-hd span:nth-child(2){flex:1}
@@ -709,6 +712,13 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   font-family:var(--num);font-weight:700;font-size:13px}
 .td-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .td-nm em{font-style:normal;color:var(--dim);font-size:10px}
+/* A converted mark says so where the eye already is: beside the athlete. Gold
+   outline, because it is the setting's doing and the setting is a control. */
+.rnt em .mitag{margin:0 6px 0 0}
+.td-nm .mitag,.wirow .who .mitag{display:table;margin:3px 0 1px}
+.mitag{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid var(--accent);
+  border-radius:999px;color:var(--accent);font-size:10px;font-weight:600;line-height:15px;
+  letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;vertical-align:1px;font-style:normal}
 .td-t{flex:none;width:52px;text-align:right;font-variant-numeric:tabular-nums;
   font-family:var(--num);font-weight:700;font-size:13.5px}
 .td-t.sim{color:var(--accent)}
@@ -740,7 +750,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .odd{flex:1;text-align:center;min-width:0}
 .odd b{font-family:var(--num);font-weight:600;font-size:14px;display:block;
   line-height:1.05;font-variant-numeric:tabular-nums;transition:color .35s}
-.odd i{font-style:normal;font-size:8px;color:var(--dim);letter-spacing:.07em;
+.odd i{font-style:normal;font-size:9.5px;color:var(--dim);letter-spacing:.07em;
   text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 
 /* ---- groups ---- */
@@ -877,7 +887,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .doc figcaption{font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.45}
 /* Sized for a 200-unit viewBox, which is the column width on a phone. At the
    old 336 these same numbers rendered under 8px. */
-.dg-lbl{font-size:5.4px;fill:var(--dim);font-family:inherit;letter-spacing:.02em}
+.dg-lbl{font-size:5.8px;fill:var(--dim);font-family:inherit;letter-spacing:.02em}
 .dg-key{font-size:7px;fill:var(--text);font-family:var(--disp);font-weight:600;
   text-transform:uppercase;letter-spacing:.06em}
 .dg-num{font-size:11px;fill:var(--text);font-family:var(--num);font-weight:700}
@@ -902,7 +912,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .ql-seat{fill:var(--accent)}
 .ql-seat.wild{fill:var(--surface);stroke:var(--accent);stroke-width:1.4;stroke-dasharray:2.4 1.8}
 .ql-n{font-family:var(--num);font-weight:700;font-size:13px;fill:var(--text)}
-.ql-t{font-size:5.4px;fill:var(--dim);letter-spacing:.02em}
+.ql-t{font-size:5.8px;fill:var(--dim);letter-spacing:.02em}
 .ql-hd{font-family:var(--disp);font-weight:600;font-size:7px;fill:var(--accent);
   letter-spacing:.12em}
 .ql-again{display:block;margin-top:5px;font-size:10px;color:var(--dim);
@@ -1014,6 +1024,22 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   .gl-wide{max-width:640px}
 }
 
+
+/* The narrowest phones, 360px and under. Measured at 320: every Runners name
+   truncated in a 73px column and the team overlay gave a name 44px, about four
+   letters. Both give up something the row can spare rather than the name:
+   narrower figure columns on the Runners board (the crest is already gone
+   below 430), and the overlay's gap column, which is the other two columns
+   subtracted. Above 360 none of this applies. */
+@media (max-width:360px){
+  .rrow .rfig{width:42px}
+  .rhead span:not(:first-child):not(:nth-child(2)){width:40px}
+  .td-row .td-t:last-child,.td-hd span:last-child{display:none}
+  .td-row,.td-hd{padding-left:12px;padding-right:12px}
+  .mitag{letter-spacing:.02em;padding:0 5px}
+  /* "pts when there" at the readable size runs 6px past its column at 320 */
+  .tcard .tc-big i{letter-spacing:.04em}
+}
 </style>
 
 <!-- Vercel Web Analytics. The npm package and the React component are the
@@ -10806,9 +10832,15 @@ function toSeconds(m){
   return (+x[1])*60+s+(x[3]?+("0."+x[3]):0);
 }
 function fmt(s){const m=Math.floor(s/60);return m+":"+(s-m*60).toFixed(1).padStart(4,"0");}
-/* An athlete's best as they ran it. A 3-mile time says so, because printing
-   the converted figure would be a time nobody ran. */
-function best(a){return fmt(a.sbRaw)+(a.sbMi?" 3mi":"");}
+/* An athlete's best is always printed as they ran it, never as the converted
+   figure, because that would be a time nobody ran. When it was a 3-mile race
+   the row carries a tag saying the model converted it. A bare "3mi" beside the
+   time was the first version, and it read as though the 3-mile time itself was
+   being raced against 5ks. */
+function miTag(a){
+  return a.sbMi?' <span class="mitag" title="Run over 3 miles. The model races it as a 5k, '
+    +((MI_FACTOR-1)*100).toFixed(1)+'% slower.">3mi conversion</span>':"";
+}
 function parseCSV(text){
   const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
   const head=splitCSVLine(lines[0]).map(h=>h.toLowerCase());
@@ -11494,7 +11526,7 @@ function renderWhatIf(){
     `<h2 class="sec">${team.name}</h2>
      <p class="sub2">Seconds off each runner${total?`. ${total}s across ${Object.keys(wiAdj).length} of them`:""}.</p>`+
     team.roster.map((r,i)=>`<div class="wirow">
-      <span class="who">${i+1}. ${r.name}<em>${best(r)}</em></span>
+      <span class="who">${i+1}. ${r.name}<em>${fmt(r.sbRaw)}</em>${miTag(r)}</span>
       <span class="step" data-n="${r.name}">
         <button data-d="-${STEP}" aria-label="less">−</button>
         <span class="${wiAdj[r.name]?"on":""}">${wiAdj[r.name]?"−"+wiAdj[r.name]+"s":"0s"}</span>
@@ -11787,7 +11819,8 @@ function buildRunBoard(pool){
     el.className="rrow a4";
     el.innerHTML='<span class="rail"></span><span class="rpl"><u>&mdash;</u></span>'
       +'<span class="rnm">'+crest(r.team,"crest")+'<span class="rnt"><b>'+r.name+'</b>'
-      +'<em>'+r.team+' &middot; '+fmt(r.sb)+(r.sbMi?' 3mi':'')+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span></span>'
+      // the tag leads the line: this row truncates from the right on a phone
+      +'<em>'+miTag(r).replace(' <span','<span')+r.team+' &middot; '+fmt(r.sb)+(r.marks>1?' &middot; '+r.marks+' races':'')+'</em></span></span>'
       +'<span class="rfig"><b>&mdash;</b><i>wins</i></span>'
       +'<span class="rfig"><b>&mdash;</b><i>all-state</i></span>'
       +'<span class="rfig"><b>&mdash;</b><i>avg place</i></span>'
@@ -12471,8 +12504,9 @@ function showTeam(idx){
     const sim=n?rtm[tm.rIdx[k]]/n:0;
     return '<div class="td-row'+(k>=SC?" out":"")+'">'
       +'<span class="td-pl">'+(k+1)+'</span>'
-      +'<span class="td-nm">'+r.name+' <em>'+(YR[r.grade]||"")+'</em></span>'
-      +'<span class="td-t">'+best(r)+'</span>'
+      // on its own line: the name column is too narrow on a phone to hold it
+      +'<span class="td-nm">'+r.name+' <em>'+(YR[r.grade]||"")+'</em>'+miTag(r)+'</span>'
+      +'<span class="td-t">'+fmt(r.sbRaw)+'</span>'
       +'<span class="td-t sim">'+(n?fmt(sim):"—")+'</span>'
       // against the 5k the model was handed, or a 3-mile best reads as +40s
       +'<span class="td-t">'+(n?"+"+(sim-(r.sbMi?r.sbRaw*MI_FACTOR:r.sbRaw)).toFixed(1)+"s":"")+'</span>'
