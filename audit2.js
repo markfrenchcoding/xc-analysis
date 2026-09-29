@@ -127,6 +127,25 @@ console.log('\nmodel wiring (live seed)');
     ok('3mi on: Crater girls get faster', on.avg5 < off.avg5, off.avg5 + ' -> ' + on.avg5);
   }
 
+  /* Race ratings: the model runs on the mark divided by how slow its race was,
+     and the page shows the time actually run. */
+  {
+    const csv = ['gender,athlete,mark,grade,team,dist,class,race']
+      .concat(['A', 'B', 'C', 'D', 'E'].map((n, i) => 'F,' + n + ',20:00.00,11,Jesuit,5000,6A,' + (i ? '1.0000' : '1.0500')))
+      .join(String.fromCharCode(10));
+    const pr = M.parseCSV(csv);
+    eq('race: the factor is read', pr.rows[0].f, 1.05);
+    M.setDATA(pr.rows); M.setClass('6A', 'F');
+    const r = M.buildModel('F', 5000).teams.find(t => t.name === 'Jesuit').roster.find(x => x.name === 'A');
+    eq('race: shown at the time run', r.sbRaw, 1200);
+    ok('race: modelled at the time over the factor (and a lone mark regressed)',
+      Math.abs(r.sb - 1200 / 1.05 * 1.006) < 1e-9, 'sb=' + r.sb);
+    const old = M.parseCSV(['gender,athlete,mark,grade,team,dist,class', 'F,A,20:00.00,11,Jesuit,5000,6A']
+      .join(String.fromCharCode(10)));
+    eq('race: a seed without the column reads as factor 1', old.rows[0].f, 1);
+    M.setDATA(rows);
+  }
+
   // 3,000m was removed from the model; only the state-meet distance is built
   for (const g of ['M', 'F']) for (const dist of [5000]) {
     const tag = g + dist;

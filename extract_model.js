@@ -15,7 +15,7 @@ const lines = src.split(/\r?\n/);
 // Names to lift. Order matters only for readability; JS hoists functions.
 const WANT = [
   'CLASSES', 'CLS', 'LEAGUES', 'AUTO', 'autoFor', 'autoTotal', 'TEAM_LEAGUE', 'setClass',
-  'CAL', 'MARK_W', 'LONE', 'TEAM_SHARE', 'SIG_T',
+  'CAL', 'MARK_W', 'LONE', 'TEAM_SHARE', 'SIG_T', 'BLOW_P', 'BLOW_MIN', 'BLOW_MEAN', 'setNoise',
   // buildModel reads this, so the headless copy needs it declared or it throws
   // the moment the function runs rather than when the file loads
   'NEXT_SEASON',
@@ -86,7 +86,7 @@ parts.push(`module.exports = {
   get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
-  MILES_3, MI_FACTOR, MI_PEN, setMiles(on){ MILES_ON = !!on; },
+  MILES_3, MI_FACTOR, MI_PEN, setMiles(on){ MILES_ON = !!on; }, setNoise,
   setLeagues(L){
     LEAGUES = L;
     LG = Object.keys(LEAGUES);

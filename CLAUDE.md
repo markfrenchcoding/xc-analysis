@@ -37,7 +37,8 @@ entrypoint that did not exist.
 ## Data
 
 Embedded as CSV in `<script id="seed" type="text/plain">` near the top of the
-file. Columns: `gender,athlete,mark,grade,team,dist`.
+file. Columns: `gender,athlete,mark,grade,team,dist,class,race` - `race` is how
+slow the race was that day, which the model divides by (see **Race ratings**).
 
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
@@ -643,9 +644,27 @@ recorded in its truth file; a hardcoded table produced NaN weeks the moment a
 season was added.
 
 **What the Track record view says, as of the last run** (four seasons, September
-cutoff): 107 of 144 actual qualifiers inside the board's top group, 2 of 8
-champions named, pooled Brier 0.1536 against 0.2319 for knowing nothing, 35%
-skill.
+cutoff, race-rated marks, scored at the 5.5% the board runs eight weeks out):
+108 of 144 actual qualifiers inside the board's top group, 3 of 8 champions
+named, pooled Brier 0.1374 against 0.2365 for knowing nothing, **42% skill**.
+
+**And at every horizon, with today's row lit** (`RECORD.byHorizon`, "How close to
+Lane changes everything"): 8 weeks 108/144 and 3 of 8 champions, **6 weeks 127/144
+and 5 of 8**, 4 weeks 129/144 and 6 of 8, 2 weeks 129/144 and 4 of 8. The
+September headline is one reading of a season; somebody looking at the board in
+October is five or four weeks out and that row is theirs. The old model at six
+weeks found 123 and named 4 - a plain season-best list had beaten it there, 127
+to 123, and race ratings are what closed that.
+Teams called 90%+ qualified 90% of the time, and the 70-90% group, which used to
+come in at 50% on a call of 81%, now comes in at 76%.
+
+**The headline is scored the way the board runs, and it used not to be.** It was
+scored at the bare race-day dial, which in September is a spread the board never
+uses. When the dial was corrected from 2.3 to 1.6 the headline fell from 35% to
+32% while the board itself improved, which is how a scoring convention reads as a
+regression. `publish.js` now runs the horizon sweep first and scores September at
+the eight-week best and the late column at the four-week best, and the page says
+the spread was chosen on the same four seasons, so it is a best case.
 
 **The page reports the horizon and the density, not one flat number.** A single
 pooled figure reads as "this model is 35% skilful", which is false in both
@@ -3187,6 +3206,137 @@ And one season best got *slower*: Mason Siewert's 2027 cross country best was
 drops, leaving his real best of 24:18.46. The audit flagged it as a slower
 value, which is exactly why it splits the report by direction.
 
+## Race ratings, and a scorecard that can see them
+
+**Every mark is divided by how fast its race was on the day before the model
+sees it.** That is Bill Meylan's idea from Tully Runners - rate the race, not the
+course - done as a fit rather than by judgment, and it is the first course
+correction this project has measured as helping rather than hurting.
+
+**The Called It archive straddles the change.** Every entry up to Sep 26 was
+taken on raw marks at a 2.3% race-day dial; entries from the next refresh on are
+race-rated at 1.6%. The archive records the sigma on each entry, so the dial
+change shows; the race ratings do not, so when November scores the archive, a
+column that moves between Sep 26 and the next entry moved partly because the
+model did.
+
+### Why the old course adjustment failed, and what fixes it
+
+`fit_courses.js` fitted `log(time) = athlete + course` with **one** ability per
+athlete for the season, so the course term soaked up about 1% a week of fitness
+and forecasts got 3% worse. Meylan never has that problem: he compares each race
+against runners' ratings as they stand, which already hold the fitness gained.
+
+`fitRaces` (in `pull/seed.js`, so the crawl, the browser harness and the backtest
+run one implementation; `backtest/race_ratings.js` re-exports it) fits
+
+    log(time) = athlete + tau x week + race + noise
+
+with the race terms shrunk toward zero by n/(n+8) and medians throughout.
+**`tau` is fixed, not fitted: `RACE_TAU = -1`, a runner 1% faster a week.**
+Fitted freely it swings from +18% to -20% a week between cutoffs, because with
+the races barely shrunk, "everyone got fitter" and "the later races were quicker"
+are the same equation. Chosen by leaving one season out, the rate came back -1 or
+-1.25 every time. A race is a meet and a gender. A mark nobody can rate (no id,
+no date, a race nobody raced twice around) keeps a factor of 1.
+
+**The seed carries it as a `race` column** - `1.0500` means the race was 5%
+slow - and the time actually run stays in `mark`. `buildSeed` ranks and trims on
+the rated value; `parseCSV` reads it as `f`; `buildModel`, `draftPool` and
+`stateModel` divide by it. Nothing a reader sees is ever the rated figure:
+`sbRaw` is the time run, the same rule as the 3-mile conversion. On the Sep 26
+data every 5,000m mark is rated, from 6% fast to 10% slow, median 0.985.
+
+### The scorecard was the problem
+
+Every earlier test - `MARK_W`, course adjustment, race ratings at team level -
+came back "better in about two thirds of bootstrap draws". The team backtest
+scores a yes/no over 144 qualifiers in four seasons, most never in doubt, and it
+cannot see a 2% effect. **`backtest/athlete_level.js`** scores the thing every one
+of those changes is actually about: each athlete's championship time, predicted
+from marks at the cutoff, centred per race. 6,000-odd paired observations.
+
+| weeks out | shipped (raw marks) | race-rated | wins |
+|---|---|---|---|
+| 8 | 3.32% | 3.27% | 64% |
+| 6 | 2.90% | 2.62% | 100% |
+| 4 | 2.31% | 2.14% | 100% |
+| 2 | 2.02% | 1.85% | 100% |
+| 1 (state only) | 1.75% | 1.57% | 100% |
+
+Robust standard deviation of the error; "wins" is the share of cluster bootstrap
+draws. **Leave one season out, the held-out error falls in every season: 1%, 8%,
+6% and 15%, 7.3% pooled.** Race ratings with no week term help at six weeks and
+turn worse than raw from two weeks in - the confound, reproduced. Carrying marks
+forward to race day at the same rate hurts late, because improvement slows.
+
+At the team level the same change is about 2% better and indistinguishable from
+luck (65%), and `backtest/oracle.js` says why.
+
+### Where the team error lives
+
+`oracle.js` runs the simulator on the board as it was, on the real league
+championship lineups, and on those lineups with every mark up to the day before:
+
+| weeks | board | real lineups | everything | error that did not exist yet |
+|---|---|---|---|---|
+| 8 | 0.1388 | 0.1450 | 0.0549 | ~60% |
+| 6 | 0.0650 | 0.0655 | 0.0549 | ~16% |
+| 4 | 0.0575 | 0.0602 | 0.0553 | ~4% |
+| 2 | 0.0527 | 0.0551 | 0.0551 | none |
+
+**Knowing the roster does not help** - "fastest seven on current marks" already
+picks the right runners. **Eight weeks out most of the error is information that
+has not happened yet** (19% of eventual scorers had no 5k mark at all), which no
+method can recover and the horizon allowance is right to cover with width. **From
+four weeks the team board is at the ceiling** of this simulator: what is left is
+race day and the model's structure, which is why better times cannot move the
+team score late while they visibly improve the athletes.
+
+### Race-day spread: 1.6%, not 2.3%
+
+`CAL.sd` was the spread of the **gap between two races** (fair-course meet to
+state), and a gap carries two races of luck, so one race's is 2.3/√2 = 1.6.
+The backtest agrees on its own: allowed below 2.0, the best total spread four and
+two weeks out on raw marks is 1.4-1.6%, and at 2.3 the October boards were too
+cautious. **`publish.js` had been starting its sweep at 2.0 and picking 2.0** -
+the bottom edge, which this file's own rule calls unmeasured. It starts at 1.0
+now, and scores race-rated seeds (`CUTOFF-race-1`), because what is published has
+to be what ships. Dial presets moved with it: 1.1 / 1.6 / 2.8.
+
+### Measured and not shipped
+
+Kept here so nobody has to rediscover them.
+
+- **Teammates share far less of a race than assumed: 8%, not `TEAM_SHARE`'s
+  30%** (ANOVA of championship residuals by team). **Blow-ups are far commoner
+  than a skewed bell curve**: beyond four robust SDs slow, 1.1% of real finishers
+  against 0.03% simulated; beyond six, one in two hundred against none.
+  `athlete_level.js --noise` measures both. **Neither changes the team forecast**
+  (`noise_value.js`: 46-51% of draws, identical pooled Brier) - less sharing and
+  more disasters roughly cancel, and a disaster usually lands on a team that was
+  safe or out either way. `setNoise(share, blowP)` and `BLOW_P` stay in the code,
+  switched off, so the test can be re-run.
+- **Boys and girls, separately.** Boys pick 1.25%/wk and girls 1% in every
+  held-out season - consistent, and worth a hundredth of a point. Girls want a
+  tighter spread than boys from six weeks in (their team scores are further
+  apart) and a wider one at eight; splitting gains under 1% on flat curves. One
+  rate and one spread for both.
+- **Per division rather than per meet** could not be tested: the backtest's season
+  grid carries a division name only for the championships (14 of 153 meet-genders
+  in 2024). It needs the slow meet-by-meet pull.
+- **Per classification** could not be tested: every backtest season is 6A.
+  Pulling 5A and 4A for the same seasons is about 1,000 requests; the right
+  design is one algorithm with each classification's parameters shrunk toward it
+  in proportion to how little evidence that classification has.
+
+```
+node backtest/athlete_level.js 1000 --taus=0,-0.5,-1,-1.25,-1.5 --bygender --noise
+node backtest/oracle.js 4000
+node backtest/race_value.js ; node backtest/race_sigma.js ; node backtest/noise_value.js
+node backtest/build_season.js <year> --race=-1   # the race-rated seeds publish.js reads
+```
+
 ## How the simulation works
 
 One "season" is: draw times → score seven league meets → allocate 14 automatic
@@ -3229,8 +3379,10 @@ standard deviation. Good days are capped by fitness; bad ones are not.
 There is deliberately **no meet-wide shock**. Multiplying everyone in a race by
 the same factor cannot change finishing order.
 
-**Calibration** (`CAL`). Default spread is 2.3%, from 2025 athletes who ran both
-a fair-course meet and the state meet at Lane:
+**Calibration** (`CAL`). Race-day spread is **1.6%** - the 2.3% below is the
+spread of the gap between two races, and one race's is that over √2 (see **Race
+ratings**). From 2025 athletes who ran both a fair-course meet and the state meet
+at Lane:
 
 | reference | date | n | state ÷ ref | spread |
 |---|---|---|---|---|
@@ -4376,7 +4528,10 @@ Listed in the app's own "How" tab:
 
 ## Open items
 
-1. **Break the course/date confound.** Course adjustment is built and fails
+1. **Break the course/date confound.** ~~Largely done~~ - race ratings hold the
+   weekly improvement fixed and rate each race against it; see **Race ratings**.
+   What remains is the old note below, kept for the venue idea, which could still
+   let the rate be fitted rather than fixed. Course adjustment is built and fails
    because a course factor currently absorbs about 1% per week of seasonal
    fitness — see the backtest section. The identifying trick is venues that host
    more than one meet on different dates: the venue effect is shared while the

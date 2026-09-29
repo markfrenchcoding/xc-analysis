@@ -243,7 +243,7 @@ async function meetRows(meetId) {
     await sleep(GAP_POST);
     if (stopping) break;
     for (const r of await divRows(meetId, d.IDMeetDiv, md.jwtMeet)) {
-      const row = Seed.resultRow(r, date, Seed.divMetres(d.DivName));
+      const row = Seed.resultRow(r, date, Seed.divMetres(d.DivName), meetId);
       if (row) out.push(row);
     }
   }

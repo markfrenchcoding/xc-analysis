@@ -107,15 +107,21 @@ function setClass(c,g){
   for(const [lg,ts] of Object.entries(LEAGUES)) ts.forEach(t=>TEAM_LEAGUE[t]=lg);
 }
 
-const CAL={ratio:1.008,sd:2.3,n:293};
+const CAL={ratio:1.008,sd:1.6,n:293};
 
 const MARK_W=[[1],[0.67,0.33],[0.50,0.30,0.20]];
 
 const LONE=0.006;
 
-const TEAM_SHARE=0.30;
+let TEAM_SHARE=0.30;
 
-const SIG_T=Math.sqrt(TEAM_SHARE), SIG_I=Math.sqrt(1-TEAM_SHARE);
+let SIG_T=Math.sqrt(TEAM_SHARE), SIG_I=Math.sqrt(1-TEAM_SHARE);
+
+let BLOW_P=0, BLOW_MIN=0.05, BLOW_MEAN=0.045;
+
+function setNoise(share,blowP){
+  TEAM_SHARE=share;SIG_T=Math.sqrt(share);SIG_I=Math.sqrt(1-share);BLOW_P=blowP;
+}
 
 let NEXT_SEASON=false;
 
@@ -148,7 +154,7 @@ function parseCSV(text){
   const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
   const head=splitCSVLine(lines[0]).map(h=>h.toLowerCase());
   const at=n=>head.indexOf(n);
-  const iG=at("gender"),iA=at("athlete"),iT=at("team"),iM=at("mark"),iD=at("dist"),iGr=at("grade"),iC=at("class");
+  const iG=at("gender"),iA=at("athlete"),iT=at("team"),iM=at("mark"),iD=at("dist"),iGr=at("grade"),iC=at("class"),iR=at("race");
   if(iG<0||iA<0||iT<0||iM<0)throw new Error("Header needs gender, athlete, team and mark.");
   const rows=[];let bad=0;
   for(let i=1;i<lines.length;i++){
@@ -157,7 +163,9 @@ function parseCSV(text){
     if(raw===null||(g!=="M"&&g!=="F")){bad++;continue;}
     const dv=iD>-1?String(c[iD]).trim():"";
     const dist=dv==="4828"?MILES_3:dv.indexOf("3")===0?3000:5000;
-    rows.push({g,name:c[iA],team:c[iT],dist,sb:raw,grade:iGr>-1?c[iGr]:"",cls:iC>-1?c[iC]:"6A"});
+    // f is how slow the race was that day (1.02 = 2% slow); the model divides by it
+    const f=iR>-1?(+c[iR]||1):1;
+    rows.push({g,name:c[iA],team:c[iT],dist,sb:raw,f,grade:iGr>-1?c[iGr]:"",cls:iC>-1?c[iC]:"6A"});
     // duplicate athlete rows are kept, not collapsed — they are the season
   }
   return {rows,bad};
@@ -173,7 +181,7 @@ function buildModel(g,dist){
     const t=byTeam.get(r.team);
     if(!t.has(r.name)) t.set(r.name,{name:r.name,grade:r.grade,marks:[]});
     // v is what the model runs on; raw is what the athlete ran, and how far
-    t.get(r.name).marks.push(mi?{v:r.sb*MI_FACTOR*(1+MI_PEN),raw:r.sb,mi:true}:{v:r.sb,raw:r.sb,mi:false});
+    t.get(r.name).marks.push(mi?{v:r.sb*MI_FACTOR*(1+MI_PEN),raw:r.sb,mi:true}:{v:r.sb/(r.f||1),raw:r.sb,mi:false});
   }
   for(const t of byTeam.values())
     for(const a of t.values()){
@@ -341,7 +349,8 @@ function draw(model,times,sigma,shock){
   for(let k=0;k<teams.length;k++) shock[k]=gauss()*sigma*SIG_T;
   for(let i=0;i<runners.length;i++){
     const r=runners[i];
-    times[i]=pickMark(r)*(1+shock[r.t]+skew()*sigma*SIG_I);
+    const blow=BLOW_P&&Math.random()<BLOW_P?BLOW_MIN-Math.log(1-Math.random())*BLOW_MEAN:0;
+    times[i]=pickMark(r)*(1+shock[r.t]+skew()*sigma*SIG_I+blow);
   }
 }
 
@@ -398,7 +407,7 @@ module.exports = {
   get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
-  MILES_3, MI_FACTOR, MI_PEN, setMiles(on){ MILES_ON = !!on; },
+  MILES_3, MI_FACTOR, MI_PEN, setMiles(on){ MILES_ON = !!on; }, setNoise,
   setLeagues(L){
     LEAGUES = L;
     LG = Object.keys(LEAGUES);

@@ -1,0 +1,1939 @@
+gender,athlete,mark,grade,team,dist,course
+M,Yosuke Shibata,14:38.20,11,South Eugene,5000,1.0010
+M,Yosuke Shibata,14:56.30,11,South Eugene,5000,1.0123
+M,Yosuke Shibata,14:50.23,11,South Eugene,5000,1.0013
+M,Khalil Sabzalian,15:44.32,10,South Eugene,5000,1.0123
+M,Khalil Sabzalian,15:38.58,10,South Eugene,5000,1.0013
+M,Khalil Sabzalian,15:51.20,10,South Eugene,5000,1.0009
+M,Luke Phillips,15:59.67,12,South Eugene,5000,1.0013
+M,Luke Phillips,16:32.10,12,South Eugene,5000,1.0010
+M,Luke Phillips,16:34.90,12,South Eugene,5000,1.0009
+M,Dakota Jett,16:21.71,11,South Eugene,5000,1.0013
+M,Dakota Jett,16:40.30,11,South Eugene,5000,1.0123
+M,Dakota Jett,17:00.90,11,South Eugene,5000,1.0009
+M,Benjamin Ayala,16:33.56,11,South Eugene,5000,1.0013
+M,Benjamin Ayala,16:49.70,11,South Eugene,5000,1.0010
+M,Benjamin Ayala,17:10.17,11,South Eugene,5000,1.0123
+M,Liv Schartz,16:44.02,11,South Eugene,5000,1.0013
+M,Liv Schartz,16:50.50,11,South Eugene,5000,1.0010
+M,Liv Schartz,16:56.30,11,South Eugene,5000,1.0009
+M,Hauke Kiley,16:51.16,11,South Eugene,5000,1.0013
+M,Hauke Kiley,17:34.79,11,South Eugene,5000,1.0123
+M,Hauke Kiley,18:18.20,11,South Eugene,5000,1.0010
+M,Malachi Schoenherr,14:38.40,12,Sheldon (OR),5000,1.0010
+M,Malachi Schoenherr,15:00.70,12,Sheldon (OR),5000,1.0261
+M,Malachi Schoenherr,14:39.22,12,Sheldon (OR),5000,1.0013
+M,Benjamin Kehrein,15:04.90,12,Sheldon (OR),5000,1.0010
+M,Benjamin Kehrein,15:09.62,12,Sheldon (OR),5000,1.0013
+M,Benjamin Kehrein,15:32.60,12,Sheldon (OR),5000,1.0261
+M,Lucas White,15:53.20,12,Sheldon (OR),5000,1.0013
+M,Lucas White,16:10.21,12,Sheldon (OR),5000,1.0123
+M,Lucas White,16:08.60,12,Sheldon (OR),5000,1.0010
+M,Caleb Daniels,16:07.49,10,Sheldon (OR),5000,1.0013
+M,Caleb Daniels,16:25.66,10,Sheldon (OR),5000,1.0123
+M,Caleb Daniels,16:35.70,10,Sheldon (OR),5000,1.0010
+M,Camden Law,16:35.15,12,Sheldon (OR),5000,1.0013
+M,Camden Law,17:11.50,12,Sheldon (OR),5000,1.0261
+M,Camden Law,17:14.62,12,Sheldon (OR),5000,1.0123
+M,Ash Campbell,17:07.23,12,Sheldon (OR),5000,1.0013
+M,Ash Campbell,17:09.50,12,Sheldon (OR),5000,1.0010
+M,Ash Campbell,16:42.60,12,Sheldon (OR),5000,0.9738
+M,Jayden Robertson,17:56.58,10,Sheldon (OR),5000,1.0123
+M,Jayden Robertson,18:06.18,10,Sheldon (OR),5000,1.0013
+M,Jayden Robertson,18:55.60,10,Sheldon (OR),5000,1.0261
+M,Kellen Williams,14:57.70,12,Jesuit,5000,1.0034
+M,Kellen Williams,14:28.10,12,Jesuit,5000,0.9547
+M,Kellen Williams,15:30.10,12,Jesuit,5000,1.0201
+M,Jackson Welsh,15:04.00,12,Jesuit,5000,1.0034
+M,Jackson Welsh,15:23.00,12,Jesuit,5000,1.0201
+M,Jackson Welsh,15:26.80,12,Jesuit,5000,1.0004
+M,Matthew Wroblewski,15:10.70,12,Jesuit,5000,1.0034
+M,Matthew Wroblewski,15:38.90,12,Jesuit,5000,1.0201
+M,Matthew Wroblewski,14:54.70,12,Jesuit,5000,0.9547
+M,Jaciah Lavier,15:16.70,10,Jesuit,5000,1.0034
+M,Jaciah Lavier,15:58.90,10,Jesuit,5000,1.0201
+M,Jaciah Lavier,15:05.10,10,Jesuit,5000,0.9547
+M,Brayden Fletcher,15:28.00,12,Jesuit,5000,1.0034
+M,Brayden Fletcher,14:56.20,12,Jesuit,5000,0.9547
+M,Brayden Fletcher,15:41.40,12,Jesuit,5000,1.0004
+M,Liam Donnelly,15:55.10,12,Jesuit,5000,1.0201
+M,Liam Donnelly,15:40.00,12,Jesuit,5000,1.0004
+M,Liam Donnelly,15:44.20,12,Jesuit,5000,1.0034
+M,Brady Lukasiewicz,15:36.70,10,Jesuit,5000,1.0004
+M,Brady Lukasiewicz,15:50.80,10,Jesuit,5000,1.0034
+M,Brady Lukasiewicz,15:16.80,10,Jesuit,5000,0.9547
+M,Faysal Ibrahim,15:35.10,10,David Douglas,5000,1.0010
+M,Faysal Ibrahim,15:30.70,10,David Douglas,5000,0.9925
+M,Faysal Ibrahim,15:51.94,10,David Douglas,5000,0.9867
+M,Ismail Ali,18:07.00,12,David Douglas,5000,0.9925
+M,Ismail Ali,18:09.98,12,David Douglas,5000,0.9867
+M,Ismail Ali,19:45.00,12,David Douglas,5000,1.0010
+M,Abdi Sanchez,18:27.00,10,David Douglas,5000,0.9925
+M,Abdi Sanchez,18:59.00,10,David Douglas,5000,1.0010
+M,Abdi Sanchez,19:15.42,10,David Douglas,5000,0.9867
+M,Nathan Cunningham,18:56.50,10,David Douglas,5000,0.9925
+M,Nathan Cunningham,19:10.10,10,David Douglas,5000,1.0010
+M,Nathan Cunningham,19:46.10,10,David Douglas,5000,1.0004
+M,Max Perry,19:15.10,11,David Douglas,5000,0.9925
+M,Max Perry,19:46.30,11,David Douglas,5000,1.0004
+M,Max Perry,19:54.80,11,David Douglas,5000,1.0010
+M,Justin Lino,19:46.40,12,David Douglas,5000,1.0010
+M,Justin Lino,19:52.10,12,David Douglas,5000,1.0004
+M,Justin Lino,19:45.00,12,David Douglas,5000,0.9925
+M,Stone Barron,19:43.24,12,David Douglas,5000,0.9867
+M,Stone Barron,20:27.40,12,David Douglas,5000,1.0010
+M,Stone Barron,21:17.70,12,David Douglas,5000,1.0004
+M,Joshua Prince,15:21.42,12,Lincoln,5000,1.0013
+M,Joshua Prince,14:52.00,12,Lincoln,5000,0.9547
+M,Joshua Prince,15:56.69,12,Lincoln,5000,1.0148
+M,Malcolm Dimoff,14:46.40,11,Lincoln,5000,0.9547
+M,Malcolm Dimoff,15:36.94,11,Lincoln,5000,1.0013
+M,Malcolm Dimoff,15:56.44,11,Lincoln,5000,1.0148
+M,Peter James,14:54.20,11,Lincoln,5000,0.9547
+M,Peter James,15:54.70,11,Lincoln,5000,1.0020
+M,Peter James,16:07.75,11,Lincoln,5000,1.0148
+M,Jack Denton,15:56.75,11,Lincoln,5000,1.0013
+M,Jack Denton,16:18.90,11,Lincoln,5000,1.0148
+M,Jack Denton,16:07.90,11,Lincoln,5000,1.0020
+M,Seth Kugel,16:00.90,10,Lincoln,5000,1.0013
+M,Seth Kugel,15:21.60,10,Lincoln,5000,0.9547
+M,Seth Kugel,16:08.90,10,Lincoln,5000,1.0020
+M,Desmond Conser,16:08.32,10,Lincoln,5000,1.0013
+M,Desmond Conser,15:23.40,10,Lincoln,5000,0.9547
+M,Desmond Conser,16:25.14,10,Lincoln,5000,1.0148
+M,Christian Ranalli,16:13.84,10,Lincoln,5000,1.0013
+M,Christian Ranalli,15:47.70,10,Lincoln,5000,0.9547
+M,Christian Ranalli,16:54.51,10,Lincoln,5000,1.0148
+M,George Lora,15:13.22,10,Ida B. Wells,5000,1.0013
+M,George Lora,14:50.50,10,Ida B. Wells,5000,0.9547
+M,George Lora,15:44.20,10,Ida B. Wells,5000,1.0004
+M,Otto Sellers,15:22.02,12,Ida B. Wells,5000,1.0013
+M,Otto Sellers,15:51.41,12,Ida B. Wells,5000,1.0148
+M,Otto Sellers,15:54.40,12,Ida B. Wells,5000,1.0105
+M,Nolan Gorsegner,15:53.21,10,Ida B. Wells,5000,1.0013
+M,Nolan Gorsegner,16:21.30,10,Ida B. Wells,5000,1.0105
+M,Nolan Gorsegner,15:39.60,10,Ida B. Wells,5000,0.9547
+M,Luca Masolo,15:53.56,12,Ida B. Wells,5000,1.0013
+M,Luca Masolo,15:56.20,12,Ida B. Wells,5000,1.0004
+M,Luca Masolo,16:13.41,12,Ida B. Wells,5000,1.0148
+M,Lev Mitchell,15:56.09,12,Ida B. Wells,5000,1.0013
+M,Lev Mitchell,15:24.40,12,Ida B. Wells,5000,0.9547
+M,Lev Mitchell,16:21.40,12,Ida B. Wells,5000,1.0105
+M,Clark Bradley,16:30.21,12,Ida B. Wells,5000,1.0013
+M,Clark Bradley,16:49.90,12,Ida B. Wells,5000,1.0105
+M,Clark Bradley,16:06.20,12,Ida B. Wells,5000,0.9547
+M,Charlie Wiliams,16:57.90,11,Ida B. Wells,5000,1.0105
+M,Charlie Wiliams,16:07.10,11,Ida B. Wells,5000,0.9547
+M,Charlie Wiliams,17:23.89,11,Ida B. Wells,5000,1.0148
+M,Paul Hretcanu,15:24.93,11,Tigard,5000,1.0013
+M,Paul Hretcanu,15:45.80,11,Tigard,5000,1.0201
+M,Paul Hretcanu,15:35.44,11,Tigard,5000,1.0007
+M,Trent Woodward,16:57.70,12,Tigard,5000,1.0201
+M,Trent Woodward,16:41.92,12,Tigard,5000,1.0013
+M,Trent Woodward,16:11.80,12,Tigard,5000,0.9547
+M,Tobias Danes,17:34.45,10,Tigard,5000,1.0013
+M,Tobias Danes,18:06.05,10,Tigard,5000,1.0288
+M,Tobias Danes,17:37.87,10,Tigard,5000,1.0007
+M,Wesley Kerns,17:56.40,12,Tigard,5000,1.0201
+M,Wesley Kerns,17:39.70,12,Tigard,5000,1.0013
+M,Wesley Kerns,17:31.10,12,Tigard,5000,0.9861
+M,Jackson Kamphuis,17:59.70,10,Tigard,5000,1.0201
+M,Jackson Kamphuis,18:11.12,10,Tigard,5000,1.0013
+M,Jackson Kamphuis,18:12.03,10,Tigard,5000,1.0007
+M,Kingston Brunscheon,18:11.12,10,Tigard,5000,1.0007
+M,Kingston Brunscheon,17:58.74,10,Tigard,5000,0.9861
+M,Kingston Brunscheon,19:20.47,10,Tigard,5000,1.0288
+M,Finnegan Nichols,18:33.40,10,Tigard,5000,1.0201
+M,Finnegan Nichols,18:21.57,10,Tigard,5000,1.0013
+M,Finnegan Nichols,18:09.19,10,Tigard,5000,0.9861
+M,Ronan Olson,15:42.83,11,Sunset,5000,1.0013
+M,Ronan Olson,15:45.20,11,Sunset,5000,1.0010
+M,Ronan Olson,16:12.70,11,Sunset,5000,1.0004
+M,Noah Harris,15:46.87,12,Sunset,5000,1.0013
+M,Noah Harris,16:07.70,12,Sunset,5000,1.0010
+M,Aiden McArthur-Jimenez,15:48.80,10,Sunset,5000,1.0010
+M,Aiden McArthur-Jimenez,15:57.16,10,Sunset,5000,1.0013
+M,Aiden McArthur-Jimenez,16:19.80,10,Sunset,5000,1.0004
+M,Aman Tesfu,16:03.64,12,Sunset,5000,1.0013
+M,Aman Tesfu,16:23.40,12,Sunset,5000,1.0010
+M,Aman Tesfu,16:27.90,12,Sunset,5000,1.0004
+M,James Dahlgren,16:11.20,11,Sunset,5000,1.0010
+M,James Dahlgren,16:14.41,11,Sunset,5000,1.0013
+M,James Dahlgren,16:30.30,11,Sunset,5000,1.0004
+M,Ethan Chesire,16:19.50,12,Sunset,5000,1.0004
+M,Ethan Chesire,16:23.00,12,Sunset,5000,1.0010
+M,Ethan Chesire,16:35.17,12,Sunset,5000,1.0013
+M,Matthew Graham,16:31.60,10,Sunset,5000,1.0013
+M,Matthew Graham,16:32.30,10,Sunset,5000,1.0010
+M,Matthew Graham,16:38.10,10,Sunset,5000,1.0004
+M,Kai Jensen,15:26.50,12,Cleveland (OR),5000,1.0013
+M,Kai Jensen,15:56.76,12,Cleveland (OR),5000,1.0123
+M,Kai Jensen,15:02.50,12,Cleveland (OR),5000,0.9547
+M,Grant Breger,15:54.60,12,Cleveland (OR),5000,1.0010
+M,Grant Breger,16:09.50,12,Cleveland (OR),5000,1.0123
+M,Grant Breger,15:59.80,12,Cleveland (OR),5000,1.0013
+M,Duncan Creagle Lujan,15:57.44,12,Cleveland (OR),5000,1.0013
+M,Duncan Creagle Lujan,16:27.42,12,Cleveland (OR),5000,1.0123
+M,Duncan Creagle Lujan,17:06.00,12,Cleveland (OR),5000,1.0244
+M,Henry Sancomb,16:44.69,10,Cleveland (OR),5000,1.0013
+M,Henry Sancomb,16:58.24,10,Cleveland (OR),5000,1.0123
+M,Henry Sancomb,16:21.00,10,Cleveland (OR),5000,0.9547
+M,Paco Warren-Coleman,17:11.83,10,Cleveland (OR),5000,1.0013
+M,Paco Warren-Coleman,16:36.90,10,Cleveland (OR),5000,0.9547
+M,Paco Warren-Coleman,17:27.80,10,Cleveland (OR),5000,1.0010
+M,Quinn Dodge,17:17.90,12,Cleveland (OR),5000,1.0010
+M,Quinn Dodge,17:33.26,12,Cleveland (OR),5000,1.0123
+M,Quinn Dodge,17:28.36,12,Cleveland (OR),5000,1.0013
+M,Pan Slaven-Davis,17:57.64,11,Cleveland (OR),5000,1.0123
+M,Pan Slaven-Davis,17:15.20,11,Cleveland (OR),5000,0.9547
+M,Pan Slaven-Davis,18:12.60,11,Cleveland (OR),5000,1.0010
+M,Isaiah Carpenter,15:33.51,11,McMinnville,5000,1.0013
+M,Isaiah Carpenter,16:20.32,11,McMinnville,5000,1.0485
+M,Isaiah Carpenter,15:44.30,11,McMinnville,5000,1.0009
+M,Henry Barsotti,16:55.30,11,McMinnville,5000,1.0485
+M,Henry Barsotti,16:14.08,11,McMinnville,5000,0.9861
+M,Henry Barsotti,15:47.40,11,McMinnville,5000,0.9547
+M,Dash Diesburg,16:57.81,10,McMinnville,5000,1.0485
+M,Dash Diesburg,16:38.30,10,McMinnville,5000,1.0009
+M,Dash Diesburg,16:41.62,10,McMinnville,5000,1.0013
+M,Brayden Christopherson,17:12.83,12,McMinnville,5000,1.0485
+M,Brayden Christopherson,15:46.10,12,McMinnville,5000,0.9547
+M,Brayden Christopherson,16:34.34,12,McMinnville,5000,1.0013
+M,Nicholas Hanke,17:25.58,12,McMinnville,5000,1.0485
+M,Nicholas Hanke,17:08.93,12,McMinnville,5000,1.0013
+M,Nicholas Hanke,17:26.89,12,McMinnville,5000,0.9861
+M,River Wessels,17:50.20,12,McMinnville,5000,1.0485
+M,River Wessels,17:29.88,12,McMinnville,5000,1.0013
+M,River Wessels,16:49.70,12,McMinnville,5000,0.9547
+M,Miles Sommerville,17:52.00,10,McMinnville,5000,1.0485
+M,Miles Sommerville,17:30.28,10,McMinnville,5000,1.0013
+M,Miles Sommerville,17:18.63,10,McMinnville,5000,0.9861
+M,Leo Brown,15:33.40,11,West Linn,5000,1.0013
+M,Leo Brown,15:40.60,11,West Linn,5000,1.0010
+M,Leo Brown,15:35.13,11,West Linn,5000,0.9861
+M,Charley Aguilar Auld,16:22.19,11,West Linn,5000,1.0013
+M,Charley Aguilar Auld,16:27.60,11,West Linn,5000,1.0010
+M,Charley Aguilar Auld,16:18.30,11,West Linn,5000,0.9861
+M,Henry Hall-Brown,16:30.43,12,West Linn,5000,1.0013
+M,Henry Hall-Brown,16:47.80,12,West Linn,5000,1.0010
+M,Henry Hall-Brown,16:52.79,12,West Linn,5000,0.9861
+M,Lucas Sobotta,16:33.82,12,West Linn,5000,1.0013
+M,Lucas Sobotta,16:44.40,12,West Linn,5000,1.0010
+M,Lucas Sobotta,16:55.28,12,West Linn,5000,1.0007
+M,Ian Houston,16:38.77,9,West Linn,5000,1.0013
+M,Ian Houston,17:09.00,9,West Linn,5000,1.0010
+M,Ian Houston,17:11.95,9,West Linn,5000,1.0007
+M,Tai Brown,16:40.68,12,West Linn,5000,1.0013
+M,Tai Brown,16:44.68,12,West Linn,5000,0.9861
+M,Tai Brown,17:04.20,12,West Linn,5000,1.0010
+M,Emerson Bush,16:43.47,11,West Linn,5000,1.0013
+M,Emerson Bush,17:01.79,11,West Linn,5000,0.9861
+M,Emerson Bush,17:34.80,11,West Linn,5000,1.0010
+M,Jasper Buskirk,15:48.96,12,Franklin (OR),5000,1.0123
+M,Jasper Buskirk,16:08.30,12,Franklin (OR),5000,1.0261
+M,Jasper Buskirk,16:15.70,12,Franklin (OR),5000,1.0009
+M,Izaak Mardon,16:08.00,12,Franklin (OR),5000,1.0261
+M,Izaak Mardon,15:44.30,12,Franklin (OR),5000,1.0009
+M,Izaak Mardon,16:52.51,12,Franklin (OR),5000,1.0148
+M,Max Gallagher,16:08.20,11,Franklin (OR),5000,1.0261
+M,Max Gallagher,16:04.55,11,Franklin (OR),5000,1.0123
+M,Max Gallagher,15:56.10,11,Franklin (OR),5000,1.0009
+M,Ben Cummings,16:35.20,10,Franklin (OR),5000,1.0261
+M,Ben Cummings,16:26.90,10,Franklin (OR),5000,1.0009
+M,Ben Cummings,16:42.95,10,Franklin (OR),5000,1.0123
+M,Felix Snyder,16:28.20,11,Franklin (OR),5000,1.0105
+M,Felix Snyder,16:40.44,11,Franklin (OR),5000,1.0123
+M,Felix Snyder,17:08.10,11,Franklin (OR),5000,1.0261
+M,Francis Bolton,16:40.24,12,Franklin (OR),5000,1.0123
+M,Francis Bolton,16:49.00,12,Franklin (OR),5000,1.0105
+M,Francis Bolton,16:55.50,12,Franklin (OR),5000,1.0009
+M,Arlo Wells,16:41.83,12,Franklin (OR),5000,1.0123
+M,Arlo Wells,16:53.20,12,Franklin (OR),5000,1.0105
+M,Arlo Wells,16:54.40,12,Franklin (OR),5000,1.0009
+M,Kole Norman,16:21.17,11,Sherwood,5000,1.0485
+M,Kole Norman,16:07.90,11,Sherwood,5000,1.0201
+M,Kole Norman,15:50.29,11,Sherwood,5000,1.0013
+M,Braden Stein,16:26.51,12,Sherwood,5000,1.0485
+M,Braden Stein,16:01.03,12,Sherwood,5000,1.0013
+M,Braden Stein,16:03.55,12,Sherwood,5000,1.0007
+M,Joel Eddington,15:58.32,11,Sherwood,5000,1.0013
+M,Joel Eddington,16:39.90,11,Sherwood,5000,1.0201
+M,Joel Eddington,16:13.17,11,Sherwood,5000,0.9861
+M,Ryan Nations,15:30.80,12,Sherwood,5000,0.9547
+M,Ryan Nations,16:37.30,12,Sherwood,5000,1.0201
+M,Ryan Nations,16:35.40,12,Sherwood,5000,1.0013
+M,Brady Edinger,16:19.40,11,Sherwood,5000,1.0013
+M,Brady Edinger,16:39.90,11,Sherwood,5000,1.0201
+M,Brady Edinger,16:23.36,11,Sherwood,5000,1.0007
+M,Davis Malan,17:11.43,12,Sherwood,5000,1.0485
+M,Davis Malan,17:11.70,12,Sherwood,5000,1.0201
+M,Davis Malan,16:53.55,12,Sherwood,5000,1.0013
+M,Blake Horner,17:00.70,11,Sherwood,5000,1.0201
+M,Blake Horner,16:29.43,11,Sherwood,5000,0.9861
+M,Blake Horner,16:01.00,11,Sherwood,5000,0.9547
+M,Lucas Franck,15:23.50,12,Mountainside,5000,1.0004
+M,Lucas Franck,15:44.52,12,Mountainside,5000,1.0001
+M,Lucas Franck,16:07.52,12,Mountainside,5000,1.0013
+M,Simon Merriss,18:06.90,10,Mountainside,5000,1.1092
+M,Simon Merriss,16:37.21,10,Mountainside,5000,1.0013
+M,Simon Merriss,16:24.90,10,Mountainside,5000,0.9775
+M,Eliot Krohn,18:08.00,10,Mountainside,5000,1.1092
+M,Eliot Krohn,17:10.30,10,Mountainside,5000,1.0013
+M,Eliot Krohn,16:53.70,10,Mountainside,5000,0.9775
+M,Hugh Ridgway,16:42.70,10,Mountainside,5000,1.0004
+M,Hugh Ridgway,16:43.87,10,Mountainside,5000,1.0013
+M,Hugh Ridgway,16:20.80,10,Mountainside,5000,0.9775
+M,Wade Wright,18:45.70,12,Mountainside,5000,1.1092
+M,Wade Wright,17:56.04,12,Mountainside,5000,1.0013
+M,Wade Wright,18:05.91,12,Mountainside,5000,1.0001
+M,Ely Rotich,17:14.73,9,Mountainside,5000,1.0013
+M,Ely Rotich,17:05.50,9,Mountainside,5000,0.9775
+M,Ely Rotich,20:03.50,9,Mountainside,5000,1.1092
+M,Nathaniel Stevens,17:30.29,11,Mountainside,5000,1.0013
+M,Nathaniel Stevens,17:28.00,11,Mountainside,5000,0.9775
+M,Nathaniel Stevens,20:44.10,11,Mountainside,5000,1.1092
+M,Ezra Dixon,16:00.77,11,South Medford,5000,1.0013
+M,Ezra Dixon,16:11.80,11,South Medford,5000,1.0010
+M,Ezra Dixon,16:39.50,11,South Medford,5000,1.0261
+M,Henry LeClair,16:08.40,11,South Medford,5000,1.0013
+M,Henry LeClair,16:28.00,11,South Medford,5000,1.0010
+M,Henry LeClair,16:53.70,11,South Medford,5000,1.0261
+M,Ezra Morgan,16:24.14,9,South Medford,5000,1.0013
+M,Ezra Morgan,16:54.40,9,South Medford,5000,1.0261
+M,Ezra Morgan,16:32.70,9,South Medford,5000,1.0010
+M,Mason Carroll,16:24.37,11,South Medford,5000,1.0013
+M,Mason Carroll,16:27.50,11,South Medford,5000,1.0010
+M,Mason Carroll,16:57.00,11,South Medford,5000,1.0261
+M,Blake Barratt,17:12.95,10,South Medford,5000,1.0013
+M,Blake Barratt,18:47.95,10,South Medford,5000,1.0261
+M,Aren Mejia,17:19.79,11,South Medford,5000,1.0013
+M,Aren Mejia,17:57.50,11,South Medford,5000,1.0261
+M,Aren Mejia,17:25.70,11,South Medford,5000,0.9919
+M,Carter Fox,18:00.98,9,South Medford,5000,1.0013
+M,Carter Fox,18:09.10,9,South Medford,5000,1.0010
+M,Carter Fox,18:48.20,9,South Medford,5000,1.0261
+M,Kaiji Alleman,14:55.90,11,Central Catholic,5000,0.9547
+M,Kaiji Alleman,15:45.34,11,Central Catholic,5000,0.9867
+M,Kaiji Alleman,16:08.32,11,Central Catholic,5000,1.0013
+M,Conal Devine,15:49.38,12,Central Catholic,5000,0.9867
+M,Conal Devine,15:24.30,12,Central Catholic,5000,0.9547
+M,Conal Devine,16:31.10,12,Central Catholic,5000,1.0013
+M,Greer Shorr,16:07.34,12,Central Catholic,5000,0.9867
+M,Greer Shorr,15:59.10,12,Central Catholic,5000,0.9547
+M,Miles Wheeler,16:24.70,11,Central Catholic,5000,1.0013
+M,Miles Wheeler,16:31.90,11,Central Catholic,5000,0.9925
+M,Miles Wheeler,16:17.90,11,Central Catholic,5000,0.9547
+M,Jess Vanderwalker,16:10.77,10,Central Catholic,5000,0.9867
+M,Jess Vanderwalker,16:04.50,10,Central Catholic,5000,0.9547
+M,Jesse Jurinka,16:18.02,10,Central Catholic,5000,0.9867
+M,Jesse Jurinka,16:07.20,10,Central Catholic,5000,0.9547
+M,Jesse Jurinka,17:04.65,10,Central Catholic,5000,1.0013
+M,Carson Beam,16:23.82,10,Central Catholic,5000,0.9867
+M,Carson Beam,16:03.80,10,Central Catholic,5000,0.9547
+M,Carson Beam,16:56.62,10,Central Catholic,5000,1.0013
+M,Emiliano Diaz-Garcia,15:33.90,12,Clackamas,5000,1.0010
+M,Emiliano Diaz-Garcia,15:36.30,12,Clackamas,5000,1.0013
+M,Emiliano Diaz-Garcia,15:07.40,12,Clackamas,5000,0.9547
+M,Kruz Mogel,15:44.70,12,Clackamas,5000,1.0010
+M,Kruz Mogel,15:57.90,12,Clackamas,5000,1.0009
+M,Kruz Mogel,15:18.70,12,Clackamas,5000,0.9547
+M,Lucius Case,16:44.50,11,Clackamas,5000,1.0010
+M,Lucius Case,16:46.11,11,Clackamas,5000,1.0013
+M,Lucius Case,16:10.50,11,Clackamas,5000,0.9547
+M,Owen Schroeder,16:56.72,10,Clackamas,5000,1.0013
+M,Owen Schroeder,17:20.40,10,Clackamas,5000,1.0010
+M,Owen Schroeder,16:51.70,10,Clackamas,5000,0.9547
+M,James Van Blarcom,17:05.27,12,Clackamas,5000,1.0013
+M,James Van Blarcom,17:06.30,12,Clackamas,5000,0.9925
+M,James Van Blarcom,17:23.40,12,Clackamas,5000,1.0010
+M,Greyden Regalado,17:14.60,10,Clackamas,5000,0.9925
+M,Greyden Regalado,17:25.83,10,Clackamas,5000,1.0013
+M,Greyden Regalado,18:00.10,10,Clackamas,5000,1.0010
+M,Eugene Weitzel,17:25.45,10,Clackamas,5000,1.0013
+M,Eugene Weitzel,17:35.60,10,Clackamas,5000,0.9925
+M,Eugene Weitzel,18:07.40,10,Clackamas,5000,1.0010
+M,Anders Hagen,15:55.97,12,West Salem,5000,1.0013
+M,Anders Hagen,16:19.10,12,West Salem,5000,1.0010
+M,Anders Hagen,16:29.80,12,West Salem,5000,0.9738
+M,Dylan McGuirk,16:24.40,12,West Salem,5000,1.0010
+M,Dylan McGuirk,16:37.94,12,West Salem,5000,1.0013
+M,Dylan McGuirk,16:29.10,12,West Salem,5000,0.9738
+M,Rafael Lemus,16:40.70,12,West Salem,5000,1.0010
+M,Rafael Lemus,17:07.95,12,West Salem,5000,1.0004
+M,Rafael Lemus,17:09.50,12,West Salem,5000,1.0013
+M,David Goodwin,16:47.30,11,West Salem,5000,1.0010
+M,David Goodwin,17:03.27,11,West Salem,5000,1.0013
+M,David Goodwin,16:36.80,11,West Salem,5000,0.9738
+M,Nolan Venti,16:54.00,12,West Salem,5000,1.0013
+M,Nolan Venti,17:13.90,12,West Salem,5000,1.0010
+M,Nolan Venti,17:02.10,12,West Salem,5000,0.9738
+M,Nathan Dickinson,17:45.46,9,West Salem,5000,1.0013
+M,Nathan Dickinson,18:00.30,9,West Salem,5000,1.0010
+M,Nathan Dickinson,17:41.70,9,West Salem,5000,0.9738
+M,David Rodriguez,17:52.00,12,West Salem,5000,1.0010
+M,David Rodriguez,17:57.18,12,West Salem,5000,1.0013
+M,David Rodriguez,17:35.40,12,West Salem,5000,0.9738
+M,Ammon Ham,16:05.42,12,Westview,5000,1.0013
+M,Ammon Ham,16:06.40,12,Westview,5000,1.0010
+M,Ammon Ham,15:51.50,12,Westview,5000,0.9547
+M,Demir Ciftci,15:22.10,12,Westview,5000,0.9547
+M,Demir Ciftci,16:16.30,12,Westview,5000,1.0010
+M,Demir Ciftci,16:18.02,12,Westview,5000,1.0013
+M,Sriharsha Padigi,16:14.31,10,Westview,5000,1.0013
+M,Sriharsha Padigi,16:34.70,10,Westview,5000,1.0010
+M,Sriharsha Padigi,16:09.80,10,Westview,5000,0.9547
+M,Cameron Acton,16:57.52,9,Westview,5000,1.0013
+M,Cameron Acton,16:17.10,9,Westview,5000,0.9547
+M,Cameron Acton,17:17.40,9,Westview,5000,1.0009
+M,cameron haley,17:28.24,11,Westview,5000,1.0013
+M,cameron haley,16:56.90,11,Westview,5000,0.9547
+M,cameron haley,18:43.60,11,Westview,5000,1.0465
+M,Emilio Curtis,16:53.10,11,Westview,5000,0.9547
+M,Emilio Curtis,17:42.64,11,Westview,5000,1.0013
+M,Emilio Curtis,17:49.20,11,Westview,5000,1.0010
+M,Jack Richling,17:52.43,11,Westview,5000,1.0013
+M,Jack Richling,17:55.40,11,Westview,5000,1.0009
+M,Jack Richling,18:52.90,11,Westview,5000,1.0465
+M,Hunter McKenzie,16:13.00,11,Oregon City,5000,1.0013
+M,Hunter McKenzie,15:32.70,11,Oregon City,5000,0.9547
+M,Hunter McKenzie,16:06.29,11,Oregon City,5000,0.9861
+M,Cole Solari,16:36.46,12,Oregon City,5000,1.0013
+M,Cole Solari,16:21.76,12,Oregon City,5000,0.9861
+M,Cole Solari,17:25.00,12,Oregon City,5000,1.0000
+M,Torsten Zornes,16:41.45,12,Oregon City,5000,1.0013
+M,Torsten Zornes,16:36.23,12,Oregon City,5000,0.9861
+M,Torsten Zornes,16:15.50,12,Oregon City,5000,0.9547
+M,Paul Coleman,16:11.20,11,Oregon City,5000,0.9547
+M,Paul Coleman,16:58.80,11,Oregon City,5000,1.0009
+M,Paul Coleman,17:09.46,11,Oregon City,5000,1.0013
+M,Ryan Saxe,17:27.76,9,Oregon City,5000,1.0013
+M,Ryan Saxe,16:46.20,9,Oregon City,5000,0.9547
+M,Ryan Saxe,17:21.63,9,Oregon City,5000,0.9861
+M,Parker Abbott,17:33.24,12,Oregon City,5000,1.0013
+M,Parker Abbott,17:51.00,12,Oregon City,5000,1.0000
+M,Parker Abbott,17:40.49,12,Oregon City,5000,0.9861
+M,Zachary Gavrich,17:36.18,10,Oregon City,5000,1.0013
+M,Zachary Gavrich,17:17.90,10,Oregon City,5000,0.9547
+M,Zachary Gavrich,18:00.05,10,Oregon City,5000,0.9861
+M,Chris Hayashi,16:09.10,12,Lake Oswego,5000,1.0007
+M,Chris Hayashi,16:11.81,12,Lake Oswego,5000,1.0013
+M,Chris Hayashi,16:09.22,12,Lake Oswego,5000,0.9861
+M,Rowan Cook,16:24.14,11,Lake Oswego,5000,1.0013
+M,Rowan Cook,16:23.50,11,Lake Oswego,5000,0.9547
+M,Rowan Cook,17:00.83,11,Lake Oswego,5000,0.9861
+M,Felix Wang,16:38.27,10,Lake Oswego,5000,1.0007
+M,Felix Wang,16:43.34,10,Lake Oswego,5000,1.0013
+M,Felix Wang,16:06.00,10,Lake Oswego,5000,0.9547
+M,Tomas Golovnykh,17:08.10,10,Lake Oswego,5000,1.0013
+M,Tomas Golovnykh,17:32.13,10,Lake Oswego,5000,0.9861
+M,Tomas Golovnykh,17:02.50,10,Lake Oswego,5000,0.9547
+M,Logan Shi,17:18.25,12,Lake Oswego,5000,1.0013
+M,Logan Shi,17:08.06,12,Lake Oswego,5000,0.9861
+M,Logan Shi,17:39.11,12,Lake Oswego,5000,1.0007
+M,Asher Tobin,16:31.40,11,Lake Oswego,5000,0.9547
+M,Asher Tobin,17:20.75,11,Lake Oswego,5000,1.0007
+M,Asher Tobin,17:24.06,11,Lake Oswego,5000,1.0013
+M,Keoni Padaca,16:39.30,11,Lake Oswego,5000,0.9547
+M,Keoni Padaca,17:38.68,11,Lake Oswego,5000,1.0007
+M,Keoni Padaca,17:43.38,11,Lake Oswego,5000,1.0013
+M,Ash Carlson,15:16.50,11,Lakeridge,5000,0.9547
+M,Ash Carlson,16:20.60,11,Lakeridge,5000,1.0034
+M,Ash Carlson,16:19.68,11,Lakeridge,5000,1.0007
+M,Cole Bruni,16:06.70,10,Lakeridge,5000,1.0034
+M,Cole Bruni,15:43.20,10,Lakeridge,5000,0.9547
+M,Cole Bruni,16:33.14,10,Lakeridge,5000,1.0007
+M,Dominic Bender,16:19.60,12,Lakeridge,5000,1.0034
+M,Dominic Bender,15:38.60,12,Lakeridge,5000,0.9547
+M,Dominic Bender,16:28.09,12,Lakeridge,5000,1.0007
+M,James Frost,16:20.80,10,Lakeridge,5000,1.0034
+M,James Frost,15:51.60,10,Lakeridge,5000,0.9547
+M,James Frost,16:33.23,10,Lakeridge,5000,0.9861
+M,Wyeth Heizer,16:21.00,11,Lakeridge,5000,1.0034
+M,Wyeth Heizer,16:28.95,11,Lakeridge,5000,1.0007
+M,Wyeth Heizer,15:43.80,11,Lakeridge,5000,0.9547
+M,Beckett Godfrey,16:25.90,12,Lakeridge,5000,1.0034
+M,Beckett Godfrey,15:58.30,12,Lakeridge,5000,0.9547
+M,Beckett Godfrey,16:38.17,12,Lakeridge,5000,0.9861
+M,Matthew Rodrigano,17:02.60,12,Lakeridge,5000,1.0034
+M,Matthew Rodrigano,16:56.42,12,Lakeridge,5000,0.9861
+M,Matthew Rodrigano,16:40.50,12,Lakeridge,5000,0.9547
+M,Tyler Walton,16:00.41,12,Adrienne Nelson,5000,1.0013
+M,Tyler Walton,15:26.80,12,Adrienne Nelson,5000,0.9547
+M,Tyler Walton,16:28.90,12,Adrienne Nelson,5000,1.0009
+M,Benjamin Stout,16:05.42,12,Adrienne Nelson,5000,1.0013
+M,Benjamin Stout,16:27.90,12,Adrienne Nelson,5000,1.0010
+M,Benjamin Stout,16:22.60,12,Adrienne Nelson,5000,0.9925
+M,Luke Harris,16:35.00,10,Adrienne Nelson,5000,0.9925
+M,Luke Harris,16:45.20,10,Adrienne Nelson,5000,1.0009
+M,Luke Harris,16:49.35,10,Adrienne Nelson,5000,1.0013
+M,Evan Stout,16:58.80,11,Adrienne Nelson,5000,0.9925
+M,Evan Stout,16:34.70,11,Adrienne Nelson,5000,0.9547
+M,Evan Stout,17:29.29,11,Adrienne Nelson,5000,1.0013
+M,Taylor Noble,17:29.91,9,Adrienne Nelson,5000,1.0013
+M,Taylor Noble,17:31.20,9,Adrienne Nelson,5000,1.0010
+M,Taylor Noble,18:04.20,9,Adrienne Nelson,5000,1.0009
+M,Cooper Nielsen,17:59.64,11,Adrienne Nelson,5000,1.0013
+M,Cooper Nielsen,17:22.60,11,Adrienne Nelson,5000,0.9547
+M,Cooper Nielsen,18:27.00,11,Adrienne Nelson,5000,1.0009
+M,Minh Pham,19:01.07,12,Adrienne Nelson,5000,1.0013
+M,Minh Pham,19:01.20,12,Adrienne Nelson,5000,1.0010
+M,Minh Pham,19:19.30,12,Adrienne Nelson,5000,0.9925
+M,Jaxsen Herring,16:27.02,11,McNary,5000,1.0123
+M,Jaxsen Herring,16:26.35,11,McNary,5000,1.0013
+M,Jaxsen Herring,16:42.50,11,McNary,5000,1.0010
+M,Yosef Picazo,16:18.00,12,McNary,5000,1.0010
+M,Yosef Picazo,16:22.08,12,McNary,5000,1.0013
+M,Yosef Picazo,16:27.70,12,McNary,5000,1.0004
+M,Garrett Clack,18:19.19,11,McNary,5000,1.0123
+M,Garrett Clack,18:12.66,11,McNary,5000,1.0013
+M,Garrett Clack,18:13.20,11,McNary,5000,1.0010
+M,Hunter Hamm,18:28.81,10,McNary,5000,1.0013
+M,Hunter Hamm,18:36.90,10,McNary,5000,1.0004
+M,Hunter Hamm,19:10.31,10,McNary,5000,1.0123
+M,Connor Bowlby,18:42.14,12,McNary,5000,1.0123
+M,Connor Bowlby,18:50.80,12,McNary,5000,1.0013
+M,Connor Bowlby,19:51.10,12,McNary,5000,1.0010
+M,Kellen Laukkanen,18:30.98,12,McNary,5000,1.0013
+M,Kellen Laukkanen,18:44.60,12,McNary,5000,1.0010
+M,Kellen Laukkanen,19:15.07,12,McNary,5000,1.0123
+M,Harrison Hales,18:37.64,9,McNary,5000,1.0013
+M,Harrison Hales,19:15.24,9,McNary,5000,1.0123
+M,Harrison Hales,19:15.80,9,McNary,5000,1.0010
+M,Liam Paulson,15:49.92,12,Grant,5000,1.0013
+M,Liam Paulson,15:20.90,12,Grant,5000,0.9547
+M,Liam Paulson,16:15.40,12,Grant,5000,0.9883
+M,Grady Gilkey,16:05.50,12,Grant,5000,0.9883
+M,Grady Gilkey,16:44.40,12,Grant,5000,1.0148
+M,Grady Gilkey,15:58.40,12,Grant,5000,0.9547
+M,Colton Hasser,16:21.34,12,Grant,5000,1.0013
+M,Colton Hasser,16:11.40,12,Grant,5000,0.9883
+M,Colton Hasser,17:39.70,12,Grant,5000,1.0703
+M,Eben Cole,16:34.70,11,Grant,5000,1.0013
+M,Eben Cole,17:48.90,11,Grant,5000,1.0703
+M,Eben Cole,16:27.50,11,Grant,5000,0.9883
+M,Wynton Martinez-Plachta,16:26.00,11,Grant,5000,0.9883
+M,Wynton Martinez-Plachta,16:45.51,11,Grant,5000,1.0013
+M,Wynton Martinez-Plachta,16:46.10,11,Grant,5000,1.0009
+M,Jack McDaniel,16:27.30,11,Grant,5000,0.9883
+M,Jack McDaniel,16:42.90,11,Grant,5000,1.0013
+M,Jack McDaniel,15:57.80,11,Grant,5000,0.9547
+M,Edgar (Eddie) Sniffen,16:46.00,10,Grant,5000,1.0013
+M,Edgar (Eddie) Sniffen,16:33.80,10,Grant,5000,0.9883
+M,Edgar (Eddie) Sniffen,18:17.50,10,Grant,5000,1.0703
+M,Gideon Frongner,16:37.31,11,Glencoe,5000,1.0013
+M,Gideon Frongner,16:18.30,11,Glencoe,5000,0.9775
+M,Gideon Frongner,16:42.44,11,Glencoe,5000,0.9861
+M,Ethan Holt,16:11.30,12,Glencoe,5000,0.9547
+M,Ethan Holt,16:59.65,12,Glencoe,5000,0.9861
+M,Ethan Holt,16:55.40,12,Glencoe,5000,0.9775
+M,Nathan White,17:20.44,12,Glencoe,5000,1.0013
+M,Nathan White,17:30.20,12,Glencoe,5000,1.0010
+M,Nathan White,16:52.50,12,Glencoe,5000,0.9547
+M,Dashel Arch,16:57.50,11,Glencoe,5000,0.9775
+M,Dashel Arch,17:20.21,11,Glencoe,5000,0.9861
+M,Dashel Arch,17:37.00,11,Glencoe,5000,1.0010
+M,Ian Child,18:27.32,11,Glencoe,5000,0.9861
+M,Ian Child,18:51.58,11,Glencoe,5000,1.0013
+M,Ian Child,18:26.00,11,Glencoe,5000,0.9775
+M,Tyler Nelson,19:19.90,11,Glencoe,5000,1.0013
+M,Tyler Nelson,18:37.10,11,Glencoe,5000,0.9547
+M,Tyler Nelson,19:21.40,11,Glencoe,5000,0.9861
+M,Luke Mallory,19:00.30,12,Glencoe,5000,0.9775
+M,Luke Mallory,19:31.89,12,Glencoe,5000,1.0013
+M,Luke Mallory,20:08.30,12,Glencoe,5000,1.0010
+M,Joe Nicholson,16:27.10,12,Century,5000,0.9931
+M,Joe Nicholson,17:30.60,12,Century,5000,1.0485
+M,Joe Nicholson,16:59.22,12,Century,5000,1.0123
+M,Tristan Arakaki,16:56.10,12,Century,5000,0.9931
+M,Tristan Arakaki,17:05.70,12,Century,5000,1.0007
+M,Tristan Arakaki,17:37.38,12,Century,5000,1.0261
+M,Logan Upchurch,17:27.00,12,Century,5000,0.9931
+M,Logan Upchurch,17:48.95,12,Century,5000,1.0007
+M,Logan Upchurch,18:08.73,12,Century,5000,1.0123
+M,Koda Dames,17:48.10,11,Century,5000,0.9931
+M,Koda Dames,18:21.27,11,Century,5000,1.0123
+M,Koda Dames,18:42.37,11,Century,5000,1.0261
+M,Dylan Connors,18:50.03,12,Century,5000,1.0485
+M,Dylan Connors,19:20.41,12,Century,5000,0.9861
+M,Dylan Connors,21:00.61,12,Century,5000,1.0261
+M,Aiden Ryeshar,17:51.70,11,Century,5000,0.9931
+M,Aiden Ryeshar,18:57.55,11,Century,5000,1.0485
+M,Aiden Ryeshar,18:09.64,11,Century,5000,1.0007
+M,Lucas Ryeshar,18:04.90,10,Century,5000,0.9931
+M,Lucas Ryeshar,18:26.10,10,Century,5000,1.0123
+M,Lucas Ryeshar,18:55.74,10,Century,5000,1.0261
+M,Juan Villalobos,16:54.57,12,Forest Grove,5000,1.0485
+M,Juan Villalobos,16:09.20,12,Forest Grove,5000,0.9931
+M,Juan Villalobos,16:19.69,12,Forest Grove,5000,0.9861
+M,Mason Wert,17:32.10,10,Forest Grove,5000,1.0485
+M,Mason Wert,17:42.80,10,Forest Grove,5000,0.9931
+M,Archy De La Rosa,17:36.20,11,Forest Grove,5000,0.9931
+M,Archy De La Rosa,18:06.35,11,Forest Grove,5000,0.9861
+M,Archy De La Rosa,18:32.56,11,Forest Grove,5000,1.0007
+M,Armani Garfias,17:40.50,10,Forest Grove,5000,0.9931
+M,Armani Garfias,18:05.91,10,Forest Grove,5000,0.9861
+M,Armani Garfias,17:51.80,10,Forest Grove,5000,0.9547
+M,Roland Moore,17:45.50,11,Forest Grove,5000,0.9931
+M,Roland Moore,18:48.62,11,Forest Grove,5000,1.0485
+M,Roland Moore,17:42.94,11,Forest Grove,5000,0.9861
+M,Murray Koschmann,19:10.07,12,Forest Grove,5000,1.0485
+M,Murray Koschmann,17:30.00,12,Forest Grove,5000,0.9547
+M,Murray Koschmann,20:31.08,12,Forest Grove,5000,0.9861
+M,Julian Garfias,18:20.20,11,Forest Grove,5000,0.9931
+M,Julian Garfias,18:30.12,11,Forest Grove,5000,0.9861
+M,Julian Garfias,18:53.90,11,Forest Grove,5000,0.9547
+M,Nolan Barber,16:32.50,10,Newberg,5000,0.9931
+M,Nolan Barber,16:58.17,10,Newberg,5000,1.0007
+M,Nolan Barber,17:59.55,10,Newberg,5000,1.0485
+M,Artem Bikmurzen,16:59.26,12,Newberg,5000,0.9861
+M,Artem Bikmurzen,17:08.50,12,Newberg,5000,0.9931
+M,Artem Bikmurzen,18:07.46,12,Newberg,5000,1.0485
+M,Henry Shaw,18:11.01,11,Newberg,5000,1.0485
+M,Henry Shaw,17:23.02,11,Newberg,5000,1.0007
+M,Henry Shaw,16:39.80,11,Newberg,5000,0.9547
+M,Mason Schermer,17:14.10,11,Newberg,5000,0.9931
+M,Mason Schermer,17:11.12,11,Newberg,5000,0.9861
+M,Mason Schermer,16:48.20,11,Newberg,5000,0.9547
+M,Axel Fisher,17:19.10,10,Newberg,5000,0.9931
+M,Axel Fisher,17:33.86,10,Newberg,5000,0.9861
+M,Axel Fisher,17:50.15,10,Newberg,5000,1.0007
+M,Braden Fale,17:17.88,12,Newberg,5000,0.9861
+M,Braden Fale,17:43.80,12,Newberg,5000,1.0009
+M,Braden Fale,16:57.10,12,Newberg,5000,0.9547
+M,Luke Meadows,17:44.40,11,Newberg,5000,0.9931
+M,Luke Meadows,17:13.60,11,Newberg,5000,0.9547
+M,Luke Meadows,17:48.59,11,Newberg,5000,0.9861
+M,Jayden Atkins,16:45.82,11,Tualatin,5000,1.0288
+M,Jayden Atkins,16:22.72,11,Tualatin,5000,1.0007
+M,Jayden Atkins,16:32.50,11,Tualatin,5000,1.0010
+M,Maxim Mezentsev,16:40.60,11,Tualatin,5000,1.0010
+M,Maxim Mezentsev,16:40.91,11,Tualatin,5000,1.0007
+M,Maxim Mezentsev,16:33.50,11,Tualatin,5000,0.9861
+M,Ernesto Torres,17:45.61,11,Tualatin,5000,1.0288
+M,Ernesto Torres,17:33.50,11,Tualatin,5000,1.0010
+M,Ernesto Torres,17:33.49,11,Tualatin,5000,1.0007
+M,Theodore Alvarado,17:10.82,11,Tualatin,5000,0.9861
+M,Theodore Alvarado,17:28.41,11,Tualatin,5000,1.0013
+M,Theodore Alvarado,17:37.70,11,Tualatin,5000,1.0010
+M,Kenyon Thompson,17:18.40,12,Tualatin,5000,0.9861
+M,Kenyon Thompson,17:44.90,12,Tualatin,5000,1.0010
+M,Kenyon Thompson,17:50.43,12,Tualatin,5000,1.0007
+M,Kamron Saechao,18:12.90,10,Tualatin,5000,1.0288
+M,Kamron Saechao,17:45.52,10,Tualatin,5000,0.9861
+M,Kamron Saechao,18:04.00,10,Tualatin,5000,1.0010
+M,Gavin Smith,17:50.40,12,Tualatin,5000,1.0013
+M,Gavin Smith,17:53.30,12,Tualatin,5000,1.0010
+M,Gavin Smith,17:42.49,12,Tualatin,5000,0.9861
+M,Carter Yates,16:49.70,12,Liberty(OR),5000,1.0013
+M,Carter Yates,16:35.57,12,Liberty(OR),5000,0.9861
+M,Carter Yates,16:11.80,12,Liberty(OR),5000,0.9547
+M,Lucas Everton,17:05.66,11,Liberty(OR),5000,1.0013
+M,Lucas Everton,16:58.87,11,Liberty(OR),5000,0.9861
+M,Lucas Everton,17:19.07,11,Liberty(OR),5000,1.0007
+M,Daniel Tate,17:26.56,11,Liberty(OR),5000,1.0013
+M,Daniel Tate,17:18.45,11,Liberty(OR),5000,0.9861
+M,Daniel Tate,17:07.70,11,Liberty(OR),5000,0.9547
+M,Jeo Oruh,17:55.99,11,Liberty(OR),5000,0.9861
+M,Jeo Oruh,18:22.81,11,Liberty(OR),5000,1.0013
+M,Liam Shutan,18:50.62,11,Liberty(OR),5000,1.0013
+M,Liam Shutan,18:58.98,11,Liberty(OR),5000,0.9861
+M,Liam Shutan,18:50.10,11,Liberty(OR),5000,0.9547
+M,Liam Buijsman,18:53.77,9,Liberty(OR),5000,0.9861
+M,Liam Buijsman,19:28.52,9,Liberty(OR),5000,1.0013
+M,Liam Buijsman,20:16.75,9,Liberty(OR),5000,1.0007
+M,Jae Redding,19:32.88,10,Liberty(OR),5000,1.0013
+M,Jae Redding,19:22.84,10,Liberty(OR),5000,0.9861
+M,Jae Redding,20:24.26,10,Liberty(OR),5000,1.0007
+M,Benjamin Glass,16:43.79,11,Grants Pass,5000,1.0013
+M,Benjamin Glass,18:10.45,11,Grants Pass,5000,1.0830
+M,Benjamin Glass,17:31.80,11,Grants Pass,5000,1.0229
+M,Mason Venekamp,16:53.47,9,Grants Pass,5000,1.0013
+M,Mason Venekamp,17:27.30,9,Grants Pass,5000,0.9798
+M,Mason Venekamp,19:25.31,9,Grants Pass,5000,1.0830
+M,Zephyr Schelz,17:06.43,11,Grants Pass,5000,1.0013
+M,Zephyr Schelz,17:16.20,11,Grants Pass,5000,0.9798
+M,Zephyr Schelz,18:33.10,11,Grants Pass,5000,1.0229
+M,Maximilian Fitzgerald,17:19.71,11,Grants Pass,5000,1.0013
+M,Maximilian Fitzgerald,19:39.81,11,Grants Pass,5000,1.0830
+M,Maximilian Fitzgerald,17:49.50,11,Grants Pass,5000,0.9798
+M,Malcolm Kennedy,17:00.00,12,Grants Pass,5000,0.9798
+M,Malcolm Kennedy,17:59.40,12,Grants Pass,5000,1.0001
+M,Malcolm Kennedy,18:10.09,12,Grants Pass,5000,1.0013
+M,Story Jagger,17:07.70,9,Grants Pass,5000,0.9798
+M,Story Jagger,19:25.44,9,Grants Pass,5000,1.0830
+M,Story Jagger,18:05.22,9,Grants Pass,5000,1.0013
+M,Corbin Westgate,17:49.43,10,Grants Pass,5000,1.0013
+M,Corbin Westgate,19:26.22,10,Grants Pass,5000,1.0830
+M,Corbin Westgate,18:36.10,10,Grants Pass,5000,1.0229
+M,Joseph Latham,16:34.00,12,Roseburg,5000,1.0013
+M,Joseph Latham,17:04.30,12,Roseburg,5000,0.9798
+M,Joseph Latham,17:47.60,12,Roseburg,5000,1.0011
+M,Ethan Smith,16:57.58,11,Roseburg,5000,1.0013
+M,Ethan Smith,17:49.90,11,Roseburg,5000,0.9798
+M,Ethan Smith,18:45.10,11,Roseburg,5000,1.0011
+M,James Randol,17:16.72,12,Roseburg,5000,0.9979
+M,James Randol,17:41.00,12,Roseburg,5000,1.0011
+M,James Randol,17:46.34,12,Roseburg,5000,1.0013
+M,Tayten Keplinger,17:09.60,10,Roseburg,5000,0.9798
+M,Tayten Keplinger,17:36.70,10,Roseburg,5000,1.0011
+M,Tayten Keplinger,17:49.20,10,Roseburg,5000,1.0013
+M,Brayden Powell,17:32.84,11,Roseburg,5000,1.0013
+M,Brayden Powell,18:43.02,11,Roseburg,5000,1.0191
+M,Brayden Powell,18:04.10,11,Roseburg,5000,0.9798
+M,Ethan Williams,18:15.69,11,Roseburg,5000,1.0191
+M,Ethan Williams,18:50.70,11,Roseburg,5000,1.0011
+M,Ethan Williams,19:00.40,11,Roseburg,5000,1.0013
+M,Henry Anderson,18:25.46,12,Roseburg,5000,1.0013
+M,Henry Anderson,18:06.90,12,Roseburg,5000,0.9798
+M,Henry Anderson,19:06.63,12,Roseburg,5000,0.9979
+M,Kayden Bejar,16:16.20,11,South Salem,5000,0.9931
+M,Kayden Bejar,16:14.30,11,South Salem,5000,0.9547
+M,Kayden Bejar,17:03.10,11,South Salem,5000,1.0004
+M,Julio Angel Quevedo Coria,18:03.69,12,South Salem,5000,1.0123
+M,Julio Angel Quevedo Coria,17:59.50,12,South Salem,5000,0.9931
+M,Julio Angel Quevedo Coria,18:23.40,12,South Salem,5000,1.0004
+M,Thien Bui,17:57.90,12,South Salem,5000,0.9931
+M,Thien Bui,18:24.70,12,South Salem,5000,1.0123
+M,Thien Bui,17:35.70,12,South Salem,5000,0.9547
+M,Easton Martin,18:09.60,9,South Salem,5000,0.9931
+M,Easton Martin,18:45.84,9,South Salem,5000,1.0123
+M,Easton Martin,18:42.00,9,South Salem,5000,1.0010
+M,Quinn Scavarelli,18:16.60,10,South Salem,5000,0.9931
+M,Quinn Scavarelli,18:32.90,10,South Salem,5000,1.0004
+M,Quinn Scavarelli,18:33.60,10,South Salem,5000,1.0010
+M,Porter DeBacker,18:32.80,11,South Salem,5000,1.0010
+M,Porter DeBacker,18:31.40,11,South Salem,5000,0.9931
+M,Porter DeBacker,18:56.11,11,South Salem,5000,1.0123
+M,Julian Bledsoe,18:49.59,9,South Salem,5000,1.0123
+M,Julian Bledsoe,18:43.50,9,South Salem,5000,1.0010
+M,Julian Bledsoe,18:45.40,9,South Salem,5000,0.9931
+M,Cole Parker,16:34.20,12,Gresham,5000,1.0010
+M,Cole Parker,16:38.20,12,Gresham,5000,0.9925
+M,Cole Parker,16:55.70,12,Gresham,5000,1.0034
+M,Jordan Aguilar,17:55.90,10,Gresham,5000,0.9925
+M,Jordan Aguilar,18:17.20,10,Gresham,5000,1.0010
+M,Jordan Aguilar,18:20.20,10,Gresham,5000,1.0034
+M,Ben Graham,18:26.40,12,Gresham,5000,1.0010
+M,Ben Graham,18:42.20,12,Gresham,5000,1.0034
+M,Ben Graham,18:33.09,12,Gresham,5000,0.9867
+M,Zion Davis,18:26.40,11,Gresham,5000,0.9925
+M,Zion Davis,18:34.43,11,Gresham,5000,0.9867
+M,Zion Davis,18:58.00,11,Gresham,5000,1.0010
+M,Nathan Parker,18:43.70,12,Gresham,5000,0.9925
+M,Nathan Parker,18:42.60,12,Gresham,5000,0.9867
+M,Nathan Parker,19:33.60,12,Gresham,5000,1.0010
+M,Jack Dillon,19:47.00,12,Gresham,5000,1.0034
+M,Jack Dillon,19:45.20,12,Gresham,5000,0.9925
+M,Jack Dillon,20:16.56,12,Gresham,5000,0.9867
+M,Elijah Culbertson,20:20.00,12,Gresham,5000,1.0010
+M,Elijah Culbertson,20:12.00,12,Gresham,5000,0.9925
+M,Elijah Culbertson,20:33.20,12,Gresham,5000,1.0034
+M,Xzaiver Parker,16:32.45,11,Sprague,5000,1.0123
+M,Xzaiver Parker,16:19.10,11,Sprague,5000,0.9931
+M,Xzaiver Parker,16:32.20,11,Sprague,5000,1.0010
+M,Michael Hudgins,16:37.80,10,Sprague,5000,0.9931
+M,Michael Hudgins,17:02.58,10,Sprague,5000,1.0123
+M,Michael Hudgins,17:02.10,10,Sprague,5000,1.0010
+M,Annon Schnell,17:00.40,12,Sprague,5000,0.9931
+M,Annon Schnell,17:28.06,12,Sprague,5000,1.0123
+M,Annon Schnell,17:42.20,12,Sprague,5000,1.0010
+M,Anderson Webb,17:28.10,11,Sprague,5000,1.0010
+M,Anderson Webb,17:36.80,11,Sprague,5000,1.0004
+M,Anderson Webb,17:29.80,11,Sprague,5000,0.9931
+M,Ignacio Soriano Martinez,17:30.80,10,Sprague,5000,0.9931
+M,Ignacio Soriano Martinez,17:52.20,10,Sprague,5000,1.0123
+M,Ignacio Soriano Martinez,18:01.50,10,Sprague,5000,1.0010
+M,Westly Higgins,17:43.10,12,Sprague,5000,0.9931
+M,Westly Higgins,17:57.90,12,Sprague,5000,1.0010
+M,Westly Higgins,18:08.80,12,Sprague,5000,1.0004
+M,Reeves Haney,17:47.10,11,Sprague,5000,0.9931
+M,Reeves Haney,17:59.80,11,Sprague,5000,1.0010
+M,Reeves Haney,18:40.10,11,Sprague,5000,1.0123
+M,Javier Aleman Vazquez,17:33.51,12,North Salem,5000,1.0123
+M,Javier Aleman Vazquez,16:43.60,12,North Salem,5000,0.9547
+M,Javier Aleman Vazquez,17:48.40,12,North Salem,5000,1.0004
+M,Ramiro Calletano Gonzalez,17:45.12,10,North Salem,5000,1.0013
+M,Ramiro Calletano Gonzalez,18:05.33,10,North Salem,5000,1.0123
+M,Ramiro Calletano Gonzalez,17:13.50,10,North Salem,5000,0.9547
+M,Julian Bechtel,17:59.66,11,North Salem,5000,1.0013
+M,Julian Bechtel,17:38.90,11,North Salem,5000,0.9547
+M,Julian Bechtel,18:47.84,11,North Salem,5000,1.0123
+M,Ezekiel Erickson,18:09.95,9,North Salem,5000,1.0013
+M,Ezekiel Erickson,17:39.70,9,North Salem,5000,0.9547
+M,Ezekiel Erickson,18:52.59,9,North Salem,5000,1.0123
+M,Jullian Ochoa,19:45.34,10,North Salem,5000,1.0013
+M,Jullian Ochoa,20:05.50,10,North Salem,5000,1.0004
+M,Jullian Ochoa,20:30.77,10,North Salem,5000,1.0123
+M,Enzo Chavez,19:28.70,11,North Salem,5000,0.9547
+M,Enzo Chavez,20:58.20,11,North Salem,5000,1.0004
+M,Enzo Chavez,21:59.54,11,North Salem,5000,1.0013
+M,William Hoffman,21:23.74,10,North Salem,5000,1.0013
+M,William Hoffman,22:53.10,10,North Salem,5000,1.0004
+M,William Hoffman,22:17.60,10,North Salem,5000,0.9547
+M,Aarav Patel,17:25.43,11,Southridge,5000,1.0013
+M,Aarav Patel,16:49.20,11,Southridge,5000,0.9547
+M,Aarav Patel,18:01.00,11,Southridge,5000,1.0201
+M,Julius Vesel,16:41.60,12,Southridge,5000,0.9547
+M,Julius Vesel,18:22.40,12,Southridge,5000,1.0465
+M,Julius Vesel,17:44.80,12,Southridge,5000,1.0010
+M,Kostadin Ferguson,17:49.50,12,Southridge,5000,1.0010
+M,Kostadin Ferguson,17:53.73,12,Southridge,5000,1.0013
+M,Kostadin Ferguson,18:42.40,12,Southridge,5000,1.0201
+M,Zach King,17:59.24,12,Southridge,5000,1.0013
+M,Zach King,19:12.20,12,Southridge,5000,1.0465
+M,Zach King,17:34.40,12,Southridge,5000,0.9547
+M,Lorenzo Freddi,19:37.40,12,Southridge,5000,1.0201
+M,Lorenzo Freddi,19:20.40,12,Southridge,5000,1.0010
+M,Lorenzo Freddi,19:32.19,12,Southridge,5000,1.0013
+M,Aven Knauer,19:36.30,10,Southridge,5000,1.0010
+M,Aven Knauer,20:00.20,10,Southridge,5000,1.0201
+M,Aven Knauer,19:18.10,10,Southridge,5000,0.9547
+M,Henry Donaldson,19:41.00,11,Southridge,5000,1.0010
+M,Henry Donaldson,20:08.80,11,Southridge,5000,1.0201
+M,Henry Donaldson,18:53.60,11,Southridge,5000,0.9547
+M,Micah Acord,16:44.64,11,North Medford,5000,1.0013
+M,Micah Acord,16:08.70,11,North Medford,5000,0.9547
+M,Micah Acord,16:53.70,11,North Medford,5000,0.9919
+M,Cole Hale,16:24.10,11,North Medford,5000,0.9547
+M,Cole Hale,17:49.30,11,North Medford,5000,1.0229
+M,Cole Hale,17:27.30,11,North Medford,5000,1.0009
+M,Jackson Muffler,17:17.78,11,North Medford,5000,1.0013
+M,Jackson Muffler,16:38.00,11,North Medford,5000,0.9547
+M,Jackson Muffler,17:35.60,11,North Medford,5000,1.0009
+M,Maddox Howell,17:32.58,12,North Medford,5000,1.0013
+M,Maddox Howell,17:22.80,12,North Medford,5000,0.9919
+M,Maddox Howell,18:11.40,12,North Medford,5000,1.0229
+M,Jacob Lintag,17:33.50,10,North Medford,5000,1.0013
+M,Jacob Lintag,17:02.40,10,North Medford,5000,0.9547
+M,Jacob Lintag,18:06.50,10,North Medford,5000,1.0009
+M,Weslee MacLeod,16:53.60,11,North Medford,5000,0.9547
+M,Weslee MacLeod,17:52.20,11,North Medford,5000,0.9919
+M,Weslee MacLeod,18:14.74,11,North Medford,5000,1.0013
+M,Dylan Cohee,17:44.20,9,North Medford,5000,0.9547
+M,Dylan Cohee,18:59.40,9,North Medford,5000,0.9919
+M,Dylan Cohee,20:07.80,9,North Medford,5000,1.0001
+M,Austin Forester,17:28.64,10,Willamette,5000,1.0057
+M,Austin Forester,17:45.57,10,Willamette,5000,1.0123
+M,Austin Forester,17:48.50,10,Willamette,5000,0.9798
+M,Simon Hruby,18:30.80,10,Willamette,5000,0.9931
+M,Simon Hruby,18:58.41,10,Willamette,5000,1.0057
+M,Simon Hruby,19:21.80,10,Willamette,5000,0.9798
+M,Asher LeGrue,19:13.70,10,Willamette,5000,0.9931
+M,Asher LeGrue,19:40.19,10,Willamette,5000,1.0123
+M,Asher LeGrue,19:55.44,10,Willamette,5000,1.0057
+M,Dustin Genge,19:56.96,12,Willamette,5000,1.0123
+M,Dustin Genge,19:49.00,12,Willamette,5000,0.9931
+M,Dustin Genge,20:20.81,12,Willamette,5000,1.0057
+M,Andy Dang,19:57.30,10,Willamette,5000,0.9931
+M,Andy Dang,20:41.97,10,Willamette,5000,1.0123
+M,Andy Dang,21:01.64,10,Willamette,5000,1.0057
+M,Jordan Williams,20:03.50,9,Willamette,5000,0.9931
+M,Jordan Williams,20:37.86,9,Willamette,5000,1.0123
+M,Jordan Williams,21:47.70,9,Willamette,5000,0.9798
+M,Coren Leiberan-Titus,20:58.80,9,Willamette,5000,0.9931
+M,Coren Leiberan-Titus,22:01.59,9,Willamette,5000,1.0123
+M,Coren Leiberan-Titus,22:04.90,9,Willamette,5000,0.9798
+M,Zach Budell,17:40.40,11,Sandy,5000,0.9925
+M,Zach Budell,17:27.80,11,Sandy,5000,0.9547
+M,Zach Budell,18:14.48,11,Sandy,5000,0.9867
+M,Owen Meissner,17:40.40,12,Sandy,5000,0.9925
+M,Owen Meissner,18:55.70,12,Sandy,5000,1.0434
+M,Owen Meissner,17:39.20,12,Sandy,5000,0.9547
+M,Zachary Pietzold,17:47.10,12,Sandy,5000,0.9925
+M,Zachary Pietzold,18:03.07,12,Sandy,5000,0.9867
+M,Zachary Pietzold,17:42.10,12,Sandy,5000,0.9547
+M,William Dunn,18:12.70,12,Sandy,5000,0.9925
+M,William Dunn,18:12.39,12,Sandy,5000,0.9867
+M,William Dunn,17:46.40,12,Sandy,5000,0.9547
+M,Zachery Flock,18:25.30,12,Sandy,5000,0.9925
+M,Zachery Flock,17:55.90,12,Sandy,5000,0.9547
+M,Zachery Flock,19:43.60,12,Sandy,5000,1.0434
+M,Hudson Goers,18:30.24,11,Sandy,5000,0.9867
+M,Hudson Goers,19:39.00,11,Sandy,5000,1.0434
+M,Henry Hutchison,18:41.80,9,Sandy,5000,0.9925
+M,Henry Hutchison,18:16.60,9,Sandy,5000,0.9547
+M,Henry Hutchison,20:22.80,9,Sandy,5000,1.0434
+M,Ernesto Coster,17:43.50,12,Roosevelt (OR),5000,1.0105
+M,Ernesto Coster,19:07.80,12,Roosevelt (OR),5000,1.0703
+M,Nicolas Birchard,17:50.29,10,Roosevelt (OR),5000,1.0013
+M,Nicolas Birchard,18:15.90,10,Roosevelt (OR),5000,1.0105
+M,Nicolas Birchard,18:20.84,10,Roosevelt (OR),5000,1.0148
+M,Atticus Cardi,18:38.80,12,Roosevelt (OR),5000,1.0105
+M,Atticus Cardi,18:29.59,12,Roosevelt (OR),5000,1.0007
+M,Atticus Cardi,20:22.20,12,Roosevelt (OR),5000,1.0703
+M,Ezra Wise,20:25.50,10,Roosevelt (OR),5000,1.0703
+M,Ezra Wise,19:32.30,10,Roosevelt (OR),5000,1.0105
+M,Ezra Wise,19:26.18,10,Roosevelt (OR),5000,1.0007
+M,Wil Vann,20:28.00,11,Roosevelt (OR),5000,1.0703
+M,Wil Vann,19:12.05,11,Roosevelt (OR),5000,1.0013
+M,Wil Vann,19:29.70,11,Roosevelt (OR),5000,1.0105
+M,Henry Fitzpatrick,19:14.74,11,Roosevelt (OR),5000,1.0013
+M,Henry Fitzpatrick,20:54.50,11,Roosevelt (OR),5000,1.0703
+M,Henry Fitzpatrick,19:58.73,11,Roosevelt (OR),5000,1.0007
+M,Everett Maus,20:47.00,9,Roosevelt (OR),5000,1.0105
+M,Everett Maus,22:16.10,9,Roosevelt (OR),5000,1.0703
+M,Everett Maus,20:53.13,9,Roosevelt (OR),5000,1.0013
+M,Holden Campbell-Murawski,17:06.65,10,McDaniel,5000,1.0013
+M,Holden Campbell-Murawski,18:27.00,10,McDaniel,5000,1.0703
+M,Holden Campbell-Murawski,17:27.50,10,McDaniel,5000,1.0105
+M,James Ruona-Banister,18:29.80,12,McDaniel,5000,1.0703
+M,James Ruona-Banister,17:24.31,12,McDaniel,5000,1.0013
+M,James Ruona-Banister,17:34.10,12,McDaniel,5000,1.0105
+M,Chase Benedetti,17:33.34,12,McDaniel,5000,1.0013
+M,Chase Benedetti,18:04.20,12,McDaniel,5000,1.0105
+M,Chase Benedetti,18:07.40,12,McDaniel,5000,1.0009
+M,Levi Kilbury,17:39.62,12,McDaniel,5000,1.0013
+M,Levi Kilbury,18:11.60,12,McDaniel,5000,1.0105
+M,Levi Kilbury,18:48.59,12,McDaniel,5000,1.0148
+M,Edward LaRoe,18:02.82,10,McDaniel,5000,1.0013
+M,Edward LaRoe,18:13.50,10,McDaniel,5000,1.0105
+M,Edward LaRoe,19:14.57,10,McDaniel,5000,1.0148
+M,Will DuBrock,18:18.19,10,McDaniel,5000,1.0013
+M,Will DuBrock,18:47.90,10,McDaniel,5000,1.0105
+M,Will DuBrock,17:46.50,10,McDaniel,5000,0.9547
+M,Liam Evans,18:26.93,10,McDaniel,5000,1.0013
+M,Liam Evans,18:43.30,10,McDaniel,5000,1.0105
+M,Liam Evans,20:09.30,10,McDaniel,5000,1.0703
+M,Oshea Wolfkind,17:41.90,10,Benson Tech,5000,0.9883
+M,Oshea Wolfkind,17:58.07,10,Benson Tech,5000,1.0013
+M,Oshea Wolfkind,18:18.65,10,Benson Tech,5000,1.0148
+M,James Vorster,18:24.80,9,Benson Tech,5000,1.0010
+M,James Vorster,18:28.32,9,Benson Tech,5000,1.0013
+M,James Vorster,18:15.50,9,Benson Tech,5000,0.9883
+M,Samuel Kruger,18:41.30,9,Benson Tech,5000,0.9883
+M,Samuel Kruger,19:17.21,9,Benson Tech,5000,1.0013
+M,Samuel Kruger,19:46.30,9,Benson Tech,5000,1.0010
+M,Alden Aaker,19:54.67,9,Benson Tech,5000,1.0013
+M,Alden Aaker,19:53.00,9,Benson Tech,5000,0.9883
+M,Alden Aaker,20:39.98,9,Benson Tech,5000,1.0244
+M,Oscar Pereira,22:30.10,9,Benson Tech,5000,1.1092
+M,Oscar Pereira,20:23.00,9,Benson Tech,5000,1.0009
+M,Oscar Pereira,21:13.15,9,Benson Tech,5000,1.0244
+M,Delano Goff,20:37.80,11,Benson Tech,5000,1.0010
+M,Delano Goff,21:07.91,11,Benson Tech,5000,1.0148
+M,Delano Goff,21:27.33,11,Benson Tech,5000,1.0244
+M,Oliver Rose,23:06.10,9,Benson Tech,5000,1.1092
+M,Oliver Rose,22:54.60,9,Benson Tech,5000,1.0010
+M,Oliver Rose,23:11.23,9,Benson Tech,5000,1.0013
+M,David Dandy,17:00.60,10,Beaverton,5000,0.9547
+M,David Dandy,18:53.60,10,Beaverton,5000,1.0465
+M,David Dandy,18:05.34,10,Beaverton,5000,1.0013
+M,Sawyer Osterhaus,17:58.30,10,Beaverton,5000,0.9547
+M,Sawyer Osterhaus,19:50.50,10,Beaverton,5000,1.0465
+M,Sawyer Osterhaus,19:10.20,10,Beaverton,5000,1.0010
+M,Evan Shumate,19:02.70,12,Beaverton,5000,1.0013
+M,Benjamin Durrant,20:08.70,12,Beaverton,5000,1.0010
+M,Benjamin Durrant,19:20.90,12,Beaverton,5000,0.9547
+M,Benjamin Durrant,21:13.70,12,Beaverton,5000,1.0465
+M,Gabriel Hemmeyer,20:20.90,11,Beaverton,5000,1.0010
+M,Gabriel Hemmeyer,20:28.15,11,Beaverton,5000,1.0013
+M,Gabriel Hemmeyer,23:04.30,11,Beaverton,5000,1.0465
+M,Sam Maanao,20:30.20,11,Beaverton,5000,1.0013
+M,Sam Maanao,20:48.80,11,Beaverton,5000,1.0010
+M,Sam Maanao,22:18.70,11,Beaverton,5000,1.0465
+M,Gordon Garner,21:23.10,11,Beaverton,5000,1.0010
+M,Gordon Garner,21:05.50,11,Beaverton,5000,0.9547
+M,Gordon Garner,23:45.00,11,Beaverton,5000,1.0465
+M,Silvino Hernandez,18:31.69,11,Aloha,5000,1.0013
+M,Silvino Hernandez,19:43.30,11,Aloha,5000,1.0465
+M,Silvino Hernandez,19:05.20,11,Aloha,5000,1.0010
+M,Iori Ohashi,19:27.40,10,Aloha,5000,1.0010
+M,Iori Ohashi,21:16.20,10,Aloha,5000,1.0465
+M,Aron Mason,19:31.66,10,Aloha,5000,1.0013
+M,Aron Mason,19:46.50,10,Aloha,5000,1.0010
+M,Aron Mason,19:29.10,10,Aloha,5000,0.9775
+M,Grayson Hanna,19:06.20,9,Aloha,5000,0.9775
+M,Grayson Hanna,20:42.88,9,Aloha,5000,1.0013
+M,Grayson Hanna,20:49.30,9,Aloha,5000,1.0010
+M,Julian Ramos,19:40.30,11,Aloha,5000,1.0013
+M,Julian Ramos,19:22.00,11,Aloha,5000,0.9775
+M,Julian Ramos,19:54.30,11,Aloha,5000,1.0010
+M,Jorge Ramos,19:46.02,10,Aloha,5000,1.0013
+M,Jorge Ramos,19:39.00,10,Aloha,5000,0.9775
+M,Jayce Robinson-Manns,19:53.24,10,Aloha,5000,1.0013
+M,Jayce Robinson-Manns,21:27.40,10,Aloha,5000,1.0465
+M,Arlo Hayes,16:52.50,12,Reynolds,5000,0.9925
+M,Arlo Hayes,16:27.70,12,Reynolds,5000,0.9547
+M,Arlo Hayes,17:17.26,12,Reynolds,5000,1.0013
+M,Jayden Peinado,17:04.70,9,Reynolds,5000,0.9925
+M,Jayden Peinado,17:17.71,9,Reynolds,5000,1.0013
+M,Jayden Peinado,16:44.50,9,Reynolds,5000,0.9547
+M,Elliott Hayes,17:18.95,12,Reynolds,5000,1.0013
+M,Elliott Hayes,16:47.30,12,Reynolds,5000,0.9547
+M,Elliott Hayes,17:32.80,12,Reynolds,5000,0.9925
+M,Jamison Fox,17:18.10,12,Reynolds,5000,0.9547
+M,Jamison Fox,18:04.60,12,Reynolds,5000,0.9925
+M,Jamison Fox,18:36.83,12,Reynolds,5000,1.0013
+M,Leonardo Ramirez,18:33.62,12,Reynolds,5000,1.0013
+M,Leonardo Ramirez,18:32.80,12,Reynolds,5000,0.9925
+M,Leonardo Ramirez,18:53.11,12,Reynolds,5000,0.9867
+M,Bryce Henrikson,18:28.80,10,Reynolds,5000,0.9925
+M,Bryce Henrikson,18:48.82,10,Reynolds,5000,1.0013
+M,Bryce Henrikson,18:21.60,10,Reynolds,5000,0.9547
+M,Alfredo Damian Rodriguez,18:45.70,12,Reynolds,5000,0.9925
+M,Alfredo Damian Rodriguez,18:04.70,12,Reynolds,5000,0.9547
+M,Alfredo Damian Rodriguez,19:25.78,12,Reynolds,5000,1.0013
+M,Sam Grimes,17:39.75,11,Barlow,5000,1.0013
+M,Sam Grimes,17:57.30,11,Barlow,5000,1.0123
+M,Sam Grimes,17:43.60,11,Barlow,5000,0.9925
+M,Carson Shields,18:58.36,11,Barlow,5000,1.0123
+M,Carson Shields,18:46.09,11,Barlow,5000,1.0013
+M,Carson Shields,18:57.29,11,Barlow,5000,1.0007
+M,Ezra DeLeon,18:40.80,11,Barlow,5000,0.9925
+M,Ezra DeLeon,18:57.16,11,Barlow,5000,0.9867
+M,Ezra DeLeon,19:44.69,11,Barlow,5000,1.0123
+M,Colin Tillson,19:31.38,12,Barlow,5000,1.0007
+M,Colin Tillson,20:39.60,12,Barlow,5000,0.9925
+M,Colin Tillson,23:59.10,12,Barlow,5000,1.1092
+M,Henry Barber,19:37.39,10,Barlow,5000,1.0013
+M,Henry Barber,20:09.66,10,Barlow,5000,1.0123
+M,Henry Barber,19:46.31,10,Barlow,5000,0.9867
+M,Efrayn Alvarado Reyes,19:52.20,9,Barlow,5000,1.0013
+M,Efrayn Alvarado Reyes,20:27.10,9,Barlow,5000,1.0123
+M,Efrayn Alvarado Reyes,20:28.80,9,Barlow,5000,0.9925
+M,Joel Caputo,20:25.60,10,Barlow,5000,0.9925
+M,Joel Caputo,21:03.50,10,Barlow,5000,1.0013
+M,Joel Caputo,20:47.21,10,Barlow,5000,0.9867
+F,Evangeline Johnson Hess,17:49.00,9,South Eugene,5000,0.9959
+F,Evangeline Johnson Hess,18:01.32,9,South Eugene,5000,1.0011
+F,Evangeline Johnson Hess,18:27.78,9,South Eugene,5000,1.0040
+F,Madi Zemper-Prill,18:53.16,12,South Eugene,5000,1.0011
+F,Madi Zemper-Prill,19:43.97,12,South Eugene,5000,1.0040
+F,Madi Zemper-Prill,19:48.70,12,South Eugene,5000,1.0045
+F,Frances Blake,19:21.23,12,South Eugene,5000,1.0011
+F,Frances Blake,19:30.10,12,South Eugene,5000,0.9959
+F,Frances Blake,19:55.65,12,South Eugene,5000,1.0040
+F,Cora Ludwig,19:35.21,11,South Eugene,5000,1.0011
+F,Cora Ludwig,19:51.90,11,South Eugene,5000,1.0045
+F,Cora Ludwig,20:02.80,11,South Eugene,5000,0.9959
+F,Eleanora Diment,19:35.95,9,South Eugene,5000,1.0011
+F,Eleanora Diment,19:46.97,9,South Eugene,5000,1.0040
+F,Eleanora Diment,20:01.40,9,South Eugene,5000,1.0045
+F,Julianne Bawden,19:35.80,10,South Eugene,5000,0.9959
+F,Julianne Bawden,19:51.33,10,South Eugene,5000,1.0040
+F,Julianne Bawden,19:53.39,10,South Eugene,5000,1.0011
+F,Alaya Drummond,19:44.90,12,South Eugene,5000,0.9959
+F,Alaya Drummond,19:55.77,12,South Eugene,5000,1.0011
+F,Alaya Drummond,20:29.36,12,South Eugene,5000,1.0040
+F,Sianna Lane,20:35.20,10,Sheldon (OR),5000,0.9959
+F,Sianna Lane,22:26.01,10,Sheldon (OR),5000,1.0372
+F,Sianna Lane,21:24.10,10,Sheldon (OR),5000,0.9883
+F,Lauren White,21:18.41,9,Sheldon (OR),5000,1.0040
+F,Lauren White,21:01.10,9,Sheldon (OR),5000,0.9883
+F,Lauren White,21:19.32,9,Sheldon (OR),5000,1.0011
+F,Chloe Brown,21:59.57,10,Sheldon (OR),5000,1.0011
+F,Chloe Brown,22:34.74,10,Sheldon (OR),5000,1.0040
+F,Chloe Brown,22:25.40,10,Sheldon (OR),5000,0.9959
+F,Cedar Hagen,22:34.07,10,Sheldon (OR),5000,1.0011
+F,Cedar Hagen,22:46.67,10,Sheldon (OR),5000,1.0040
+F,Cedar Hagen,24:08.30,10,Sheldon (OR),5000,0.9959
+F,Lauren Fenley,23:08.00,9,Sheldon (OR),5000,0.9959
+F,Lauren Fenley,24:13.42,9,Sheldon (OR),5000,1.0372
+F,Lauren Fenley,23:39.18,9,Sheldon (OR),5000,1.0040
+F,Kaia Muilenburg,24:16.59,12,Sheldon (OR),5000,1.0372
+F,Kaia Muilenburg,23:27.79,12,Sheldon (OR),5000,1.0011
+F,Kaia Muilenburg,23:37.70,12,Sheldon (OR),5000,0.9959
+F,Madelyn Scott,23:15.40,11,Sheldon (OR),5000,0.9883
+F,Madelyn Scott,24:39.19,11,Sheldon (OR),5000,1.0011
+F,Madelyn Scott,24:37.10,11,Sheldon (OR),5000,0.9959
+F,Maeve O'Scannlain,17:58.60,11,Jesuit,5000,0.9959
+F,Maeve O'Scannlain,18:33.70,11,Jesuit,5000,1.0166
+F,Maeve O'Scannlain,17:47.10,11,Jesuit,5000,0.9571
+F,Anya Augustine,18:06.30,11,Jesuit,5000,0.9959
+F,Anya Augustine,18:38.50,11,Jesuit,5000,1.0166
+F,Anya Augustine,18:06.00,11,Jesuit,5000,0.9571
+F,Elizabeth Welsh,18:07.00,11,Jesuit,5000,0.9959
+F,Elizabeth Welsh,18:24.10,11,Jesuit,5000,0.9999
+F,Elizabeth Welsh,18:42.90,11,Jesuit,5000,1.0166
+F,Mary Jane (mimi) Thompson,18:51.80,12,Jesuit,5000,0.9959
+F,Mary Jane (mimi) Thompson,19:35.70,12,Jesuit,5000,1.0166
+F,Mary Jane (mimi) Thompson,18:38.30,12,Jesuit,5000,0.9571
+F,Alana Barker,19:15.20,10,Jesuit,5000,0.9959
+F,Alana Barker,19:43.70,10,Jesuit,5000,1.0166
+F,Alana Barker,19:06.90,10,Jesuit,5000,0.9571
+F,Amelia Goodman,18:38.90,10,Jesuit,5000,0.9571
+F,Amelia Goodman,19:39.20,10,Jesuit,5000,0.9959
+F,Amelia Goodman,20:33.90,10,Jesuit,5000,0.9999
+F,Madeline Bostic,19:43.80,9,Jesuit,5000,0.9959
+F,Madeline Bostic,19:08.30,9,Jesuit,5000,0.9571
+F,Madeline Bostic,20:56.00,9,Jesuit,5000,1.0166
+F,Ellery Lincoln,16:56.96,11,Lincoln,5000,1.0011
+F,Ellery Lincoln,16:28.50,11,Lincoln,5000,0.9571
+F,Ellery Lincoln,17:32.50,11,Lincoln,5000,1.0029
+F,Elyse Henriksen,18:22.26,12,Lincoln,5000,1.0178
+F,Elyse Henriksen,18:20.50,12,Lincoln,5000,1.0011
+F,Elyse Henriksen,18:25.70,12,Lincoln,5000,1.0029
+F,Claire Tagalog,19:03.70,12,Lincoln,5000,1.0011
+F,Claire Tagalog,18:30.20,12,Lincoln,5000,0.9571
+F,Claire Tagalog,19:45.40,12,Lincoln,5000,1.0029
+F,Gwyn Fairchild,19:11.38,9,Lincoln,5000,1.0011
+F,Gwyn Fairchild,19:11.20,9,Lincoln,5000,0.9571
+F,Gwyn Fairchild,20:59.15,9,Lincoln,5000,1.0116
+F,Julia Olivares,19:45.04,10,Lincoln,5000,1.0011
+F,Julia Olivares,20:02.10,10,Lincoln,5000,1.0029
+F,Julia Olivares,19:08.80,10,Lincoln,5000,0.9571
+F,Matilda Hof,19:48.57,9,Lincoln,5000,1.0011
+F,Matilda Hof,19:38.80,9,Lincoln,5000,0.9885
+F,Matilda Hof,20:21.72,9,Lincoln,5000,1.0040
+F,Rosie Gross,20:07.27,10,Lincoln,5000,1.0011
+F,Rosie Gross,21:19.43,10,Lincoln,5000,1.0116
+F,Samantha Moylan,19:26.56,10,Ida B. Wells,5000,1.0011
+F,Samantha Moylan,19:46.20,10,Ida B. Wells,5000,0.9571
+F,Samantha Moylan,22:36.80,10,Ida B. Wells,5000,1.0737
+F,Zora Li Budd Baker,19:28.30,9,Ida B. Wells,5000,1.0011
+F,Zora Li Budd Baker,19:34.80,9,Ida B. Wells,5000,0.9571
+F,Zora Li Budd Baker,20:37.70,9,Ida B. Wells,5000,1.0066
+F,Jane Coffey-Read,18:37.90,12,Ida B. Wells,5000,0.9571
+F,Jane Coffey-Read,19:42.40,12,Ida B. Wells,5000,1.0066
+F,Jane Coffey-Read,19:36.04,12,Ida B. Wells,5000,1.0011
+F,Aeysha Hobaish,20:01.03,10,Ida B. Wells,5000,1.0011
+F,Aeysha Hobaish,19:26.60,10,Ida B. Wells,5000,0.9571
+F,Aeysha Hobaish,20:44.80,10,Ida B. Wells,5000,1.0066
+F,Millie Grabenhorst,20:09.27,10,Ida B. Wells,5000,1.0011
+F,Millie Grabenhorst,20:47.60,10,Ida B. Wells,5000,1.0066
+F,Millie Grabenhorst,19:48.60,10,Ida B. Wells,5000,0.9571
+F,Ivy Tubay,20:09.27,10,Ida B. Wells,5000,1.0011
+F,Ivy Tubay,20:58.20,10,Ida B. Wells,5000,1.0066
+F,Ivy Tubay,20:02.20,10,Ida B. Wells,5000,0.9571
+F,Henry McClenathan,21:11.40,9,Ida B. Wells,5000,1.0005
+F,Henry McClenathan,21:40.50,9,Ida B. Wells,5000,1.0066
+F,Henry McClenathan,21:21.90,9,Ida B. Wells,5000,0.9571
+F,Sophia Service,18:28.30,10,Tigard,5000,1.0011
+F,Sophia Service,18:50.20,10,Tigard,5000,1.0166
+F,Sophia Service,18:45.70,10,Tigard,5000,1.0021
+F,Leah Heidt,18:15.80,12,Tigard,5000,0.9571
+F,Leah Heidt,19:13.96,12,Tigard,5000,1.0011
+F,Leah Heidt,19:31.52,12,Tigard,5000,1.0021
+F,Sydney Joule,19:23.17,11,Tigard,5000,1.0011
+F,Sydney Joule,19:56.40,11,Tigard,5000,1.0166
+F,Sydney Joule,19:32.98,11,Tigard,5000,0.9943
+F,Meadow Baxter,19:35.83,12,Tigard,5000,1.0011
+F,Meadow Baxter,19:31.25,12,Tigard,5000,0.9943
+F,Meadow Baxter,20:21.80,12,Tigard,5000,1.0166
+F,Makaila Rust,20:24.62,12,Tigard,5000,0.9943
+F,Makaila Rust,20:50.08,12,Tigard,5000,1.0127
+F,Makaila Rust,19:59.80,12,Tigard,5000,0.9571
+F,Nevaeh Larsen,20:49.65,10,Tigard,5000,1.0011
+F,Nevaeh Larsen,22:05.10,10,Tigard,5000,1.0166
+F,Nevaeh Larsen,21:36.08,10,Tigard,5000,0.9943
+F,Ruby Veal,20:51.10,10,Tigard,5000,1.0011
+F,Ruby Veal,20:43.65,10,Tigard,5000,0.9943
+F,Ruby Veal,21:19.30,10,Tigard,5000,1.0166
+F,Elissa Schaeffer,17:41.40,12,Sunset,5000,0.9959
+F,Elissa Schaeffer,17:59.50,12,Sunset,5000,0.9999
+F,Naomi Cesar,17:56.20,11,Sunset,5000,0.9999
+F,Naomi Cesar,18:17.30,11,Sunset,5000,0.9959
+F,Naomi Cesar,18:46.91,11,Sunset,5000,1.0011
+F,Liv Brady,18:51.70,11,Sunset,5000,0.9959
+F,Liv Brady,19:02.44,11,Sunset,5000,1.0011
+F,Liv Brady,19:04.40,11,Sunset,5000,0.9999
+F,Kayley Charon,19:12.70,12,Sunset,5000,1.0011
+F,Kayley Charon,19:48.30,12,Sunset,5000,0.9959
+F,Kayley Charon,19:55.20,12,Sunset,5000,0.9999
+F,Ellie Baker,19:36.40,11,Sunset,5000,0.9999
+F,Ellie Baker,19:56.40,11,Sunset,5000,0.9959
+F,Ellie Baker,20:35.77,11,Sunset,5000,1.0011
+F,Hannah Baik,20:08.60,12,Sunset,5000,0.9959
+F,Hannah Baik,20:24.15,12,Sunset,5000,1.0011
+F,Hannah Baik,20:37.90,12,Sunset,5000,0.9999
+F,Vivienne Deeb,20:27.30,10,Sunset,5000,0.9959
+F,Vivienne Deeb,21:02.34,10,Sunset,5000,1.0011
+F,Vivienne Deeb,21:06.10,10,Sunset,5000,0.9999
+F,Olivia Palmer,19:03.30,12,Cleveland (OR),5000,0.9571
+F,Olivia Palmer,20:29.80,12,Cleveland (OR),5000,1.0178
+F,Olivia Palmer,20:18.66,12,Cleveland (OR),5000,1.0040
+F,Charlotte Gardner,19:28.40,12,Cleveland (OR),5000,0.9571
+F,Charlotte Gardner,21:47.26,12,Cleveland (OR),5000,1.0116
+F,Lucille Moenning,20:26.71,12,Cleveland (OR),5000,1.0040
+F,Lucille Moenning,20:23.70,12,Cleveland (OR),5000,0.9959
+F,Lucille Moenning,20:32.17,12,Cleveland (OR),5000,1.0011
+F,Riley Grant,20:37.06,11,Cleveland (OR),5000,1.0011
+F,Riley Grant,20:57.70,11,Cleveland (OR),5000,0.9959
+F,Riley Grant,21:23.14,11,Cleveland (OR),5000,1.0040
+F,Leora Mellor,20:32.40,10,Cleveland (OR),5000,0.9959
+F,Leora Mellor,20:48.35,10,Cleveland (OR),5000,1.0040
+F,Leora Mellor,20:45.95,10,Cleveland (OR),5000,1.0011
+F,Geneveve Robinson,20:40.57,10,Cleveland (OR),5000,1.0011
+F,Geneveve Robinson,21:13.90,10,Cleveland (OR),5000,0.9959
+F,Geneveve Robinson,22:02.15,10,Cleveland (OR),5000,1.0178
+F,Gabrielle Palmer,21:14.80,10,Cleveland (OR),5000,0.9959
+F,Gabrielle Palmer,22:00.09,10,Cleveland (OR),5000,1.0011
+F,Gabrielle Palmer,22:41.33,10,Cleveland (OR),5000,1.0040
+F,Josephine McPhillips,20:53.46,11,McMinnville,5000,1.0011
+F,Josephine McPhillips,20:54.76,11,McMinnville,5000,0.9943
+F,Josephine McPhillips,20:16.80,11,McMinnville,5000,0.9571
+F,Angela Hernandez-Gallo,20:58.04,12,McMinnville,5000,1.0011
+F,Angela Hernandez-Gallo,21:19.26,12,McMinnville,5000,0.9943
+F,Angela Hernandez-Gallo,23:00.96,12,McMinnville,5000,1.0285
+F,Keira Christopherson,20:53.55,9,McMinnville,5000,0.9943
+F,Keira Christopherson,21:13.90,9,McMinnville,5000,1.0011
+F,Keira Christopherson,20:19.20,9,McMinnville,5000,0.9571
+F,Emily Pacheco Segovia,21:24.62,10,McMinnville,5000,0.9943
+F,Emily Pacheco Segovia,21:38.38,10,McMinnville,5000,1.0011
+F,Emily Pacheco Segovia,21:07.00,10,McMinnville,5000,0.9571
+F,Lily Swart,21:32.35,11,McMinnville,5000,0.9943
+F,Lily Swart,22:27.91,11,McMinnville,5000,1.0285
+F,Lily Swart,21:58.66,11,McMinnville,5000,1.0011
+F,Kathleen Robinson,22:18.58,11,McMinnville,5000,1.0285
+F,Kathleen Robinson,21:55.06,11,McMinnville,5000,1.0011
+F,Kathleen Robinson,22:12.00,11,McMinnville,5000,1.0045
+F,Shelby Huffman,22:17.50,11,McMinnville,5000,0.9943
+F,Shelby Huffman,22:29.65,11,McMinnville,5000,1.0011
+F,Shelby Huffman,21:52.40,11,McMinnville,5000,0.9571
+F,Eleanor Wyatt,17:52.20,10,West Linn,5000,0.9959
+F,Eleanor Wyatt,18:12.12,10,West Linn,5000,1.0011
+F,Eleanor Wyatt,18:19.54,10,West Linn,5000,0.9943
+F,Lauren McKinley,19:24.94,10,West Linn,5000,1.0011
+F,Lauren McKinley,19:31.10,10,West Linn,5000,0.9959
+F,Lauren McKinley,19:47.60,10,West Linn,5000,1.0049
+F,Sienna Reeder,19:18.06,10,West Linn,5000,0.9943
+F,Sienna Reeder,19:48.60,10,West Linn,5000,0.9959
+F,Sienna Reeder,20:02.88,10,West Linn,5000,1.0011
+F,Lucia Decamps,19:26.69,11,West Linn,5000,1.0011
+F,Lucia Decamps,19:53.89,11,West Linn,5000,0.9943
+F,Lucia Decamps,20:39.30,11,West Linn,5000,1.0049
+F,Emerson Mobley,19:23.91,9,West Linn,5000,0.9943
+F,Emerson Mobley,19:55.60,9,West Linn,5000,0.9959
+F,Emerson Mobley,20:29.62,9,West Linn,5000,1.0021
+F,Violet Gowdy,19:29.00,12,West Linn,5000,0.9959
+F,Violet Gowdy,19:31.16,12,West Linn,5000,0.9943
+F,Violet Gowdy,19:40.12,12,West Linn,5000,1.0011
+F,Lauren Burnett,20:57.18,12,West Linn,5000,1.0011
+F,Lauren Burnett,21:23.40,12,West Linn,5000,0.9959
+F,Lauren Burnett,22:05.10,12,West Linn,5000,1.0049
+F,Alison Fajardo,17:49.30,11,Franklin (OR),5000,0.9571
+F,Alison Fajardo,18:55.12,11,Franklin (OR),5000,1.0040
+F,Alison Fajardo,19:16.60,11,Franklin (OR),5000,1.0045
+F,Liv Fraser,18:29.50,12,Franklin (OR),5000,0.9571
+F,Liv Fraser,20:01.32,12,Franklin (OR),5000,1.0040
+F,Liv Fraser,20:20.70,12,Franklin (OR),5000,1.0066
+F,Elizabeth Haendler,19:54.72,12,Franklin (OR),5000,1.0040
+F,Elizabeth Haendler,19:01.30,12,Franklin (OR),5000,0.9571
+F,Elizabeth Haendler,20:10.10,12,Franklin (OR),5000,1.0045
+F,Tessa Rivard,19:03.70,12,Franklin (OR),5000,0.9571
+F,Tessa Rivard,20:16.80,12,Franklin (OR),5000,1.0045
+F,Tessa Rivard,20:16.45,12,Franklin (OR),5000,1.0040
+F,Rosemary Otto,20:09.80,9,Franklin (OR),5000,1.0040
+F,Rosemary Otto,20:40.50,9,Franklin (OR),5000,1.0066
+F,Rosemary Otto,20:09.00,9,Franklin (OR),5000,0.9571
+F,Soraya Merida,20:15.40,11,Franklin (OR),5000,1.0045
+F,Soraya Merida,21:42.03,11,Franklin (OR),5000,1.0116
+F,Lyvia Mitchell,20:36.05,9,Franklin (OR),5000,1.0040
+F,Lyvia Mitchell,19:40.20,9,Franklin (OR),5000,0.9571
+F,Lyvia Mitchell,21:26.49,9,Franklin (OR),5000,1.0178
+F,Nezeya Bugher,18:24.86,9,Sherwood,5000,1.0011
+F,Nezeya Bugher,18:47.35,9,Sherwood,5000,0.9943
+F,Nezeya Bugher,19:14.00,9,Sherwood,5000,1.0166
+F,Evylee Bugher,19:32.84,11,Sherwood,5000,1.0285
+F,Evylee Bugher,18:20.00,11,Sherwood,5000,0.9571
+F,Evylee Bugher,20:09.48,11,Sherwood,5000,0.9943
+F,Tyler Thomas,19:14.61,11,Sherwood,5000,1.0021
+F,Tyler Thomas,19:45.62,11,Sherwood,5000,1.0285
+F,Tyler Thomas,19:09.16,11,Sherwood,5000,0.9943
+F,Lucy Tomb,19:08.66,10,Sherwood,5000,0.9943
+F,Lucy Tomb,19:18.58,10,Sherwood,5000,1.0011
+F,Lucy Tomb,19:45.80,10,Sherwood,5000,1.0166
+F,Grace Sappenfield,18:36.70,12,Sherwood,5000,0.9571
+F,Grace Sappenfield,19:38.87,12,Sherwood,5000,1.0021
+F,Grace Sappenfield,20:10.00,12,Sherwood,5000,1.0166
+F,Breeanna Hollins,19:56.57,9,Sherwood,5000,0.9943
+F,Breeanna Hollins,19:38.90,9,Sherwood,5000,0.9571
+F,Breeanna Hollins,20:33.98,9,Sherwood,5000,1.0011
+F,Hayden Shimp,20:35.22,11,Sherwood,5000,1.0011
+F,Hayden Shimp,20:49.39,11,Sherwood,5000,0.9943
+F,Hayden Shimp,21:39.91,11,Sherwood,5000,1.0285
+F,Miranda Oblad,18:32.85,12,Mountainside,5000,1.0011
+F,Miranda Oblad,18:32.00,12,Mountainside,5000,0.9999
+F,Miranda Oblad,18:52.20,12,Mountainside,5000,0.9898
+F,Eliana Martin,20:37.92,11,Mountainside,5000,1.0011
+F,Eliana Martin,21:05.00,11,Mountainside,5000,0.9898
+F,Eliana Martin,21:24.72,11,Mountainside,5000,0.9987
+F,Izzy Matarazzo,21:02.87,11,Mountainside,5000,1.0011
+F,Izzy Matarazzo,20:50.00,11,Mountainside,5000,0.9898
+F,Izzy Matarazzo,21:24.59,11,Mountainside,5000,0.9987
+F,Brooke Wilson,20:49.30,12,Mountainside,5000,0.9898
+F,Brooke Wilson,21:23.18,12,Mountainside,5000,0.9987
+F,Brooke Wilson,21:26.85,12,Mountainside,5000,1.0011
+F,Mira Garland,21:11.10,12,Mountainside,5000,0.9999
+F,Mira Garland,24:55.50,12,Mountainside,5000,1.1163
+F,Mira Garland,22:32.73,12,Mountainside,5000,1.0011
+F,Piper Garland,21:31.54,11,Mountainside,5000,1.0011
+F,Piper Garland,21:56.10,11,Mountainside,5000,0.9999
+F,Piper Garland,21:57.25,11,Mountainside,5000,0.9987
+F,Anna Offenstein,21:38.60,11,Mountainside,5000,0.9898
+F,Anna Offenstein,21:54.40,11,Mountainside,5000,0.9999
+F,Anna Offenstein,22:01.45,11,Mountainside,5000,0.9987
+F,Kahryn Fjarli,20:08.00,10,South Medford,5000,0.9959
+F,Kahryn Fjarli,20:25.05,10,South Medford,5000,1.0011
+F,Kahryn Fjarli,21:09.47,10,South Medford,5000,1.0372
+F,Cate Brassell,21:08.40,11,South Medford,5000,0.9959
+F,Cate Brassell,22:02.81,11,South Medford,5000,1.0372
+F,Cate Brassell,21:33.09,11,South Medford,5000,1.0011
+F,Meg Bell,22:23.62,11,South Medford,5000,1.0372
+F,Meg Bell,21:35.10,11,South Medford,5000,0.9959
+F,Meg Bell,21:52.50,11,South Medford,5000,0.9877
+F,Callie Bodine,22:51.13,9,South Medford,5000,1.0372
+F,Callie Bodine,22:22.01,9,South Medford,5000,1.0011
+F,Callie Bodine,22:09.40,9,South Medford,5000,0.9877
+F,Isabella Avina,22:11.60,9,South Medford,5000,0.9959
+F,Isabella Avina,22:52.00,9,South Medford,5000,1.0041
+F,Isabella Avina,24:12.67,9,South Medford,5000,1.0372
+F,Ava Rogers,22:26.65,11,South Medford,5000,1.0011
+F,Ava Rogers,23:28.80,11,South Medford,5000,0.9959
+F,Ava Rogers,24:35.62,11,South Medford,5000,1.0372
+F,Pepper Matichuk,22:58.70,11,South Medford,5000,0.9959
+F,Pepper Matichuk,22:50.60,11,South Medford,5000,0.9877
+F,Pepper Matichuk,24:03.40,11,South Medford,5000,1.0372
+F,Marli Phelps,17:55.90,12,Central Catholic,5000,0.9571
+F,Marli Phelps,19:10.51,12,Central Catholic,5000,1.0011
+F,Marli Phelps,18:57.36,12,Central Catholic,5000,0.9889
+F,Emma Wazny,19:45.35,11,Central Catholic,5000,1.0011
+F,Emma Wazny,19:41.70,11,Central Catholic,5000,0.9571
+F,Emma Wazny,20:34.25,11,Central Catholic,5000,0.9889
+F,Samantha Carlston,19:48.18,10,Central Catholic,5000,1.0011
+F,Samantha Carlston,20:37.06,10,Central Catholic,5000,0.9889
+F,Samantha Carlston,22:47.70,10,Central Catholic,5000,0.9868
+F,Mia Swinyard,20:38.94,9,Central Catholic,5000,1.0011
+F,Mia Swinyard,20:28.80,9,Central Catholic,5000,0.9571
+F,Mia Swinyard,21:32.53,9,Central Catholic,5000,0.9889
+F,Kayley Sumner,20:50.57,12,Central Catholic,5000,1.0011
+F,Kayley Sumner,20:50.95,12,Central Catholic,5000,0.9889
+F,Kayley Sumner,22:56.30,12,Central Catholic,5000,0.9868
+F,Alaina Baranksi,20:43.30,10,Central Catholic,5000,0.9868
+F,Alaina Baranksi,21:37.59,10,Central Catholic,5000,1.0011
+F,Alaina Baranksi,20:49.50,10,Central Catholic,5000,0.9571
+F,Bridget Keller,21:18.78,9,Central Catholic,5000,1.0011
+F,Bridget Keller,20:43.20,9,Central Catholic,5000,0.9571
+F,Bridget Keller,21:34.30,9,Central Catholic,5000,0.9889
+F,Abigail Nesmith,20:08.01,12,Clackamas,5000,1.0011
+F,Abigail Nesmith,20:07.90,12,Clackamas,5000,0.9959
+F,Abigail Nesmith,20:13.20,12,Clackamas,5000,0.9868
+F,Anna Lindaman,20:47.20,12,Clackamas,5000,0.9959
+F,Anna Lindaman,20:41.90,12,Clackamas,5000,0.9868
+F,Anna Lindaman,21:23.22,12,Clackamas,5000,1.0011
+F,Alexandra Nord,21:04.73,9,Clackamas,5000,1.0011
+F,Alexandra Nord,21:22.80,9,Clackamas,5000,0.9868
+F,Alexandra Nord,21:57.80,9,Clackamas,5000,0.9959
+F,Bella Nord,20:48.90,11,Clackamas,5000,0.9571
+F,Bella Nord,21:29.90,11,Clackamas,5000,0.9868
+F,Bella Nord,22:24.02,11,Clackamas,5000,1.0011
+F,Samantha Lindeman,21:50.10,12,Clackamas,5000,0.9959
+F,Samantha Lindeman,21:02.20,12,Clackamas,5000,0.9571
+F,Samantha Lindeman,22:02.49,12,Clackamas,5000,1.0011
+F,Naomi Flores,22:37.50,11,Clackamas,5000,0.9868
+F,Naomi Flores,23:04.10,11,Clackamas,5000,1.0011
+F,Naomi Flores,23:24.10,11,Clackamas,5000,0.9959
+F,Kaden Rathjen,23:00.83,10,Clackamas,5000,1.0011
+F,Kaden Rathjen,22:47.70,10,Clackamas,5000,0.9868
+F,Kaden Rathjen,23:25.00,10,Clackamas,5000,0.9959
+F,Avery Meier,18:07.88,12,West Salem,5000,1.0011
+F,Avery Meier,18:15.00,12,West Salem,5000,1.0005
+F,Mia Rasca,19:41.00,12,West Salem,5000,1.0011
+F,Madelyn Olson,20:10.85,11,West Salem,5000,1.0011
+F,Madelyn Olson,20:52.10,11,West Salem,5000,1.0005
+F,Abigail Evans,20:48.77,12,West Salem,5000,1.0011
+F,Abigail Evans,21:27.20,12,West Salem,5000,1.0005
+F,Hannah Williams,20:59.21,9,West Salem,5000,1.0011
+F,Hannah Williams,22:01.40,9,West Salem,5000,1.0005
+F,Teresa Lovely,21:02.90,11,West Salem,5000,0.9959
+F,Teresa Lovely,21:14.53,11,West Salem,5000,1.0011
+F,Teresa Lovely,21:55.70,11,West Salem,5000,1.0005
+F,Casey Ammon,21:29.10,10,West Salem,5000,1.0005
+F,Lea Anderson,20:36.08,9,Westview,5000,1.0011
+F,Lea Anderson,21:34.60,9,Westview,5000,0.9959
+F,Lea Anderson,21:00.30,9,Westview,5000,0.9571
+F,Emily Gatton,21:03.80,12,Westview,5000,0.9959
+F,Emily Gatton,21:15.17,12,Westview,5000,1.0011
+F,Emily Gatton,20:28.20,12,Westview,5000,0.9571
+F,Amara Pantell,21:41.57,10,Westview,5000,1.0011
+F,Amara Pantell,20:45.60,10,Westview,5000,0.9571
+F,Amara Pantell,21:59.70,10,Westview,5000,0.9959
+F,Adelaide Timmons,21:44.30,12,Westview,5000,0.9959
+F,Adelaide Timmons,22:05.49,12,Westview,5000,1.0011
+F,Adelaide Timmons,21:12.70,12,Westview,5000,0.9571
+F,Ellie Brems,22:24.71,9,Westview,5000,1.0011
+F,Ellie Brems,21:44.70,9,Westview,5000,0.9571
+F,Ellie Brems,23:58.70,9,Westview,5000,0.9959
+F,Ashley Ham,22:41.11,12,Westview,5000,1.0011
+F,Ashley Ham,22:59.40,12,Westview,5000,0.9959
+F,Ashley Ham,25:19.30,12,Westview,5000,1.0329
+F,Yurui Lin,23:54.02,11,Westview,5000,1.0011
+F,Yurui Lin,24:10.20,11,Westview,5000,0.9959
+F,Yurui Lin,23:37.90,11,Westview,5000,0.9571
+F,Grace Carrillo,19:22.38,12,Oregon City,5000,1.0011
+F,Grace Carrillo,19:24.94,12,Oregon City,5000,0.9943
+F,Grace Carrillo,18:52.00,12,Oregon City,5000,0.9571
+F,Olivia Beaudin,19:22.52,12,Oregon City,5000,0.9943
+F,Olivia Beaudin,19:13.00,12,Oregon City,5000,0.9815
+F,Olivia Beaudin,19:41.80,12,Oregon City,5000,1.0045
+F,Eli Gervais,20:51.58,9,Oregon City,5000,1.0011
+F,Eli Gervais,21:11.00,9,Oregon City,5000,0.9571
+F,Paula Roca Lujan,21:47.05,12,Oregon City,5000,0.9943
+F,Paula Roca Lujan,22:15.00,12,Oregon City,5000,0.9815
+F,Paula Roca Lujan,22:42.31,12,Oregon City,5000,1.0011
+F,Ariana Booker,21:25.60,10,Oregon City,5000,0.9571
+F,Ariana Booker,22:33.96,10,Oregon City,5000,0.9943
+F,Ariana Booker,22:21.00,10,Oregon City,5000,0.9815
+F,Sophia Grisham,22:36.89,12,Oregon City,5000,0.9943
+F,Sophia Grisham,21:56.50,12,Oregon City,5000,0.9571
+F,Sophia Grisham,23:27.00,12,Oregon City,5000,1.0045
+F,Lilia Conrad,22:53.19,12,Oregon City,5000,0.9943
+F,Lilia Conrad,23:05.86,12,Oregon City,5000,1.0011
+F,Lilia Conrad,22:57.50,12,Oregon City,5000,0.9571
+F,Taylor Sheldon,19:22.93,12,Lake Oswego,5000,1.0011
+F,Cordelia Megowan,19:28.00,12,Lake Oswego,5000,1.0021
+F,Cordelia Megowan,19:25.27,12,Lake Oswego,5000,0.9943
+F,Cordelia Megowan,19:35.30,12,Lake Oswego,5000,1.0011
+F,Eden Rosensteel,19:38.14,12,Lake Oswego,5000,1.0011
+F,Eden Rosensteel,19:33.98,12,Lake Oswego,5000,0.9943
+F,Eden Rosensteel,20:57.31,12,Lake Oswego,5000,1.0021
+F,Lillia Rains,19:50.67,12,Lake Oswego,5000,1.0011
+F,Lillia Rains,20:40.56,12,Lake Oswego,5000,0.9943
+F,Davina Barber,20:42.64,10,Lake Oswego,5000,0.9943
+F,Davina Barber,20:56.33,10,Lake Oswego,5000,1.0011
+F,Davina Barber,20:32.60,10,Lake Oswego,5000,0.9571
+F,Ingrid Weddle,21:35.10,12,Lake Oswego,5000,1.0011
+F,Ingrid Weddle,21:49.25,12,Lake Oswego,5000,0.9943
+F,Ingrid Weddle,23:46.49,12,Lake Oswego,5000,1.0021
+F,Brooklyn Lindsey,22:42.24,10,Lake Oswego,5000,1.0021
+F,Grace Houlihan,18:10.80,12,Lakeridge,5000,0.9959
+F,Grace Houlihan,18:38.00,12,Lakeridge,5000,0.9943
+F,Grace Houlihan,18:00.30,12,Lakeridge,5000,0.9571
+F,Ramona Tarlow,19:54.68,11,Lakeridge,5000,1.0021
+F,Clara Surratt,19:02.90,10,Lakeridge,5000,0.9571
+F,Clara Surratt,19:57.75,10,Lakeridge,5000,0.9943
+F,Clara Surratt,20:36.88,10,Lakeridge,5000,1.0021
+F,Kaya Merrill,20:04.18,12,Lakeridge,5000,0.9943
+F,Kaya Merrill,20:31.71,12,Lakeridge,5000,1.0021
+F,Kaya Merrill,20:25.30,12,Lakeridge,5000,0.9959
+F,Kiara Lee,19:44.60,10,Lakeridge,5000,0.9571
+F,Kiara Lee,20:37.45,10,Lakeridge,5000,0.9943
+F,Kiara Lee,20:51.20,10,Lakeridge,5000,0.9959
+F,Miriam Brennan,21:12.07,11,Lakeridge,5000,1.0021
+F,Miriam Brennan,21:46.14,11,Lakeridge,5000,0.9943
+F,Miriam Brennan,21:03.80,11,Lakeridge,5000,0.9571
+F,Katelyn Houlihan,21:35.30,10,Lakeridge,5000,0.9959
+F,Katelyn Houlihan,21:46.05,10,Lakeridge,5000,0.9943
+F,Katelyn Houlihan,22:30.25,10,Lakeridge,5000,1.0021
+F,Natalie Summers,20:02.60,10,Adrienne Nelson,5000,0.9959
+F,Natalie Summers,20:03.80,10,Adrienne Nelson,5000,0.9868
+F,Natalie Summers,19:29.70,10,Adrienne Nelson,5000,0.9571
+F,Molly Nelson,20:10.96,12,Adrienne Nelson,5000,1.0011
+F,Molly Nelson,20:24.30,12,Adrienne Nelson,5000,0.9959
+F,Molly Nelson,19:58.50,12,Adrienne Nelson,5000,0.9571
+F,Diana Pop,21:19.30,9,Adrienne Nelson,5000,0.9959
+F,Diana Pop,21:24.70,9,Adrienne Nelson,5000,0.9868
+F,Diana Pop,21:53.24,9,Adrienne Nelson,5000,1.0011
+F,Madelyn Kincade,21:43.40,10,Adrienne Nelson,5000,1.0011
+F,Madelyn Kincade,21:58.30,10,Adrienne Nelson,5000,0.9868
+F,Madelyn Kincade,22:35.60,10,Adrienne Nelson,5000,0.9959
+F,Lily Harris,22:14.32,12,Adrienne Nelson,5000,1.0011
+F,Lily Harris,22:29.70,12,Adrienne Nelson,5000,0.9959
+F,Lily Harris,22:17.90,12,Adrienne Nelson,5000,0.9868
+F,Molly Harrison,22:33.20,12,Adrienne Nelson,5000,0.9868
+F,Molly Harrison,22:53.46,12,Adrienne Nelson,5000,0.9889
+F,Molly Harrison,23:13.30,12,Adrienne Nelson,5000,0.9959
+F,Sophia Perez,22:45.10,11,Adrienne Nelson,5000,0.9868
+F,Sophia Perez,23:18.20,11,Adrienne Nelson,5000,0.9959
+F,Sophia Perez,23:37.27,11,Adrienne Nelson,5000,1.0011
+F,Jocelyn Schnurbusch,19:17.45,12,McNary,5000,1.0040
+F,Jocelyn Schnurbusch,19:21.85,12,McNary,5000,1.0011
+F,Jocelyn Schnurbusch,20:00.30,12,McNary,5000,0.9959
+F,Kailyn Bollman-Lechner,20:32.23,12,McNary,5000,1.0011
+F,Kailyn Bollman-Lechner,20:41.90,12,McNary,5000,0.9959
+F,Kailyn Bollman-Lechner,21:08.99,12,McNary,5000,1.0040
+F,Hayden Claypool,21:35.11,12,McNary,5000,1.0011
+F,Hayden Claypool,21:53.70,12,McNary,5000,0.9959
+F,Hayden Claypool,22:26.16,12,McNary,5000,1.0040
+F,Adiley Hernandez,21:52.33,9,McNary,5000,1.0011
+F,Adiley Hernandez,21:49.70,9,McNary,5000,0.9959
+F,Adiley Hernandez,22:28.42,9,McNary,5000,1.0040
+F,Emily Gomez,22:05.27,12,McNary,5000,1.0011
+F,Emily Gomez,22:22.28,12,McNary,5000,1.0040
+F,Emily Gomez,22:45.80,12,McNary,5000,0.9959
+F,Cassidy Kerner,22:49.01,12,McNary,5000,1.0011
+F,Cassidy Kerner,23:03.09,12,McNary,5000,1.0040
+F,Cassidy Kerner,23:01.20,12,McNary,5000,0.9959
+F,Avery Bollman-Lechner,23:12.45,12,McNary,5000,1.0011
+F,Avery Bollman-Lechner,23:42.62,12,McNary,5000,1.0040
+F,Avery Bollman-Lechner,23:45.80,12,McNary,5000,0.9959
+F,Olive Aiguier,20:02.10,11,Grant,5000,0.9885
+F,Olive Aiguier,21:14.12,11,Grant,5000,1.0116
+F,Olive Aiguier,22:49.60,11,Grant,5000,1.0045
+F,Sofia Kimura,20:22.09,11,Grant,5000,1.0011
+F,Sofia Kimura,20:15.50,11,Grant,5000,0.9885
+F,Sofia Kimura,21:20.05,11,Grant,5000,1.0116
+F,Ada Siemens,20:08.10,12,Grant,5000,0.9885
+F,Ada Siemens,20:58.10,12,Grant,5000,1.0045
+F,Ada Siemens,20:01.70,12,Grant,5000,0.9571
+F,Marlene Gundel,20:15.20,11,Grant,5000,0.9885
+F,Marlene Gundel,20:53.50,11,Grant,5000,1.0045
+F,Marlene Gundel,21:22.13,11,Grant,5000,1.0116
+F,Leah Richman,20:33.20,9,Grant,5000,0.9885
+F,Leah Richman,20:53.72,9,Grant,5000,1.0011
+F,Leah Richman,20:29.20,9,Grant,5000,0.9571
+F,Althea Linville,21:12.43,10,Grant,5000,1.0011
+F,Althea Linville,20:27.00,10,Grant,5000,0.9571
+F,Althea Linville,21:14.50,10,Grant,5000,0.9885
+F,Brie Michaud,21:13.60,11,Grant,5000,1.0011
+F,Brie Michaud,21:04.60,11,Grant,5000,0.9885
+F,Brie Michaud,21:58.50,11,Grant,5000,1.0045
+F,Kalia Young,21:12.37,11,Glencoe,5000,1.0011
+F,Kalia Young,21:55.00,11,Glencoe,5000,0.9898
+F,Kalia Young,22:22.20,11,Glencoe,5000,0.9959
+F,Molly Wilson,21:09.50,12,Glencoe,5000,0.9898
+F,Molly Wilson,21:31.82,12,Glencoe,5000,1.0011
+F,Molly Wilson,22:16.60,12,Glencoe,5000,0.9959
+F,Annabelle May,21:47.89,11,Glencoe,5000,1.0011
+F,Annabelle May,22:34.70,11,Glencoe,5000,0.9571
+F,Annabelle May,24:14.45,11,Glencoe,5000,1.0021
+F,Alexa Zuercher,22:21.83,11,Glencoe,5000,1.0011
+F,Alexa Zuercher,22:36.08,11,Glencoe,5000,0.9943
+F,Alexa Zuercher,23:01.00,11,Glencoe,5000,0.9898
+F,Elena Holt,22:30.21,9,Glencoe,5000,1.0011
+F,Elena Holt,22:30.90,9,Glencoe,5000,0.9959
+F,Elena Holt,22:35.29,9,Glencoe,5000,0.9943
+F,Lily Hammond,22:48.80,12,Glencoe,5000,0.9898
+F,Lily Hammond,23:21.27,12,Glencoe,5000,0.9943
+F,Lily Hammond,24:46.17,12,Glencoe,5000,1.0285
+F,Ella Tews,23:25.00,11,Glencoe,5000,0.9959
+F,Ella Tews,23:39.16,11,Glencoe,5000,1.0011
+F,Ella Tews,22:49.70,11,Glencoe,5000,0.9571
+F,Shelby Smith,21:54.62,9,Century,5000,1.0372
+F,Shelby Smith,21:37.60,9,Century,5000,0.9946
+F,Shelby Smith,21:48.79,9,Century,5000,0.9943
+F,Lindsey Everton,21:51.50,12,Century,5000,0.9946
+F,Lindsey Everton,22:25.22,12,Century,5000,1.0040
+F,Lindsey Everton,22:33.86,12,Century,5000,0.9943
+F,Gwen Kondor,22:44.42,12,Century,5000,1.0040
+F,Gwen Kondor,24:13.57,12,Century,5000,1.0372
+F,Bridget Cadegan,23:25.75,11,Century,5000,0.9943
+F,Bridget Cadegan,23:42.60,11,Century,5000,0.9946
+F,Bridget Cadegan,24:12.35,11,Century,5000,1.0040
+F,Peregrine Lieb,24:08.01,10,Century,5000,0.9943
+F,Peregrine Lieb,25:02.09,10,Century,5000,1.0040
+F,Peregrine Lieb,25:02.68,10,Century,5000,1.0021
+F,Megyn Royce,24:18.00,11,Century,5000,0.9946
+F,Megyn Royce,24:23.77,11,Century,5000,0.9943
+F,Megyn Royce,24:45.30,11,Century,5000,1.0040
+F,Adeline Glem,25:29.30,12,Century,5000,0.9943
+F,Adeline Glem,25:59.60,12,Century,5000,0.9946
+F,Iris Marquis,19:56.20,11,Forest Grove,5000,0.9946
+F,Iris Marquis,20:19.94,11,Forest Grove,5000,0.9943
+F,Iris Marquis,20:12.30,11,Forest Grove,5000,0.9571
+F,Maren Naone,19:58.00,11,Forest Grove,5000,0.9946
+F,Maren Naone,20:16.75,11,Forest Grove,5000,0.9943
+F,Maren Naone,20:13.10,11,Forest Grove,5000,0.9571
+F,Freya Henriksen,21:55.70,11,Forest Grove,5000,0.9946
+F,Freya Henriksen,22:14.61,11,Forest Grove,5000,0.9943
+F,Freya Henriksen,23:21.86,11,Forest Grove,5000,1.0285
+F,Addy Carl,22:49.70,9,Forest Grove,5000,0.9946
+F,Addy Carl,23:09.54,9,Forest Grove,5000,0.9943
+F,Addy Carl,22:23.40,9,Forest Grove,5000,0.9571
+F,Raen Beier,23:06.50,9,Forest Grove,5000,0.9946
+F,Raen Beier,23:12.53,9,Forest Grove,5000,0.9943
+F,Raen Beier,25:44.73,9,Forest Grove,5000,1.0285
+F,Elisabeth Hansen,23:31.86,11,Forest Grove,5000,0.9943
+F,Elisabeth Hansen,24:13.20,11,Forest Grove,5000,0.9571
+F,Elisabeth Hansen,33:00.80,11,Forest Grove,5000,0.9946
+F,McKenna Chapin,23:27.50,10,Forest Grove,5000,0.9571
+F,McKenna Chapin,24:24.20,10,Forest Grove,5000,0.9946
+F,McKenna Chapin,26:07.70,10,Forest Grove,5000,0.9943
+F,Abigail Wheatley,19:57.90,12,Newberg,5000,0.9946
+F,Abigail Wheatley,20:16.01,12,Newberg,5000,0.9943
+F,Abigail Wheatley,20:52.00,12,Newberg,5000,1.0041
+F,Elise Jones,21:03.10,12,Newberg,5000,0.9946
+F,Elise Jones,20:45.10,12,Newberg,5000,0.9571
+F,Elise Jones,21:36.09,12,Newberg,5000,0.9943
+F,Greta Breninger,21:17.50,12,Newberg,5000,0.9946
+F,Greta Breninger,21:33.66,12,Newberg,5000,0.9943
+F,Greta Breninger,22:38.63,12,Newberg,5000,1.0285
+F,Eliana Byerley,22:04.80,11,Newberg,5000,0.9943
+F,Eliana Byerley,22:13.60,11,Newberg,5000,0.9946
+F,Eliana Byerley,22:52.90,11,Newberg,5000,1.0041
+F,Ada Burg,22:23.60,9,Newberg,5000,0.9946
+F,Ada Burg,22:39.59,9,Newberg,5000,0.9943
+F,Ada Burg,22:54.30,9,Newberg,5000,1.0041
+F,Abby Seits,22:34.98,12,Newberg,5000,0.9943
+F,Abby Seits,22:23.50,12,Newberg,5000,0.9571
+F,Abby Seits,23:51.73,12,Newberg,5000,1.0021
+F,Maya Ferguson,22:44.73,9,Newberg,5000,0.9943
+F,Maya Ferguson,23:11.30,9,Newberg,5000,0.9946
+F,Maya Ferguson,24:08.22,9,Newberg,5000,1.0021
+F,Lauren Gerlach,17:56.15,11,Tualatin,5000,1.0011
+F,Lauren Gerlach,17:52.40,11,Tualatin,5000,0.9959
+F,Lauren Gerlach,17:51.67,11,Tualatin,5000,0.9943
+F,Violet Wilbourn,19:33.06,10,Tualatin,5000,0.9943
+F,Violet Wilbourn,19:43.09,10,Tualatin,5000,1.0011
+F,Violet Wilbourn,19:46.80,10,Tualatin,5000,0.9959
+F,Jackson Hale,20:19.88,11,Tualatin,5000,0.9943
+F,Jackson Hale,20:30.66,11,Tualatin,5000,1.0011
+F,Jackson Hale,21:00.21,11,Tualatin,5000,1.0127
+F,Ciena Harmon,20:40.82,12,Tualatin,5000,1.0011
+F,Ciena Harmon,22:23.89,12,Tualatin,5000,1.0127
+F,Ciena Harmon,22:18.48,12,Tualatin,5000,1.0021
+F,Mariah Aguilar,21:00.53,12,Tualatin,5000,0.9943
+F,Mariah Aguilar,21:14.09,12,Tualatin,5000,1.0011
+F,Mariah Aguilar,21:26.20,12,Tualatin,5000,0.9959
+F,Chobei Aubrylle Nivera,21:03.10,12,Tualatin,5000,0.9959
+F,Chobei Aubrylle Nivera,21:03.81,12,Tualatin,5000,0.9943
+F,Chobei Aubrylle Nivera,21:42.37,12,Tualatin,5000,1.0021
+F,Malin Meyer,25:10.11,10,Tualatin,5000,1.0011
+F,Malin Meyer,25:04.10,10,Tualatin,5000,0.9959
+F,Malin Meyer,25:45.27,10,Tualatin,5000,0.9943
+F,Emma Nussbaumer,20:56.57,11,Liberty(OR),5000,0.9943
+F,Emma Nussbaumer,22:24.42,11,Liberty(OR),5000,1.0011
+F,Emma Nussbaumer,21:42.70,11,Liberty(OR),5000,0.9571
+F,Bella Reyes,22:51.38,10,Liberty(OR),5000,1.0011
+F,Bella Reyes,23:04.71,10,Liberty(OR),5000,0.9943
+F,Bella Reyes,22:31.70,10,Liberty(OR),5000,0.9571
+F,Asha Spotts,23:07.74,10,Liberty(OR),5000,1.0011
+F,Asha Spotts,23:18.54,10,Liberty(OR),5000,0.9943
+F,Asha Spotts,23:19.50,10,Liberty(OR),5000,0.9571
+F,Anya Everton,23:20.41,9,Liberty(OR),5000,1.0011
+F,Anya Everton,22:24.20,9,Liberty(OR),5000,0.9571
+F,Anya Everton,24:31.26,9,Liberty(OR),5000,1.0021
+F,Lily Rogers,25:54.12,9,Liberty(OR),5000,1.0011
+F,Lily Rogers,27:32.39,9,Liberty(OR),5000,1.0285
+F,Lily Rogers,27:32.71,9,Liberty(OR),5000,0.9943
+F,Mikaelyn Concepcion,27:07.80,11,Liberty(OR),5000,0.9571
+F,Mikaelyn Concepcion,28:44.56,11,Liberty(OR),5000,1.0011
+F,Mikaelyn Concepcion,28:49.48,11,Liberty(OR),5000,0.9943
+F,Skyler Roberts,28:43.64,11,Liberty(OR),5000,0.9943
+F,Skyler Roberts,28:03.90,11,Liberty(OR),5000,0.9571
+F,Skyler Roberts,30:01.31,11,Liberty(OR),5000,1.0021
+F,Stella Williams,20:23.36,9,Grants Pass,5000,1.0011
+F,Stella Williams,20:10.00,9,Grants Pass,5000,0.9708
+F,Stella Williams,21:18.60,9,Grants Pass,5000,1.0067
+F,Penelope Atondo,21:36.15,9,Grants Pass,5000,1.0011
+F,Penelope Atondo,21:45.80,9,Grants Pass,5000,0.9708
+F,Penelope Atondo,23:29.40,9,Grants Pass,5000,1.0143
+F,Olivia Allen,21:43.97,10,Grants Pass,5000,1.0011
+F,Olivia Allen,21:46.10,10,Grants Pass,5000,0.9708
+F,Olivia Allen,23:05.40,10,Grants Pass,5000,1.0067
+F,Lilly Loghry,21:44.95,9,Grants Pass,5000,1.0011
+F,Lilly Loghry,23:15.20,9,Grants Pass,5000,1.0067
+F,Lilly Loghry,24:09.97,9,Grants Pass,5000,1.0403
+F,Scarlet Scott,21:05.60,9,Grants Pass,5000,0.9708
+F,Scarlet Scott,21:57.04,9,Grants Pass,5000,1.0011
+F,Scarlet Scott,22:47.00,9,Grants Pass,5000,1.0143
+F,Riley Allen,22:01.15,9,Grants Pass,5000,1.0011
+F,Riley Allen,24:18.87,9,Grants Pass,5000,1.0403
+F,Riley Allen,22:45.50,9,Grants Pass,5000,0.9708
+F,Addison Allen,22:06.14,11,Grants Pass,5000,1.0011
+F,Addison Allen,21:26.60,11,Grants Pass,5000,0.9708
+F,Addison Allen,23:01.10,11,Grants Pass,5000,1.0143
+F,Rylie McLaughlin,20:27.50,12,Roseburg,5000,1.0011
+F,Rylie McLaughlin,20:58.30,12,Roseburg,5000,1.0009
+F,Rylie McLaughlin,20:33.10,12,Roseburg,5000,0.9708
+F,Briana Smith,21:08.69,10,Roseburg,5000,1.0011
+F,Briana Smith,21:43.10,10,Roseburg,5000,0.9708
+F,Briana Smith,22:49.60,10,Roseburg,5000,1.0009
+F,Macy Kurtz,21:38.39,10,Roseburg,5000,1.0011
+F,Macy Kurtz,22:40.60,10,Roseburg,5000,0.9708
+F,Tatum Scott,22:00.62,11,Roseburg,5000,1.0011
+F,Tatum Scott,22:04.60,11,Roseburg,5000,0.9708
+F,Tatum Scott,22:56.01,11,Roseburg,5000,0.9960
+F,Paige Heacock,21:35.00,10,Roseburg,5000,0.9708
+F,Paige Heacock,22:33.94,10,Roseburg,5000,1.0011
+F,Paige Heacock,22:59.81,10,Roseburg,5000,0.9960
+F,Audrey Allen,23:00.75,11,Roseburg,5000,1.0011
+F,Audrey Allen,24:12.45,11,Roseburg,5000,1.0203
+F,Audrey Allen,24:51.70,11,Roseburg,5000,0.9708
+F,Juniper Crocker,23:25.03,12,Roseburg,5000,1.0011
+F,Juniper Crocker,23:56.92,12,Roseburg,5000,0.9960
+F,Ginger Gilmour,21:17.40,12,South Salem,5000,0.9946
+F,Ginger Gilmour,21:44.20,12,South Salem,5000,0.9959
+F,Ginger Gilmour,21:13.00,12,South Salem,5000,0.9571
+F,Meredith Heyen,22:31.20,10,South Salem,5000,0.9959
+F,Meredith Heyen,21:41.00,10,South Salem,5000,0.9571
+F,Meredith Heyen,22:41.20,10,South Salem,5000,1.0005
+F,Maleah Hopkins,23:09.80,11,South Salem,5000,0.9959
+F,Maleah Hopkins,23:19.00,11,South Salem,5000,0.9946
+F,Maleah Hopkins,24:06.96,11,South Salem,5000,1.0040
+F,Olivia McCoy,23:29.00,9,South Salem,5000,0.9946
+F,Olivia McCoy,22:42.50,9,South Salem,5000,0.9571
+F,Olivia McCoy,23:50.36,9,South Salem,5000,1.0040
+F,Abby Falcon,22:36.40,12,South Salem,5000,0.9571
+F,Abby Falcon,23:36.50,12,South Salem,5000,0.9946
+F,Abby Falcon,24:00.32,12,South Salem,5000,1.0040
+F,Emmy Cox,24:27.30,11,South Salem,5000,0.9946
+F,Emmy Cox,24:42.26,11,South Salem,5000,1.0040
+F,Emmy Cox,24:59.00,11,South Salem,5000,0.9959
+F,Sophia Barizo,24:42.00,11,South Salem,5000,0.9959
+F,Sophia Barizo,24:47.80,11,South Salem,5000,0.9946
+F,Sophia Barizo,24:16.90,11,South Salem,5000,0.9571
+F,Sabrina Davis,19:52.00,10,Gresham,5000,0.9868
+F,Sabrina Davis,20:06.80,10,Gresham,5000,0.9959
+F,Sabrina Davis,20:11.20,10,Gresham,5000,0.9959
+F,Jayla Rubalcava,24:04.70,11,Gresham,5000,0.9868
+F,Ainsley Strong,25:19.00,9,Gresham,5000,0.9959
+F,Ainsley Strong,29:22.70,9,Gresham,5000,1.1163
+F,Ainsley Strong,26:12.90,9,Gresham,5000,0.9959
+F,Ryah Barber,25:44.00,10,Gresham,5000,0.9959
+F,Ryah Barber,27:16.40,10,Gresham,5000,0.9868
+F,Ryah Barber,29:02.60,10,Gresham,5000,0.9959
+F,Sophia Miclea,29:36.90,9,Gresham,5000,1.1163
+F,Sophia Miclea,26:32.70,9,Gresham,5000,0.9959
+F,Sophia Miclea,26:43.90,9,Gresham,5000,0.9959
+F,Shaila Chavero,26:30.10,12,Gresham,5000,0.9959
+F,Shaila Chavero,26:46.80,12,Gresham,5000,0.9868
+F,Shaila Chavero,27:06.07,12,Gresham,5000,0.9889
+F,Rosa Barajas Mercado,26:47.10,11,Gresham,5000,0.9959
+F,Rosa Barajas Mercado,28:40.40,11,Gresham,5000,0.9868
+F,Rosa Barajas Mercado,29:23.00,11,Gresham,5000,0.9959
+F,Jovi Johnson,19:00.80,10,Sprague,5000,0.9946
+F,Jovi Johnson,19:30.25,10,Sprague,5000,1.0040
+F,Jovi Johnson,19:38.70,10,Sprague,5000,0.9959
+F,Tatum Jones,20:19.80,12,Sprague,5000,0.9959
+F,Tatum Jones,20:58.04,12,Sprague,5000,1.0040
+F,Tatum Jones,21:01.10,12,Sprague,5000,0.9946
+F,Hazel Christensen,21:59.10,11,Sprague,5000,0.9959
+F,Hazel Christensen,22:06.60,11,Sprague,5000,0.9946
+F,Hazel Christensen,22:42.40,11,Sprague,5000,1.0040
+F,Molly Friese,22:53.47,9,Sprague,5000,1.0040
+F,Molly Friese,22:42.90,9,Sprague,5000,0.9946
+F,Molly Friese,23:44.90,9,Sprague,5000,0.9959
+F,Althea Zoltner,23:37.00,12,Sprague,5000,0.9959
+F,Althea Zoltner,24:03.36,12,Sprague,5000,1.0040
+F,Kyleah Bern,23:53.90,10,Sprague,5000,0.9946
+F,Kyleah Bern,24:37.33,10,Sprague,5000,1.0040
+F,Kyleah Bern,24:43.20,10,Sprague,5000,0.9959
+F,Ella Trussell,24:24.50,12,Sprague,5000,0.9959
+F,Ella Trussell,24:24.10,12,Sprague,5000,0.9946
+F,Ella Trussell,25:19.47,12,Sprague,5000,1.0040
+F,Nelida Dalgas,17:10.27,12,North Salem,5000,1.0011
+F,Nelida Dalgas,16:53.00,12,North Salem,5000,0.9571
+F,Nelida Dalgas,17:40.70,12,North Salem,5000,1.0005
+F,Kadence May,20:07.09,9,North Salem,5000,1.0011
+F,Kadence May,20:20.64,9,North Salem,5000,1.0040
+F,Kadence May,21:04.50,9,North Salem,5000,0.9571
+F,Citlali Zavala,20:27.34,11,North Salem,5000,1.0011
+F,Citlali Zavala,20:15.50,11,North Salem,5000,0.9571
+F,Citlali Zavala,21:25.30,11,North Salem,5000,1.0005
+F,Solè Sanchez,21:13.20,10,North Salem,5000,0.9571
+F,London Heinz,22:45.59,10,North Salem,5000,1.0011
+F,London Heinz,23:34.54,10,North Salem,5000,1.0040
+F,London Heinz,22:50.90,10,North Salem,5000,0.9571
+F,Samai Sagrero,23:11.24,9,North Salem,5000,1.0011
+F,Samai Sagrero,23:36.91,9,North Salem,5000,1.0040
+F,Samai Sagrero,23:13.60,9,North Salem,5000,0.9571
+F,Hailey Mahn,23:21.39,9,North Salem,5000,1.0040
+F,Hailey Mahn,23:06.80,9,North Salem,5000,0.9571
+F,Adelaide Wasnick,19:38.60,12,Southridge,5000,1.0166
+F,Adelaide Wasnick,19:17.50,12,Southridge,5000,0.9959
+F,Adelaide Wasnick,19:27.91,12,Southridge,5000,1.0011
+F,Hannah Mangan,19:35.76,9,Southridge,5000,1.0011
+F,Hannah Mangan,19:30.40,9,Southridge,5000,0.9959
+F,Hannah Mangan,19:58.90,9,Southridge,5000,1.0166
+F,Lydia Strayer,20:45.00,11,Southridge,5000,0.9571
+F,Lydia Strayer,22:14.20,11,Southridge,5000,1.0166
+F,Lydia Strayer,22:07.60,11,Southridge,5000,0.9959
+F,Mika Ceccarelli,23:40.70,11,Southridge,5000,1.0011
+F,Mika Ceccarelli,24:59.90,11,Southridge,5000,1.0166
+F,Mika Ceccarelli,23:40.00,11,Southridge,5000,0.9571
+F,Alyssa Kinne,23:46.60,10,Southridge,5000,0.9959
+F,Alyssa Kinne,23:04.50,10,Southridge,5000,0.9571
+F,Alyssa Kinne,25:45.10,10,Southridge,5000,1.0329
+F,Lucy Price,24:05.65,10,Southridge,5000,1.0011
+F,Lucy Price,23:40.60,10,Southridge,5000,0.9571
+F,Giselle Flores Herrera,24:32.23,11,Southridge,5000,1.0011
+F,Giselle Flores Herrera,24:53.20,11,Southridge,5000,0.9959
+F,Giselle Flores Herrera,25:34.60,11,Southridge,5000,1.0166
+F,Evelyn Crooks,19:50.28,10,North Medford,5000,1.0011
+F,Evelyn Crooks,19:18.00,10,North Medford,5000,0.9571
+F,Evelyn Crooks,20:18.80,10,North Medford,5000,1.0041
+F,Lucy Brumble,19:28.40,9,North Medford,5000,0.9571
+F,Lucy Brumble,20:25.95,9,North Medford,5000,1.0011
+F,Lucy Brumble,21:21.50,9,North Medford,5000,0.9877
+F,Madeleine Bevers,20:23.02,10,North Medford,5000,1.0011
+F,Madeleine Bevers,21:14.70,10,North Medford,5000,1.0041
+F,Madeleine Bevers,20:31.80,10,North Medford,5000,0.9571
+F,Lily Zavala,19:29.70,11,North Medford,5000,0.9571
+F,Lily Zavala,20:26.99,11,North Medford,5000,1.0011
+F,Lily Zavala,20:48.40,11,North Medford,5000,1.0041
+F,Sienna Meager,21:52.52,10,North Medford,5000,1.0011
+F,Sienna Meager,21:07.30,10,North Medford,5000,0.9571
+F,Sienna Meager,22:30.70,10,North Medford,5000,1.0041
+F,Jocelyn Scull,22:22.64,12,North Medford,5000,1.0011
+F,Jocelyn Scull,22:32.90,12,North Medford,5000,0.9877
+F,Jocelyn Scull,22:38.10,12,North Medford,5000,0.9571
+F,Lily Reid,22:00.70,11,North Medford,5000,0.9571
+F,Lily Reid,23:13.10,11,North Medford,5000,1.0041
+F,Lily Reid,23:14.73,11,North Medford,5000,1.0011
+F,Piper Richmond,20:40.28,10,Willamette,5000,1.0048
+F,Piper Richmond,21:04.00,10,Willamette,5000,1.0000
+F,Piper Richmond,21:22.83,10,Willamette,5000,1.0040
+F,Maren Widmer,23:19.32,12,Willamette,5000,1.0048
+F,Maren Widmer,23:20.19,12,Willamette,5000,1.0040
+F,Maren Widmer,24:27.00,12,Willamette,5000,1.0000
+F,Aubrey Sheridan,23:50.80,12,Willamette,5000,0.9946
+F,Aubrey Sheridan,24:35.64,12,Willamette,5000,1.0040
+F,Aubrey Sheridan,25:41.92,12,Willamette,5000,1.0048
+F,Zoe Hawks,24:09.88,9,Willamette,5000,1.0040
+F,Zoe Hawks,24:13.52,9,Willamette,5000,1.0048
+F,Zoe Hawks,24:55.90,9,Willamette,5000,0.9708
+F,Irene Arredondo Callejon,24:58.90,11,Willamette,5000,0.9946
+F,Irene Arredondo Callejon,26:18.66,11,Willamette,5000,1.0040
+F,Irene Arredondo Callejon,27:35.68,11,Willamette,5000,1.0048
+F,Bria Baker,25:41.00,10,Willamette,5000,1.0000
+F,Bria Baker,25:00.90,10,Willamette,5000,0.9708
+F,Rebekah LeGrue,26:08.50,12,Willamette,5000,0.9946
+F,Rebekah LeGrue,26:56.06,12,Willamette,5000,1.0040
+F,Rebekah LeGrue,28:35.01,12,Willamette,5000,1.0048
+F,Gianna Carneiro,20:57.20,12,Sandy,5000,0.9868
+F,Gianna Carneiro,21:24.30,12,Sandy,5000,0.9889
+F,Gianna Carneiro,20:44.30,12,Sandy,5000,0.9571
+F,Chloe Hutchison,21:36.00,11,Sandy,5000,0.9868
+F,Chloe Hutchison,21:01.90,11,Sandy,5000,0.9571
+F,Chloe Hutchison,23:53.60,11,Sandy,5000,1.0458
+F,Willa Hagemann,21:56.60,9,Sandy,5000,0.9868
+F,Willa Hagemann,21:35.10,9,Sandy,5000,0.9571
+F,Willa Hagemann,22:53.61,9,Sandy,5000,0.9889
+F,Alexis Tull,22:22.30,10,Sandy,5000,0.9868
+F,Alexis Tull,22:14.70,10,Sandy,5000,0.9571
+F,Alexis Tull,24:56.10,10,Sandy,5000,1.0458
+F,Josie Nobel,22:35.50,10,Sandy,5000,0.9868
+F,Josie Nobel,22:28.90,10,Sandy,5000,0.9571
+F,Josie Nobel,24:56.40,10,Sandy,5000,1.0458
+F,Brynn Fleming Harris,22:04.70,12,Sandy,5000,0.9571
+F,Brynn Fleming Harris,23:00.47,12,Sandy,5000,0.9889
+F,Brynn Fleming Harris,24:29.00,12,Sandy,5000,1.0458
+F,Elizabeth Rose,22:52.60,9,Sandy,5000,0.9868
+F,Elizabeth Rose,22:18.90,9,Sandy,5000,0.9571
+F,Elizabeth Rose,25:52.90,9,Sandy,5000,1.0458
+F,Hazel Patterson,21:32.31,12,Roosevelt (OR),5000,1.0011
+F,Hazel Patterson,23:06.40,12,Roosevelt (OR),5000,1.0737
+F,Hazel Patterson,22:11.44,12,Roosevelt (OR),5000,1.0021
+F,Valentina Hickerson,23:10.10,11,Roosevelt (OR),5000,1.0066
+F,Valentina Hickerson,24:10.61,11,Roosevelt (OR),5000,1.0116
+F,Valentina Hickerson,24:10.73,11,Roosevelt (OR),5000,1.0021
+F,Avery Carter,24:26.68,10,Roosevelt (OR),5000,1.0011
+F,Avery Carter,24:54.70,10,Roosevelt (OR),5000,1.0066
+F,Avery Carter,27:20.10,10,Roosevelt (OR),5000,1.0737
+F,Lillian Stewart,24:46.80,12,Roosevelt (OR),5000,1.0021
+F,Lillian Stewart,25:34.35,12,Roosevelt (OR),5000,1.0116
+F,Cora Traetow,24:58.85,10,Roosevelt (OR),5000,1.0011
+F,Cora Traetow,25:38.70,10,Roosevelt (OR),5000,1.0066
+F,Cora Traetow,25:41.69,10,Roosevelt (OR),5000,1.0021
+F,Asha Paleaz,25:25.98,12,Roosevelt (OR),5000,1.0011
+F,Asha Paleaz,26:54.21,12,Roosevelt (OR),5000,1.0021
+F,Asha Paleaz,29:19.50,12,Roosevelt (OR),5000,1.0737
+F,Eleanor Bradbury,25:31.53,12,Roosevelt (OR),5000,1.0021
+F,Eleanor Bradbury,26:00.55,12,Roosevelt (OR),5000,1.0116
+F,Mira Shah,20:28.50,10,McDaniel,5000,1.0045
+F,Mira Shah,20:29.50,10,McDaniel,5000,1.0011
+F,Mira Shah,21:39.62,10,McDaniel,5000,1.0116
+F,Maya Riojas,23:42.40,10,McDaniel,5000,1.0737
+F,Maya Riojas,21:20.20,10,McDaniel,5000,0.9571
+F,Maya Riojas,22:30.00,10,McDaniel,5000,1.0066
+F,Sam Kilburn,22:18.15,10,McDaniel,5000,1.0011
+F,Sam Kilburn,22:34.50,10,McDaniel,5000,1.0066
+F,Sam Kilburn,21:59.40,10,McDaniel,5000,0.9571
+F,Mirai Oglesbee,24:25.30,11,McDaniel,5000,1.0737
+F,Mirai Oglesbee,23:19.80,11,McDaniel,5000,1.0045
+F,Mirai Oglesbee,23:51.79,11,McDaniel,5000,1.0116
+F,Cecilia Hosti,22:50.41,12,McDaniel,5000,1.0011
+F,Cecilia Hosti,23:24.20,12,McDaniel,5000,1.0066
+F,Cecilia Hosti,22:16.00,12,McDaniel,5000,0.9571
+F,Amara Hice,23:02.44,12,McDaniel,5000,1.0011
+F,Amara Hice,23:33.40,12,McDaniel,5000,1.0066
+F,Amara Hice,24:38.37,12,McDaniel,5000,1.0116
+F,Johanna Greiner,22:57.20,10,McDaniel,5000,0.9571
+F,Johanna Greiner,24:25.55,10,McDaniel,5000,1.0011
+F,Johanna Greiner,24:49.70,10,McDaniel,5000,1.0045
+F,Grace Mendiola,20:18.06,12,Beaverton,5000,1.0011
+F,Grace Mendiola,19:35.70,12,Beaverton,5000,0.9571
+F,Grace Mendiola,21:20.80,12,Beaverton,5000,1.0329
+F,Claire Durrant,20:23.62,10,Beaverton,5000,1.0011
+F,Claire Durrant,19:58.00,10,Beaverton,5000,0.9571
+F,Claire Durrant,21:09.80,10,Beaverton,5000,0.9959
+F,DeElen Magalen,21:06.83,10,Beaverton,5000,1.0011
+F,DeElen Magalen,20:31.00,10,Beaverton,5000,0.9571
+F,DeElen Magalen,22:02.00,10,Beaverton,5000,0.9959
+F,Adel Bean,21:57.30,12,Beaverton,5000,0.9959
+F,Adel Bean,21:45.00,12,Beaverton,5000,0.9571
+F,Adel Bean,23:01.50,12,Beaverton,5000,1.0011
+F,Kennedy Corbridge,23:06.00,12,Beaverton,5000,0.9959
+F,Kennedy Corbridge,23:44.60,12,Beaverton,5000,1.0011
+F,Luna Cirugeda Botella,24:32.51,12,Beaverton,5000,1.0011
+F,Luna Cirugeda Botella,25:04.80,12,Beaverton,5000,0.9959
+F,Elizabeth Streit,25:15.55,11,Beaverton,5000,1.0011
+F,Elizabeth Streit,25:20.90,11,Beaverton,5000,0.9959
+F,Mya Retasket,21:57.30,11,Aloha,5000,0.9959
+F,Mya Retasket,22:08.29,11,Aloha,5000,1.0011
+F,Mya Retasket,24:08.70,11,Aloha,5000,1.0329
+F,Lillian O'Mara,21:59.70,12,Aloha,5000,0.9898
+F,Lillian O'Mara,22:28.79,12,Aloha,5000,1.0011
+F,Lillian O'Mara,22:38.70,12,Aloha,5000,0.9959
+F,Audrey Cooper,22:51.36,10,Aloha,5000,1.0011
+F,Audrey Cooper,25:00.50,10,Aloha,5000,1.0329
+F,Mae Fields,23:10.03,10,Aloha,5000,1.0011
+F,Mae Fields,23:05.30,10,Aloha,5000,0.9898
+F,Mae Fields,23:22.70,10,Aloha,5000,0.9959
+F,Madelyn O'Mara,24:02.03,10,Aloha,5000,1.0011
+F,Madelyn O'Mara,24:09.90,10,Aloha,5000,0.9898
+F,Madelyn O'Mara,24:51.70,10,Aloha,5000,0.9959
+F,Emma Evans,25:15.45,9,Aloha,5000,1.0011
+F,Emma Evans,25:04.70,9,Aloha,5000,0.9898
+F,Emma Evans,25:59.90,9,Aloha,5000,0.9959
+F,Michelle Mena Cardenas,27:13.70,12,Aloha,5000,0.9898
+F,Michelle Mena Cardenas,28:23.48,12,Aloha,5000,1.0011
+F,Michelle Mena Cardenas,28:49.50,12,Aloha,5000,0.9959
+F,Annalee Tang,21:32.50,12,Reynolds,5000,0.9571
+F,Annalee Tang,22:27.30,12,Reynolds,5000,0.9868
+F,Annalee Tang,22:39.33,12,Reynolds,5000,0.9889
+F,Cali Thoman,21:53.10,12,Reynolds,5000,0.9571
+F,Cali Thoman,22:59.43,12,Reynolds,5000,1.0011
+F,Cali Thoman,22:44.20,12,Reynolds,5000,0.9868
+F,Ava Gray,22:58.60,12,Reynolds,5000,0.9571
+F,Ava Gray,24:51.40,12,Reynolds,5000,0.9868
+F,Estefania Rios Cano,23:41.40,12,Reynolds,5000,0.9868
+F,Estefania Rios Cano,23:36.50,12,Reynolds,5000,0.9571
+F,Anjy Martinez,24:50.73,12,Reynolds,5000,0.9889
+F,Anjy Martinez,24:11.30,12,Reynolds,5000,0.9571
+F,Anjy Martinez,25:57.05,12,Reynolds,5000,1.0011
+F,Yani Naknakhone,24:57.10,12,Reynolds,5000,0.9868
+F,Yani Naknakhone,26:29.06,12,Reynolds,5000,1.0011
+F,McKenna Lasselle Ibsen,24:45.20,10,Reynolds,5000,0.9571
+F,Lacey Veltkamp,22:14.23,11,Barlow,5000,1.0040
+F,Lacey Veltkamp,22:15.90,11,Barlow,5000,1.0011
+F,Lacey Veltkamp,23:13.27,11,Barlow,5000,1.0021
+F,Audrey Carlson,22:17.67,12,Barlow,5000,1.0011
+F,Audrey Carlson,22:31.76,12,Barlow,5000,1.0040
+F,Audrey Carlson,22:10.90,12,Barlow,5000,0.9868
+F,Claire Lee,22:29.26,12,Barlow,5000,0.9889
+F,Claire Lee,22:33.60,12,Barlow,5000,0.9868
+F,Claire Lee,23:16.47,12,Barlow,5000,1.0040
+F,Ariana Campbell,23:28.85,12,Barlow,5000,1.0011
+F,Ariana Campbell,23:57.10,12,Barlow,5000,1.0040
+F,Ariana Campbell,23:45.08,12,Barlow,5000,0.9889
+F,Samantha Lawson,23:30.29,9,Barlow,5000,1.0011
+F,Samantha Lawson,23:20.70,9,Barlow,5000,0.9868
+F,Samantha Lawson,24:11.29,9,Barlow,5000,1.0040
+F,Hallel Mathews,23:44.54,11,Barlow,5000,1.0011
+F,Hallel Mathews,24:23.49,11,Barlow,5000,1.0040
+F,Hallel Mathews,24:24.45,11,Barlow,5000,0.9889
+F,Sophia Oommen,24:29.81,10,Barlow,5000,1.0021
+F,Sophia Oommen,24:35.14,10,Barlow,5000,1.0011
+F,Titi Paternoster,19:41.00,10,St Mary's Academy,5000,0.9946
+F,Titi Paternoster,19:59.46,10,St Mary's Academy,5000,0.9943
+F,Titi Paternoster,20:17.90,10,St Mary's Academy,5000,0.9959
+F,Megan Coffield,19:42.10,11,St Mary's Academy,5000,0.9946
+F,Megan Coffield,20:08.36,11,St Mary's Academy,5000,0.9943
+F,Megan Coffield,20:42.70,11,St Mary's Academy,5000,0.9959
+F,Lydia Creany,19:42.70,10,St Mary's Academy,5000,0.9946
+F,Lydia Creany,20:16.28,10,St Mary's Academy,5000,0.9943
+F,Lydia Creany,19:58.50,10,St Mary's Academy,5000,0.9571
+F,Alinea Wang,20:22.45,11,St Mary's Academy,5000,1.0021
+F,Alinea Wang,20:13.94,11,St Mary's Academy,5000,0.9943
+F,Alinea Wang,20:16.30,11,St Mary's Academy,5000,0.9946
+F,Isabel Rodriguez Guenther,20:35.64,12,St Mary's Academy,5000,0.9943
+F,Isabel Rodriguez Guenther,20:57.10,12,St Mary's Academy,5000,0.9959
+F,Isabel Rodriguez Guenther,20:59.00,12,St Mary's Academy,5000,0.9946
+F,Petula Ahrens,21:17.40,10,St Mary's Academy,5000,0.9959
+F,Petula Ahrens,21:29.88,10,St Mary's Academy,5000,0.9943
+F,Petula Ahrens,21:36.70,10,St Mary's Academy,5000,0.9946
+F,Samantha Harder,21:34.00,12,St Mary's Academy,5000,0.9959
+F,Samantha Harder,21:40.40,12,St Mary's Academy,5000,0.9946
+F,Samantha Harder,22:23.70,12,St Mary's Academy,5000,0.9943

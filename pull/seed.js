@@ -80,7 +80,7 @@
   /* One athletic.net result -> one row for buildSeed, or null to skip it.
      SortValue is already seconds, which saves parsing Result, but it is also
      where the 999999 scratch sentinel lives - buildSeed's bounds catch that. */
-  function resultRow(r, date, dist) {
+  function resultRow(r, date, dist, meetId) {
     if (!r || r.Exhibition) return null;     // unattached, not on anyone's roster
     return {
       g: r.Gender,
@@ -95,6 +95,10 @@
       grade: r.Grade || r.AgeGrade || '',
       seconds: r.SortValue || r.Result,
       dist: dist || 5000,
+      /* who and where, so races can be rated: the athlete by id (a name is not
+         an identity) and the meet the mark came from */
+      aid: +r.AthleteID || 0,
+      mid: meetId ? String(meetId) : '',
       date: date || '',
     };
   }
@@ -294,8 +298,21 @@
          attribute or a text node. */
       keep.push({ g: r.g, name: cleanName(r.name), dist,
                   sec, date: r.date || '', grade: String(r.grade || '').replace(/\D/g, ''),
-                  team: b.name, cls: b.cls });
+                  team: b.name, cls: b.cls, aid: r.aid || 0, mid: r.mid || '',
+                  race: +r.race || 1 });
     }
+
+    /* Rate every 5,000m race from every Oregon result read, not only the marks
+       that will ship: the more runners who cross between races, the better each
+       race is pinned. A mark with no athlete id, meet or date - an old saved
+       crawl, the shipped seed read back in a test - keeps whatever factor it
+       arrived with, which is 1 unless it came from a seed that had one. */
+    const rateable = keep.filter(r => r.dist === 5000 && r.aid && r.mid && r.date);
+    const races = rateable.length
+      ? fitRaces(rateable.map(r => ({ aid: r.aid, g: r.g, mid: r.mid, secs: r.sec, date: r.date })),
+                 { tauPct: RACE_TAU, seasonStart: year + '-' + SEASON_START })
+      : null;
+    for (const r of rateable) r.race = races.factorFor(r.mid + '|' + r.g);
 
     /* athlete -> their marks, on the board they belong to.
        Deduplicated on the day and the time: nobody runs two 5,000m races on one
@@ -314,12 +331,15 @@
       // with no date there is nothing to compare, so nothing is deduplicated
       const sig = r.date && r.date + '@' + r.sec;
       if (sig) { if (a.seen.has(sig)) { dropped.duplicate++; continue; } a.seen.add(sig); }
-      a.marks.push(r.sec);
+      a.marks.push({ sec: r.sec, race: r.race });
     }
+    /* Ranked and trimmed on the race-rated value, which is what the model runs
+       on: a 17:40 on a slow day can be the better of two marks than a 17:30 on a
+       quick one. The time actually run is what is written. */
     for (const a of byAthlete.values()) {
-      a.marks.sort((x, y) => x - y);
+      a.marks.sort((x, y) => x.sec / x.race - y.sec / y.race);
       a.marks = a.marks.slice(0, MARKS_PER_ATHLETE);
-      a.best = a.marks[0];
+      a.best = a.marks[0].sec / a.marks[0].race;
     }
 
     // team -> its seven fastest
@@ -346,10 +366,10 @@
       || a.best - b.best
       || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
-    const lines = ['gender,athlete,mark,grade,team,dist,class'];
+    const lines = ['gender,athlete,mark,grade,team,dist,class,race'];
     for (const a of out)
-      for (const sec of a.marks)
-        lines.push([a.g, a.name, fmt(sec), a.grade, a.team, a.dist, a.cls].join(','));
+      for (const m of a.marks)
+        lines.push([a.g, a.name, fmt(m.sec), a.grade, a.team, a.dist, a.cls, m.race.toFixed(4)].join(','));
 
     const five = out.filter(a => a.dist === 5000), miles = out.filter(a => a.dist === MILES_3);
     return {
@@ -364,8 +384,109 @@
         teams: [...new Set(miles.map(a => a.team + ' ' + (a.g === 'F' ? 'girls' : 'boys')))].sort(),
       },
       latest, dropped,
+      races: races ? races.stats : null,
       offBoard: [...offBoardNames].sort(),
       outOfState: [...outOfStateNames].sort(),
+    };
+  }
+
+  /* ---------- race ratings ----------
+     How fast each race was on its day, the Tully Runners way: a runner's mark is
+     divided by it before anything else looks at the mark. Lives here, not in
+     backtest/, because the weekly crawl, the browser harness and the backtest all
+     have to run the same fit - see backtest/race_ratings.js for the reasoning and
+     backtest/athlete_level.js for the evidence. RACE_TAU is the weekly
+     improvement held fixed while the races are fitted; chosen leaving one season
+     out, it came back -1 or -1.25 every time. */
+  const RACE_TAU = -1;
+  const median = a => {
+    if (!a.length) return 0;
+    const s = a.slice().sort((x, y) => x - y), h = s.length >> 1;
+    return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2;
+  };
+
+  /* rows: { aid, g, mid, secs, date }  (date as YYYY-MM-DD)
+     opts: shrink (k in n/(n+k)), iters, seasonStart (YYYY-MM-DD, week zero),
+           tauPct - the weekly improvement, FIXED, as a percentage (-1 = a runner
+           gets 1% faster a week). Pass null to estimate it, which is kept only to
+           show that it cannot be: on the four backtest seasons the estimate swings
+           from +18% to -20% a week between cutoffs. The race terms are barely
+           shrunk (a field of eighty gives n/(n+k) of 0.9), so "everyone got fitter"
+           and "the later races were quicker" are the same equation and the slope
+           wanders between them. Meylan resolves it by judgment and by rating
+           against recent form. Here it is one number chosen the way the variance
+           dial is: by which value forecasts best across every season. */
+  function fitRaces(rows, opts) {
+    const o = Object.assign({ shrink: 8, iters: 60, seasonStart: null, tauPct: -1 }, opts || {});
+    const FIXED = o.tauPct !== null && o.tauPct !== undefined;
+    const DAY = 864e5;
+    const t0 = new Date((o.seasonStart || rows.reduce((m, r) => r.date < m ? r.date : m, '9999')) + 'T12:00:00');
+    const week = d => (new Date(d + 'T12:00:00') - t0) / (7 * DAY);
+
+    // one observation per athlete per race; a repeat is the same race read twice
+    const seen = new Set(), obs = [];
+    for (const r of rows) {
+      // a race is a meet and a gender, or finer if the caller says so (r.race):
+      // varsity and JV at one meet are different fields at different times
+      const race = r.race || (r.mid + '|' + r.g), k = r.aid + '|' + race;
+      if (seen.has(k) || !(r.secs > 0) || !r.date) continue;
+      seen.add(k);
+      obs.push({ a: r.aid + '|' + r.g, race, y: Math.log(r.secs), w: week(r.date) });
+    }
+    const per = new Map();
+    for (const x of obs) per.set(x.a, (per.get(x.a) || 0) + 1);
+    const fitObs = obs.filter(x => per.get(x.a) >= 2);
+
+    const A = new Map(), R = new Map();
+    const byA = new Map(), byR = new Map();
+    for (const x of fitObs) {
+      (byA.get(x.a) || byA.set(x.a, []).get(x.a)).push(x);
+      (byR.get(x.race) || byR.set(x.race, []).get(x.race)).push(x);
+      R.set(x.race, 0);
+    }
+    let tau = FIXED ? Math.log(1 + o.tauPct / 100) : 0;
+    for (let it = 0; it < o.iters; it++) {
+      for (const [a, xs] of byA) A.set(a, median(xs.map(x => x.y - tau * x.w - R.get(x.race))));
+      for (const [race, xs] of byR) {
+        const m = median(xs.map(x => x.y - A.get(x.a) - tau * x.w));
+        R.set(race, m * xs.length / (xs.length + o.shrink));
+      }
+      // tau from within-athlete variation only: centre each athlete's weeks
+      let num = 0, den = 0;
+      if (!FIXED) {
+      for (const xs of byA.values()) {
+        const wb = xs.reduce((s, x) => s + x.w, 0) / xs.length;
+        for (const x of xs) {
+          const dw = x.w - wb;
+          num += dw * (x.y - A.get(x.a) - R.get(x.race));
+          den += dw * dw;
+        }
+      }
+      // the least-squares slope of what the athlete and race terms leave
+      tau = den ? num / den : 0;
+      }
+      // pin the level: races average zero, weighted by field size
+      let s = 0, n = 0;
+      for (const [race, xs] of byR) { s += R.get(race) * xs.length; n += xs.length; }
+      const mu = n ? s / n : 0;
+      for (const race of R.keys()) R.set(race, R.get(race) - mu);
+      for (const a of A.keys()) A.set(a, A.get(a) + mu);
+    }
+
+    const races = [...byR.entries()].map(([race, xs]) => ({ race, n: xs.length, effect: R.get(race) }));
+    return {
+      tau,                                    // log-time per week; negative = getting faster
+      races,
+      /* The factor a mark is divided by. mode 'race' removes the race; 'trend'
+         also moves the mark from its date to `toDate` at the fitted rate. A race
+         the fit never saw (nobody in it raced twice) is left at 1. */
+      factorFor(race, date, mode, toDate) {
+        const e = R.has(race) ? R.get(race) : 0;
+        if (mode !== 'trend' || !date || !toDate) return Math.exp(e);
+        return Math.exp(e + tau * (week(date) - week(toDate)));
+      },
+      stats: { observations: obs.length, informative: fitObs.length, athletes: byA.size,
+               races: byR.size, pctPerWeek: (Math.exp(tau) - 1) * 100 },
     };
   }
 
@@ -400,6 +521,6 @@
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
            cleanName,
            patchIndex, patchLogos, SEASON_START, MIN_5K, MAX_5K,
-           OREGON_DIV, MILES_3, divMetres, wantDiv, resultRow, teamsFromTree,
+           OREGON_DIV, MILES_3, divMetres, wantDiv, resultRow, teamsFromTree, fitRaces, RACE_TAU,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };
 }));

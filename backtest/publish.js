@@ -15,11 +15,80 @@ const L = require('./lib.js');
 const SEASONS = +(process.argv[2] || 20000);
 const HSEASONS = +(process.argv[3] || 5000);
 const SIGMA = L.M.CAL.sd;
+/* What ships is race-rated marks, so what is published is scored on race-rated
+   seeds: build_season.js --race=-1 writes them, from marks known at each cutoff.
+   Scoring the raw seeds here would publish a record of a model the site no
+   longer runs. */
+const VARIANT = '-race' + require('../pull/seed.js').RACE_TAU;
 const YEARS = L.years();
 const t0 = Date.now();
 
 console.log('publishing the backtest — ' + SEASONS.toLocaleString() + ' seasons per board, sigma '
   + SIGMA + '%');
+
+/* ---------- how the right dial moves with the horizon ---------- */
+console.log('  horizon sweep, ' + HSEASONS.toLocaleString() + ' seasons per point');
+/* Wide enough that the answer is never the edge of the range. With four
+   seasons the eight-week optimum came back as exactly 6.0%, the old top of the
+   sweep, which is not a measurement - it is a sweep that ran out. sweep.js had
+   already gone to 8.0 for the same reason. The bottom ran out too, and for
+   longer: it started at 2.0, the four- and two-week optimum came back as 2.0,
+   and the site's race-day spread sat at 2.3 on the strength of it. It now
+   starts at 1.0. */
+const SIGMAS = [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.3, 2.6, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0, 9.0];
+// every season carries its own state meet date in its truth file
+const STATE_DAY = Object.fromEntries(YEARS.map(y => [y, L.truthFor(y).stateDate]));
+const nCuts = Math.min(...YEARS.map(y => L.cutoffs(y).length));
+const horizon = [];
+for (let ci = 0; ci < nCuts; ci++) {
+  let weeks = 0, best = null, atShipped = 0;
+  for (const s of SIGMAS) {
+    const ps = [];
+    for (const year of YEARS) for (const g of ['M', 'F']) {
+      const cut = L.cutoffs(year)[ci];
+      weeks = (new Date(STATE_DAY[year]) - new Date(cut)) / 6048e5;
+      for (const t of L.odds(year, g, cut + VARIANT, s, HSEASONS).teams) ps.push([t.p, t.actual]);
+    }
+    const b = L.brier(ps);
+    if (Math.abs(s - SIGMA) < 1e-9) atShipped = b;
+    if (!best || b < best.b) best = { s, b };
+  }
+  horizon.push({ weeks: +weeks.toFixed(1), best: best.s, brier: +best.b.toFixed(4),
+                 shipped: +atShipped.toFixed(4) });
+  console.log('    ' + weeks.toFixed(0) + 'w out: best sigma ' + best.s + '%');
+}
+
+/* The headline is scored the way the board actually runs, not at the bare
+   race-day dial. The site adds a horizon allowance on top of the dial, read off
+   the sweep above, so eight weeks out it runs at the eight-week best and four
+   weeks out at the four-week one. Scoring September at the bare dial published
+   a model nobody sees: when the dial moved from 2.3 to 1.6 - a correction, see
+   CLAUDE.md - the headline skill fell from 35% to 32% while what the board
+   actually runs improved. The catch, stated on the page: the spread is chosen on
+   these same four seasons, so the headline is a best case for the method. */
+const SIG_SEPT = horizon[0].best, SIG_LATE = horizon[2].best;
+
+/* The same four seasons scored at every horizon, each at the spread the board
+   runs there. The September headline is one reading of the season; a reader
+   looking at the board in October is five or four weeks out, and deserves the
+   figures for where the board actually is. */
+const byHorizon = horizon.map((h, ci) => {
+  let found = 0, field = 0, champ = 0, n = 0; const ps = [];
+  for (const year of YEARS) for (const g of ['M', 'F']) {
+    const r = L.odds(year, g, L.cutoffs(year)[ci] + VARIANT, h.best, HSEASONS);
+    field += r.order.length;
+    found += r.teams.filter(t => t.modelled).slice(0, r.order.length).filter(t => t.actual).length;
+    const fav = r.teams.reduce((x, y) => (y.win > x.win ? y : x));
+    if (fav.name === r.order[0]) champ++;
+    n++;
+    for (const t of r.teams) ps.push([t.p, t.actual]);
+  }
+  const b = L.brier(ps), base = ps.reduce((s, p) => s + p[1], 0) / ps.length;
+  const bref = L.brier(ps.map(p => [base, p[1]]));
+  console.log('    ' + h.weeks + 'w out: found ' + found + '/' + field + ', ' + champ + ' of ' + n + ' champions');
+  return { weeks: h.weeks, sigma: h.best, found, ofField: field, champHit: champ, champOf: n,
+           skill: Math.round(100 * (1 - b / bref)) };
+});
 
 /* ---------- the September pass, board by board ---------- */
 /* How many marks the model actually had at a cutoff. athletic.net's coverage
@@ -35,7 +104,7 @@ const perSeason = [];
 for (const year of YEARS) {
   const cutoff = L.cutoffs(year)[0];
   for (const gender of ['M', 'F']) {
-    const { teams, order, truth } = L.odds(year, gender, cutoff, SIGMA, SEASONS);
+    const { teams, order, truth } = L.odds(year, gender, cutoff + VARIANT, SIG_SEPT, SEASONS);
     pooled.push(...teams);
     const found = teams.filter(t => t.modelled).slice(0, order.length).filter(t => t.actual).length;
     const bs = L.brier(teams.map(t => [t.p, t.actual]));
@@ -48,7 +117,7 @@ for (const year of YEARS) {
        model that is weak from a model that is early, and those are different
        things to know about a September projection. */
     const lateCut = L.cutoffs(year)[2];
-    const lt = L.odds(year, gender, lateCut, SIGMA, SEASONS);
+    const lt = L.odds(year, gender, lateCut + VARIANT, SIG_LATE, SEASONS);
     const lb = L.brier(lt.teams.map(x => [x.p, x.actual]));
     const lbase = lt.teams.reduce((s, x) => s + x.actual, 0) / lt.teams.length;
     const lref = L.brier(lt.teams.map(x => [lbase, x.actual]));
@@ -81,35 +150,6 @@ const bands = bins.map(([lo, hi]) => {
     was: Math.round(100 * g.reduce((s, t) => s + t.actual, 0) / g.length),
   };
 }).filter(Boolean);
-
-/* ---------- how the right dial moves with the horizon ---------- */
-console.log('  horizon sweep, ' + HSEASONS.toLocaleString() + ' seasons per point');
-/* Wide enough that the answer is never the edge of the range. With four
-   seasons the eight-week optimum came back as exactly 6.0%, the old top of the
-   sweep, which is not a measurement - it is a sweep that ran out. sweep.js had
-   already gone to 8.0 for the same reason. */
-const SIGMAS = [2.0, 2.3, 2.6, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0, 9.0];
-// every season carries its own state meet date in its truth file
-const STATE_DAY = Object.fromEntries(YEARS.map(y => [y, L.truthFor(y).stateDate]));
-const nCuts = Math.min(...YEARS.map(y => L.cutoffs(y).length));
-const horizon = [];
-for (let ci = 0; ci < nCuts; ci++) {
-  let weeks = 0, best = null, atShipped = 0;
-  for (const s of SIGMAS) {
-    const ps = [];
-    for (const year of YEARS) for (const g of ['M', 'F']) {
-      const cut = L.cutoffs(year)[ci];
-      weeks = (new Date(STATE_DAY[year]) - new Date(cut)) / 6048e5;
-      for (const t of L.odds(year, g, cut, s, HSEASONS).teams) ps.push([t.p, t.actual]);
-    }
-    const b = L.brier(ps);
-    if (Math.abs(s - SIGMA) < 1e-9) atShipped = b;
-    if (!best || b < best.b) best = { s, b };
-  }
-  horizon.push({ weeks: +weeks.toFixed(1), best: best.s, brier: +best.b.toFixed(4),
-                 shipped: +atShipped.toFixed(4) });
-  console.log('    ' + weeks.toFixed(0) + 'w out: best sigma ' + best.s + '%');
-}
 
 /* ---------- pack it ----------
    RECORD used to carry the live seed's row count as `marks`. It has been
@@ -146,6 +186,7 @@ const R = {
   skill: Math.round(100 * (1 - brier / bref)),
   logloss: +L.logloss(pooled.map(t => [t.p, t.actual])).toFixed(3),
   sigma: SIGMA,
+  sigmaRun: SIG_SEPT, sigmaRunLate: SIG_LATE, byHorizon,
   runs: SEASONS,
   bands, horizon, perSeason,
   cutoffLate: label(L.cutoffs(YEARS[0])[2]),

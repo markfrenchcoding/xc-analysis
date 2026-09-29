@@ -145,7 +145,7 @@ function meetRows(meetId, counters) {
     }
     if (!rows.length) counters.empty++;
     for (const r of rows) {
-      const row = Seed.resultRow(r, date, dist);
+      const row = Seed.resultRow(r, date, dist, meetId);
       if (row) out.push(row);
     }
   }
@@ -263,7 +263,12 @@ function main() {
 
   if (bad) { log('\n  NOT WRITING: ' + bad); process.exitCode = 2; return; }
   if (DRY) { log('\n  --dry, nothing written'); return; }
-  if (b.rows === wasRows && date === (html.match(/const DATA_DATE="([\d-]+)"/) || [, ''])[1]) {
+  /* "Nothing changed" is the seed's content, not its row count: re-rating races
+     or a new column can rewrite every row and leave the count exactly where it
+     was. */
+  const wasSeed = (fs.readFileSync(IDX, 'utf8').match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
+    .trim().replace(/\r\n/g, '\n');
+  if (b.csv.trim() === wasSeed && date === (html.match(/const DATA_DATE="([\d-]+)"/) || [, ''])[1]) {
     log('\n  nothing changed'); process.exitCode = 3; return;
   }
 

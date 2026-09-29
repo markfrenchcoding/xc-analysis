@@ -26,3 +26,11 @@ pull/roster/.page-baseline*.json
 
 # screenshots taken while checking a layout; regenerated on demand
 look/
+
+# race-rated backtest seeds other than the one publish.js reads; they rebuild in
+# seconds with build_season.js --race=...
+backtest/data/*-race0.csv
+backtest/data/*-race-0.5.csv
+backtest/data/*-race-1.5.csv
+backtest/data/*-trend*.csv
+backtest/data/*-drace*.csv

@@ -23,11 +23,11 @@ ok(Object.keys(board).length > 200, 'board covers the schools');
 const raw = html.match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/)[1].trim();
 const lines = raw.split('\n');
 const head = lines[0].split(',');
-eq(head.join(','), 'gender,athlete,mark,grade,team,dist,class', 'header');
+eq(head.join(','), 'gender,athlete,mark,grade,team,dist,class,race', 'header');
 
 const rows = lines.slice(1).map(l => {
   const c = l.split(',');
-  return { g: c[0], name: c[1], mark: c[2], grade: c[3], school: c[4], dist: +c[5], cls: c[6] };
+  return { g: c[0], name: c[1], mark: c[2], grade: c[3], school: c[4], dist: +c[5], cls: c[6], race: +c[7] || 1 };
 });
 console.log(lines.length - 1 + ' rows in, ' + new Set(rows.map(r => r.school)).size + ' schools');
 
@@ -291,6 +291,38 @@ ok(!(999 in ft.ids), 'an out-of-state school has no Oregon id');
   eq(aliased.rows, 1, 'an id finds the board school whatever athletic.net calls it');
   const noId = S.buildSeed([mk('Old Row', 'Jesuit', 0, 970)], board, ft.ids);
   eq(noId.rows, 1, 'a row with no id falls back to its name');
+}
+
+/* ---------- race ratings ----------
+   Eight runners race twice: a quick day, then a meet where everyone ran 4%
+   slower. The slow race has to come out slow, the marks have to be trimmed on
+   the rated value, and the time actually run is what gets written. */
+{
+  const rows = [];
+  for (let i = 0; i < 8; i++) {
+    const base = 1100 + i * 10;
+    rows.push({ g: 'F', name: 'Runner ' + i, school: 'Jesuit', grade: '11', dist: 5000,
+                seconds: base, date: '2026-09-06', aid: 100 + i, mid: 'quick' });
+    rows.push({ g: 'F', name: 'Runner ' + i, school: 'Jesuit', grade: '11', dist: 5000,
+                seconds: base * 1.04, date: '2026-09-13', aid: 100 + i, mid: 'slow' });
+  }
+  const b = S.buildSeed(rows, board);
+  const lines = b.csv.split('\n');
+  eq(lines[0], 'gender,athlete,mark,grade,team,dist,class,race', 'the seed carries a race column');
+  const f = mid => +lines.slice(1).find(l => l.includes(mid === 'slow' ? '19:04.00' : '18:20.00')).split(',')[7];
+  // eight runners is a thin race, so each rating is shrunk halfway toward zero
+  // (n / (n + 8)). The slow meet is a week later, when a runner should be 1%
+  // quicker (RACE_TAU), so it is 5% slower than form says, not 4% - and halved,
+  // 2.5%. The week is the point: without it the gap would read 2%.
+  ok(f('slow') > 1.005, 'the slow race is rated slow — ' + f('slow'));
+  ok(f('quick') < 0.995, 'and the quick one quick — ' + f('quick'));
+  ok(Math.abs(f('slow') / f('quick') - 1.025) < 0.003, 'by the shrunk gap plus a week, about 2.5% — ' + (f('slow') / f('quick')).toFixed(4));
+  ok(/,Runner 0,19:04\.00,/.test(b.csv), 'the time actually run is written, not the rated one');
+  ok(b.races && b.races.races === 2, 'two races rated');
+  // a lone mark in an unrated race, and a row with no id, keep factor 1
+  const lone = S.buildSeed([{ g: 'F', name: 'Solo', school: 'Jesuit', grade: '9', dist: 5000,
+    seconds: 1200, date: '2026-09-06' }], board);
+  ok(/,1\.0000$/.test(lone.csv.split('\n')[1]), 'an unrateable mark keeps a factor of 1');
 }
 
 console.log(pass + ' passed' + (fail ? ', ' + fail + ' FAILED' : ''));

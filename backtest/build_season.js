@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fitCourses } = require('../fit_courses.js');
+const { fitRaces } = require('./race_ratings.js');
 
 const YEAR = process.argv[2];
 // argv[3] is an optional raw directory; flags must not be mistaken for one
@@ -36,6 +37,13 @@ if (COMMON) {
   COMMON_IDS = new Set(JSON.parse(fs.readFileSync(f, 'utf8')).meets[YEAR] || []);
 }
 if (!cfg) { console.error('no seasons.json entry for ' + YEAR); process.exit(1); }
+
+/* --race=0,-0.5,-1 writes race-rated seeds, one pair per weekly improvement
+   rate: CUTOFF-race<rate> divides each mark by how fast its race was, and
+   CUTOFF-trend<rate> also carries it forward to the cutoff date at that rate.
+   See race_ratings.js. Read back through lib.odds as CUTOFF + "-race-1" etc. */
+const RACE_TAUS = ((process.argv.find(a => a.startsWith('--race=')) || '').split('=')[1] || '')
+  .split(',').filter(Boolean).map(Number);
 
 const split = l => { const o = []; let c = '', q = false;
   for (const ch of l) { if (q) { if (ch === '"') q = false; else c += ch; }
@@ -183,13 +191,15 @@ function seedFor(g, CUTOFF, useCourse, onlyCommon, xrule) {
     && !(xrule && xrule.test(Object.assign({ factor: cfForRule(r.mid) }, meetStats[r.mid]))));
   // with adjustment off every factor is 1, so ranking falls back to raw time
   // and the seed is byte-identical to the one built before this existed
-  const cf = useCourse ? coursesAt(CUTOFF) : { factorFor: () => 1 };
+  // a function is a per-mark factor (the race ratings); true is the course fit
+  const cf = typeof useCourse === 'function' ? { factorFor: (mid, d, r) => useCourse(r) }
+    : useCourse ? coursesAt(CUTOFF) : { factorFor: () => 1 };
   const ath = new Map(), seen = new Set();
   for (const r of info) {
     const pk = `${r.aid}|${r.mid}|${r.dist}|${r.s}`; if (seen.has(pk)) continue; seen.add(pk);
     const k = `${r.aid}|${r.dist}`;
     if (!ath.has(k)) ath.set(k, { name: r.name, grade: r.grade, school: r.school, dist: r.dist, marks: [] });
-    const f = cf.factorFor(r.mid, r.dist);
+    const f = cf.factorFor(r.mid, r.dist, r);
     ath.get(k).marks.push({ raw: r.s, f, adj: r.s / f });
   }
   // rank and cut on the course-neutral value, which is what the model will use
@@ -269,6 +279,30 @@ for (const CUTOFF of cfg.cutoffs) {
     fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + "-x" + XARG + ".csv"),
       x.join("\n") + "\n");
     console.log("    " + XARG + ": " + n + " athletes, " + (x.length - 1) + " marks");
+  }
+
+  /* Two granularities. "race" rates a meet's boys or girls as one race; "drace"
+     rates each division on its own, because a meet's varsity and JV 5,000m are
+     different fields at different times of day and lumping them lets the JV
+     field set the varsity race's speed. */
+  const keyOf = { race: r => r.mid + '|' + r.g, drace: r => r.mid + '|' + r.g + '|' + r.divName };
+  for (const tauPct of RACE_TAUS) for (const gran of ['race', 'drace']) {
+    const fit = fitRaces(rows.filter(r => !(cfg.exclude || []).includes(r.mid)
+      && (meta.meets[r.mid] || {}).date <= CUTOFF)
+      .map(r => ({ aid: r.aid, g: r.g, mid: r.mid, race: keyOf[gran](r), secs: r.s,
+                   date: (meta.meets[r.mid] || {}).date })),
+      { tauPct, seasonStart: YEAR + SEASON_START });
+    for (const mode of gran === 'race' ? ['race', 'trend'] : ['drace']) {
+      const fm = mode === 'trend' ? 'trend' : 'race';
+      const out = ["gender,athlete,mark,grade,team,dist,course"];
+      for (const g of ["M", "F"])
+        for (const a of seedFor(g, CUTOFF, r => fit.factorFor(keyOf[gran](r), (meta.meets[r.mid] || {}).date, fm, CUTOFF)))
+          for (const m of a.marks)
+            out.push([g, a.name, fmt(m.raw), a.grade, a.school, a.dist, m.f.toFixed(4)].map(esc).join(","));
+      fs.writeFileSync(path.join(outDir, YEAR + "-seed-" + CUTOFF + "-" + mode + tauPct + ".csv"), out.join("\n") + "\n");
+    }
+    console.log("    " + gran + " at " + tauPct + "%/wk: " + fit.stats.races + " rated from "
+      + fit.stats.informative + " marks by athletes who raced twice");
   }
 
   const cf = coursesAt(CUTOFF);
