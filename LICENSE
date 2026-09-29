@@ -1,9 +1,12 @@
-Copyright (c) 2026 Mark French. All rights reserved.
+Copyright (c) 2026 the authors of Chute. All rights reserved.
 
 Chute (chutexc.vercel.app) and everything in this repository is proprietary:
 the simulation and the site, the data pipeline in pull/, the backtest harness
 and season databases in backtest/, the school dashboards in tualatin/ and
 sherwood/, and the written notes.
+
+Copyright vests in the authors whether or not they are named here. Naming no
+one waives nothing.
 
 THIS REPOSITORY IS PUBLIC FOR ONE REASON
 
@@ -48,4 +51,5 @@ in their data.
 
 ENQUIRIES
 
-Permission, licensing and partnership: markfrenchoit@outlook.com
+Permission, licensing and partnership enquiries: open an issue at
+github.com/markfrenchcoding/xc-analysis
