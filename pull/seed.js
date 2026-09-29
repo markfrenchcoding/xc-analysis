@@ -49,19 +49,38 @@
   const OREGON_DIV = 87377;            // World > United States > High School > Oregon
 
   /* "5,000 Meters Varsity" -> 5000. The only place a division's distance is
-     recorded; there is no distance field. The imperial divisions ("3 Miles
-     Varsity Boys") are meant to come out as 0 and be dropped - the board is
-     5,000m and nothing is ever converted - so a meet of nothing but 3-mile
-     races contributing no rows is right rather than broken. */
+     recorded; there is no distance field.
+
+     Three miles is the one imperial distance read, as 4828 (metres, rounded).
+     Crater's top three girls raced Woodbridge in California over 3 miles in
+     September 2026 and nowhere else, so the board had never heard of them. The
+     marks are kept at the distance they were run; converting them is the site's
+     job and only when the reader asks, behind the "3-mile races" setting. Every
+     other imperial distance still comes out as 0 and is dropped. */
+  const MILES_3 = 4828;
   function divMetres(name) {
-    const m = String(name || '').match(/([\d,]+)\s*Meters/i);
-    return m ? +m[1].replace(/,/g, '') : 0;
+    const s = String(name || '');
+    const m = s.match(/([\d,]+)\s*Meters?/i);
+    if (m) return +m[1].replace(/,/g, '');
+    return /(^|\D)3\s*Miles?\b/i.test(s) ? MILES_3 : 0;
+  }
+
+  /* Which divisions a crawl reads: every 5,000m race and every 3-mile race.
+     The 3-mile grade races were skipped at first, on the guess that a
+     frosh-soph race at Woodbridge would not reach anyone's top seven. That was
+     a guess, and athletic.net's own Oregon list says 3 miles is not only
+     Woodbridge: Crater's Sawyer Hutton ran his at the Bill Springhorn Classic,
+     in Oregon, on Sep 4. The cost is Woodbridge's 67 divisions, about two
+     minutes of requests a week. */
+  function wantDiv(name) {
+    const d = divMetres(name);
+    return d === 5000 || d === MILES_3;
   }
 
   /* One athletic.net result -> one row for buildSeed, or null to skip it.
      SortValue is already seconds, which saves parsing Result, but it is also
      where the 999999 scratch sentinel lives - buildSeed's bounds catch that. */
-  function resultRow(r, date) {
+  function resultRow(r, date, dist) {
     if (!r || r.Exhibition) return null;     // unattached, not on anyone's roster
     return {
       g: r.Gender,
@@ -75,7 +94,7 @@
       teamId: +(r.TeamID || r.SchoolID) || 0,
       grade: r.Grade || r.AgeGrade || '',
       seconds: r.SortValue || r.Result,
-      dist: 5000,
+      dist: dist || 5000,
       date: date || '',
     };
   }
@@ -235,11 +254,14 @@
     const floor = year ? year + '-' + SEASON_START : '';
 
     for (const r of rows) {
-      if (+r.dist !== 5000) { dropped.dist++; continue; }
+      const dist = +r.dist;
+      if (dist !== 5000 && dist !== MILES_3) { dropped.dist++; continue; }
       if (floor && r.date && r.date < floor) { dropped.preseason++; continue; }
       const sec = toSeconds(r.seconds != null ? r.seconds : r.mark);
       if (!sec) { dropped.unparsed++; continue; }
-      if (sec < MIN_5K || sec > MAX_5K) { dropped.implausible++; continue; }
+      // the same bounds, scaled to the distance actually run
+      const k = dist / 5000;
+      if (sec < MIN_5K * k || sec > MAX_5K * k) { dropped.implausible++; continue; }
       let b;
       if (byId && r.teamId) {
         const own = byId[r.teamId];
@@ -270,7 +292,7 @@
          ampersands would break the page. Apostrophes stay - O'Brien and St
          Mary's are real, and an apostrophe cannot escape a double-quoted
          attribute or a text node. */
-      keep.push({ g: r.g, name: cleanName(r.name),
+      keep.push({ g: r.g, name: cleanName(r.name), dist,
                   sec, date: r.date || '', grade: String(r.grade || '').replace(/\D/g, ''),
                   team: b.name, cls: b.cls });
     }
@@ -280,9 +302,13 @@
        afternoon in the same hundredth of a second, so a repeat is a meet read
        twice - an interrupted crawl resuming, or a division listed twice - and
        counting it would fill a real mark slot with a copy. */
+    /* A 3-mile mark and a 5,000m one are never compared here, so they are two
+       separate athletes as far as the trimming goes: the 5,000m seed comes out
+       exactly as it did before 3-mile races were read, and the 3-mile rows sit
+       on top of it. The site decides whether to use them. */
     const byAthlete = new Map();
     for (const r of keep) {
-      const k = r.cls + '|' + r.g + '|' + r.team + '|' + r.name;
+      const k = r.dist + '|' + r.cls + '|' + r.g + '|' + r.team + '|' + r.name;
       if (!byAthlete.has(k)) byAthlete.set(k, { ...r, marks: [], seen: new Set() });
       const a = byAthlete.get(k);
       // with no date there is nothing to compare, so nothing is deduplicated
@@ -299,7 +325,7 @@
     // team -> its seven fastest
     const byTeam = new Map();
     for (const a of byAthlete.values()) {
-      const k = a.cls + '|' + a.g + '|' + a.team;
+      const k = a.dist + '|' + a.cls + '|' + a.g + '|' + a.team;
       if (!byTeam.has(k)) byTeam.set(k, []);
       byTeam.get(k).push(a);
     }
@@ -313,7 +339,8 @@
     // order rather than alphabetical, or the file opens on 2A/1A.
     const rank = c => ['6A', '5A', '4A', '3A', '2A/1A'].indexOf(c);
     out.sort((a, b) =>
-      rank(a.cls) - rank(b.cls)
+      b.dist - a.dist                       // every 5,000m row, then the 3-mile ones
+      || rank(a.cls) - rank(b.cls)
       || (a.g < b.g ? -1 : a.g > b.g ? 1 : 0)
       || (a.team < b.team ? -1 : a.team > b.team ? 1 : 0)
       || a.best - b.best
@@ -322,14 +349,20 @@
     const lines = ['gender,athlete,mark,grade,team,dist,class'];
     for (const a of out)
       for (const sec of a.marks)
-        lines.push([a.g, a.name, fmt(sec), a.grade, a.team, 5000, a.cls].join(','));
+        lines.push([a.g, a.name, fmt(sec), a.grade, a.team, a.dist, a.cls].join(','));
 
+    const five = out.filter(a => a.dist === 5000), miles = out.filter(a => a.dist === MILES_3);
     return {
       csv: lines.join('\n'),
       rows: lines.length - 1,
-      athletes: out.length,
-      teams: byTeam.size,
-      schools: new Set(out.map(a => a.team)).size,
+      athletes: five.length,
+      teams: new Set(five.map(a => a.cls + '|' + a.g + '|' + a.team)).size,
+      schools: new Set(five.map(a => a.team)).size,
+      miles: {
+        rows: miles.reduce((n, a) => n + a.marks.length, 0),
+        athletes: miles.length,
+        teams: [...new Set(miles.map(a => a.team + ' ' + (a.g === 'F' ? 'girls' : 'boys')))].sort(),
+      },
       latest, dropped,
       offBoard: [...offBoardNames].sort(),
       outOfState: [...outOfStateNames].sort(),
@@ -367,6 +400,6 @@
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
            cleanName,
            patchIndex, patchLogos, SEASON_START, MIN_5K, MAX_5K,
-           OREGON_DIV, divMetres, resultRow, teamsFromTree,
+           OREGON_DIV, MILES_3, divMetres, wantDiv, resultRow, teamsFromTree,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };
 }));

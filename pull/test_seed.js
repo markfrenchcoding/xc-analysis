@@ -72,18 +72,19 @@ eq(built.schools, new Set(rows.map(r => r.school)).size, 'school count survives'
 const norm = a => a.map(x => [x.g, x.name, x.mark, x.grade, x.school, x.cls].join('|')).sort();
 const after = built.csv.split('\n').slice(1).map(l => {
   const c = l.split(',');
-  return { g: c[0], name: c[1], mark: c[2], grade: c[3], school: c[4], cls: c[6] };
+  return { g: c[0], name: c[1], mark: c[2], grade: c[3], school: c[4], dist: +c[5], cls: c[6] };
 });
 const A = norm(rows), B = norm(after);
 const missing = A.filter((x, i) => x !== B[i]);
 ok(A.join('\n') === B.join('\n'), 'identical rows; first divergence: ' + (missing[0] || '-'));
 
-/* ---------- the caps really cap ---------- */
+/* ---------- the caps really cap ----------
+   Per distance: a 3-mile mark never competes with a 5k one for a slot. */
 const perAthlete = new Map(), perTeam = new Map();
 for (const r of after) {
-  const a = r.cls + '|' + r.g + '|' + r.school + '|' + r.name;
+  const a = r.dist + '|' + r.cls + '|' + r.g + '|' + r.school + '|' + r.name;
   perAthlete.set(a, (perAthlete.get(a) || 0) + 1);
-  const t = r.cls + '|' + r.g + '|' + r.school;
+  const t = r.dist + '|' + r.cls + '|' + r.g + '|' + r.school;
   if (!perTeam.has(t)) perTeam.set(t, new Set());
   perTeam.get(t).add(r.name);
 }
@@ -206,7 +207,32 @@ ok(logos.split('const LOGO=').length === 2, 'one LOGO map, not two');
 eq(S.OREGON_DIV, 87377, 'Oregon is division 87377');
 eq(S.divMetres('5,000 Meters Varsity'), 5000, 'a 5k division');
 eq(S.divMetres('3,000 Meters Novice'), 3000, 'a 3k division');
-eq(S.divMetres('3 Miles Varsity Boys'), 0, 'an imperial division is not metres');
+eq(S.divMetres('3 Miles Varsity Boys'), 4828, 'three miles is read, as metres');
+eq(S.divMetres('3 Miles Race 62 - 9:34pm - Bob Day Sweeps (G)'), 4828, 'a Woodbridge race name');
+eq(S.divMetres('2 Miles Varsity'), 0, 'any other imperial distance is not');
+eq(S.divMetres('13 Miles'), 0, 'and a 13 is not a 3');
+ok(S.wantDiv('5,000 Meters JV Boys Gold. (21mins-)'), 'every 5k race is read');
+ok(S.wantDiv('3 Miles Race 63 - 9:54pm - D. Speck Sweeps (B'), 'a sweepstakes race is read');
+ok(S.wantDiv('3 Miles Race 18 - 8:40pm - Red Varsity A (B)'), 'a varsity race is read');
+ok(S.wantDiv('3 Miles Race 05 - 6:04pm - White Soph (B)'), 'and a sophomore race, since every 3-mile race counts');
+ok(!S.wantDiv('3,000 Meters Varsity'), 'a 3k is still not read');
+
+/* ---------- 3-mile rows ride on top of the 5k seed and never displace it ---------- */
+{
+  const one = (name, sec, dist, date) => ({ g: 'F', name, school: 'Jesuit', grade: '11',
+                                            seconds: sec, dist, date });
+  const five = [one('A Five', 1100, 5000, '2026-09-05'), one('A Five', 1110, 5000, '2026-09-12')];
+  const base = S.buildSeed(five, board);
+  const both = S.buildSeed([...five, one('A Five', 960, 4828, '2026-09-19'),
+                            one('Miles Only', 958.7, 4828, '2026-09-19')], board);
+  ok(both.csv.startsWith(base.csv + '\n'), 'the 5k rows are exactly what they were without 3-mile races');
+  ok(/,Miles Only,15:58\.70,11,Jesuit,4828,/.test(both.csv), 'a 3-mile mark keeps the time actually run, marked 4828');
+  eq(both.athletes, base.athletes, 'athlete counts are 5k counts');
+  eq(both.miles.rows, 2, 'and the 3-mile rows are counted on their own');
+  eq(both.miles.teams.join(), 'Jesuit girls', 'naming the teams they belong to');
+  eq(S.buildSeed([one('Too Quick', 700, 4828, '2026-09-19')], board).rows, 0,
+     'a 3-mile time is held to the 5k bounds, scaled');
+}
 eq(S.divMetres('5,000 Meters JV Boys Gold. (21mins-)'), 5000, 'a messy division name');
 eq(S.divMetres(''), 0, 'no name, no distance');
 

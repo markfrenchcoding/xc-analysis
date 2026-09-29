@@ -236,13 +236,14 @@ async function divRows(meetId, divId, jwt) {
 async function meetRows(meetId) {
   const md = await get('Meet/GetMeetData?meetId=' + meetId + '&sport=xc');
   const date = (md.meet && (md.meet.MeetDate || md.meet.StartDate) || '').slice(0, 10);
-  const divs = (md.xcDivisions || []).filter(d => Seed.divMetres(d.DivName) === 5000);
+  // every 5k race, and the 3-mile varsity ones - see wantDiv in seed.js
+  const divs = (md.xcDivisions || []).filter(d => Seed.wantDiv(d.DivName));
   const out = [];
   for (const d of divs) {
     await sleep(GAP_POST);
     if (stopping) break;
     for (const r of await divRows(meetId, d.IDMeetDiv, md.jwtMeet)) {
-      const row = Seed.resultRow(r, date);
+      const row = Seed.resultRow(r, date, Seed.divMetres(d.DivName));
       if (row) out.push(row);
     }
   }
@@ -365,7 +366,8 @@ function finish(html, board) {
     ['Team boards', b.teams],
     ['Crests', Object.keys(S.logos).length],
     ['Results through', date],
-    ['Dropped — not 5,000 m', b.dropped.dist],
+    ['3-mile marks kept', b.miles.rows + (b.miles.teams.length ? ' (' + b.miles.teams.join(', ') + ')' : '')],
+    ['Dropped — not 5,000 m or 3 miles', b.dropped.dist],
     ['Dropped — before the season', b.dropped.preseason],
     ['Dropped — no usable time', b.dropped.unparsed],
     ['Dropped — not a possible 5k', b.dropped.implausible],

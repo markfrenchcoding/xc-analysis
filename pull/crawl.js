@@ -129,9 +129,11 @@ function calendarFor(team) {
 function meetRows(meetId, counters) {
   const md = ask(API + 'Meet/GetMeetData?meetId=' + meetId + '&sport=xc');
   const date = ((md.meet && (md.meet.MeetDate || md.meet.StartDate)) || '').slice(0, 10);
-  const divs = (md.xcDivisions || []).filter(d => Seed.divMetres(d.DivName) === 5000);
+  const divs = (md.xcDivisions || []).filter(d => Seed.wantDiv(d.DivName));
   const out = [];
   for (const d of divs) {
+    const dist = Seed.divMetres(d.DivName);
+    if (dist !== 5000) counters.miles = (counters.miles || 0) + 1;
     sleepSync(GAP_POST);
     counters.read++;
     let rows = (ask(API + 'Meet/GetResultsData3',
@@ -143,7 +145,7 @@ function meetRows(meetId, counters) {
     }
     if (!rows.length) counters.empty++;
     for (const r of rows) {
-      const row = Seed.resultRow(r, date);
+      const row = Seed.resultRow(r, date, dist);
       if (row) out.push(row);
     }
   }
@@ -192,7 +194,7 @@ function main() {
     log(S.meets.length + ' meets with results');
   }
 
-  const counters = { read: S.read, empty: S.empty };
+  const counters = { read: S.read, empty: S.empty, miles: S.miles || 0 };
   while (S.mi < S.meets.length) {
     const id = S.meets[S.mi];
     try {
@@ -207,7 +209,7 @@ function main() {
     }
     // the index advances before the save: recording "done" on a half-read meet
     // re-pulls it on resume and doubles every mark in it
-    S.mi++; S.read = counters.read; S.empty = counters.empty;
+    S.mi++; S.read = counters.read; S.empty = counters.empty; S.miles = counters.miles;
     fs.writeFileSync(STATE, JSON.stringify(S));
     sleepSync(GAP_GET);
   }
@@ -241,6 +243,11 @@ function main() {
   log('  schools           ' + b.schools);
   log('  results through   ' + date);
   log('  dropped           ' + JSON.stringify(b.dropped));
+  /* 3-mile races are read and kept at the distance run; the site converts them
+     only when a reader turns the setting on. Listed so a week that suddenly
+     finds a lot of them is noticed. */
+  log('  3-mile races      ' + (counters.miles || 0) + ' read, ' + b.miles.rows + ' marks for '
+    + (b.miles.teams.length ? b.miles.teams.join(', ') : 'no Oregon team'));
   if (b.outOfState.length)
     log('  other states      ' + b.outOfState.join(', ') + '  (same name, not the Oregon school)');
   log('  empty races       ' + counters.empty + ' of ' + counters.read);

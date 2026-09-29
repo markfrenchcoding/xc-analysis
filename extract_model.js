@@ -19,6 +19,8 @@ const WANT = [
   // buildModel reads this, so the headless copy needs it declared or it throws
   // the moment the function runs rather than when the file loads
   'NEXT_SEASON',
+  // and these, for the 3-mile setting, which is off unless a caller turns it on
+  'MILES_3', 'MI_FACTOR', 'MI_PEN', 'MILES_ON',
   'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'buildModel', 'scoreMeet',
   'SK_HI', 'SK_MEAN', 'SK_SD',
   'playDistricts', 'playState', 'skew', 'spare', 'gauss', 'pickMark', 'draw', 'shift',
@@ -84,6 +86,7 @@ parts.push(`module.exports = {
   get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
+  MILES_3, MI_FACTOR, MI_PEN, setMiles(on){ MILES_ON = !!on; },
   setLeagues(L){
     LEAGUES = L;
     LG = Object.keys(LEAGUES);

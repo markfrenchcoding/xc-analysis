@@ -119,6 +119,14 @@ const SIG_T=Math.sqrt(TEAM_SHARE), SIG_I=Math.sqrt(1-TEAM_SHARE);
 
 let NEXT_SEASON=false;
 
+const MILES_3=4828;
+
+const MI_FACTOR=Math.pow(5000/4828.032,1.06);
+
+const MI_PEN=LONE;
+
+let MILES_ON=false;
+
 function splitCSVLine(l){
   const o=[];let c="",q=false;
   for(let i=0;i<l.length;i++){const ch=l[i];
@@ -147,7 +155,8 @@ function parseCSV(text){
     const c=splitCSVLine(lines[i]),raw=toSeconds(c[iM]);
     const g=(c[iG]||"").toUpperCase().charAt(0);
     if(raw===null||(g!=="M"&&g!=="F")){bad++;continue;}
-    const dist=iD>-1&&String(c[iD]).indexOf("3")===0?3000:5000;
+    const dv=iD>-1?String(c[iD]).trim():"";
+    const dist=dv==="4828"?MILES_3:dv.indexOf("3")===0?3000:5000;
     rows.push({g,name:c[iA],team:c[iT],dist,sb:raw,grade:iGr>-1?c[iGr]:"",cls:iC>-1?c[iC]:"6A"});
     // duplicate athlete rows are kept, not collapsed — they are the season
   }
@@ -157,18 +166,22 @@ function parseCSV(text){
 function buildModel(g,dist){
   const byTeam=new Map();
   for(const r of DATA){
-    if(r.g!==g||r.dist!==dist||r.cls!==CLS)continue;
+    const mi=r.dist===MILES_3&&MILES_ON&&dist===5000;
+    if(r.g!==g||(r.dist!==dist&&!mi)||r.cls!==CLS)continue;
     if(NEXT_SEASON&&String(r.grade).trim()==="12")continue;   // graduated
     if(!byTeam.has(r.team))byTeam.set(r.team,new Map());
     const t=byTeam.get(r.team);
     if(!t.has(r.name)) t.set(r.name,{name:r.name,grade:r.grade,marks:[]});
-    t.get(r.name).marks.push(r.sb);
+    // v is what the model runs on; raw is what the athlete ran, and how far
+    t.get(r.name).marks.push(mi?{v:r.sb*MI_FACTOR*(1+MI_PEN),raw:r.sb,mi:true}:{v:r.sb,raw:r.sb,mi:false});
   }
   for(const t of byTeam.values())
     for(const a of t.values()){
-      a.marks.sort((x,y)=>x-y);
+      a.marks.sort((x,y)=>x.v-y.v);
       a.marks=a.marks.slice(0,3);       // top three of the season
-      a.sbRaw=a.marks[0];               // what they actually ran, for display
+      a.sbRaw=a.marks[0].raw;           // what they actually ran, for display -
+      a.sbMi=a.marks[0].mi;             // never the converted figure
+      a.marks=a.marks.map(m=>m.v);
       if(a.marks.length===1) a.marks=[a.marks[0]*(1+LONE)];
       a.sb=a.marks[0];
       a.w=MARK_W[a.marks.length-1].slice();
@@ -363,7 +376,7 @@ function runnerTally(model){
     if(!tm.roster)continue;
     tm.rIdx.forEach((ri,k)=>{
       by[ri]={ri,name:tm.roster[k].name,team:tm.name,league:tm.league,grade:tm.roster[k].grade,
-        sb:tm.roster[k].sbRaw,marks:tm.roster[k].marks.length,
+        sb:tm.roster[k].sbRaw,sbMi:tm.roster[k].sbMi,marks:tm.roster[k].marks.length,
         n:0,placeSum:0,win:0,top21:0,best:1e9};
     });
   }
@@ -385,6 +398,7 @@ module.exports = {
   get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},
   setDATA(d){ DATA = d; },
+  MILES_3, MI_FACTOR, MI_PEN, setMiles(on){ MILES_ON = !!on; },
   setLeagues(L){
     LEAGUES = L;
     LG = Object.keys(LEAGUES);

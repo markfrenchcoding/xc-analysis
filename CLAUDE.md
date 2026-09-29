@@ -47,10 +47,57 @@ file. Columns: `gender,athlete,mark,grade,team,dist`.
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
-**5,000m only.** The state meet and every league championship are run at
-5,000m, so that is the only board. Short early-season races (the 3k meets in
-late August) are dropped at pull time and the distance toggle was removed from
-the site. Nothing is ever converted between distances.
+**5,000m, plus 3 miles behind a setting.** The state meet and every league
+championship are run at 5,000m, so that is the board. Short early-season races
+(the 3k meets in late August) are dropped at pull time and the distance toggle
+was removed from the site. A 3k is never converted: it is 40% short, and the
+5k it implies depends on the athlete.
+
+**Three miles is the one exception, and it is opt-in.** A Reddit reader pointed
+out that Crater's girls had raced their top runners only at Woodbridge, in
+California, over 3 miles. Measured: Brynn Davenport (15:58.7, 2nd in the
+Sweepstakes), Adley Damon and Gwen Vanwart were on **no** 5k list, so the board
+had Crater's girls on a 19:53 five when their real front end was two minutes a
+runner quicker. Three miles is 3.4% short of 5,000m, close enough that the
+distance is a small, well-understood correction and the course is the real
+unknown - which is true of every 5k on the board too.
+
+- The seed carries 3-mile marks as `dist` **4828**, at the time actually run.
+  `buildSeed` keeps them as separate athletes for trimming, so the 5,000m rows
+  are byte-identical to a seed without them, and a 3-mile row can never push a
+  5k mark out of a slot. `divMetres` reads "3 Miles" and nothing else imperial.
+- **The crawl reads every 3-mile race** (`wantDiv`), grade races included.
+  Woodbridge alone is 67 divisions, about two minutes of requests a week. It is
+  not only Woodbridge: athletic.net's Oregon 3-mile list counts 101 boys, and
+  Crater's Sawyer Hutton ran his at the Bill Springhorn Classic in Oregon. The
+  report prints a `3-mile races` line with the teams affected.
+- **That list is not a source.** `xcRankings/GetRankings` returns the top five
+  and blurs everyone below (`blurAfterDepth: 5`) unless the request is signed
+  in. A signed-in pull would be scraping under an account that clicked through
+  the terms, which is the strongest version of the exposure in the strategy
+  notes. The crawl reads the same races through the meets, unsigned.
+- **The site ignores them unless the reader asks.** "3-mile races" sits under
+  Races simulated in the settings, `Leave out` by default. On, `buildModel`
+  scales each mark by Riegel, `(5000/4828.032)^1.06` = **1.0378**, then by
+  `1+MI_PEN` (= `LONE`) for being run on a course and at a distance the rest of
+  the board never saw. **Neither number is fitted** - Oregon has too few 3-mile
+  races to measure a conversion from - so it ships as a reader's option rather
+  than as the default, and the backtest, the Track record and every snapshot
+  run with it off.
+- **A converted time is never shown.** `sbRaw` is what the athlete ran and
+  `sbMi` says it was 3 miles; `best()` prints `15:58.7 3mi`.
+- It locks with the dials, reports in the collapsed summary, marks every board
+  in the Next-season slot, and rides in the hash as `/3mi` so a shared link
+  shows the same board. The Dream Team does not read it.
+
+**What it does, Sep 29 crawl (results through Sep 26):** 181 three-mile marks
+on 21 teams, from 103 races read. Crater girls go from 19:53 (3rd on
+five-average in 5A) to 17:16 (1st, and the win is effectively certain), Crater
+boys 5th to 2nd, Corvallis boys 9th to 5th, Caldera girls 13th to 6th, West
+Linn boys 4th to 3rd in 6A. Teams whose 3-mile marks convert slower than their
+5ks - The Dalles, North Medford, Phoenix - do not move. Woodbridge is a fast
+course and the conversion cannot know that, so the size of Crater's jump is
+overstated; the direction is what the setting is for.
 
 Updating the database means replacing that block and committing. There is no
 admin UI and there should not be — the app is customer-facing.
@@ -3947,8 +3994,8 @@ it moved. Anything added below that point must stay below it.
 
 ```
 node extract_model.js        # regenerate model.js after any signature change
-node audit2.js               # 93 checks, 1 deliberate failure
-node pull/test_seed.js       # 64 checks on the seed builder, no network
+node audit2.js               # 104 checks, 1 deliberate failure
+node pull/test_seed.js       # 104 checks on the seed builder, no network
 node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
 node pull/test_roster.js     # 93 checks on the roster builder, no network
 node pull/test_whoswho.js    # 67 checks on the Who's Who parser, no network

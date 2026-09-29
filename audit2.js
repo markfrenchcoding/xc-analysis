@@ -86,9 +86,46 @@ console.log('\nmodel wiring (live seed)');
   const { rows, bad } = M.parseCSV(seed);
   eq('seed parses with no bad rows', bad, 0);
   ok('seed has rows', rows.length > 500, 'rows=' + rows.length);
-  ok('seed is 5,000m only', rows.every(r => r.dist === 5000),
-    (new Set(rows.map(r => r.dist))).size + ' distinct distances');
+  ok('seed is 5,000m and 3 miles, nothing else', rows.every(r => r.dist === 5000 || r.dist === M.MILES_3),
+    [...new Set(rows.map(r => r.dist))].join(','));
   M.setDATA(rows);
+
+  /* The 3-mile setting. Off, the seed's 3-mile rows must change nothing at all:
+     the board has to be what it was before they were read. On, a runner the
+     board had never heard of has to arrive, carrying the time she actually ran
+     for display and the converted one for the model. */
+  {
+    const snap = m => JSON.stringify(m.teams.map(t => [t.name, t.avg5, t.short,
+      (t.roster || []).map(r => [r.name, r.sb, r.sbRaw, r.marks])]));
+    M.setMiles(false);
+    for (const [cls, g] of [['5A', 'F'], ['5A', 'M'], ['6A', 'M']]) {
+      M.setClass(cls, g);
+      const withMi = snap(M.buildModel(g, 5000));
+      M.setDATA(rows.filter(r => r.dist === 5000));
+      const without = snap(M.buildModel(g, 5000));
+      M.setDATA(rows);
+      ok(cls + ' ' + g + ': 3-mile rows change nothing while the setting is off', withMi === without);
+    }
+    M.setClass('5A', 'F');
+    const crater = on => { M.setMiles(on); const m = M.buildModel('F', 5000);
+      return m.teams.find(t => t.name === 'Crater'); };
+    const off = crater(false), on = crater(true);
+    M.setMiles(false);
+    const bd = on && on.roster.find(r => r.name === 'Brynn Davenport');
+    ok('3mi on: a runner with only a 3-mile mark joins her team', !!bd);
+    ok('3mi off: and is absent without it', !off.roster.some(r => r.name === 'Brynn Davenport'));
+    if (bd) {
+      eq('3mi on: she is shown at the time she ran', bd.sbRaw, 958.7);
+      eq('3mi on: marked as a 3-mile time', bd.sbMi, true);
+      ok('3mi on: and modelled at the converted, penalised one',
+        // the lone-mark penalty applies only if Woodbridge was her only race
+        Math.abs(bd.sb - 958.7 * M.MI_FACTOR * (1 + M.MI_PEN) * (bd.marks.length === 1 ? 1.006 : 1)) < 1e-9,
+        'sb=' + bd.sb + ', ' + bd.marks.length + ' marks');
+    }
+    ok('3mi on: Riegel puts 3 miles about 3.8% under 5,000m',
+      Math.abs(M.MI_FACTOR - 1.0378) < 0.0005, 'factor=' + M.MI_FACTOR);
+    ok('3mi on: Crater girls get faster', on.avg5 < off.avg5, off.avg5 + ' -> ' + on.avg5);
+  }
 
   // 3,000m was removed from the model; only the state-meet distance is built
   for (const g of ['M', 'F']) for (const dist of [5000]) {
