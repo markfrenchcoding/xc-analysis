@@ -650,7 +650,10 @@ named, pooled Brier 0.1374 against 0.2365 for knowing nothing, **42% skill**.
 
 **And at every horizon, with today's row lit** (`RECORD.byHorizon`, "How close to
 Lane changes everything"): 8 weeks 108/144 and 3 of 8 champions, **6 weeks 127/144
-and 5 of 8**, 4 weeks 129/144 and 6 of 8, 2 weeks 129/144 and 4 of 8. The
+and 5 of 8**, 4 weeks 129/144 and 5-6 of 8, 2 weeks 129/144 and 4 of 8. The
+four-week champion count flips between 5 and 6 from one publish to the next: a
+close race's favourite, decided by Monte Carlo noise at 12,000 seasons. Quote it
+as a range, never as one number. The
 September headline is one reading of a season; somebody looking at the board in
 October is five or four weeks out and that row is theirs. The old model at six
 weeks found 123 and named 4 - a plain season-best list had beaten it there, 127
@@ -3205,6 +3208,47 @@ And one season best got *slower*: Mason Siewert's 2027 cross country best was
 23:46.04 at the **Steens Mountain uphill camp 5k**, which the summer rule now
 drops, leaving his real best of 24:18.46. The audit flagged it as a slower
 value, which is exactly why it splits the report by direction.
+
+## A ranking is not a forecast
+
+The Track record scores three things on the same raw season bests at every
+horizon (`RECORD.vsRanking`): **a plain ranking** where the fastest N go to
+state, **season bests run through OSAA's league and at-large rules**, and the
+board. From six weeks in, ignoring the rules costs 10-12 real qualifiers of 144 -
+every season three to five teams inside a ranking's top sixteen stay home as
+third in a strong league (Lincoln boys, 8th in the state in 2023) and three to
+five from its twenties and thirties go (Clackamas boys, 32nd in 2022). **Eight
+weeks out a plain ranking is better, 112 to 107**, because September has too few
+races to read league places, and the page says so rather than hiding it.
+
+**It names the method, never the site.** athletic.net does apply OSAA's rules -
+it runs the state advancement after the league championships. What a ranking or
+a whole-classification hypothetical meet does not do is project qualification
+before them. "athletic.net ignores OSAA's rules" would be false as stated.
+
+Against a season-best projection with the rules applied (`baseline.js`, its
+reconstruction from meet dates), qualifiers are level at every horizon;
+champions 18 of 32 to 14; and a season-best list states 28 to 74 wrong calls a
+horizon as certainties where the board, from six weeks, states none.
+
+## The How tab's design
+
+It read as one paragraph at one volume: 13px body, 10.5px captions, 9.5px
+labels, headings a point above the text, a box around everything. Scoped under
+`#p-doc` at the end of the sheet: section headings are display lines with a
+hairline above; the first paragraph under each is a standfirst in the text
+colour; body is 15.5px on a 64ch measure; figures sit on a borderless surface
+and run to the glass on a phone, which is what lifts the smallest diagram label
+from 9px to 10.3px; above 600px they cap at 500px so labels stop near 14px
+instead of ballooning to 24. Stats and the scorecard are ruled lists, not tiles.
+Captions, notes and table text take `--muted`: `--dim` is 3.8:1 on the dark
+ground, under the 4.5:1 small text needs. In tables a figure never wraps and the
+label column does; the season table scrolls instead. **No eyebrow labels and no
+section numbers** - the headings carry the hierarchy.
+
+**The stats under the first diagram are counted off DATA** (`syncHowStats`).
+They had been typed once and sat at 2,221 athletes and 2,974 results for a month
+while the database passed 3,500 and 9,000.
 
 ## Race ratings, and a scorecard that can see them
 

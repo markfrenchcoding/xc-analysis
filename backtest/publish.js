@@ -92,6 +92,47 @@ const byHorizon = horizon.map((h, ci) => {
            skill: Math.round(100 * (1 - b / bref)), picks };
 });
 
+/* A ranking is not a forecast. State is two from every league plus the at-large
+   places, not the fastest sixteen, so three things are scored on the same raw
+   season bests at every horizon:
+     ranking  every team on its five fastest season bests, the top N go - what a
+              reader takes from a ranking list or a whole-classification
+              hypothetical meet
+     rules    the same season bests, one race, no randomness, run through OSAA's
+              league places and at-large rules (baseline.js)
+     chute    the board, from byHorizon above
+   and the teams a ranking gets most wrong are kept as examples: the best-ranked
+   that stayed home and the worst-ranked that went. Named by method, not by
+   site: athletic.net does apply OSAA's rules, after the league championships. */
+const vsRanking = horizon.map((h, ci) => {
+  let ranking = 0, rules = 0, field = 0; const home = [], went = [];
+  for (const year of YEARS) for (const g of ['M', 'F']) {
+    const cut = L.cutoffs(year)[ci], truth = L.truthFor(year);
+    const csv = fs.readFileSync(path.join(__dirname, 'data', year + '-seed-' + cut + '.csv'), 'utf8');
+    L.M.setDATA(L.M.parseCSV(csv).rows.filter(r => r.g === g));
+    L.M.setLeagues(truth.leagues[g]);
+    const m = L.M.buildModel(g, 5000);
+    const ranked = m.teams.filter(t => !t.short)
+      .map(t => ({ name: t.name, league: t.league, avg: t.roster.slice(0, 5).reduce((s, r) => s + r.sbRaw, 0) / 5 }))
+      .sort((a, b) => a.avg - b.avg);
+    const real = new Set(truth.state[g].map(x => x.team)), N = real.size;
+    field += N;
+    ranking += ranked.slice(0, N).filter(t => real.has(t.name)).length;
+    ranked.forEach((t, i) => {
+      const x = { year: +year, g, team: t.name.replace(/ \(OR\)$/, ''), league: t.league, rank: i + 1 };
+      if (i < N && !real.has(t.name)) home.push(x);
+      if (i >= N && real.has(t.name)) went.push(x);
+    });
+    const det = L.odds(year, g, cut, 0.0001, 1, () => [1, 0, 0]);
+    rules += det.teams.filter(t => t.modelled).slice(0, det.order.length).filter(t => t.actual).length;
+  }
+  home.sort((a, b) => a.rank - b.rank); went.sort((a, b) => b.rank - a.rank);
+  console.log('    ' + h.weeks + 'w out: a ranking finds ' + ranking + ', season bests with the rules '
+    + rules + ', the board ' + byHorizon[ci].found + ' of ' + field);
+  return { weeks: h.weeks, ranking, rules, chute: byHorizon[ci].found, ofField: field,
+           stayedHome: home.slice(0, 3), went: went.slice(0, 3), missed: home.length };
+});
+
 /* ---------- the September pass, board by board ---------- */
 /* How many marks the model actually had at a cutoff. athletic.net's coverage
    has grown - 14 meets by the 2022 September cutoff, 33 by the same point in
@@ -188,7 +229,7 @@ const R = {
   skill: Math.round(100 * (1 - brier / bref)),
   logloss: +L.logloss(pooled.map(t => [t.p, t.actual])).toFixed(3),
   sigma: SIGMA,
-  sigmaRun: SIG_SEPT, sigmaRunLate: SIG_LATE, byHorizon,
+  sigmaRun: SIG_SEPT, sigmaRunLate: SIG_LATE, byHorizon, vsRanking,
   runs: SEASONS,
   bands, horizon, perSeason,
   cutoffLate: label(L.cutoffs(YEARS[0])[2]),
