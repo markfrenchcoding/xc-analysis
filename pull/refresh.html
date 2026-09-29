@@ -263,7 +263,7 @@ async function run() {
 
     if (S.stage === 'teams') {
       const f = await findTeams(board);
-      S.teams = f.teams; S.logos = f.logos; S.stage = 'cal'; S.ti = 0; save();
+      S.teams = f.teams; S.logos = f.logos; S.ids = f.ids; S.stage = 'cal'; S.ti = 0; save();
     }
 
     if (S.stage === 'cal') {
@@ -343,7 +343,11 @@ async function run() {
 let BUILT = null;
 function finish(html, board) {
   progress(1, 1, 'done');
-  const b = Seed.buildSeed(S.rows, board);
+  if (!S.ids) log('this run was started before schools were matched by id — '
+    + 'same-named schools from other states may be mixed in; press Start over to be sure', 'w');
+  const b = Seed.buildSeed(S.rows, board, S.ids);
+  if (b.outOfState.length)
+    log('same name, another state, left out: ' + b.outOfState.join(', '), 'w');
   const date = b.latest || new Date().toISOString().slice(0, 10);
   let out = Seed.patchIndex(html, b.csv, date);
   out = Seed.patchLogos(out, S.logos);
@@ -367,6 +371,7 @@ function finish(html, board) {
     ['Dropped — not a possible 5k', b.dropped.implausible],
     ['Dropped — the same race twice', b.dropped.duplicate],
     ['Dropped — school not on a board', b.dropped.offBoard],
+    ['Dropped — same name, another state', b.dropped.outOfState],
     ['Races with no results posted', S.divsEmpty + ' of ' + S.divsRead],
     ['Meets that never answered', S.failed.length],
   ];

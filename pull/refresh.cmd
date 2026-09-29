@@ -18,6 +18,12 @@ set LOG=%~dp0last-run.log
 echo ============================================= >> "%LOG%"
 echo %DATE% %TIME% >> "%LOG%"
 
+rem Catch up with GitHub first. Fixes are often uploaded through the web UI, so
+rem this checkout can be behind: the crawl would run last week's code, and the
+rem push at the end would be refused as out of date. --ff-only never merges;
+rem if this checkout has its own unpushed edits it stops and says so.
+git pull --ff-only origin main >> "%LOG%" 2>&1
+
 node pull\crawl.js >> "%LOG%" 2>&1
 set CODE=%ERRORLEVEL%
 

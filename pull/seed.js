@@ -67,6 +67,12 @@
       g: r.Gender,
       name: ((r.FirstName || '') + ' ' + (r.LastName || '')).trim(),
       school: r.SchoolName,
+      /* Which school, by number. The name is not enough: athletic.net does not
+         suffix every shared name, and a meet on an Oregon team's calendar can
+         hold an Idaho or Washington school spelled exactly like an Oregon one.
+         Centennial of Meridian, Idaho raced under Centennial of Gresham's name
+         for most of September 2026 and was picked to win 5A girls. */
+      teamId: +(r.TeamID || r.SchoolID) || 0,
       grade: r.Grade || r.AgeGrade || '',
       seconds: r.SortValue || r.Result,
       dist: 5000,
@@ -79,11 +85,13 @@
      a regional grouping), so it appears several times; keep the busiest row,
      which is the one whose ResultCount is real. */
   function teamsFromTree(alignedTeams, board) {
-    const seen = new Map(), logos = {};
+    const seen = new Map(), logos = {}, ids = {};
     for (const r of alignedTeams || []) {
       const b = board[lookup(r.SchoolName)];
       if (!b) continue;                      // not a school on an OSAA board
       const name = Object.values(b)[0].name;  // spell it the board's way
+      // every Oregon id a board school goes by; buildSeed keeps only these
+      if (r.SchoolID) ids[r.SchoolID] = name;
       if (r.MascotUrl && !logos[name]) logos[name] = 'https:' + r.MascotUrl + '=s96';
       const prev = seen.get(name);
       if (!prev || (r.ResultCount || 0) > prev.results)
@@ -92,7 +100,7 @@
     const onBoard = new Set(Object.values(board).map(v => Object.values(v)[0].name));
     return {
       teams: [...seen.values()],
-      logos,
+      logos, ids,
       absent: [...onBoard].filter(n => !seen.has(n)).sort(),
     };
   }
@@ -209,10 +217,17 @@
       .replace(/\s+/g, ' ').trim();
   }
 
-  function buildSeed(rows, board) {
+  /* ids: { athletic.net team id -> board name }, from teamsFromTree. With it,
+     a result counts for an Oregon school only if it carries that school's id,
+     and a same-named school from another state is dropped as outOfState.
+     Without it (an old saved crawl, a test) the name alone decides, as before. */
+  function buildSeed(rows, board, ids) {
     const keep = [];
-    const dropped = { dist: 0, unparsed: 0, offBoard: 0, preseason: 0, duplicate: 0, implausible: 0 };
-    const offBoardNames = new Set();
+    const dropped = { dist: 0, unparsed: 0, offBoard: 0, outOfState: 0, preseason: 0,
+                      duplicate: 0, implausible: 0 };
+    const offBoardNames = new Set(), outOfStateNames = new Set();
+    const byId = ids && Object.keys(ids).length ? ids : null;
+    const boardOf = (name, g) => (board[lookup(name)] || {})[g];
     let latest = '';
 
     // the floor moves with the season the results are actually from
@@ -225,7 +240,17 @@
       const sec = toSeconds(r.seconds != null ? r.seconds : r.mark);
       if (!sec) { dropped.unparsed++; continue; }
       if (sec < MIN_5K || sec > MAX_5K) { dropped.implausible++; continue; }
-      const b = (board[lookup(r.school)] || {})[r.g];
+      let b;
+      if (byId && r.teamId) {
+        const own = byId[r.teamId];
+        if (!own) {
+          // named like a board school but numbered like somebody else's
+          if (boardOf(r.school, r.g)) { dropped.outOfState++; outOfStateNames.add(strip(r.school)); }
+          else { dropped.offBoard++; if (strip(r.school)) offBoardNames.add(strip(r.school)); }
+          continue;
+        }
+        b = boardOf(own, r.g);
+      } else b = boardOf(r.school, r.g);
       // a blank school is an unattached entry, not a school we failed to match,
       // so it is dropped without being reported as one
       if (!b) { dropped.offBoard++; if (strip(r.school)) offBoardNames.add(strip(r.school)); continue; }
@@ -307,6 +332,7 @@
       schools: new Set(out.map(a => a.team)).size,
       latest, dropped,
       offBoard: [...offBoardNames].sort(),
+      outOfState: [...outOfStateNames].sort(),
     };
   }
 

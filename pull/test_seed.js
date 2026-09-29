@@ -237,5 +237,35 @@ eq(ft.logos.Jesuit, 'https://x/a=s96', 'the crest gets a scheme and a size');
 ok(ft.absent.includes('Elgin'), 'a board school with no team is reported absent');
 ok(ft.absent.length > 200, 'and so is everyone else not in this tiny tree');
 
+/* ---------- same name, another state ----------
+   Centennial of Meridian, Idaho shared meets with Oregon teams and, matched by
+   name, was filed as Centennial of Gresham and picked to win 5A girls. */
+eq(S.resultRow({ ...rawResult, TeamID: 220 }, '').teamId, 220, 'the team id rides along');
+eq(S.resultRow(rawResult, '').teamId, 0, 'no id is 0, not undefined');
+ok(ft.ids[220] === 'Jesuit', 'the tree maps an Oregon id to its board name');
+ok(!(999 in ft.ids), 'an out-of-state school has no Oregon id');
+{
+  const mk = (name, school, teamId, sec) => ({ g: 'M', name, school, teamId, seconds: sec,
+    dist: 5000, date: '2026-09-20' });
+  const rows = [
+    mk('Oregon Runner', 'Jesuit', 220, 960),
+    mk('Idaho Runner', 'Jesuit', 4242, 900),     // same name, another state's number
+    mk('Nobody', 'Battle Ground', 999, 950),
+  ];
+  const withIds = S.buildSeed(rows, board, ft.ids);
+  ok(/Oregon Runner/.test(withIds.csv), 'the Oregon athlete is kept');
+  ok(!/Idaho Runner/.test(withIds.csv), 'the same-named school from another state is dropped');
+  eq(withIds.dropped.outOfState, 1, 'and counted as out of state');
+  eq(withIds.outOfState.join(), 'Jesuit', 'and named, so the crawl can report it');
+  eq(withIds.dropped.offBoard, 1, 'a school not on any board is still offBoard');
+  const byName = S.buildSeed(rows, board);
+  ok(/Idaho Runner/.test(byName.csv), 'without ids the name decides, as it always did');
+  const aliased = S.buildSeed([mk('Jo Lee', 'Northwest Christian Academy', 77, 1100)],
+    board, { 77: 'Northwest Christian' });
+  eq(aliased.rows, 1, 'an id finds the board school whatever athletic.net calls it');
+  const noId = S.buildSeed([mk('Old Row', 'Jesuit', 0, 970)], board, ft.ids);
+  eq(noId.rows, 1, 'a row with no id falls back to its name');
+}
+
 console.log(pass + ' passed' + (fail ? ', ' + fail + ' FAILED' : ''));
 process.exit(fail ? 1 : 0);

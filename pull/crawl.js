@@ -187,7 +187,7 @@ function main() {
       if (++n % 25 === 0) log('  ' + n + '/' + live.length);
       sleepSync(GAP_GET);
     }
-    S = { logos: f.logos, meets: [...meets], mi: 0, rows: [], failed: [],
+    S = { logos: f.logos, ids: f.ids, meets: [...meets], mi: 0, rows: [], failed: [],
           read: 0, empty: 0 };
     log(S.meets.length + ' meets with results');
   }
@@ -228,7 +228,7 @@ function main() {
   }
 
   /* ---------- build and report ---------- */
-  const b = Seed.buildSeed(S.rows, board);
+  const b = Seed.buildSeed(S.rows, board, S.ids);
   const date = b.latest || new Date().toISOString().slice(0, 10);
   const wasRows = (fs.readFileSync(IDX, 'utf8').match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
     .trim().split(/\r?\n/).length - 1;
@@ -241,6 +241,8 @@ function main() {
   log('  schools           ' + b.schools);
   log('  results through   ' + date);
   log('  dropped           ' + JSON.stringify(b.dropped));
+  if (b.outOfState.length)
+    log('  other states      ' + b.outOfState.join(', ') + '  (same name, not the Oregon school)');
   log('  empty races       ' + counters.empty + ' of ' + counters.read);
   log('  meets unanswered  ' + S.failed.length);
 
