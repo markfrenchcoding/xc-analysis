@@ -1338,10 +1338,30 @@ traffic was a separate decision from counting the app's** and was taken
 separately. Vercel's analytics is cookieless and collects no personal data,
 which is what makes it an ordinary choice rather than a problem.
 
-**Two guards, each one line to reverse.** `SHOW_CURRENT` is false, so anybody
-still enrolled shows as an initial and only alumni are named. And the page is
-`noindex` at both the meta and header level: publishing a link and publishing
-to a search index are different decisions, and only the first was made.
+**`SHOW_CURRENT` is TRUE, and this file said false for three days.** Athletes
+still at school are named in full alongside the alumni, flipped on Sep 25 at
+the head coach's request, with the reasoning in that commit: every result here
+is already on athletic.net under the same full name, and what is new is the
+*gathering* rather than the disclosure. It is his programme and his call, and
+the footer tells every reader in plain words - "everyone is named, athletes
+still at school included, at the coach's request. The page is not indexed by
+search engines."
+
+The decision was right and recorded. **The note was not updated, so this file
+went on promising a protection the site does not have** - and it was still
+promising it on the day the page was shared with a whole programme's parents
+and athletes. That is the exact failure this file keeps writing down about
+itself: a claim nobody re-checked reads as settled. When a one-line flag
+changes, grep this file for its name before the commit lands.
+
+One line back to `false` returns every enrolled athlete to an initial.
+
+**`noindex` is the guard that is still a guard**, at both the meta and header
+level, and it is doing more work now than it was: publishing a link and
+publishing to a search index are different decisions, and only the first was
+made. A coach sending the address to his own team is what the page is for. It
+staying out of a search for a fifteen-year-old's name is what `noindex` is
+for. Neither substitutes for the other.
 
 **The raw archive is not served.** `pull/roster/` stays in the root
 `.vercelignore` and is outside the second project's root twice over. The page
@@ -3124,14 +3144,27 @@ and 2 at-large berths → **redraw all times** → score the 16-team state meet.
 The redraw matters. A team that got hot at districts starts again from its
 marks. Carrying one draw through both would amplify luck instead of averaging it.
 
-**Sampling.** Each race draws from an athlete's top three marks at 25/50/25,
-renormalised when fewer exist (`MARK_W`, `pickMark`). Live as of the Sep 26
-pull: **3,068 of 3,617** athlete-boards carry two or three marks, **85%**, up
-from 53% a fortnight earlier and 348 of 1,172 before the automated pull. This is
-now the ordinary case rather than the exception, which also means the `MARK_W`
-unfairness below is biting less: it only hurts when *some* teams have raced
-twice and others have not, and by late September most have. Read open item 2
-before leaning on it — the two-mark weights are not neutral.
+**Sampling.** Each race draws from an athlete's top three marks, weighted by
+`MARK_W` — an explicit table, `[[1], [0.67, 0.33], [0.50, 0.30, 0.20]]`, with a
+row per mark count and the best mark leading every row (`pickMark`).
+
+**This paragraph said "25/50/25, renormalised when fewer exist" for weeks after
+that scheme was replaced**, which is the description of the bug rather than the
+fix. Truncating `[0.25, 0.50, 0.25]` and renormalising handed a two-mark athlete
+`[0.33, 0.67]`, two thirds of the weight on their *slower* race, which was a
+penalty for racing more often. The table exists precisely so that cannot happen.
+Anybody reading only this section would have described the model wrongly, and
+somebody did.
+
+Live as of the Sep 26 pull: **3,068 of 3,617** athlete-boards carry two or three
+marks, **85%**, up from 53% a fortnight earlier and 348 of 1,172 before the
+automated pull. That is the ordinary case now rather than the exception.
+
+What the weights still cannot do is judge a second mark fairly, because a slower
+race and a harder course look identical — **open item 1**, not item 2, which is
+the shipped horizon allowance and has nothing to do with marks. Re-run
+`markw.js` when the course/date confound breaks; the gradient toward the best
+mark should flatten.
 
 **Noise.** `time = mark × (1 + teamShock + individual)`. 30% of variance is
 shared across a squad (`TEAM_SHARE`); variances add, so the two components are
