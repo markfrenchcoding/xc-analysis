@@ -30,7 +30,22 @@ function sandbox(eol) {
   fs.copyFileSync(SNAP, path.join(dir, 'backtest', 'snapshot.js'));
   fs.copyFileSync(path.join(ROOT, 'pull', 'seed.js'), path.join(dir, 'pull', 'seed.js'));
   const p = path.join(dir, 'index.html');
-  fs.writeFileSync(p, fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n').replace(/\n/g, eol));
+  let html = fs.readFileSync(p, 'utf8');
+  /* Date the newest archived entry TODAY, so the clash the tests provoke is
+     there whatever day the suite runs. It used to lean on the shipped file
+     already holding today's entry, which is true only on the day a snapshot
+     was taken - so six checks passed on refresh day and failed on the other
+     six, and a suite that is usually red is a suite nobody reads. The bug was
+     in the fixture, never in the guard.
+
+     Same family as the UTC/local fault this file already records: anything
+     that reasons about "today" has to own that decision rather than inherit
+     it from whenever somebody last ran something. */
+  const at = html.lastIndexOf('"taken":"');
+  if (at < 0) throw new Error('no archived entry to re-date');
+  const close = html.indexOf('"', at + 9);          // end of the date value
+  html = html.slice(0, at) + '"taken":"' + localToday + html.slice(close);
+  fs.writeFileSync(p, html.replace(/\r\n/g, '\n').replace(/\n/g, eol));
   return dir;
 }
 const run = (dir, args) => {

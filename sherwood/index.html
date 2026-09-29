@@ -1096,6 +1096,24 @@ body.condensed nav button{padding-top:9px;padding-bottom:9px}
 }
 
 </style>
+
+<!-- Vercel Web Analytics. The npm package needs a bundler and this page is one
+     static file, so it takes the HTML route: a queue shim and a deferred tag.
+     The shim comes first, because the deferred script can load after the page
+     has already tried to record something.
+
+     build_dash.js only rewrites the named data blocks and INFO, so this
+     survives a rebuild - the same reason a head edit survives crawl.js on the
+     app. It is NOT written by the builder, so a page built from scratch would
+     need it adding by hand.
+
+     This is what stopped connect-src being 'none' in this project's own
+     vercel.json. A separate Vercel project gets no inheritance, so the header
+     had to change here as well as at the root. -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 

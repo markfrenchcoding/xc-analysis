@@ -986,6 +986,26 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 }
 
 </style>
+
+<!-- Vercel Web Analytics. The npm package and the React component are the
+     documented route and neither can be used here: this is one static file
+     with no build step. Enabling Analytics on the project serves the script
+     from the site's own origin, so two tags do the same job.
+
+     The queue shim has to come first. The deferred script may load after the
+     page has already tried to record something, and window.va collects those
+     calls until the real one replaces it.
+
+     /_vercel/insights/ is the stable path and is provisioned alongside a
+     per-project one that ad blockers cannot pattern-match. If blocked traffic
+     ever looks material, swap in the unique path from the dashboard's HTML
+     tab; nothing else here changes, because the CSP allows 'self' either way.
+
+     This is what stopped connect-src being 'none'. See Security in CLAUDE.md. -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 

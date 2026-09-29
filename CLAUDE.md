@@ -1309,11 +1309,28 @@ repo, full stop.
 
 `tualatin/vercel.json` carries its own headers rather than borrowing the app's,
 because a separate project gets no inheritance. Same CSP shape —
-`default-src none`, fonts from gstatic, `connect-src none`, verified against
-what the page actually asks for: three Google Fonts urls and zero fetches. Two
+`default-src none`, fonts from gstatic, `connect-src 'self'`. Two
 differences from the app's: no `googleusercontent` in `img-src`, because there
 are no crests here, and an added **`X-Robots-Tag: noindex, nofollow,
 noarchive`** header to back up the meta tag in the page.
+
+**"A separate project gets no inheritance" is the whole reason this paragraph
+keeps earning its place.** Turning on Vercel Web Analytics meant the same two
+edits three times: the script tags in each page's head and `connect-src 'self'`
+in each project's own `vercel.json`. Root `vercel.json` reaches none of them.
+Enabling it in the dashboard is also per project, and that part cannot be done
+from here.
+
+**The tags are in the built pages and not in the builder.** `build_dash.js`
+only rewrites the named `d-*` data blocks and the `INFO` constant, the same way
+`patchIndex` only touches the seed and `DATA_DATE`, so a head edit survives
+every rebuild. The cost is that a page recreated from scratch would not have
+them - the head of `<slug>/index.html` is hand-maintained and always has been.
+
+**These two pages are `noindex` and about named local kids, so counting their
+traffic was a separate decision from counting the app's** and was taken
+separately. Vercel's analytics is cookieless and collects no personal data,
+which is what makes it an ordinary choice rather than a problem.
 
 **Two guards, each one line to reverse.** `SHOW_CURRENT` is false, so anybody
 still enrolled shows as an initial and only alumni are named. And the page is
@@ -3424,9 +3441,36 @@ asserts on the string that comes out, not on the regex restated.
 and `X-Frame-Options: DENY` (the site is never framed), HSTS with preload, a
 locked-down Permissions-Policy, and a CSP whose `default-src` is `none` with
 each source opened only where it is used: fonts from gstatic, crests from
-googleusercontent, and `connect-src none` on the app because the page makes no
-requests of its own. `/pull/` gets its own looser policy, because the refresh
-harness genuinely does call athletic.net.
+googleusercontent, and `connect-src 'self'` on the app. `/pull/` gets its own
+looser policy, because the refresh harness genuinely does call athletic.net.
+
+**`connect-src` was `none` and is `'self'`, and the reason is Vercel Web
+Analytics.** The old note said `none` was right "because the page makes no
+requests of its own", which was true until the site started counting its
+visitors. The script is served from the site's own origin and beacons to
+`/_vercel/insights/view` on the same origin, so `'self'` is the whole of the
+widening - no third-party host is allowed anything.
+
+**It would have failed silently and looked like Vercel's fault.** `script-src`
+already had `'self'`, so the script loads and runs either way; only the beacon
+is blocked. The dashboard then sits empty, which is indistinguishable from
+"analytics has not started collecting yet" - and Vercel's own troubleshooting
+points at ad blockers, which is the wrong place to look. If a future pass
+tightens this back to `none`, that is what breaks.
+
+**The npm package is not an option and the dashboard will keep offering it.**
+Vercel's setup panel shows `npm i @vercel/analytics` under every framework
+including "Other", and offers an agent that opens a pull request adding it. The
+app is one static file with no build step, so it takes the HTML route instead:
+a queue shim and a deferred script tag above `</head>`. The shim must come
+first, because the deferred script can load after the page has already tried to
+record something.
+
+**The path is `/_vercel/insights/script.js`, and there is a second one.**
+Enabling Analytics provisions both that stable path and a per-project path that
+ad blockers cannot pattern-match. The stable one is used because it can be
+written down; swapping in the unique path costs one line and no CSP change,
+since `'self'` covers both.
 
 **The CSP has to keep `unsafe-inline` for scripts, and that is a real
 limitation rather than an oversight.** The app is one inline `<script>`, so the
@@ -3920,7 +3964,25 @@ announced themselves:
 `backtest/test_snapshot.js` now provokes real refusals against a real file in
 both line endings, and asserts that a permitted write leaves *exactly one*
 declaration. Verified non-vacuous the way `test_crawl.js` is: put the LF-only
-regex back and the suite fails.
+regex back and the suite fails - 15 of 46 when last checked.
+
+**And then the suite itself was only right one day in six.** `sandbox()` copies
+the live `index.html`, and six checks leaned on that copy "already holding
+today's entry, so a plain run must refuse". True on the day a snapshot was
+taken and false every other day: on Sep 28, against a Sep 26 archive, a plain
+run correctly wrote a new entry and the clash check had nothing to clash with.
+It read as the guard failing and was the fixture lying.
+
+The fixture re-dates its newest entry to today, so the clash is there whatever
+day the suite runs. Same family as the UTC/local fault above: **anything that
+reasons about "today" has to own that decision**, not inherit it from whenever
+somebody last ran something.
+
+Worth knowing because of how it hides. The suite was green on Sep 26, when it
+was run minutes after a snapshot, and red on the 28th with nothing changed in
+between. A test whose result depends on the calendar gets read as flaky, and a
+suite that is usually red is a suite nobody reads - which would have cost the
+append-only guard its whole value a second time.
 
 **`--force` now requires `--why` and staples the reason to the entry**, which the
 site renders beside the date with a dagger. The rule was never "never rewrite" -
