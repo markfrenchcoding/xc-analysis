@@ -5,7 +5,13 @@ seven league meets, at-large selection, then the state meet at Lane — and
 reports each team's odds of qualifying, placing and winning.
 
 Live: https://chutexc.vercel.app
-Repo: github.com/markfrenchcoding/xc-analysis (Vercel project is named `chutexc`)
+Repo: github.com/markfrenchcoding/xc-analysis
+
+**One repo, three Vercel projects, one push deploys all of them.** `chutexc`
+serves this file from the repo root. `tualatinxctf` and `sherwoodxctf` serve
+the school dashboards from `tualatin/` and `sherwood/` - see **A second
+school**. All three must keep framework preset **Other**, and each carries its
+own `vercel.json`, because a project inherits nothing from the root.
 
 ## Shape of the thing
 
@@ -2704,6 +2710,23 @@ do this for another school" turned out to be mostly yes already: everything
 that does the work had been written to take the school as an argument, and
 what was hardcoded was the output path, one filter string and six literals in
 the copy.
+
+**Live at `sherwoodxctf.vercel.app`**, the third Vercel project, root
+directory `sherwood/`, framework preset **Other** like the other two. It is
+`noindex` at both the meta and header level, the same as Tualatin.
+
+That address went unrecorded for a fortnight and had to be **guessed** -
+`sherwoodxctf` by analogy with `tualatinxctf`, then confirmed by the page's own
+title - when all three sites needed checking after a change. Two of the three
+domains were in this file and the third was not, which is the sort of gap that
+costs nothing until somebody has to verify something. Every deployed address
+this repo owns:
+
+| project | address | root | indexed |
+|---|---|---|---|
+| chutexc | `chutexc.vercel.app` | repo root | yes |
+| tualatinxctf | `tualatinxctf.vercel.app` | `tualatin/` | no |
+| sherwoodxctf | `sherwoodxctf.vercel.app` | `sherwood/` | no |
 
 ```
 node pull/roster.js 159 --name Sherwood    # Sherwood is athletic.net team 159
