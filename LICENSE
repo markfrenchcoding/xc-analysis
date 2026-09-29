@@ -1,0 +1,51 @@
+Copyright (c) 2026 Mark French. All rights reserved.
+
+Chute (chutexc.vercel.app) and everything in this repository is proprietary:
+the simulation and the site, the data pipeline in pull/, the backtest harness
+and season databases in backtest/, the school dashboards in tualatin/ and
+sherwood/, and the written notes.
+
+THIS REPOSITORY IS PUBLIC FOR ONE REASON
+
+The forward archive inside index.html records what the model predicted before
+the races it describes. The commit dates on those entries are the evidence,
+and evidence nobody can inspect is not evidence. That is why this is readable.
+
+Being able to read this work is not permission to use it. No licence is
+granted by implication, and none is granted by the fact that the site serves
+its complete source to every browser. Chute is one static file with no
+backend; handing you the source is a consequence of how it is built, not an
+offer of the code.
+
+YOU MAY
+
+  - read the source, the notes and the commit history
+  - use the published site as a visitor
+  - quote short excerpts, with attribution, for comment, criticism or review
+
+YOU MAY NOT, without written permission
+
+  - copy, mirror, republish or redistribute this repository or the served
+    page, in whole or in substantial part
+  - create derivative works, including a version adapted to another state,
+    another sport, or another set of classifications
+  - use any of it commercially
+  - redistribute the compiled databases: the seed in index.html, the season
+    data in backtest/data/, or the roster archives in pull/roster/
+
+ON THE DATA
+
+Race results are facts and belong to nobody. What is claimed here is the
+compilation: the selection, correction and arrangement of those facts, which
+is most of the work in this repository and none of it obvious. Deciding that a
+junior varsity race is not a varsity one, that a July camp time trial is not
+the season, that a relay split is not an open 400, and that two athlete
+profiles are one person, is editorial judgement rather than transcription.
+
+Marks and results are derived from athletic.net and from OSAA, and remain
+subject to whatever terms those sources impose. Nothing here grants any right
+in their data.
+
+ENQUIRIES
+
+Permission, licensing and partnership: markfrenchoit@outlook.com

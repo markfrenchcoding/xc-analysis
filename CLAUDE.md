@@ -3476,6 +3476,41 @@ nothing against anybody who can press View Source. What is actually protected is
 the *domain* and the *record* - the archive's commit dates live in a public
 repository, which is a claim a copy cannot make.
 
+**There is a LICENCE now, and it is the restrictive kind.** No `LICENSE` file
+meant all rights reserved by default, which is the strongest position already -
+public is not open source, and a reader acquires no right to copy. The file
+makes that explicit rather than leaving it to be inferred, because a silent
+protection deters nobody.
+
+**It deters; it does not prevent.** Nothing technical changed and nothing can:
+the model ships to every browser, and that is a consequence of the one-file
+rule rather than an oversight. A copy is still one right-click away. What the
+notice does is remove "I assumed it was open" as an answer.
+
+**The notice is in the served page as well as the repo**, at the top of all
+three `index.html` files, because the file somebody copies is the one View
+Source hands them and a repo LICENSE does not travel with it. Safe from the
+weekly refresh: `patchIndex` only rewrites the seed block and `DATA_DATE`, and
+`build_dash.js` only the `d-*` blocks and `INFO`.
+
+**The claim over the data is a compilation claim, and that is the honest one.**
+Race results are facts and belong to nobody. Deciding that a junior varsity
+race is not a varsity one, that a July camp time trial is not the season, that
+a relay split is not an open 400, and that two athlete profiles are one person
+is editorial judgement - most of the work in `pull/`, and none of it obvious.
+
+**Keeping the repo public was considered against monetising and rejected, for
+the opposite of the obvious reason.** Going private would protect the algorithm
+by exactly zero, because it has shipped to every visitor since day one, and it
+would delete the forward archive's whole claim: commit dates a stranger can
+verify. The record is the asset and the code is the implementation. If a deal
+ever needs the model server-side, move it then - the model and the seed are
+separable, and by that point the record is what is being bought.
+
+**The real exposure to an athletic.net partnership is the crawl, not the IP.**
+Whether a weekly automated pull sits inside their terms is worth answering
+before approaching them rather than discovering mid-conversation.
+
 **The one untrusted input is an athlete's name.** It comes from athletic.net and
 ends up interpolated into `innerHTML` on five boards. `pull/seed.js` strips
 `< > & "` and unprintable control characters at ingest, so nothing that could
