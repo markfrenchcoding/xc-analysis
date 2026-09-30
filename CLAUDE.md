@@ -4436,6 +4436,33 @@ both the wide shape and the original `[qual, win]` one, and a column that did no
 exist yet prints as a dash. Widening the archive must never mean going back over
 what it already said.
 
+### The out-of-state errata
+
+**Every snapshot from Sep 15 to Sep 26 carried other states' runners.** Until
+the Sep 28 fix (`8deedf4`, match on athletic.net team id) results were filed by
+school name, and 23 Oregon names share one with a school elsewhere. The archive
+had Centennial's 5A girls - seven Boise, Idaho runners - at 81% to win, and
+Century (6A girls, six of seven), Redmond (5A, six of seven from Sep 25),
+Riverside, Rainier, Toledo, Union and others carrying them too.
+
+**The entries were not rewritten.** Rewriting them would break the archive's
+one promise. `ARCHIVE_ERRATA`, right under `SNAPSHOTS`, records for each board
+which teams had how many foreign runners in their top seven on which date, and
+which archived runners were never Oregon athletes. It was computed by taking the
+seed out of each snapshot's own commit and asking which of each team's top
+seven are absent from the id-matched seed. Called it marks those teams and
+runners with a double dagger, strikes the affected dates through, and says in
+plain words what happened, that every rival's odds moved with them, and when it
+was fixed. **Elgin is left out**: it has no athletic.net team, so the id filter
+drops all of its rows and cannot tell us which were foreign.
+
+`snapshot.js` rewrites only the `SNAPSHOTS` line, so the errata line survives
+every refresh. New entries are clean and need no errata.
+
+**The same view printed the wrong field size**: "one of the 12 teams" on 6A
+girls, because it read `FIELD`, which belongs to whatever board Odds is on. It
+computes the field from `CLASSES[FWD_CLS][FWD_G]` now.
+
 ### The guard was inert for a day, and how
 
 Everything below was silent. It is the most useful thing in this section.
