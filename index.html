@@ -1124,6 +1124,15 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   #p-doc .doc .stat:nth-last-child(2),#p-doc .rec-tile:nth-last-child(2){border-bottom:1px solid var(--line)}
   #p-doc .doc figure{padding:24px 24px 18px}
 }
+
+/* the What if tab's two questions */
+.wi-ask{display:flex;gap:6px;margin:12px 0 0}
+.wi-ask .solve{flex:1;font-size:13px;padding:10px 8px}
+.solve.ghost{background:none;color:var(--text);border:1px solid var(--line)}
+.solve.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.cmphead.lose,.cmp.lose,.cmphead.beat,.cmp.beat{grid-template-columns:1fr 84px 84px}
+.cmp.lose span em,.cmp.beat span em{display:block;font-style:normal;color:var(--muted);font-size:11.5px}
+.cmp.beat b.lo{color:var(--muted)}
 </style>
 
 <!-- Vercel Web Analytics. The npm package and the React component are the
@@ -10956,11 +10965,14 @@ function buildModel(g,dist){
   for(const [name,m] of byTeam){
     const lg=TEAM_LEAGUE[name];
     if(!lg){unassigned.push(name);continue;}
-    const roster=[...m.values()].sort((a,b)=>a.sb-b.sb).slice(0,7);
+    const ranked=[...m.values()].sort((a,b)=>a.sb-b.sb);
+    const roster=ranked.slice(0,7);
+    // the eighth, who steps in when one of the seven does not race
+    const bench=ranked[7]||null;
     const idx=teams.length;
     if(roster.length<SC){teams.push({name,league:lg,idx,rIdx:[],short:roster.length,avg5:Infinity});continue;}
     const rIdx=roster.map(r=>{runners.push({marks:r.marks,w:r.w,sb:r.sb,t:idx});return runners.length-1;});
-    teams.push({name,league:lg,idx,rIdx,short:0,roster,
+    teams.push({name,league:lg,idx,rIdx,short:0,roster,bench,
       avg5:roster.slice(0,SC).reduce((s,r)=>s+r.sb,0)/SC});
   }
   const byLeague={};
@@ -11612,7 +11624,11 @@ function renderWhatIf(){
        </select>
        <button class="solve" id="wiSolve">Find it</button>
      </div>
-     <p class="sub2" style="margin-top:6px">Picks the cheapest set of improvements that makes the chosen outcome more likely than not.</p>`;
+     <p class="sub2" style="margin-top:6px">Picks the cheapest set of improvements that makes the chosen outcome more likely than not.</p>
+     <div class="wi-ask">
+       <button class="solve ghost" id="wiLose">Who can't we lose?</button>
+       <button class="solve ghost" id="wiBeat">Who do we have to beat?</button>
+     </div>`;
 
   document.querySelectorAll("#wiRoster .step button").forEach(b=>b.onclick=()=>{
     const n=b.parentElement.dataset.n;
@@ -11621,6 +11637,8 @@ function renderWhatIf(){
     renderWhatIf();
   });
   document.getElementById("wiSolve").onclick=solveGoal;
+  document.getElementById("wiLose").onclick=runLose;
+  document.getElementById("wiBeat").onclick=runBeat;
   sel.onchange=()=>{wiAdj={};renderWhatIf();document.getElementById("wiOut").innerHTML="";};
 }
 
@@ -11631,7 +11649,7 @@ function adjFor(model,team,map){
 }
 
 /* Paced runner over a set of worlds. onEnd gets the tallies. */
-function runWorlds(model,worlds,seasons,label,onEnd){
+function runWorlds(model,worlds,seasons,label,onEnd,stepFn){
   running=true;
   const go=document.getElementById("go");
   go.textContent="…";go.classList.add("running");
@@ -11649,7 +11667,8 @@ function runWorlds(model,worlds,seasons,label,onEnd){
     if(gen!==runGen)return;                 // the model this was built on is gone
     if(!t0)t0=ts;
     const target=Math.max(done+1,Math.min(seasons,Math.floor(seasons*(ts-t0)/dur)));
-    done=catchUp(done,target,()=>oneSeason(model,worlds,sigma,times,shock,tmp));
+    done=catchUp(done,target,stepFn?()=>stepFn(times,shock,sigma)
+      :()=>oneSeason(model,worlds,sigma,times,shock,tmp));
     pk.style.left=(done/seasons*100)+"%";
     rb.querySelector(".track i").style.width=(done/seasons*100)+"%";
     lab.textContent=label+" "+done.toLocaleString()+"/"+seasons.toLocaleString();
@@ -11716,6 +11735,158 @@ function showWhatIf(meta,team,n,names){
         combined<sum-1?"The gains overlap: once one of them is past a rival, the next has less left to win.":
         "The gains are close to additive."}</div>`;
   }
+  document.getElementById("wiOut").innerHTML=html;
+}
+
+/* ---- who can't we lose ----
+   Every one of the seven sits the season out in turn, against identical
+   simulated races, and the team's eighth steps in at their own level - the seed
+   keeps twelve deep, so there is a real runner to promote. A team with no
+   eighth runs six. What changes is what that runner is worth: to the chance of
+   reaching Lane, and in points at the league championship. The sixth and
+   seventh score nothing there and still move the total, because they finish in
+   front of other teams' scorers - displacement, which is the thing a coach
+   knows matters and has never had a number for. */
+function runLose(){
+  if(running)return;
+  const {model,team}=wiTeamNow();
+  if(!team)return;
+  document.getElementById("wiOut").innerHTML="";
+  const worlds=[],meta=[];
+  const add=(adj,tag,who)=>{const T=blankTally(model);worlds.push({adj,byIdx:T.byIdx});meta.push({tag,who,by:T.byIdx});};
+  add(null,"base");
+  team.roster.forEach((r,k)=>{
+    const a=new Float64Array(model.runners.length);
+    // shift() subtracts adj, so a negative adj slows them to the eighth's level
+    a[team.rIdx[k]]=team.bench?-(team.bench.sb-r.sb):-1e6;
+    add(a,"out",r);
+  });
+  const seasons=Math.max(1000,Math.min(nSims,2500));
+  runWorlds(model,worlds,seasons,"",n=>showLose(meta,team,n));
+}
+function showLose(meta,team,n){
+  const base=meta[0].by[team.idx];
+  const q0=base.qual/n, p0=base.scoreSum/Math.max(1,base.n);
+  const rows=meta.slice(1).map((m,k)=>{const b=m.by[team.idx];
+    return {r:m.who,k,q:b.qual/n,dq:b.qual/n-q0,dp:b.scoreSum/Math.max(1,b.n)-p0};});
+  rows.sort((a,b)=>a.dq-b.dq||b.dp-a.dp);
+  const sub=team.bench?`${team.bench.name} (${fmt(team.bench.sbRaw)}) steps in each time.`
+    :`There is no eighth runner in the database, so the team runs six.`;
+  const worst=rows[0];
+  const quiet=rows.filter(x=>x.k>=5&&x.dp>0.5);
+  let html=`<h2 class="sec">Who ${team.name} can't lose</h2>
+    <p class="sub2">Each runner sits out in turn, against the same ${n.toLocaleString()} simulated seasons. ${sub}</p>`;
+  if(Math.abs(worst.dq)>=0.01)
+    html+=`<div class="note"><b>Losing ${worst.r.name} costs the most:</b> reaching Lane goes from ${pct(q0*n,n)} to ${pct(worst.q*n,n)}, and the team gives up about ${Math.round(worst.dp)} points at the league championship.</div>`;
+  else
+    html+=`<div class="note">No single runner changes whether ${team.name} reaches Lane: it is ${q0>0.5?"in":"out"} either way. The points below are what each is worth at the league championship.</div>`;
+  html+=`<div class="cmphead lose"><span>without</span><span>reaches Lane (now ${pct(q0*n,n)})</span><span>league pts</span></div>`;
+  for(const x of rows){
+    const cls=Math.abs(x.dq)<0.005?"flat":(x.dq>0?"up":"dn");
+    html+=`<div class="cmp lose"><span>${x.r.name}<em>${x.k+1}${x.k>=5?" · displaces":""}</em></span>
+      <b>${pct(x.q*n,n)}</b>
+      <span class="d ${x.dp>0.5?"dn":"flat"}">${x.dp>0.5?"+"+Math.round(x.dp):"—"}</span></div>`;
+  }
+  if(quiet.length){
+    const pts=quiet.map(x=>Math.round(x.dp)), same=pts.every(v=>v===pts[0]);
+    const worth=same?`about ${pts[0]} point${pts[0]===1?"":"s"}${quiet.length>1?" each":""}`
+      :quiet.map((x,i)=>`${x.r.name.split(" ")[0]} about ${pts[i]}`).join(", ");
+    html+=`<div class="note">${quiet.map(x=>x.r.name).join(" and ")} ${quiet.length>1?"score":"scores"} nothing at the league championship and ${quiet.length>1?"are":"is"} still worth ${worth}, by finishing in front of other teams' scorers.</div>`;
+  }
+  html+=`<p class="sub2">League points are the team's average score at its league championship; lower is better, so a plus is what the team loses without them.</p>`;
+  document.getElementById("wiOut").innerHTML=html;
+}
+
+/* ---- who do we have to beat ----
+   Every simulated league championship is kept and split by the result against
+   each rival: how often the team qualifies when it beats them and when it does
+   not. That is how a coach thinks the week of district - not in percentages but
+   in who has to be beaten - and it makes the at-large rule concrete: losing to
+   the right rival can still leave you third and inside the at-large. */
+function runBeat(){
+  if(running)return;
+  const {model,team}=wiTeamNow();
+  if(!team)return;
+  document.getElementById("wiOut").innerHTML="";
+  const list=model.byLeague[team.league]||[];
+  const rivals=list.filter(t=>t.idx!==team.idx);
+  const S={n:0,q:0,by:rivals.map(t=>({t,nb:0,qb:0,nl:0,ql:0,m20:0,q20:0})),seasons:[]};
+  const T=blankTally(model);
+  const seasons=Math.max(1000,Math.min(nSims,4000));
+  runWorlds(model,[],seasons,"",()=>showBeat(team,S),(times,shock,sigma)=>{
+    draw(model,times,sigma,shock);
+    const field=playDistricts(model,T.byIdx,times,null);
+    const inq=field.includes(team.idx);
+    const r=scoreMeet(list,times,SC,PL);
+    const pos={};r.forEach((x,i)=>{pos[x.idx]=i;});
+    const mine=r[pos[team.idx]];
+    S.n++;if(inq)S.q++;
+    let mask=0;
+    S.by.forEach((b,j)=>{if(pos[b.t.idx]!==undefined&&mine&&pos[team.idx]<pos[b.t.idx])mask|=1<<j;});
+    S.seasons.push({mask,inq});
+    for(const b of S.by){
+      if(pos[b.t.idx]===undefined||!mine)continue;
+      if(pos[team.idx]<pos[b.t.idx]){b.nb++;if(inq)b.qb++;
+        if(r[pos[b.t.idx]].total-mine.total>=20){b.m20++;if(inq)b.q20++;}}
+      else{b.nl++;if(inq)b.ql++;}
+    }
+  });
+}
+function showBeat(team,S){
+  const q=S.q/S.n, P=(a,b)=>b?Math.round(100*a/b)+"%":"—";
+  const live=S.by.filter(b=>b.nb>=S.n*0.03&&b.nl>=S.n*0.03)
+    .map(b=>({...b,swing:b.qb/b.nb-b.ql/b.nl})).sort((a,b)=>b.swing-a.swing);
+  const nm=a=>a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a[a.length-1];
+  let html=`<h2 class="sec">Who ${team.name} has to beat</h2>
+    <p class="sub2">The ${team.league} championship, across ${S.n.toLocaleString()} simulated seasons. ${team.name} reaches Lane in ${P(S.q,S.n)} of them.</p>`;
+  if(!live.length||live[0].swing<0.1){
+    html+=`<div class="note">${q>0.9?`${team.name} reaches Lane whatever happens against any one rival.`
+      :q<0.1?`No single result against one rival gets ${team.name} to Lane often enough to matter. The individual qualifying places are the way through.`
+      :`No one rival decides it: ${team.name}'s chances ride on the whole league rather than one head-to-head.`}</div>`;
+    document.getElementById("wiOut").innerHTML=html;return;
+  }
+  const top=live[0];
+  /* A team that is nearly certain wants the opposite question: what is the one
+     result that could keep it home, and how likely is that. "Mountainside is
+     the one" reads as a crisis for a team that beats Mountainside 96% of the
+     time. */
+  if(q>=0.85){
+    // the loss that hurts most when it happens, not the loss that happens most
+    const risk=live.slice().sort((a,b)=>a.ql/a.nl-b.ql/b.nl)[0];
+    html+=`<div class="note"><b>The one result that could keep ${team.name} home: finishing behind ${risk.t.name}.</b> That happens in ${P(risk.nl,S.n)} of seasons, and even then ${team.name} reaches Lane ${P(risk.ql,risk.nl)} of the time.</div>`;
+    html+=`<div class="cmphead beat"><span>against</span><span>beat them</span><span>lose to them</span></div>`;
+    for(const b of live)
+      html+=`<div class="cmp beat"><span>${b.t.name}<em>beat them in ${P(b.nb,S.n)} of seasons</em></span><b>${P(b.qb,b.nb)}</b><b class="lo">${P(b.ql,b.nl)}</b></div>`;
+    document.getElementById("wiOut").innerHTML=html;return;
+  }
+  /* When two or three rivals swing it about equally, the answer is how many of
+     them to finish ahead of - "beat two of these three" - not one name, and
+     leading with one name would be wrong. Counted straight off the seasons. */
+  const group=live.filter(b=>b.swing>=top.swing*0.6).slice(0,4);
+  if(group.length>=2){
+    const bit=group.map(b=>1<<S.by.findIndex(x=>x.t===b.t));
+    const byK=[];
+    for(const x of S.seasons){const k=bit.filter(m=>x.mask&m).length;
+      (byK[k]=byK[k]||{n:0,q:0});byK[k].n++;if(x.inq)byK[k].q++;}
+    const N=group.length, names=nm(group.map(b=>b.t.name));
+    const word=k=>k===N?(N===2?"both":"all "+N):k===0?"none of them":k+" of "+N;
+    // the fewest wins that make it more likely than not, if any
+    let need=null;for(let k=0;k<=N;k++) if(byK[k]&&byK[k].n>=S.n*0.02&&byK[k].q/byK[k].n>=0.5){need=k;break;}
+    html+=`<div class="note"><b>It is not one team, it is ${N===2?"two":N===3?"three":"four"}: ${names}.</b> `
+      +(need!==null?`${team.name} needs to finish ahead of ${word(need)} to be more likely in than out. `:"")
+      +`Here is how often it reaches Lane by how many of them it beats.</div>`;
+    html+=`<div class="cmphead beat"><span>finishes ahead of</span><span>reaches Lane</span><span></span></div>`;
+    for(let k=N;k>=0;k--) if(byK[k]&&byK[k].n>=S.n*0.02)
+      html+=`<div class="cmp beat"><span>${word(k)[0].toUpperCase()+word(k).slice(1)}<em>happens in ${P(byK[k].n,S.n)} of seasons</em></span><b>${P(byK[k].q,byK[k].n)}</b><b class="lo"></b></div>`;
+    html+=`<h2 class="sec">Team by team</h2>`;
+  }else{
+    html+=`<div class="note"><b>${top.t.name} is the one.</b> Beat them and ${team.name} reaches Lane ${P(top.qb,top.nb)} of the time. Finish behind them and it is ${P(top.ql,top.nl)}. ${team.name} beats them in ${P(top.nb,S.n)} of seasons.`
+      +(top.m20>=S.n*0.03?` By 20 points or more, ${team.name} is in ${P(top.q20,top.m20)} of the time.`:"")+`</div>`;
+  }
+  html+=`<div class="cmphead beat"><span>against</span><span>beat them</span><span>lose to them</span></div>`;
+  for(const b of live)
+    html+=`<div class="cmp beat"><span>${b.t.name}<em>beat them in ${P(b.nb,S.n)} of seasons</em></span><b>${P(b.qb,b.nb)}</b><b class="lo">${P(b.ql,b.nl)}</b></div>`;
+  html+=`<p class="sub2">Chance of reaching Lane in the seasons ${team.name} finished ahead of that team, and in the seasons it did not. Rivals it almost always beats, or almost never, are left out.</p>`;
   document.getElementById("wiOut").innerHTML=html;
 }
 

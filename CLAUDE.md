@@ -3209,6 +3209,54 @@ And one season best got *slower*: Mason Siewert's 2027 cross country best was
 drops, leaving his real best of 24:18.46. The audit flagged it as a slower
 value, which is exactly why it splits the report by direction.
 
+## Two coach questions on the What if tab
+
+**"Who can't we lose?"** (`runLose`) sits each of the seven out in turn against
+identical simulated seasons and promotes the team's **eighth** - `buildModel`
+now keeps `team.bench`, the next runner by rated mark, because the seed is
+twelve deep and a real team would put that runner in. The substitution is an
+`adj` on the missing runner: their draw, slowed to the eighth's level, so the
+comparison stays paired. No eighth, the team runs six. It reports the chance of
+reaching Lane without each runner and the points the team gives up at its league
+championship - including the sixth and seventh, who score nothing there and are
+still worth points by finishing in front of other teams' scorers. On Tualatin
+boys: losing the #1 takes them from 26% to 6% and costs 18 league points; the
+sixth and seventh are worth about a point each.
+
+**"Who do we have to beat?"** (`runBeat`) keeps every simulated league
+championship and splits the chance of reaching Lane by the result against each
+rival. `runWorlds` takes an optional per-season function for it. Three shapes,
+chosen by what the numbers say rather than by one template:
+
+- **several rivals swinging it about equally** - the answer is how many of them
+  to finish ahead of. Tualatin boys: ahead of all three of Lakeridge, Lake Oswego
+  and Oregon City, 100% (that is second, an automatic place); two of three, 21%
+  (third, the at-large pool); one, 0%. Leading with a single name there was wrong
+  and was the first version.
+- **one rival** - "X is the one", with a line for winning by 20 or more.
+- **a team that is nearly certain** (85%+) - the one result that could keep it
+  home, chosen as **the loss that hurts most when it happens, not the one that
+  happens most**. Picking by frequency named Sunset for Jesuit, a loss that
+  leaves Jesuit at 98%; the real danger is Mountainside, 4% likely and 68% after.
+
+## Lane-equivalent times: measured, not built
+
+Asked whether a mark could be shown as "what it is worth at Lane".
+`backtest/lane_equiv.js` converts each state finisher's race-rated marks with a
+Lane factor learned from the other seasons and compares with the clock at Lane:
+
+| weeks out | typical miss | two in three within | nine in ten within |
+|---|---|---|---|
+| 4 | 1.6% (17s on a 17:00) | 25s | 47s |
+| 2 | 1.7% | 25s | 46s |
+| 1 | 1.5% (16s) | 23s | 41s |
+
+About 3 seconds (15%) better than the same conversion from a plain season best
+(`--raw`). **Lane itself runs 1.5-2% fast or slow from one year to the next**
+(2022 -1.8%, 2023 +1.4 to +2.3%), about 20 seconds, which is weather and nothing
+a conversion can know - a third of the error. So it would be honest as "a
+typical day at Lane, give or take 25 seconds", not as a prediction of the clock.
+
 ## A ranking is not a forecast
 
 The Track record scores three things on the same raw season bests at every

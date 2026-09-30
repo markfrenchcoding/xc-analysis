@@ -198,11 +198,14 @@ function buildModel(g,dist){
   for(const [name,m] of byTeam){
     const lg=TEAM_LEAGUE[name];
     if(!lg){unassigned.push(name);continue;}
-    const roster=[...m.values()].sort((a,b)=>a.sb-b.sb).slice(0,7);
+    const ranked=[...m.values()].sort((a,b)=>a.sb-b.sb);
+    const roster=ranked.slice(0,7);
+    // the eighth, who steps in when one of the seven does not race
+    const bench=ranked[7]||null;
     const idx=teams.length;
     if(roster.length<SC){teams.push({name,league:lg,idx,rIdx:[],short:roster.length,avg5:Infinity});continue;}
     const rIdx=roster.map(r=>{runners.push({marks:r.marks,w:r.w,sb:r.sb,t:idx});return runners.length-1;});
-    teams.push({name,league:lg,idx,rIdx,short:0,roster,
+    teams.push({name,league:lg,idx,rIdx,short:0,roster,bench,
       avg5:roster.slice(0,SC).reduce((s,r)=>s+r.sb,0)/SC});
   }
   const byLeague={};
