@@ -151,7 +151,8 @@ a race table for everyone after a weekend, and About for the proof.
   horizontal scrollers, a slider and the course map, all of which a swipe would
   fight. The About styles are scoped
   `:is(#p-doc,#p-races)` so the race table shares them.
-- At 375px each tab is about 48px beside Run, in the same place on every tab.
+- At 375px each tab is 59px wide and 46px tall beside an 87px Run (49px at 320),
+  in the same place on every tab.
 
 **About fans out.** It is the one tab holding three different things, so a tap
 offers How it works, Track record and Called it as three cards that rise out of
@@ -3811,9 +3812,10 @@ while sorting. It stays **off** the ninety runner rows for the same arithmetic.
 
 Three tabs and one button. The tabs are how you move around the site; the button
 does one thing. So the tabs take the room (`flex:1`, set in the display face,
-uppercase) and Run is capped at 38% and 190px - still the loudest element on the
-page by colour, no longer by area. It was the other way round, at roughly two
-thirds button.
+uppercase) and Run is a quarter of the bar, capped at 128px - still the loudest
+element on the page by colour, no longer by area. It was two thirds button once,
+then 38%; at 38% four tabs got 48px each and the owner found them fiddly to hit.
+Each tab is at least 44px tall, the usual floor for a thumb.
 
 ## The home-screen icon
 
