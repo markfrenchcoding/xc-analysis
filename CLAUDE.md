@@ -381,6 +381,13 @@ the crest it already had.
 **Results-through date.** Driven by `DATA_DATE`, rendered into the header on
 load.
 
+**The header credits athletic.net, and links to it.** It reads "Through Sep 26
+· athletic.net" - "Results through" was dropped to keep it on one line at 375px;
+at 320 the whole header column is 115px and every line wraps anyway. The How
+tab says the same under the database counts. Added Sep 30, when the site had no
+credit anywhere and a data-access request to athletic.net was about to go out:
+every number on this site is their data, and it should say so.
+
 **The site opens dark, whatever the machine prefers.** It used to read
 `prefers-color-scheme` on load and switch to light, which meant most visitors
 never saw the design as it was built - the board, the crests and the pace line

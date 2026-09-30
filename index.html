@@ -308,7 +308,7 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 header h1{font-family:'Anton','Barlow Condensed',sans-serif;font-weight:400;font-size:26px;margin:0;
   line-height:1;letter-spacing:.015em;transform:skewX(-8deg);transform-origin:left bottom}
 header .hsub{color:var(--dim);font-size:11.5px;line-height:1.3;flex:1}
-header .asof{color:var(--muted);font-size:10.5px}
+header .asof{color:var(--muted);font-size:10.5px}header .asof a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .themeBtn{background:var(--surface);border:1px solid var(--line);color:var(--muted);
   width:32px;height:32px;border-radius:9px;cursor:pointer;line-height:1;
   display:grid;place-items:center;flex:none;transition:transform .18s var(--ease),color .2s}
@@ -10461,6 +10461,7 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
         <div class="stat"><b id="hsSch">&mdash;</b><i>schools across all five classifications</i></div>
         <div class="stat"><b id="hsRun">&mdash;</b><i>seasons played out per run</i></div>
       </div>
+      <p>Every result comes from <a href="https://www.athletic.net/" target="_blank" rel="noopener">athletic.net</a>, where Oregon's coaches and meet directors post them.</p>
 
       <h3>A season is not one race</h3>
       <p>Line every runner up at their season best and you learn who is fastest on paper. You do not learn how likely anything is, and paper does not run in November.</p>
@@ -13883,8 +13884,13 @@ addEventListener("resize",()=>{
 function loadSeed(){
   setClass(CLS,gender);
   const d=new Date(DATA_DATE+"T12:00:00");
-  document.getElementById("asof").textContent="Results through "
-    +d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  // the credit rides on the date: every result on the site is athletic.net's
+  const asof=document.getElementById("asof");
+  asof.textContent="Through "
+    +d.toLocaleDateString("en-US",{month:"short",day:"numeric"})+" \u00b7 ";
+  const src=document.createElement("a");
+  src.href="https://www.athletic.net/";src.target="_blank";src.rel="noopener";
+  src.textContent="athletic.net";asof.appendChild(src);
   syncHead();
   const {rows}=parseCSV(document.getElementById("seed").textContent);
   DATA=rows;
