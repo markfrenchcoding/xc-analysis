@@ -137,8 +137,17 @@ a race table for everyone after a weekend, and About for the proof.
   does on About.
 - **Run is on every tab and the bar never changes shape.** It hid on Races and
   About at first, and the four tabs jumped to fill its space the moment either
-  was tapped - every label sliding sideways under the finger. From Races or About,
-  Run goes to Odds and runs the board; on Team it runs the what-if. The About styles are scoped
+  was tapped - every label sliding sideways under the finger. On Races and About
+  it greys out and does nothing (`.idle`, disabled); on Team it runs the what-if.
+  It briefly jumped to Odds and ran the board from there, and the owner preferred
+  a button that plainly has nothing to do on this page.
+- **Switching tabs slides.** One `.tab-pill` sits behind the tabs and moves to
+  the pressed one (`movePill`, re-placed on resize and when the fonts land), and
+  the new panel comes in from the side its tab is on (`in-r`/`in-l`, 28px and a
+  fade). The old panel goes at once, because two long panels on screen together
+  would stack. Taps only, no finger swipe between tabs: the boards carry
+  horizontal scrollers, a slider and the course map, all of which a swipe would
+  fight. The About styles are scoped
   `:is(#p-doc,#p-races)` so the race table shares them.
 - At 375px each tab is about 48px beside Run, in the same place on every tab.
 

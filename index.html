@@ -802,17 +802,28 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.045em;
   text-transform:uppercase;padding:9px 6px;
   border-radius:8px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap}
-.tabs button[aria-pressed="true"]{background:var(--raised);color:var(--text);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.tabs{position:relative}
+.tabs button{position:relative;z-index:1}
+.tabs button[aria-pressed="true"]{color:var(--text)}
+.tab-pill{position:absolute;left:3px;top:3px;bottom:3px;width:0;border-radius:8px;pointer-events:none;
+  background:var(--raised);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .32s cubic-bezier(.3,1.1,.4,1),width .32s cubic-bezier(.3,1.1,.4,1)}
 .go{flex:0 0 auto;width:38%;max-width:190px;min-width:96px;
   background:var(--accent);color:var(--on-accent);border:0;font-family:var(--num);
   font-weight:700;font-size:15.5px;letter-spacing:.01em;border-radius:11px;cursor:pointer;
   transition:transform .18s var(--ease),opacity .2s}
 .go:active{transform:scale(.97)}
 .go.running{background:var(--raised);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
+.go{transition:transform .18s var(--ease),opacity .2s,background-color .25s,color .25s}
+.go.idle,.go.idle.running{background:var(--raised);color:var(--dim);box-shadow:inset 0 0 0 1px var(--line);cursor:default}
+.go.idle:active{transform:none}
 
 .panel{display:none}
 .panel.on{display:block;animation:pin .28s var(--ease)}
+.panel.on.in-r{animation:swipeR .34s cubic-bezier(.2,.8,.25,1)}
+.panel.on.in-l{animation:swipeL .34s cubic-bezier(.2,.8,.25,1)}
+@keyframes swipeR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes swipeL{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
 @keyframes pin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
 .note{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--accent);
@@ -10542,6 +10553,7 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
 
 <div class="bar"><div class="bar-inner">
   <div class="tabs" role="group" aria-label="Sections">
+    <span class="tab-pill" aria-hidden="true"></span>
     <button data-p="p-sim" aria-pressed="true">Odds</button>
     <button data-p="p-wi" aria-pressed="false">Team</button>
     <button data-p="p-races" aria-pressed="false">Races</button>
@@ -13703,13 +13715,35 @@ FAN.addEventListener("keydown",e=>{
 });
 SCRIM.onclick=()=>fanClose(false);
 
+/* The pill under the pressed tab slides to the next one, and the new panel
+   comes in from the side its tab sits on: to the right of where you were, it
+   arrives from the right. transform and opacity only. The old panel goes at
+   once - two long panels on screen together would stack. */
+const TAB_ORDER=["p-sim","p-wi","p-races","p-doc"];
+function movePill(b,instant){
+  const pill=document.querySelector(".tab-pill");
+  if(!pill||!b||!b.offsetWidth)return;
+  if(instant)pill.style.transition="none";
+  pill.style.width=b.offsetWidth+"px";
+  pill.style.transform="translateX("+(b.offsetLeft-3)+"px)";
+  if(instant){void pill.offsetWidth;pill.style.transition="";}
+}
 function selectTab(b){
+  const was=document.querySelector(".panel.on");
+  const from=was?TAB_ORDER.indexOf(was.id):-1, to=TAB_ORDER.indexOf(b.dataset.p);
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
-  /* Run stays on every tab. Hiding it on Races and About made the four tabs
-     jump to fill its space the moment either was tapped - every label sliding
-     sideways under the finger. The bar keeps one shape, and Run keeps one
-     meaning: run the board. */
+  movePill(b);
+  document.querySelectorAll(".panel").forEach(p=>{
+    const on=p.id===b.dataset.p;
+    p.classList.toggle("on",on);
+    p.classList.remove("in-l","in-r");
+    if(on&&from>=0&&from!==to){void p.offsetWidth;p.classList.add(to>from?"in-r":"in-l");}
+  });
+  /* Run keeps its place on every tab, so the bar never changes shape - hiding
+     it made the four tabs jump sideways under the finger. Races and About have
+     nothing to run, so there it greys out and does nothing. */
+  const go=document.getElementById("go"), idle=b.dataset.p==="p-doc"||b.dataset.p==="p-races";
+  go.disabled=idle;go.classList.toggle("idle",idle);
   // The controls belong to everything that runs. About has nothing to set, and
   // Races carries its own boys/girls switch because it spans every classification.
   document.getElementById("ctl").classList.toggle("off",b.dataset.p==="p-doc"||b.dataset.p==="p-races");
@@ -13729,11 +13763,14 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
 document.getElementById("go").onclick=()=>{
   if(running){skip=true;return;}
   if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();
-  // from Races or About, Run means the board: go there and run it
-  if(!document.getElementById("p-sim").classList.contains("on"))
-    selectTab(document.querySelector('.tabs button[data-p="p-sim"]'));
-  run();
+  if(document.getElementById("p-sim").classList.contains("on"))run();
 };
+{
+  const pressed=()=>document.querySelector('.tabs button[aria-pressed="true"]');
+  addEventListener("resize",()=>movePill(pressed(),true));
+  if(document.fonts)document.fonts.ready.then(()=>movePill(pressed(),true));
+  movePill(pressed(),true);
+}
 addEventListener("resize",()=>{
   if(running)return;
   if(cards.length){measure();cards.forEach(c=>{c.pos=-1;});}
