@@ -137,6 +137,9 @@ a race table for everyone after a weekend, and About for the proof.
   copy of the panel toggle, so the pill stayed on Team while Odds was showing and
   Run kept whatever state the last tab left. It passes `keepScroll` instead, so
   the reveal is not fought by the scroll to the top.
+- **The Team tab opens on the school you came for.** A search or a link naming a
+  team sets `PENDING_TEAM`, so the tab no longer opens on whichever school is
+  first alphabetically.
 - **Run queues behind a Team calculation.** Both kinds of run share the button
   and `running`. Pressing it on Odds while a Team run was going did nothing,
   silently; now it reads "Up next" and `runQueued` starts the board when the

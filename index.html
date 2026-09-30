@@ -10943,7 +10943,8 @@ function goToSchool(s){
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
   syncHead();syncViewText();renderForward();
   if(NEXT_SEASON)syncNextNote();syncMiNote();
-  clearOut();wiAdj={};renderWhatIf();
+  // the school somebody searched for is the one the Team tab should open on
+  clearOut();wiAdj={};PENDING_TEAM=s.name;renderWhatIf();
   // through selectTab, so the pill, Run and the controls all follow; it keeps
   // the scroll, which would otherwise fight the reveal below
   fanClose(false);
@@ -13866,7 +13867,7 @@ loadSeed();
   setClass(CLS,gender);
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
-  if(h.team&&!h.page)FOCUS=h.team;
+  if(h.team&&!h.page){FOCUS=h.team;PENDING_TEAM=h.team;}
   if(h.mi)setMiles(true);
   if(h.page&&h.team)OPEN_TEAM=h.team;
 })();
