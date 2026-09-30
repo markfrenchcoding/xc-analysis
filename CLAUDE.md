@@ -144,6 +144,10 @@ a race table for everyone after a weekend, and About for the proof.
   and `running`. Pressing it on Odds while a Team run was going did nothing,
   silently; now it reads "Up next" and `runQueued` starts the board when the
   Team run ends (`RUN_OWNER`, `RUN_AFTER`, cleared by `cancelRun`).
+- **Races shows "that day" in seconds for the time typed in**: a race 1.2% slow
+  reads "12s slow" at 17:00 and "11s slow" at 15:30, with the percentage under it
+  (`t*(f-1)`, same basis as the Lane column). A minute or more prints as m:ss.
+  "About average" (under 0.5%) keeps its label with the seconds beneath.
 - **Races sorts by heading**: date newest first, race A-Z, and "that day" or the
   Lane time with the slowest race first; a second tap reverses (`RACE_SORT`).
 - **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it

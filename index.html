@@ -1167,7 +1167,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 :is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2) em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:2px}
 :is(#p-doc,#p-races) .rec-tbl.races td:first-child{color:var(--muted);white-space:nowrap}
 :is(#p-doc,#p-races) .rec-tbl.races th:nth-child(2),:is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2){text-align:left}
-.rday{font-size:12.5px;white-space:nowrap}
+.rday{font-size:12.5px;white-space:nowrap}.rday i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:1px}
 .rday.slow{color:var(--text)}
 .rday.fast{color:var(--accent)}
 .rday.even{color:var(--muted)}
@@ -11969,13 +11969,15 @@ function renderRaces(){
     return `<th aria-sort="${on?(RACE_SORT.dir>0?"ascending":"descending"):"none"}"><button class="rsort${on?" on":""}" data-k="${k}">${label}<i aria-hidden="true">${on?(RACE_SORT.dir>0?"▲":"▼"):""}</i></button></th>`;};
   const body=rows.map(r=>{
     const f=r[6]/shift, day=(f-1)*100;
-    const tag=Math.abs(day)<0.5?`<span class="rday even">about average</span>`
-      :`<span class="rday ${day>0?"slow":"fast"}">${Math.abs(day).toFixed(1)}% ${day>0?"slow":"fast"}</span>`;
+    // seconds at the time typed in: someone on t form that day would have run t*f
+    const s=Math.round(t*(f-1)), gap=a=>a<60?a+"s":mmss(a), secs=s===0?"even":`${gap(Math.abs(s))} ${s>0?"slow":"fast"}`;
+    const tag=Math.abs(day)<0.5?`<span class="rday even">about average<i>${secs}</i></span>`
+      :`<span class="rday ${day>0?"slow":"fast"}">${gap(Math.abs(s))} ${day>0?"slow":"fast"}<i>${Math.abs(day).toFixed(1)}%</i></span>`;
     return `<tr><td>${d(r[2])}</td><td>${r[1]}<em>${r[4]} runners rated it</em></td><td>${tag}</td><td class="rlane">${mmss(t/f*LANE.factor)}</td></tr>`;
   }).join("");
   out.innerHTML=(rows.length?`<p class="rsort-hint">Tap a heading to sort.</p><div class="rec-wrap"><table class="rec-tbl races"><thead><tr>${th("date","date")}${th("race","race")}${th("day","that day")}${th("lane",mmss(t)+" there is")}</tr></thead><tbody>${body}</tbody></table></div>`
       :`<p>No race matches "${q.replace(/[<>&"]/g,"")}".</p>`)
-    +`<p class="rec-note">A time at Lane on a typical day. Checked against ${LANE.seasons.length} past state meets, two in three runners landed within ${LANE.twoThirds}% of it, about ${band} seconds either way at ${mmss(t)}, and nine in ten within ${LANE.nineTenths}%. Part of that is Lane itself: some years it runs a couple of percent fast or slow. A race is rated from how the runners in it ran against their own form, so it cannot tell a hard course from bad weather on the same afternoon, and a race few runners raced twice around is rated closer to average.</p>`;
+    +`<p class="rec-note">"That day" is how much slower or faster the race ran than an average Oregon race, in seconds for a ${mmss(t)} runner. The last column is that time at Lane on a typical day. Checked against ${LANE.seasons.length} past state meets, two in three runners landed within ${LANE.twoThirds}% of it, about ${band} seconds either way at ${mmss(t)}, and nine in ten within ${LANE.nineTenths}%. Part of that is Lane itself: some years it runs a couple of percent fast or slow. A race is rated from how the runners in it ran against their own form, so it cannot tell a hard course from bad weather on the same afternoon, and a race few runners raced twice around is rated closer to average.</p>`;
 }
 document.querySelectorAll(".race-ctl button[data-rg]").forEach(b=>b.onclick=()=>{
   const was=RACE_G; RACE_G=b.dataset.rg;
