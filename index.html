@@ -1165,6 +1165,42 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   background:var(--accent);color:var(--on-accent);border:0;font-family:var(--num);font-weight:700;
   font-size:15px;letter-spacing:.02em}
 #p-races{padding-bottom:10px}
+
+/* ---------- the About fan ----------
+   Three cards rise out of the About button and settle, bottom one first, on
+   the raised surface with the site's hairline and a soft shadow. transform and
+   opacity only, so it stays smooth on a phone; the overshoot is in the curve,
+   not in a second animation. The scrim is a whisper of dim, enough to say the
+   board behind is not what the next tap acts on. */
+.bar-inner{position:relative}
+.fan{position:absolute;bottom:calc(100% + 10px);right:0;z-index:45;display:flex;flex-direction:column;
+  gap:6px;width:min(272px,calc(100vw - 24px));pointer-events:none}
+.fan.open{pointer-events:auto}
+.fan button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  padding:11px 14px 11px 12px;border-radius:14px;border:1px solid var(--line);
+  background:var(--raised);color:var(--text);font:inherit;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.35);
+  opacity:0;transform:translateY(14px) scale(.94);transform-origin:bottom right;
+  transition:transform .34s cubic-bezier(.2,.9,.3,1.25),opacity .22s ease-out,border-color .2s,background .2s;
+  transition-delay:calc(var(--i) * 45ms)}
+.fan.open button{opacity:1;transform:none}
+.fan:not(.open) button{transition-delay:calc((2 - var(--i)) * 25ms);transition-duration:.16s}
+.fan button:hover,.fan button:focus-visible{border-color:var(--accent);outline:none;
+  background:color-mix(in srgb,var(--accent) 7%,var(--raised))}
+.fan button.cur{border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
+.fan button.cur b::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);margin-left:8px;vertical-align:2px}
+.fan svg{flex:none;width:30px;height:30px;padding:6px;border-radius:9px;background:var(--surface);
+  fill:none;stroke:var(--muted);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.fan svg circle{fill:var(--accent);stroke:none}
+.fan svg circle.o{fill:none;stroke:var(--muted);stroke-width:1.4}
+.fan svg .ln{stroke:var(--accent)}
+.fan b{display:block;font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.03em;
+  text-transform:uppercase;line-height:1.1}
+.fan i{display:block;font-style:normal;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.25}
+.fan-scrim{position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.28);opacity:0;transition:opacity .22s}
+.fan-scrim.open{opacity:1}
+.tabs button[aria-expanded="true"]{background:var(--raised);color:var(--text)}
 </style>
 
 <!-- Vercel Web Analytics. The npm package and the React component are the
@@ -10509,10 +10545,25 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
     <button data-p="p-sim" aria-pressed="true">Odds</button>
     <button data-p="p-wi" aria-pressed="false">Team</button>
     <button data-p="p-races" aria-pressed="false">Races</button>
-    <button data-p="p-doc" aria-pressed="false">About</button>
+    <button data-p="p-doc" aria-pressed="false" aria-haspopup="menu" aria-expanded="false" aria-controls="aboutFan">About</button>
   </div>
   <button class="go" id="go">Run</button>
+  <div class="fan" id="aboutFan" role="menu" aria-label="About" hidden>
+    <button role="menuitem" data-view="v-how" style="--i:2">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="2.2"/><circle cx="12" cy="7" r="2.2"/><circle cx="18" cy="7" r="2.2" class="o"/><circle cx="6" cy="14" r="2.2"/><circle cx="12" cy="14" r="2.2" class="o"/><circle cx="18" cy="14" r="2.2" class="o"/><path d="M4 20h16"/></svg>
+      <span><b>How it works</b><i>The model, in plain words</i></span>
+    </button>
+    <button role="menuitem" data-view="v-record" style="--i:1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-4 3 2 5-6" class="ln"/></svg>
+      <span><b>Track record</b><i>Scored against past seasons</i></span>
+    </button>
+    <button role="menuitem" data-view="v-called" style="--i:0">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M9 15l2 2 4-4" class="ln"/></svg>
+      <span><b>Called it</b><i>What the board said, dated</i></span>
+    </button>
+  </div>
 </div></div>
+<div class="fan-scrim" id="fanScrim" hidden></div>
 
 <div class="toast" id="toast"></div>
 
@@ -13607,7 +13658,52 @@ document.querySelectorAll(".clsw button").forEach(b=>b.onclick=()=>{
   syncHead();syncViewText();renderForward();
   if(NEXT_SEASON) syncNextNote();syncMiNote();
   clearOut();wiAdj={};renderWhatIf();writeHash();});
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+/* About fans out. It is the one tab holding three different things - the
+   explanation, the scorecard, the dated archive - so a tap offers the three
+   rather than dropping the reader on whichever was last. They rise out of the
+   button one after another and settle; the switch inside About stays for anyone
+   who lands there from a link. Escape, a tap outside or About again closes it,
+   and the arrows walk it. */
+const FAN=document.getElementById("aboutFan"), SCRIM=document.getElementById("fanScrim");
+const ABOUT_BTN=document.querySelector('.tabs button[data-p="p-doc"]');
+function fanOpen(){
+  const cur=document.querySelector('#p-doc .vsw button[aria-pressed="true"]');
+  FAN.querySelectorAll("button").forEach(x=>x.classList.toggle("cur",
+    document.getElementById("p-doc").classList.contains("on")&&cur&&x.dataset.view===cur.dataset.view));
+  // right edge on the About button's, kept inside the glass
+  // (on a phone About sits mid-bar with Run to its right, and there is not
+  // 272px to its left, so the fan slides right until its left edge clears 12px)
+  FAN.hidden=false;SCRIM.hidden=false;
+  const bar=FAN.parentElement.getBoundingClientRect(), a=ABOUT_BTN.getBoundingClientRect();
+  const w=FAN.offsetWidth;
+  FAN.style.right=Math.max(0,Math.min(bar.right-a.right-4,bar.right-w-12))+"px";
+  void FAN.offsetWidth;FAN.classList.add("open");SCRIM.classList.add("open");
+  ABOUT_BTN.setAttribute("aria-expanded","true");
+  (FAN.querySelector(".cur")||FAN.querySelector("button:last-child")).focus({preventScroll:true});
+}
+function fanClose(back){
+  if(FAN.hidden)return;
+  FAN.classList.remove("open");SCRIM.classList.remove("open");
+  ABOUT_BTN.setAttribute("aria-expanded","false");
+  setTimeout(()=>{if(!FAN.classList.contains("open")){FAN.hidden=true;SCRIM.hidden=true;}},220);
+  if(back)ABOUT_BTN.focus({preventScroll:true});
+}
+FAN.querySelectorAll("button").forEach(x=>x.onclick=()=>{
+  fanClose(false);
+  selectTab(ABOUT_BTN);
+  const v=document.querySelector('#p-doc .vsw button[data-view="'+x.dataset.view+'"]');
+  if(v)v.click();
+});
+FAN.addEventListener("keydown",e=>{
+  const items=[...FAN.querySelectorAll("button")], i=items.indexOf(document.activeElement);
+  if(e.key==="ArrowUp"||e.key==="ArrowLeft"){e.preventDefault();items[(i-1+items.length)%items.length].focus();}
+  else if(e.key==="ArrowDown"||e.key==="ArrowRight"){e.preventDefault();items[(i+1)%items.length].focus();}
+  else if(e.key==="Escape"){e.preventDefault();fanClose(true);}
+  else if(e.key==="Tab"){fanClose(false);}
+});
+SCRIM.onclick=()=>fanClose(false);
+
+function selectTab(b){
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
   document.getElementById("go").style.display=/p-sim|p-wi/.test(b.dataset.p)?"":"none";
@@ -13621,7 +13717,12 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
      hidden panel measures zero — so a board built while the reader was on
      another tab has to be re-laid-out the moment it comes back. */
   if(b.dataset.p==="p-sim")refreshView();
-  scrollTo({top:0,behavior:"smooth"});});
+  scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+  if(b===ABOUT_BTN){FAN.hidden?fanOpen():fanClose(true);return;}
+  fanClose(false);selectTab(b);
+});
 document.getElementById("go").onclick=()=>{
   if(running){skip=true;return;}
   if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();

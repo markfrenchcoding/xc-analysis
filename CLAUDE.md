@@ -139,6 +139,16 @@ a race table for everyone after a weekend, and About for the proof.
 - At 320px four tabs are 69px each beside nothing; on Odds and Team they share
   the bar with Run.
 
+**About fans out.** It is the one tab holding three different things, so a tap
+offers How it works, Track record and Called it as three cards that rise out of
+the button and settle, bottom first - transform and opacity only, the overshoot
+in the curve. The section on screen is marked in gold; Escape, a tap outside or
+About again closes it, arrows walk it, focus returns to About. **On a phone About
+sits mid-bar with Run to its right**, so the fan is right-aligned to About only
+while its left edge clears 12px, and slides right otherwise - aligned blindly it
+hung 52px off the glass at 375. The switch inside About stays for readers who
+land there from a link.
+
 **Inside Odds, three views.** Inside
 Odds a segmented switch chooses Teams, Runners or Leagues. That is the shape
 because all three of those *are* odds — they were three sibling tabs for a
