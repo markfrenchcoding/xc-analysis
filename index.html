@@ -109,6 +109,19 @@ header{padding:13px 0 9px;border-bottom:1px solid var(--line);display:flex;align
 .brand:hover .pk-team{transform:translate(2.35px,-1.32px)}
 body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 @keyframes surge{0%{transform:none}34%{transform:translate(4.4px,-2.5px)}100%{transform:none}}
+/* Idle: every seven seconds a stride runs through the pack, front runner
+   first - each dot lifts a unit and settles, then the mark rests. It animates
+   the circles, not .pk-team, because the group's transform belongs to the
+   hover and the surge; the two compose. Staggered by position along the lean. */
+.pk-team circle{transform-box:fill-box;transform-origin:center;animation:stride 7s var(--ease) infinite}
+.pk-score circle:nth-child(1){animation-delay:1.2s}
+.pk-score circle:nth-child(3){animation-delay:1.27s}
+.pk-score circle:nth-child(2){animation-delay:1.42s}
+.pk-score circle:nth-child(4){animation-delay:1.48s}
+.pk-disp circle:nth-child(1){animation-delay:1.54s}
+.pk-score circle:nth-child(5){animation-delay:1.68s}
+.pk-disp circle:nth-child(2){animation-delay:1.74s}
+@keyframes stride{0%,11%,100%{transform:none}4%{transform:translate(.5px,-1.3px) scale(1.08)}}
 .brand{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
 
@@ -141,6 +154,7 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
   .pl-drops,.c-cloud{display:none}
   .pl-wrap.raining .c-water{animation:none}
   .pk-team{transition:none}
+  .pk-team circle,.empty.start .es-dots circle{animation:none}
   .gl-tape{animation:none}
 }
 .gl-kick{margin:13px 17px 0;padding:11px 12px;border-radius:11px;background:var(--bg);
@@ -836,7 +850,16 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    only that it is not filled in yet. */
 .empty.start{padding:30px 18px 34px}
 .empty.start svg{width:104px;height:auto;display:block;margin:0 auto 14px;overflow:visible}
-.empty.start .es-dots circle{fill:var(--accent);opacity:.9}
+.empty.start .es-dots circle{fill:var(--accent);opacity:.9;transform-box:fill-box;transform-origin:center;
+  animation:esBob 3.2s ease-in-out infinite alternate}
+/* Idle: the five drift up and down out of step, like odds that have not
+   settled yet - which is what the board is waiting to do. */
+.empty.start .es-dots circle:nth-child(1){animation-delay:-.4s}
+.empty.start .es-dots circle:nth-child(2){animation-delay:-2.1s;animation-duration:2.7s}
+.empty.start .es-dots circle:nth-child(3){animation-delay:-1.1s;animation-duration:3.6s}
+.empty.start .es-dots circle:nth-child(4){animation-delay:-2.9s;animation-duration:2.9s}
+.empty.start .es-dots circle:nth-child(5){animation-delay:-1.7s;animation-duration:3.4s}
+@keyframes esBob{0%{transform:translateY(3.5px);opacity:.55}100%{transform:translateY(-3.5px);opacity:1}}
 .empty.start .es-line{stroke:var(--line);stroke-width:1.6;fill:none}
 .empty.start b{display:block;font-family:var(--disp);font-weight:700;font-size:17px;
   text-transform:uppercase;letter-spacing:.03em;color:var(--text);margin-bottom:7px}
@@ -3829,9 +3852,9 @@ M,Sriharsha Padigi,16:30.90,11,Westview,5000,6A,0.9719
 M,Emilio Curtis,17:30.00,12,Westview,5000,6A,1.0299
 M,Emilio Curtis,16:34.90,12,Westview,5000,6A,0.9719
 M,Emilio Curtis,16:43.05,12,Westview,5000,6A,0.9713
-M,Cameron Haley,16:56.20,12,Westview,5000,6A,0.9719
-M,Cameron Haley,16:42.90,12,Westview,5000,6A,0.9425
-M,Cameron Haley,18:29.12,12,Westview,5000,6A,1.0299
+M,cameron haley,16:56.20,12,Westview,5000,6A,0.9719
+M,cameron haley,16:42.90,12,Westview,5000,6A,0.9425
+M,cameron haley,18:29.12,12,Westview,5000,6A,1.0299
 M,Colton Wold,18:13.75,11,Westview,5000,6A,1.0299
 M,Wilson Huang,17:49.76,11,Westview,5000,6A,0.9713
 M,Wilson Huang,17:48.13,11,Westview,5000,6A,0.9425
@@ -4257,8 +4280,8 @@ F,Mikaelyn Concepcion,30:01.79,12,Liberty,5000,5A,0.9747
 F,Maya Lawler,28:35.78,9,Liberty,5000,5A,0.9747
 F,Maya Lawler,30:23.76,9,Liberty,5000,5A,0.9903
 F,Maya Lawler,31:25.12,9,Liberty,5000,5A,0.9762
-F,Grace Perdomo Hazen,29:28.59,12,Liberty,5000,5A,0.9903
-F,Grace Perdomo Hazen,30:08.05,12,Liberty,5000,5A,0.9762
+F,Grace Perdomo-Hazen,29:28.59,12,Liberty,5000,5A,0.9903
+F,Grace Perdomo-Hazen,30:08.05,12,Liberty,5000,5A,0.9762
 F,Amelie Yamashita,20:09.59,10,Milwaukie,5000,5A,0.9747
 F,Amelie Yamashita,20:50.09,10,Milwaukie,5000,5A,0.9960
 F,Amelie Yamashita,20:33.88,10,Milwaukie,5000,5A,0.9762
@@ -4565,8 +4588,8 @@ F,Taelyn Reiswig,26:59.90,10,Willamette,5000,5A,0.9846
 F,Taelyn Reiswig,31:07.90,10,Willamette,5000,5A,1.0686
 F,Loralei Vermillion,28:14.80,10,Willamette,5000,5A,0.9846
 F,Loralei Vermillion,28:21.51,10,Willamette,5000,5A,0.9860
-F,Llywellyn Paul,29:45.70,9,Willamette,5000,5A,0.9860
-F,Llywellyn Paul,31:46.20,9,Willamette,5000,5A,0.9846
+F,Llywellyn Paul,29:45.70,10,Willamette,5000,5A,0.9860
+F,Llywellyn Paul,31:46.20,10,Willamette,5000,5A,0.9846
 F,Cristal Vasquez Ruiz,29:43.80,10,Willamette,5000,5A,0.9846
 F,Cristal Vasquez Ruiz,29:47.60,10,Willamette,5000,5A,0.9860
 F,Georgia Black,21:02.00,11,Wilsonville,5000,5A,0.9909
@@ -7816,7 +7839,7 @@ F,Libby Warnicke,30:48.76,10,Willamina,5000,3A,1.0121
 F,Bridgette Manley,28:08.96,11,Willamina,5000,3A,0.9714
 F,Bridgette Manley,30:05.26,11,Willamina,5000,3A,1.0121
 F,Bridgette Manley,32:12.30,11,Willamina,5000,3A,1.0170
-F,Ariana Gnos,34:47.85,10,Willamina,5000,3A,1.0121
+F,Arianna Gnos,34:47.85,10,Willamina,5000,3A,1.0121
 F,Elizabeth Gretzon,35:00.91,9,Willamina,5000,3A,1.0121
 F,Jocelyn Nelson,21:10.41,10,Yamhill-Carlton,5000,3A,1.0686
 F,Jocelyn Nelson,20:40.69,10,Yamhill-Carlton,5000,3A,0.9903
@@ -10818,6 +10841,7 @@ const POLL={"6A|M":{"Lincoln":1,"Jesuit":2,"Sunset":3,"Central Catholic":4,"Sher
 const POLL_DATE="2026-08-26";
 const POLL_KIND="preseason";
 const DATA_DATE="2026-09-26";
+const RACES=[["271300","7th Annual Rogue XC","2026-09-26","F",52,1,0.9926],["271300","7th Annual Rogue XC","2026-09-26","M",93,10,0.996],["272207","Connell Invite","2026-09-26","M",6,0,0.9978],["269957","Nike Portland XC","2026-09-26","F",514,307,0.9747],["269957","Nike Portland XC","2026-09-26","M",880,535,0.9713],["271813","Three Course Challenge","2026-09-26","M",282,82,1.0965],["271813","Three Course Challenge","2026-09-26","F",151,37,1.0883],["272579","Willamette Golden Hour 5K","2026-09-26","M",44,0,0.9738],["272579","Willamette Golden Hour 5K","2026-09-26","F",22,0,0.986],["272679","Woahink Lake XC Invitational","2026-09-26","M",71,0,0.9969],["272679","Woahink Lake XC Invitational","2026-09-26","F",56,0,1.0004],["275973","Bridgette Nelson Invite","2026-09-25","M",33,0,0.9887],["275973","Bridgette Nelson Invite","2026-09-25","F",21,0,0.9989],["275399","Champs Invite","2026-09-25","F",105,0,0.9714],["275399","Champs Invite","2026-09-25","M",175,0,0.9651],["273922","Derbyshire Twilight Meet","2026-09-25","F",27,0,0.9633],["273922","Derbyshire Twilight Meet","2026-09-25","M",36,0,0.9669],["271947","Nike Bob Firman Invitational XC","2026-09-25","M",103,102,0.983],["271947","Nike Bob Firman Invitational XC","2026-09-25","F",80,71,0.9887],["286192","MetSong 5K","2026-09-24","M",3,0,0.9965],["275156","BHHS at Salmon Run","2026-09-23","M",7,0,0.9961],["275156","BHHS at Salmon Run","2026-09-23","F",7,0,0.9959],["279965","Jefferson Invitational","2026-09-23","M",12,0,0.9701],["279965","Jefferson Invitational","2026-09-23","F",1,0,0.9903],["273693","Jewell Jaunt","2026-09-23","F",19,0,1.0385],["273693","Jewell Jaunt","2026-09-23","M",39,0,1.0304],["278404","NWOC league meet (hosted by Sandy)","2026-09-23","M",78,0,1.0015],["278404","NWOC league meet (hosted by Sandy)","2026-09-23","F",42,0,0.996],["273426","Payette Open","2026-09-23","F",18,0,0.9897],["273426","Payette Open","2026-09-23","M",22,0,0.985],["267986","Bellevue Cross Country Invitational","2026-09-19","M",14,16,0.9848],["267986","Bellevue Cross Country Invitational","2026-09-19","F",11,14,0.9753],["271385","Eagle Island XC Invitational 2026","2026-09-19","F",27,0,0.9987],["271385","Eagle Island XC Invitational 2026","2026-09-19","M",41,0,1.0043],["272274","Fort Steilacoom Invitational","2026-09-19","M",9,0,0.9945],["272274","Fort Steilacoom Invitational","2026-09-19","F",10,0,0.9855],["272514","Northwest Classic-Sponsored by Steens Mountain Running Camp","2026-09-19","F",361,111,0.9846],["272514","Northwest Classic-Sponsored by Steens Mountain Running Camp","2026-09-19","M",595,172,0.9792],["274463","Prefontaine Memorial Run","2026-09-19","M",148,47,0.974],["274463","Prefontaine Memorial Run","2026-09-19","F",101,27,0.9815],["271536","The Mook XC Invitational","2026-09-19","F",534,435,0.9762],["271536","The Mook XC Invitational","2026-09-19","M",853,622,0.9719],["272398","World's Longest Beach Run","2026-09-19","M",35,0,1.0001],["272398","World's Longest Beach Run","2026-09-19","F",21,0,1.009],["272943","Hawk Invite","2026-09-18","F",58,0,0.9996],["272943","Hawk Invite","2026-09-18","M",82,0,0.9964],["281282","Perrydale Invite","2026-09-18","M",13,0,0.9983],["281282","Perrydale Invite","2026-09-18","F",2,0,1.017],["276044","Southwest Christian Invite","2026-09-18","F",41,0,0.9981],["276044","Southwest Christian Invite","2026-09-18","M",63,0,0.9973],["278225","PIL @ Gabriel (Roosevelt Grant Ida Jefferson McDaniel)","2026-09-17","F",75,78,1.0462],["278225","PIL @ Gabriel (Roosevelt Grant Ida Jefferson McDaniel)","2026-09-17","M",143,150,1.0535],["275165","Hillsboro XC Championship","2026-09-16","F",15,25,1.0017],["275165","Hillsboro XC Championship","2026-09-16","M",38,55,0.9982],["278227","PIL @ Fernhill (Cleveland Lincoln Benson Franklin)","2026-09-16","F",51,61,1.0051],["278227","PIL @ Fernhill (Cleveland Lincoln Benson Franklin)","2026-09-16","M",88,104,0.9925],["273136","Parma Invite","2026-09-16","M",18,0,1.0023],["273136","Parma Invite","2026-09-16","F",15,0,1.0023],["272266","Silver Falls Oktoberfest Invitational","2026-09-16","M",165,13,0.9948],["272266","Silver Falls Oktoberfest Invitational","2026-09-16","F",122,9,0.9946],["277039","Trico Meet @ Stevenson","2026-09-15","F",3,0,1.0029],["273441","Union at Battle Ground","2026-09-15","M",9,0,0.9985],["273441","Union at Battle Ground","2026-09-15","F",6,0,0.9983],["272846","Dallmann Dash","2026-09-12","F",3,0,1.0434],["272846","Dallmann Dash","2026-09-12","M",7,0,1.0704],["272997","Escape the Rock","2026-09-12","F",12,0,1.0662],["272997","Escape the Rock","2026-09-12","M",12,0,1.0322],["270279","Jack Jill Invitational","2026-09-12","M",67,36,0.9721],["270279","Jack Jill Invitational","2026-09-12","F",27,11,0.9742],["272500","Melon Fest","2026-09-12","M",27,0,1.0212],["272500","Melon Fest","2026-09-12","F",14,0,1.0209],["271186","Oregon City XC Invitational","2026-09-12","M",551,350,0.9425],["271186","Oregon City XC Invitational","2026-09-12","F",307,212,0.9496],["272646","Stayton XC Invitational","2026-09-12","F",55,0,1.0377],["272646","Stayton XC Invitational","2026-09-12","M",71,0,1.0332],["272694","Wolfpack 5k 2026","2026-09-12","M",109,0,1.0034],["272694","Wolfpack 5k 2026","2026-09-12","F",78,0,1.0235],["274796","49th Annual Catherine Creek Scamper","2026-09-11","M",100,0,1.0646],["274796","49th Annual Catherine Creek Scamper","2026-09-11","F",82,0,1.0443],["275362","65th Annual Steve Maas Run-a-Ree","2026-09-11","M",69,0,0.9949],["275362","65th Annual Steve Maas Run-a-Ree","2026-09-11","F",24,0,0.9909],["273596","Ash Creek Invitational","2026-09-11","F",211,119,0.9903],["273596","Ash Creek Invitational","2026-09-11","M",317,186,0.9846],["272602","Gervais Invitational","2026-09-11","F",31,0,1.0121],["272602","Gervais Invitational","2026-09-11","M",63,0,0.9973],["278094","Catlin Gabel XC Invitational","2026-09-10","M",12,0,1.0382],["278094","Catlin Gabel XC Invitational","2026-09-10","F",9,0,1.041],["273311","West Orthodontics Invitational (Formerly Max King)","2026-09-10","F",66,14,1.0625],["273311","West Orthodontics Invitational (Formerly Max King)","2026-09-10","M",104,21,1.0134],["275497","2026 NWOC Preview","2026-09-09","F",34,0,1.0261],["275497","2026 NWOC Preview","2026-09-09","M",77,0,0.9986],["273147","Country Fair Classic","2026-09-09","M",231,33,1.0127],["273147","Country Fair Classic","2026-09-09","F",159,8,1.0253],["277959","MHC Preview","2026-09-09","M",78,82,1.0062],["277959","MHC Preview","2026-09-09","F",40,41,1.0222],["275793","Mountainside Southridge Beaverton Jesuit","2026-09-09","F",64,67,1.0218],["275793","Mountainside Southridge Beaverton Jesuit","2026-09-09","M",122,132,1.0198],["273432","Nyssa Invite","2026-09-09","M",45,0,1.0129],["273432","Nyssa Invite","2026-09-09","F",31,0,1.0232],["272502","Umpqua Opener","2026-09-09","F",30,12,0.9986],["272502","Umpqua Opener","2026-09-09","M",53,14,1.0086],["275359","Westview @ Sunset","2026-09-09","F",34,36,1.0411],["275359","Westview @ Sunset","2026-09-09","M",77,70,1.0299],["272633","Cardinal Classic","2026-09-05","F",5,0,1.0195],["272633","Cardinal Classic","2026-09-05","M",11,0,1.0222],["274035","Fugate farms invite","2026-09-05","M",65,6,0.9812],["274035","Fugate farms invite","2026-09-05","F",22,2,0.9821],["272635","Marist Invite","2026-09-05","F",58,11,0.9963],["272635","Marist Invite","2026-09-05","M",87,12,0.9863],["271535","Ultimook Race","2026-09-05","F",431,166,1.0686],["271535","Ultimook Race","2026-09-05","M",695,238,1.0934],["273410","24th Caldwell Twilight","2026-09-03","F",32,0,0.9836],["273410","24th Caldwell Twilight","2026-09-03","M",57,0,0.9923],["275326","GMC Preview","2026-09-03","F",28,0,0.9821],["275326","GMC Preview","2026-09-03","M",87,0,0.9756],["274181","COWAPA District Preview","2026-09-02","F",38,0,1.0462],["274181","COWAPA District Preview","2026-09-02","M",49,0,1.0345],["277853","PIL Preview","2026-09-02","F",133,143,0.9679],["277853","PIL Preview","2026-09-02","M",224,237,0.9738],["271785","Pacific Conference Preview","2026-09-02","F",77,80,0.9908],["271785","Pacific Conference Preview","2026-09-02","M",123,130,0.977],["273228","Darrel Deedon Invite","2026-09-01","M",64,0,0.9972],["273228","Darrel Deedon Invite","2026-09-01","F",39,0,1.0132],["273654","Ranger Rick VII","2026-08-31","M",24,5,1.0212],["273654","Ranger Rick VII","2026-08-31","F",27,9,1.0478],["274971","RiverHawk 5k/Track Grand Opening","2026-08-29","F",31,8,1.0942],["274971","RiverHawk 5k/Track Grand Opening","2026-08-29","M",57,19,1.0831],["273573","Weiser Invite","2026-08-28","F",16,0,1.0218],["273573","Weiser Invite","2026-08-28","M",22,0,1.0206],["275822","Millicoma Icebreaker","2026-08-27","F",6,0,1.0104],["275822","Millicoma Icebreaker","2026-08-27","M",14,0,1.0188]];
 const LANE={"factor":1.0186,"miss":1.5,"twoThirds":2.3,"nineTenths":4,"n":1229,"seasons":[2022,2023,2024,2025]};
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);

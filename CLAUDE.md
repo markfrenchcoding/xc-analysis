@@ -252,6 +252,12 @@ formation is ever redrawn, both need it.
 "— Oregon cross country state odds", which is a description rather than a name
 and read as noise in a row of tabs.
 
+*The seven stride when idle.* Every seven seconds one lift runs through the
+pack, front runner first, and the mark rests between. It animates the circles,
+never `.pk-team`, whose transform belongs to the hover and the surge - the two
+compose. The Odds empty state's five dots drift out of step (`esBob`), odds not
+yet settled. Both stop under `prefers-reduced-motion`.
+
 *The seven surge on tap.* `.pk-team` animates on `body.gunlap-fire`, which is the
 class the flag's ripple used and the draft still sets. A transform on an SVG
 group resolves against the viewBox, so those translate values are user units,
