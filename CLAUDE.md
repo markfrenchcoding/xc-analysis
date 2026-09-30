@@ -133,6 +133,14 @@ a race table for everyone after a weekend, and About for the proof.
   it starts the beat run - selecting afterwards ran the question for whichever
   school was first alphabetically. A run that finishes after the reader moved on
   re-runs for the school now selected rather than printing a stale answer.
+- **Every tab switch goes through `selectTab`.** The school search called its own
+  copy of the panel toggle, so the pill stayed on Team while Odds was showing and
+  Run kept whatever state the last tab left. It passes `keepScroll` instead, so
+  the reveal is not fought by the scroll to the top.
+- **Run queues behind a Team calculation.** Both kinds of run share the button
+  and `running`. Pressing it on Odds while a Team run was going did nothing,
+  silently; now it reads "Up next" and `runQueued` starts the board when the
+  Team run ends (`RUN_OWNER`, `RUN_AFTER`, cleared by `cancelRun`).
 - **Races sorts by heading**: date newest first, race A-Z, and "that day" or the
   Lane time with the slowest race first; a second tap reverses (`RACE_SORT`).
 - **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it
@@ -3632,6 +3640,20 @@ site lie:**
   can then move because **we** moved rather than because a race happened.
 
 ## Find a school, and link to one
+
+**A link is split before it is decoded, and decoding never throws.** Found by
+feeding the site broken links on Sep 30. The site writes 2A/1A as `2A%2F1A`,
+and `readHash` decoded the whole hash first, so the slash came back, the class
+split into "2A" and "1A", and **every shared 2A/1A link opened 6A boys**. A
+malformed escape (`#%E0%A4%A`, or a `%` in a name) threw from
+`decodeURIComponent` at startup and **left the page blank**. Each segment is
+decoded on its own inside a try now, an unescaped `2A/1A` is rejoined, and the
+team is matched case-insensitively against `SCHOOLS` and written back in the
+board's spelling - an unknown name is dropped rather than carried in the URL.
+
+**An edited address reloads.** The site writes its hash with `replaceState`,
+which fires no event, so a `hashchange` can only be the reader pasting or
+editing a link in an open tab. It used to do nothing.
 
 The board shows one classification and one gender at a time, so a visitor who
 wants their own school had to know which of ten boards it is on, and anybody

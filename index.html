@@ -10892,10 +10892,16 @@ function boardHash(){
 function writeHash(){
   try{history.replaceState(null,"",boardHash());}catch(e){}
 }
+/* Split on "/" before decoding: the site writes 2A/1A as 2A%2F1A, and decoding
+   first turned every 2A/1A link into three pieces and a 6A board. A malformed
+   escape must not throw either - this runs at startup, and an exception here
+   left the whole page blank. */
 function readHash(){
-  const h=decodeURIComponent(location.hash.replace(/^#/,"")).trim();
-  if(!h)return null;
-  let p=h.split("/").map(s=>s.trim()).filter(Boolean);
+  const dec=x=>{try{return decodeURIComponent(x);}catch(e){return x;}};
+  let p=location.hash.replace(/^#/,"").split("/").map(x=>dec(x).trim()).filter(Boolean);
+  if(!p.length)return null;
+  // an older link, or one typed by hand, may carry 2A/1A unescaped
+  if(p.length>1&&/^2a$/i.test(p[0])&&/^1a$/i.test(p[1]))p=["2A/1A",...p.slice(2)];
   const mi=p.some(s=>s.toLowerCase()==="3mi");
   p=p.filter(s=>s.toLowerCase()!=="3mi");
   const page=p.length>3&&p[p.length-1].toLowerCase()==="team";
@@ -10904,7 +10910,13 @@ function readHash(){
   const cls=Object.keys(CLASSES).find(c=>c.toLowerCase()===p[0].toLowerCase());
   if(!cls)return null;
   const g=/^g/i.test(p[1]||"")?"F":"M";
-  return {cls,g,mi,page,team:p[2]?decodeURIComponent(p[2]):null};
+  // match the school the way the board spells it; an unknown name is dropped
+  let team=null;
+  if(p[2]){
+    const hit=SCHOOLS.find(o=>o.cls===cls&&o.g===g&&o.k===p[2].toLowerCase());
+    team=hit?hit.name:null;
+  }
+  return {cls,g,mi,page:page&&!!team,team};
 }
 
 /* Reveal a team once the numbers have stopped moving. Called from settle, so
@@ -10932,8 +10944,10 @@ function goToSchool(s){
   syncHead();syncViewText();renderForward();
   if(NEXT_SEASON)syncNextNote();syncMiNote();
   clearOut();wiAdj={};renderWhatIf();
-  document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.p==="p-sim"));
-  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-sim"));
+  // through selectTab, so the pill, Run and the controls all follow; it keeps
+  // the scroll, which would otherwise fight the reveal below
+  fanClose(false);
+  selectTab(document.querySelector('.tabs button[data-p="p-sim"]'),true);
   // put the Teams view in front without going through the click handler,
   // which would also scroll to the top and fight the reveal below
   VIEW="v-teams";
@@ -11790,8 +11804,18 @@ function adjFor(model,team,map){
 }
 
 /* Paced runner over a set of worlds. onEnd gets the tallies. */
+/* Two kinds of run share one Run button: the board, and the Team page's
+   calculations. Pressing Run on Odds while a Team calculation is going used to
+   do nothing at all, silently. Now it queues the board, which starts the moment
+   the Team run ends. */
+let RUN_OWNER="", RUN_AFTER=false;
+function runQueued(){
+  if(!RUN_AFTER||running)return;
+  RUN_AFTER=false;
+  if(document.getElementById("p-sim").classList.contains("on"))run();
+}
 function runWorlds(model,worlds,seasons,label,onEnd,stepFn,fast){
-  running=true;
+  running=true;RUN_OWNER="team";
   const go=document.getElementById("go");
   go.textContent="…";go.classList.add("running");
   const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
@@ -11817,8 +11841,9 @@ function runWorlds(model,worlds,seasons,label,onEnd,stepFn,fast){
     if(done<seasons)nextTick(step);
     else{
       rb.classList.remove("on");document.body.classList.remove("simming");lockDials(false);
-      lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+      lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;setTimeout(runQueued,0);
       onEnd(done);
+      setTimeout(runQueued,0);
     }
   });
 }
@@ -11897,7 +11922,8 @@ let RACE_SORT={k:"date",dir:-1};
 const RACE_SORT_FIRST={date:-1,race:1,day:-1,lane:1};
 const RACE_DEFAULT={M:"17:00",F:"20:00"};
 function parseRun(v){
-  const t=String(v||"").trim().replace(/[ .]/g,":");
+  // a runner types 17:00.4 as often as 17:00; the tenths are dropped, not refused
+  const t=String(v||"").trim().replace(/^(\d{1,2}:\d{2})\.\d+$/,"$1").replace(/[ .]/g,":");
   let m=/^(\d{1,2}):(\d{1,2})$/.exec(t);
   if(!m){const d=/^(\d{3,4})$/.exec(t); if(d){const x=d[1].padStart(4,"0");m=[0,x.slice(0,2),x.slice(2)];}}
   if(!m)return null;
@@ -12169,7 +12195,7 @@ function solveGoal(){
   const out=document.getElementById("wiOut");
   const rb=document.getElementById("runbar"),lab=document.getElementById("runlab"),
         pk=document.getElementById("pack");
-  running=true;
+  running=true;RUN_OWNER="team";
   const go=document.getElementById("go");go.textContent="…";go.classList.add("running");
   rb.classList.add("on");document.body.classList.add("simming");lockDials(true);
   out.innerHTML="";
@@ -12221,7 +12247,7 @@ function solveGoal(){
 
   const done=(msg)=>{
     rb.classList.remove("on");document.body.classList.remove("simming");lockDials(false);
-    lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+    lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;setTimeout(runQueued,0);
     document.getElementById("wiOut").innerHTML=`<div class="note">${msg}</div>`;
   };
   if(p0>=GOAL_P){
@@ -12240,7 +12266,7 @@ function solveGoal(){
 
   const stop=(b,total,stalled)=>{
     rb.classList.remove("on");document.body.classList.remove("simming");lockDials(false);
-    lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;
+    lab.textContent="";go.textContent="Run";go.classList.remove("running");running=false;setTimeout(runQueued,0);
     finishSolve(cur,key,label,p0,b,total,stalled);
   };
 
@@ -12451,7 +12477,7 @@ function run(){
       `<div class="empty">No team here can field five runners.</div>`;
     return;
   }
-  running=true;skip=false;
+  running=true;skip=false;RUN_OWNER="board";
   document.body.classList.add("simming");lockDials(true);
   const go=document.getElementById("go");
   go.textContent="Finish";go.classList.add("running");
@@ -13004,7 +13030,7 @@ function lockDials(on){
 function cancelRun(){
   lockDials(false);
   runGen++;
-  running=false;skip=false;
+  running=false;skip=false;RUN_AFTER=false;
   document.body.classList.remove("simming");
   const go=document.getElementById("go");
   if(go){go.textContent="Run";go.classList.remove("running");}
@@ -13763,7 +13789,7 @@ function movePill(b,instant){
   pill.style.transform="translateX("+(b.offsetLeft-3)+"px)";
   if(instant){void pill.offsetWidth;pill.style.transition="";}
 }
-function selectTab(b){
+function selectTab(b,keepScroll){
   const was=document.querySelector(".panel.on");
   const from=was?TAB_ORDER.indexOf(was.id):-1, to=TAB_ORDER.indexOf(b.dataset.p);
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
@@ -13789,14 +13815,19 @@ function selectTab(b){
      hidden panel measures zero — so a board built while the reader was on
      another tab has to be re-laid-out the moment it comes back. */
   if(b.dataset.p==="p-sim")refreshView();
-  scrollTo({top:0,behavior:"smooth"});
+  if(!keepScroll)scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   if(b===ABOUT_BTN){FAN.hidden?fanOpen():fanClose(true);return;}
   fanClose(false);selectTab(b);
 });
 document.getElementById("go").onclick=()=>{
-  if(running){skip=true;return;}
+  const onSim=document.getElementById("p-sim").classList.contains("on");
+  if(running){
+    if(onSim&&RUN_OWNER!=="board"){RUN_AFTER=true;document.getElementById("go").textContent="Up next";}
+    else skip=true;
+    return;
+  }
   if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();
   if(document.getElementById("p-sim").classList.contains("on"))run();
 };
@@ -13847,6 +13878,10 @@ initFind();
 if(OPEN_TEAM)goTeam(OPEN_TEAM);
 if(FOCUS)run();
 writeHash();
+/* The site writes its own address with replaceState, which fires nothing, so a
+   hashchange only ever means the reader edited or pasted a link into this tab.
+   Answer it the way a fresh visit would. */
+addEventListener("hashchange",()=>{if(location.hash!==boardHash())location.reload();});
 </script>
 </body>
 </html>
