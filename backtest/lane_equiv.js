@@ -7,7 +7,7 @@
 // athlete_level.js this is not centred per race: it has to get the absolute
 // time right, so it also carries how much Lane itself varied that year.
 //
-//   node backtest/lane_equiv.js [--raw]
+//   node backtest/lane_equiv.js [--raw] [--write]
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -77,4 +77,31 @@ for (const wk of [4, 2, 1]) {
     + sec(q(0.667), 1200) + 's); nine in ten within ' + (100 * q(0.9)).toFixed(1) + '% ('
     + sec(q(0.9), 1020) + 's / ' + sec(q(0.9), 1200) + 's)');
   console.log('    how far Lane itself ran from its usual: ' + yearShift.join(', '));
+}
+
+/* --write puts the conversion into the page, generated rather than typed: the
+   factor pooled over every season (a rated mark times this is a typical day at
+   Lane), and how far off it ran when each season was held out, one week out -
+   the information the race table has, which is every race so far. The page
+   puts live ratings on the same 6A basis before applying it; see RACES. */
+if (process.argv.includes('--write')) {
+  const wk = 1;
+  const all = YEARS.flatMap(y => pairs[wk][y]);
+  const factor = median(all.map(p => p.actual / p.rated));
+  const errs = [];
+  for (const y of YEARS) {
+    const L = median(YEARS.filter(v => v !== y).flatMap(v => pairs[wk][v]).map(p => p.actual / p.rated));
+    for (const p of pairs[wk][y]) errs.push(Math.abs(Math.log(p.actual / (p.rated * L))));
+  }
+  errs.sort((a, b) => a - b);
+  const q = f => +(100 * errs[Math.floor(f * (errs.length - 1))]).toFixed(1);
+  const LANE = { factor: +factor.toFixed(4), miss: q(0.5), twoThirds: q(0.667), nineTenths: q(0.9),
+                 n: errs.length, seasons: YEARS.map(Number) };
+  const IDX = path.join(__dirname, '..', 'index.html');
+  let t = fs.readFileSync(IDX, 'utf8');
+  const line = 'const LANE=' + JSON.stringify(LANE) + ';';
+  if (/const LANE=\{[^\n]*\};/.test(t)) t = t.replace(/const LANE=\{[^\n]*\};/, () => line);
+  else t = t.replace(/(const DATA_DATE="[\d-]+";)/, m => m + '\n' + line);
+  fs.writeFileSync(IDX, t);
+  console.log('\n  wrote ' + line);
 }

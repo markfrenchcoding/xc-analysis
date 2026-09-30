@@ -200,6 +200,7 @@ function main() {
     try {
       const r = meetRows(id, counters);
       S.rows.push(...r.rows);
+      (S.meetInfo = S.meetInfo || {})[id] = { name: r.name, date: r.date };
       log('  ' + (S.mi + 1) + '/' + S.meets.length + '  ' + r.date + '  '
         + r.name.slice(0, 42) + '  ' + r.rows.length);
     } catch (e) {
@@ -221,6 +222,7 @@ function main() {
       try {
         const r = meetRows(id, counters);
         S.rows.push(...r.rows);
+        (S.meetInfo = S.meetInfo || {})[id] = { name: r.name, date: r.date };
         S.failed = S.failed.filter(x => x !== id);
         log('  recovered ' + r.name.slice(0, 40) + '  ' + r.rows.length);
       } catch (e) { log('  meet ' + id + ' still will not answer'); }
@@ -268,7 +270,9 @@ function main() {
      was. */
   const wasSeed = (fs.readFileSync(IDX, 'utf8').match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
     .trim().replace(/\r\n/g, '\n');
-  if (b.csv.trim() === wasSeed && date === (html.match(/const DATA_DATE="([\d-]+)"/) || [, ''])[1]) {
+  // a page with no race table yet is a change even when the seed is not
+  if (b.csv.trim() === wasSeed && /const RACES=/.test(html)
+      && date === (html.match(/const DATA_DATE="([\d-]+)"/) || [, ''])[1]) {
     log('\n  nothing changed'); process.exitCode = 3; return;
   }
 
@@ -280,6 +284,13 @@ function main() {
   const fresh = fs.readFileSync(IDX, 'utf8');
   let out = Seed.patchIndex(fresh, b.csv, date);
   out = Seed.patchLogos(out, S.logos);
+  // every rated race, named and dated, for the race table on the How tab
+  const info = S.meetInfo || {};
+  out = Seed.patchRaces(out, b.raceTable
+    // a meet name is athletic.net text headed for innerHTML, like an athlete's
+    .map(r => [r.mid, Seed.cleanName((info[r.mid] || {}).name || ''), (info[r.mid] || {}).date || '',
+               r.g, r.n, r.n6A, +r.f.toFixed(4)])
+    .sort((a, c) => (a[2] < c[2] ? 1 : a[2] > c[2] ? -1 : 0) || (a[1] < c[1] ? -1 : 1)));
   fs.writeFileSync(IDX, out);
 
   /* The commit message is written here rather than assembled in the .cmd.

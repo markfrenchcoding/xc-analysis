@@ -1036,73 +1036,73 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    3.8:1 on the dark ground and 3.4:1 on the light one, under the 4.5:1 that
    text this size needs.
 
-   Scoped to #p-doc so none of it reaches the boards, and it sits at the end of
+   Scoped to :is(#p-doc,#p-races) so none of it reaches the boards, and it sits at the end of
    the sheet with an id in every selector, so it wins on specificity and on
    order both. */
-#p-doc h2.sec{font-size:clamp(28px,8vw,40px);letter-spacing:.01em;line-height:1.05;
+:is(#p-doc,#p-races) h2.sec{font-size:clamp(28px,8vw,40px);letter-spacing:.01em;line-height:1.05;
   margin:28px 0 10px}
-#p-doc .sub2{font-size:15.5px;color:var(--muted);line-height:1.55;max-width:60ch;margin:0 0 8px}
-#p-doc .sub2 code{font-size:13px}
-#p-doc .doc h3{font-family:var(--disp);font-weight:600;font-size:clamp(21px,5.8vw,27px);
+:is(#p-doc,#p-races) .sub2{font-size:15.5px;color:var(--muted);line-height:1.55;max-width:60ch;margin:0 0 8px}
+:is(#p-doc,#p-races) .sub2 code{font-size:13px}
+:is(#p-doc,#p-races) .doc h3{font-family:var(--disp);font-weight:600;font-size:clamp(21px,5.8vw,27px);
   line-height:1.15;letter-spacing:.005em;color:var(--text);text-wrap:balance;
   margin:46px 0 12px;padding-top:26px;border-top:1px solid var(--line)}
-#p-doc .doc > h3:first-child{margin-top:18px;padding-top:0;border-top:0}
-#p-doc .doc p{font-size:15.5px;line-height:1.65;color:var(--muted);margin:0 0 14px;max-width:64ch}
-#p-doc .doc h3 + p{font-size:17.5px;line-height:1.55;color:var(--text)}
-#p-doc .doc p b,#p-doc .doc p strong{color:var(--text);font-weight:600}
-#p-doc .doc em{color:var(--text)}
+:is(#p-doc,#p-races) .doc > h3:first-child{margin-top:18px;padding-top:0;border-top:0}
+:is(#p-doc,#p-races) .doc p{font-size:15.5px;line-height:1.65;color:var(--muted);margin:0 0 14px;max-width:64ch}
+:is(#p-doc,#p-races) .doc h3 + p{font-size:17.5px;line-height:1.55;color:var(--text)}
+:is(#p-doc,#p-races) .doc p b,:is(#p-doc,#p-races) .doc p strong{color:var(--text);font-weight:600}
+:is(#p-doc,#p-races) .doc em{color:var(--text)}
 
 /* figures: a quiet surface, the caption under a hairline */
-#p-doc .doc figure{margin:24px 0 28px;padding:18px 16px 16px;background:var(--surface);
+:is(#p-doc,#p-races) .doc figure{margin:24px 0 28px;padding:18px 16px 16px;background:var(--surface);
   border:0;border-radius:16px;box-shadow:0 1px 0 color-mix(in srgb,var(--line) 70%,transparent) inset,
   0 12px 28px -18px rgba(0,0,0,.55)}
-#p-doc .doc figcaption{font-size:13.5px;line-height:1.55;color:var(--muted);
+:is(#p-doc,#p-races) .doc figcaption{font-size:13.5px;line-height:1.55;color:var(--muted);
   margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}
-#p-doc .doc figcaption b{color:var(--text);font-weight:600}
+:is(#p-doc,#p-races) .doc figcaption b{color:var(--text);font-weight:600}
 
 /* stats and the scorecard: ruled lists, the figure on the right */
-#p-doc .doc .stats,#p-doc .rec-tiles{display:grid;grid-template-columns:1fr;gap:0;margin:22px 0 26px}
-#p-doc .doc .stat,#p-doc .rec-tile{display:flex;flex-direction:row-reverse;justify-content:space-between;
+:is(#p-doc,#p-races) .doc .stats,:is(#p-doc,#p-races) .rec-tiles{display:grid;grid-template-columns:1fr;gap:0;margin:22px 0 26px}
+:is(#p-doc,#p-races) .doc .stat,:is(#p-doc,#p-races) .rec-tile{display:flex;flex-direction:row-reverse;justify-content:space-between;
   align-items:baseline;gap:16px;background:none;border:0;border-radius:0;
   border-top:1px solid var(--line);padding:13px 0;box-shadow:none}
-#p-doc .doc .stat:last-child,#p-doc .rec-tile:last-child{border-bottom:1px solid var(--line)}
-#p-doc .doc .stat b,#p-doc .rec-tile b{font-family:var(--num);font-weight:700;
+:is(#p-doc,#p-races) .doc .stat:last-child,:is(#p-doc,#p-races) .rec-tile:last-child{border-bottom:1px solid var(--line)}
+:is(#p-doc,#p-races) .doc .stat b,:is(#p-doc,#p-races) .rec-tile b{font-family:var(--num);font-weight:700;
   font-size:28px;line-height:1;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}
-#p-doc .rec-tile b{color:var(--accent)}
-#p-doc .doc .stat i,#p-doc .rec-tile i{font-style:normal;font-size:14px;line-height:1.45;
+:is(#p-doc,#p-races) .rec-tile b{color:var(--accent)}
+:is(#p-doc,#p-races) .doc .stat i,:is(#p-doc,#p-races) .rec-tile i{font-style:normal;font-size:14px;line-height:1.45;
   color:var(--muted);margin:0;max-width:34ch}
 
 /* tables */
-#p-doc .rec-wrap{margin:16px 0 6px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-#p-doc .rec-wrap::-webkit-scrollbar{height:6px}
-#p-doc .rec-wrap::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
-#p-doc .rec-tbl{font-size:14px}
-#p-doc .rec-tbl th{font-size:10.5px;letter-spacing:.08em;color:var(--muted);padding:0 0 9px;
+:is(#p-doc,#p-races) .rec-wrap{margin:16px 0 6px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+:is(#p-doc,#p-races) .rec-wrap::-webkit-scrollbar{height:6px}
+:is(#p-doc,#p-races) .rec-wrap::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+:is(#p-doc,#p-races) .rec-tbl{font-size:14px}
+:is(#p-doc,#p-races) .rec-tbl th{font-size:10.5px;letter-spacing:.08em;color:var(--muted);padding:0 0 9px;
   vertical-align:bottom;line-height:1.3}
-#p-doc .rec-tbl td{padding:11px 0;color:var(--muted)}
-#p-doc .rec-tbl td:first-child{color:var(--text)}
-#p-doc .rec-tbl th+th,#p-doc .rec-tbl td+td{padding-left:14px}
-#p-doc .rec-tbl tr.now td{background:color-mix(in srgb,var(--accent) 11%,transparent);color:var(--text)}
-#p-doc .rec-tbl tr.now td:first-child{padding-left:10px;border-radius:8px 0 0 8px}
-#p-doc .rec-tbl tr.now td:last-child{padding-right:10px;border-radius:0 8px 8px 0}
-#p-doc .rec-tbl tr.now td,#p-doc .rec-tbl tr.now + tr td{border-top-color:transparent}
-#p-doc .rec-tbl .miss{color:var(--muted)}
-#p-doc .rec-note{font-size:12.5px;line-height:1.55;color:var(--muted);margin:10px 0 0;max-width:64ch}
-#p-doc .rec-chart{margin:16px 0 8px;background:var(--surface);border-radius:16px;
+:is(#p-doc,#p-races) .rec-tbl td{padding:11px 0;color:var(--muted)}
+:is(#p-doc,#p-races) .rec-tbl td:first-child{color:var(--text)}
+:is(#p-doc,#p-races) .rec-tbl th+th,:is(#p-doc,#p-races) .rec-tbl td+td{padding-left:14px}
+:is(#p-doc,#p-races) .rec-tbl tr.now td{background:color-mix(in srgb,var(--accent) 11%,transparent);color:var(--text)}
+:is(#p-doc,#p-races) .rec-tbl tr.now td:first-child{padding-left:10px;border-radius:8px 0 0 8px}
+:is(#p-doc,#p-races) .rec-tbl tr.now td:last-child{padding-right:10px;border-radius:0 8px 8px 0}
+:is(#p-doc,#p-races) .rec-tbl tr.now td,:is(#p-doc,#p-races) .rec-tbl tr.now + tr td{border-top-color:transparent}
+:is(#p-doc,#p-races) .rec-tbl .miss{color:var(--muted)}
+:is(#p-doc,#p-races) .rec-note{font-size:12.5px;line-height:1.55;color:var(--muted);margin:10px 0 0;max-width:64ch}
+:is(#p-doc,#p-races) .rec-chart{margin:16px 0 8px;background:var(--surface);border-radius:16px;
   padding:14px 8px 6px;box-sizing:border-box;
   box-shadow:0 1px 0 color-mix(in srgb,var(--line) 70%,transparent) inset,0 12px 28px -18px rgba(0,0,0,.55)}
 /* A figure never breaks ("127 / of / 144" across three lines); the label
    column wraps instead when a row is short of room. The wide season table is
    the exception - it scrolls, so nothing in it has to wrap. */
-#p-doc .rec-tbl td{white-space:nowrap}
-#p-doc .rec-tbl td:first-child{white-space:normal}
-#p-doc .rec-tbl.wide td:first-child{white-space:nowrap}
-#p-doc .fwd-tm{color:var(--muted);font-size:12px}
-#p-doc .rec-chart text{fill:var(--muted)}
+:is(#p-doc,#p-races) .rec-tbl td{white-space:nowrap}
+:is(#p-doc,#p-races) .rec-tbl td:first-child{white-space:normal}
+:is(#p-doc,#p-races) .rec-tbl.wide td:first-child{white-space:nowrap}
+:is(#p-doc,#p-races) .fwd-tm{color:var(--muted);font-size:12px}
+:is(#p-doc,#p-races) .rec-chart text{fill:var(--muted)}
 
 /* browser surfaces carry the palette too */
-#p-doc ::selection{background:color-mix(in srgb,var(--accent) 35%,transparent);color:var(--text)}
-#p-doc .doc a{color:var(--text);text-decoration-color:var(--accent);text-underline-offset:3px}
+:is(#p-doc,#p-races) ::selection{background:color-mix(in srgb,var(--accent) 35%,transparent);color:var(--text)}
+:is(#p-doc,#p-races) .doc a{color:var(--text);text-decoration-color:var(--accent);text-underline-offset:3px}
 
 /* On a phone a figure runs to the glass. The drawings are 200 units wide and
    their smallest labels are 5.8 units, which is as big as the two-line labels
@@ -1110,19 +1110,19 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
    padding that rendered at 9px. Edge to edge it is 10.3px, and the drawing is
    what the reader came to look at anyway. */
 @media (max-width:599px){
-  #p-doc .doc figure{margin-left:-13px;margin-right:-13px;border-radius:0;padding:18px 10px 16px}
-  #p-doc .doc figcaption{padding-left:3px;padding-right:3px}
+  :is(#p-doc,#p-races) .doc figure{margin-left:-13px;margin-right:-13px;border-radius:0;padding:18px 10px 16px}
+  :is(#p-doc,#p-races) .doc figcaption{padding-left:3px;padding-right:3px}
 }
 /* The drawings are 200 units wide and scale with their box, so on a desktop
    column they would draw their labels at 24px, bigger than the headings. They
    stop at a width where the smallest label is about 14px and centre on their
    surface; the chart the same. */
 @media (min-width:600px){
-  #p-doc .doc figure svg{max-width:500px;margin:0 auto}
-  #p-doc .rec-chart{max-width:520px;margin-left:auto;margin-right:auto}
-  #p-doc .doc .stats,#p-doc .rec-tiles{grid-template-columns:1fr 1fr;column-gap:32px}
-  #p-doc .doc .stat:nth-last-child(2),#p-doc .rec-tile:nth-last-child(2){border-bottom:1px solid var(--line)}
-  #p-doc .doc figure{padding:24px 24px 18px}
+  :is(#p-doc,#p-races) .doc figure svg{max-width:500px;margin:0 auto}
+  :is(#p-doc,#p-races) .rec-chart{max-width:520px;margin-left:auto;margin-right:auto}
+  :is(#p-doc,#p-races) .doc .stats,:is(#p-doc,#p-races) .rec-tiles{grid-template-columns:1fr 1fr;column-gap:32px}
+  :is(#p-doc,#p-races) .doc .stat:nth-last-child(2),:is(#p-doc,#p-races) .rec-tile:nth-last-child(2){border-bottom:1px solid var(--line)}
+  :is(#p-doc,#p-races) .doc figure{padding:24px 24px 18px}
 }
 
 /* the What if tab's two questions */
@@ -1133,6 +1133,38 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .cmphead.lose,.cmp.lose,.cmphead.beat,.cmp.beat{grid-template-columns:1fr 84px 84px}
 .cmp.lose span em,.cmp.beat span em{display:block;font-style:normal;color:var(--muted);font-size:11.5px}
 .cmp.beat b.lo{color:var(--muted)}
+
+/* the race table */
+.race-ctl{display:grid;gap:10px;margin:14px 0 4px}
+.race-time{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--muted);flex-wrap:wrap}
+#raceT{width:84px;font-family:var(--num);font-weight:700;font-size:22px;text-align:center;
+  background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+#raceT:focus,#raceQ:focus{outline:none;border-color:var(--accent)}
+#raceQ{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;font:inherit;font-size:15px}
+:is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2){white-space:normal;color:var(--text);line-height:1.35}
+:is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2) em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:2px}
+:is(#p-doc,#p-races) .rec-tbl.races td:first-child{color:var(--muted);white-space:nowrap}
+:is(#p-doc,#p-races) .rec-tbl.races th:nth-child(2),:is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2){text-align:left}
+.rday{font-size:12.5px;white-space:nowrap}
+.rday.slow{color:var(--text)}
+.rday.fast{color:var(--accent)}
+.rday.even{color:var(--muted)}
+:is(#p-doc,#p-races) .rec-tbl.races .rlane{font-family:var(--num);font-weight:700;font-size:17px;color:var(--text)}
+
+/* the Team page */
+#p-wi .wisel{margin:6px 0 4px}
+.tm-part{margin-top:34px;padding-top:6px;border-top:1px solid var(--line)}
+.stand{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:14px 0 6px}
+.stand div{padding:4px 0}
+.stand div+div{border-left:1px solid var(--line);padding-left:14px}
+.stand b{display:block;font-family:var(--num);font-weight:700;font-size:30px;line-height:1;color:var(--text)}
+.stand div:first-child b{color:var(--accent)}
+.stand i{display:block;font-style:normal;font-size:12.5px;color:var(--muted);margin-top:4px}
+.gl-go{display:block;width:100%;margin:14px 0 2px;padding:12px;border-radius:10px;cursor:pointer;
+  background:var(--accent);color:var(--on-accent);border:0;font-family:var(--num);font-weight:700;
+  font-size:15px;letter-spacing:.02em}
+#p-races{padding-bottom:10px}
 </style>
 
 <!-- Vercel Web Analytics. The npm package and the React component are the
@@ -10437,12 +10469,34 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
     </div>
   </section>
 
+  <section class="panel" id="p-races">
+      <h2 class="sec">Every race, at Lane</h2>
+      <p class="sub2" id="raceSub"></p>
+      <div class="race-ctl">
+        <div class="switch" role="group" aria-label="Boys or girls">
+          <button data-rg="M" aria-pressed="true">Boys</button>
+          <button data-rg="F" aria-pressed="false">Girls</button>
+        </div>
+        <label class="race-time">Run
+          <input id="raceT" value="17:00" inputmode="numeric" autocomplete="off" aria-label="A time to convert">
+          at each race below</label>
+        <input id="raceQ" type="search" placeholder="Find a meet" autocomplete="off" aria-label="Find a meet">
+      </div>
+      <div class="doc" id="raceOut"></div>
+    </section>
+
   <section class="panel" id="p-wi">
-    <h2 class="sec">What if a runner improves?</h2>
-    <p class="sub2">Take time off one or more of your seven and see what it does to your league and state odds. Both worlds are run against the same simulated races, so the difference is the improvement, not luck.</p>
-    <select id="wiTeam" class="wisel"></select>
-    <div id="wiRoster"></div>
-    <div id="wiOut"></div>
+    <h2 class="sec" id="tmHead">Your team</h2>
+    <select id="wiTeam" class="wisel" aria-label="School"></select>
+    <div id="tmStand"></div>
+    <div class="tm-part" id="tBeat"></div>
+    <div class="tm-part" id="tLose"></div>
+    <div class="tm-part">
+      <h2 class="sec">What if they drop time?</h2>
+      <p class="sub2">Take time off one or more of the seven and see what it does to the league and state odds. Both worlds run against the same simulated races, so the difference is the improvement, not luck.</p>
+      <div id="wiRoster"></div>
+      <div id="wiOut"></div>
+    </div>
   </section>
 
   
@@ -10453,8 +10507,9 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
 <div class="bar"><div class="bar-inner">
   <div class="tabs" role="group" aria-label="Sections">
     <button data-p="p-sim" aria-pressed="true">Odds</button>
-    <button data-p="p-wi" aria-pressed="false">What if</button>
-    <button data-p="p-doc" aria-pressed="false">How</button>
+    <button data-p="p-wi" aria-pressed="false">Team</button>
+    <button data-p="p-races" aria-pressed="false">Races</button>
+    <button data-p="p-doc" aria-pressed="false">About</button>
   </div>
   <button class="go" id="go">Run</button>
 </div></div>
@@ -10700,6 +10755,7 @@ const POLL={"6A|M":{"Lincoln":1,"Jesuit":2,"Sunset":3,"Central Catholic":4,"Sher
 const POLL_DATE="2026-08-26";
 const POLL_KIND="preseason";
 const DATA_DATE="2026-09-26";
+const LANE={"factor":1.0186,"miss":1.5,"twoThirds":2.3,"nineTenths":4,"n":1229,"seasons":[2022,2023,2024,2025]};
 const FULL_MS=10000;                       // pacing for a full 5,000-race run
 const durMs=()=>Math.max(320,FULL_MS*nSims/5000);
 let nSims=5000;          // 1, then 250-step increments to 5,000
@@ -10742,9 +10798,13 @@ const SCHOOLS=(()=>{
 })();
 
 let FOCUS=null;              // a team to reveal once the board has settled
+let OPEN_TEAM=null;          // a link ending /team opens that school's page
 
 function boardHash(){
   const g=gender==="M"?"boys":"girls";
+  const tp=document.getElementById("p-wi"), sel=document.getElementById("wiTeam");
+  if(tp&&tp.classList.contains("on")&&sel&&sel.value)
+    return "#"+encodeURIComponent(CLS)+"/"+g+"/"+encodeURIComponent(sel.value)+"/team"+(MILES_ON?"/3mi":"");
   return "#"+encodeURIComponent(CLS)+"/"+g+(FOCUS?"/"+encodeURIComponent(FOCUS):"")+(MILES_ON?"/3mi":"");
 }
 function writeHash(){
@@ -10756,11 +10816,13 @@ function readHash(){
   let p=h.split("/").map(s=>s.trim()).filter(Boolean);
   const mi=p.some(s=>s.toLowerCase()==="3mi");
   p=p.filter(s=>s.toLowerCase()!=="3mi");
+  const page=p.length>3&&p[p.length-1].toLowerCase()==="team";
+  if(page)p=p.slice(0,-1);
   if(!p.length)return null;
   const cls=Object.keys(CLASSES).find(c=>c.toLowerCase()===p[0].toLowerCase());
   if(!cls)return null;
   const g=/^g/i.test(p[1]||"")?"F":"M";
-  return {cls,g,mi,team:p[2]?decodeURIComponent(p[2]):null};
+  return {cls,g,mi,page,team:p[2]?decodeURIComponent(p[2]):null};
 }
 
 /* Reveal a team once the numbers have stopped moving. Called from settle, so
@@ -11602,15 +11664,16 @@ function renderWhatIf(){
     document.getElementById("wiRoster").innerHTML=`<div class="empty">No team here can field five runners.</div>`;
     document.getElementById("wiOut").innerHTML="";return;
   }
-  const keep=sel.value;
+  const keep=PENDING_TEAM||sel.value;
+  if(PENDING_TEAM&&PENDING_TEAM!==sel.value){wiAdj={};document.getElementById("wiOut").innerHTML="";}
+  PENDING_TEAM=null;
   sel.innerHTML=teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join("");
   if(teams.some(t=>t.name===keep))sel.value=keep;
   const team=teams.find(t=>t.name===sel.value)||teams[0];
   const total=Object.values(wiAdj).reduce((s,v)=>s+v,0);
 
   document.getElementById("wiRoster").innerHTML=
-    `<h2 class="sec">${team.name}</h2>
-     <p class="sub2">Seconds off each runner${total?`. ${total}s across ${Object.keys(wiAdj).length} of them`:""}.</p>`+
+    `<p class="sub2">Seconds off each runner${total?`. ${total}s across ${Object.keys(wiAdj).length} of them`:""}.</p>`+
     team.roster.map((r,i)=>`<div class="wirow">
       <span class="who">${i+1}. ${r.name}<em>${fmt(r.sbRaw)}</em>${miTag(r)}</span>
       <span class="step" data-n="${r.name}">
@@ -11624,11 +11687,8 @@ function renderWhatIf(){
        </select>
        <button class="solve" id="wiSolve">Find it</button>
      </div>
-     <p class="sub2" style="margin-top:6px">Picks the cheapest set of improvements that makes the chosen outcome more likely than not.</p>
-     <div class="wi-ask">
-       <button class="solve ghost" id="wiLose">Who can't we lose?</button>
-       <button class="solve ghost" id="wiBeat">Who do we have to beat?</button>
-     </div>`;
+     <p class="sub2" style="margin-top:6px">Picks the cheapest set of improvements that makes the chosen outcome more likely than not.</p>`;
+  syncTeamPage(team);
 
   document.querySelectorAll("#wiRoster .step button").forEach(b=>b.onclick=()=>{
     const n=b.parentElement.dataset.n;
@@ -11637,9 +11697,8 @@ function renderWhatIf(){
     renderWhatIf();
   });
   document.getElementById("wiSolve").onclick=solveGoal;
-  document.getElementById("wiLose").onclick=runLose;
-  document.getElementById("wiBeat").onclick=runBeat;
-  sel.onchange=()=>{wiAdj={};renderWhatIf();document.getElementById("wiOut").innerHTML="";};
+  sel.onchange=()=>{wiAdj={};renderWhatIf();document.getElementById("wiOut").innerHTML="";
+    autoBeat();writeHash();};
 }
 
 function adjFor(model,team,map){
@@ -11649,7 +11708,7 @@ function adjFor(model,team,map){
 }
 
 /* Paced runner over a set of worlds. onEnd gets the tallies. */
-function runWorlds(model,worlds,seasons,label,onEnd,stepFn){
+function runWorlds(model,worlds,seasons,label,onEnd,stepFn,fast){
   running=true;
   const go=document.getElementById("go");
   go.textContent="…";go.classList.add("running");
@@ -11660,7 +11719,8 @@ function runWorlds(model,worlds,seasons,label,onEnd,stepFn){
   const tmp=new Float64Array(model.runners.length);
   const shock=new Float64Array(model.teams.length);
   const sigma=totalSigma(sigmaPct)/100;
-  const dur=Math.max(320,FULL_MS*seasons/5000);
+  // fast: an answer the page asks for on its own, not a run the reader pressed
+  const dur=fast?600:Math.max(320,FULL_MS*seasons/5000);
   let done=0,t0=0;
   const gen=runGen;
   nextTick(function step(ts){
@@ -11738,6 +11798,115 @@ function showWhatIf(meta,team,n,names){
   document.getElementById("wiOut").innerHTML=html;
 }
 
+/* ---- every race, at Lane ----
+   One row per rated race: how fast that day ran against an average Oregon race,
+   and what a time run there is worth on a typical day at Lane. RACES comes from
+   the crawl, LANE from backtest/lane_equiv.js --write, so nothing here is typed.
+
+   The live ratings average to zero over every Oregon 5,000m race; the backtest's
+   average over races full of 6A teams, and LANE was measured on that basis. So
+   the ratings are first moved onto it: the 6A-weighted average rating becomes
+   one. Without that, small-school meets would shift every conversion a little. */
+let RACE_G="M";
+const RACE_DEFAULT={M:"17:00",F:"20:00"};
+function parseRun(v){
+  const t=String(v||"").trim().replace(/[ .]/g,":");
+  let m=/^(\d{1,2}):(\d{1,2})$/.exec(t);
+  if(!m){const d=/^(\d{3,4})$/.exec(t); if(d){const x=d[1].padStart(4,"0");m=[0,x.slice(0,2),x.slice(2)];}}
+  if(!m)return null;
+  const sec=+m[1]*60+ +m[2];
+  return +m[2]<60&&sec>=11*60&&sec<=45*60?sec:null;
+}
+function mmss(sec){const r=Math.round(sec),m=Math.floor(r/60);return m+":"+String(r%60).padStart(2,"0");}
+function renderRaces(){
+  const out=document.getElementById("raceOut"), sub=document.getElementById("raceSub");
+  if(!out)return;
+  if(typeof RACES==="undefined"||typeof LANE==="undefined"||!RACES.length){
+    out.innerHTML=`<p>The race table fills in on the next weekly refresh.</p>`;sub.textContent="";return;
+  }
+  // put the ratings on the 6A basis LANE was measured on
+  let sw=0,sl=0;for(const r of RACES){if(r[5]){sw+=r[5];sl+=r[5]*Math.log(r[6]);}}
+  const shift=sw?Math.exp(sl/sw):1;
+  const t=parseRun(document.getElementById("raceT").value);
+  const q=(document.getElementById("raceQ").value||"").trim().toLowerCase();
+  const rows=RACES.filter(r=>r[3]===RACE_G&&(!q||r[1].toLowerCase().includes(q)));
+  const lanePct=((LANE.factor-1)*100).toFixed(1);
+  sub.innerHTML=`${RACES.filter(r=>r[3]===RACE_G).length} ${RACE_G==="M"?"boys'":"girls'"} races rated, through ${new Date(DATA_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}. On a typical day Lane runs about ${lanePct}% slower than an average Oregon race.`;
+  if(t===null){out.innerHTML=`<p>Type a time like 17:00 or 1700.</p>`;return;}
+  const band=Math.round(t*LANE.twoThirds/100);
+  const d=iso=>new Date(iso+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  const body=rows.map(r=>{
+    const f=r[6]/shift, day=(f-1)*100;
+    const tag=Math.abs(day)<0.5?`<span class="rday even">about average</span>`
+      :`<span class="rday ${day>0?"slow":"fast"}">${Math.abs(day).toFixed(1)}% ${day>0?"slow":"fast"}</span>`;
+    return `<tr><td>${d(r[2])}</td><td>${r[1]}<em>${r[4]} runners rated it</em></td><td>${tag}</td><td class="rlane">${mmss(t/f*LANE.factor)}</td></tr>`;
+  }).join("");
+  out.innerHTML=(rows.length?`<div class="rec-wrap"><table class="rec-tbl races"><thead><tr><th>date</th><th>race</th><th>that day</th><th>${mmss(t)} there is</th></tr></thead><tbody>${body}</tbody></table></div>`
+      :`<p>No race matches "${q.replace(/[<>&"]/g,"")}".</p>`)
+    +`<p class="rec-note">A time at Lane on a typical day. Checked against ${LANE.seasons.length} past state meets, two in three runners landed within ${LANE.twoThirds}% of it, about ${band} seconds either way at ${mmss(t)}, and nine in ten within ${LANE.nineTenths}%. Part of that is Lane itself: some years it runs a couple of percent fast or slow. A race is rated from how the runners in it ran against their own form, so it cannot tell a hard course from bad weather on the same afternoon, and a race few runners raced twice around is rated closer to average.</p>`;
+}
+document.querySelectorAll(".race-ctl button[data-rg]").forEach(b=>b.onclick=()=>{
+  const was=RACE_G; RACE_G=b.dataset.rg;
+  document.querySelectorAll(".race-ctl button[data-rg]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const inp=document.getElementById("raceT");
+  if(inp.value===RACE_DEFAULT[was]) inp.value=RACE_DEFAULT[RACE_G];
+  renderRaces();
+});
+document.getElementById("raceT").addEventListener("input",renderRaces);
+document.getElementById("raceQ").addEventListener("input",renderRaces);
+
+/* ---- the Team page ----
+   One school, in the order a coach asks: where it stands, who it has to beat,
+   who it cannot lose, then the seconds tool. The first two fill themselves in;
+   "who can't we lose" is seven paired runs and waits for a tap. BEAT_KEY stops
+   the page re-running the same question when nothing that feeds it changed. */
+let BEAT_KEY="";
+const beatKey=()=>[CLS,gender,document.getElementById("wiTeam").value,MILES_ON,NEXT_SEASON,sigmaPct].join("|");
+function syncTeamPage(team){
+  document.getElementById("tmHead").textContent=team.name;
+  const lose=document.getElementById("tLose");
+  if(!lose.dataset.team||lose.dataset.team!==beatKey()){
+    lose.dataset.team=beatKey();
+    lose.innerHTML=`<h2 class="sec">Who ${team.name} can't lose</h2>
+      <p class="sub2">Each of the seven sits out in turn and the team's eighth steps in. What does each one cost?</p>
+      <button class="solve ghost" id="wiLose">Find out</button>`;
+    document.getElementById("wiLose").onclick=runLose;
+  }
+  syncStand(team,null);
+}
+/* Where it stands: the board's own numbers when the board has been run on this
+   classification and gender, otherwise the qualifying chance the beat question
+   just measured. Never a number from a different board. */
+function syncStand(team,q){
+  const el=document.getElementById("tmStand");
+  const onBoard=RUN&&RUN.model&&RUN.model.teams.some(t=>t.name===team.name&&t.idx===team.idx)
+    &&RUN.done>0&&RUN.byIdx&&RUN.byIdx[team.idx];
+  const lg=ABBR[team.league]||team.league;
+  if(onBoard){
+    const b=RUN.byIdx[team.idx], n=RUN.done;
+    el.innerHTML=`<div class="stand"><div><b>${pct(b.qual,n)}</b><i>reaches Lane</i></div>
+      <div><b>${pct(b.win,n)}</b><i>wins state</i></div>
+      <div><b>${b.ptsN?Math.round(b.ptsSum/b.ptsN):"\u2014"}</b><i>points when there</i></div></div>
+      <p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}, from the board's last run.</p>`;
+  }else if(q!==null){
+    el.innerHTML=`<div class="stand"><div><b>${Math.round(100*q)}%</b><i>reaches Lane</i></div></div>
+      <p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}. Run the board for the chance of winning and the points.</p>`;
+  }else el.innerHTML=`<p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}</p>`;
+}
+function autoBeat(){
+  if(running||!document.getElementById("p-wi").classList.contains("on"))return;
+  if(BEAT_KEY===beatKey()&&document.getElementById("tBeat").innerHTML)return;
+  runBeat();
+}
+/* Straight to a school's page from anywhere: the overlay on the board, or a
+   link that ends in /team. */
+let PENDING_TEAM=null;
+function goTeam(name){
+  // chosen before the tab opens, so the page's own run is for this school
+  PENDING_TEAM=name;
+  document.querySelector('.tabs button[data-p="p-wi"]').click();
+}
+
 /* ---- who can't we lose ----
    Every one of the seven sits the season out in turn, against identical
    simulated races, and the team's eighth steps in at their own level - the seed
@@ -11751,7 +11920,7 @@ function runLose(){
   if(running)return;
   const {model,team}=wiTeamNow();
   if(!team)return;
-  document.getElementById("wiOut").innerHTML="";
+  document.getElementById("tLose").innerHTML=`<h2 class="sec">Who ${team.name} can't lose</h2><p class="sub2">Sitting each runner out in turn…</p>`;
   const worlds=[],meta=[];
   const add=(adj,tag,who)=>{const T=blankTally(model);worlds.push({adj,byIdx:T.byIdx});meta.push({tag,who,by:T.byIdx});};
   add(null,"base");
@@ -11794,7 +11963,7 @@ function showLose(meta,team,n){
     html+=`<div class="note">${quiet.map(x=>x.r.name).join(" and ")} ${quiet.length>1?"score":"scores"} nothing at the league championship and ${quiet.length>1?"are":"is"} still worth ${worth}, by finishing in front of other teams' scorers.</div>`;
   }
   html+=`<p class="sub2">League points are the team's average score at its league championship; lower is better, so a plus is what the team loses without them.</p>`;
-  document.getElementById("wiOut").innerHTML=html;
+  document.getElementById("tLose").innerHTML=html;
 }
 
 /* ---- who do we have to beat ----
@@ -11807,7 +11976,7 @@ function runBeat(){
   if(running)return;
   const {model,team}=wiTeamNow();
   if(!team)return;
-  document.getElementById("wiOut").innerHTML="";
+  document.getElementById("tBeat").innerHTML=`<h2 class="sec">Who ${team.name} has to beat</h2><p class="sub2">Playing out the ${team.league} championship…</p>`;
   const list=model.byLeague[team.league]||[];
   const rivals=list.filter(t=>t.idx!==team.idx);
   const S={n:0,q:0,by:rivals.map(t=>({t,nb:0,qb:0,nl:0,ql:0,m20:0,q20:0})),seasons:[]};
@@ -11830,9 +11999,11 @@ function runBeat(){
         if(r[pos[b.t.idx]].total-mine.total>=20){b.m20++;if(inq)b.q20++;}}
       else{b.nl++;if(inq)b.ql++;}
     }
-  });
+  },true);
 }
 function showBeat(team,S){
+  // the reader moved to another school while this ran: answer for that one
+  if(document.getElementById("wiTeam").value!==team.name){autoBeat();return;}
   const q=S.q/S.n, P=(a,b)=>b?Math.round(100*a/b)+"%":"—";
   const live=S.by.filter(b=>b.nb>=S.n*0.03&&b.nl>=S.n*0.03)
     .map(b=>({...b,swing:b.qb/b.nb-b.ql/b.nl})).sort((a,b)=>b.swing-a.swing);
@@ -11843,7 +12014,7 @@ function showBeat(team,S){
     html+=`<div class="note">${q>0.9?`${team.name} reaches Lane whatever happens against any one rival.`
       :q<0.1?`No single result against one rival gets ${team.name} to Lane often enough to matter. The individual qualifying places are the way through.`
       :`No one rival decides it: ${team.name}'s chances ride on the whole league rather than one head-to-head.`}</div>`;
-    document.getElementById("wiOut").innerHTML=html;return;
+    document.getElementById("tBeat").innerHTML=html;BEAT_KEY=beatKey();syncStand(team,S.q/S.n);return;
   }
   const top=live[0];
   /* A team that is nearly certain wants the opposite question: what is the one
@@ -11857,7 +12028,7 @@ function showBeat(team,S){
     html+=`<div class="cmphead beat"><span>against</span><span>beat them</span><span>lose to them</span></div>`;
     for(const b of live)
       html+=`<div class="cmp beat"><span>${b.t.name}<em>beat them in ${P(b.nb,S.n)} of seasons</em></span><b>${P(b.qb,b.nb)}</b><b class="lo">${P(b.ql,b.nl)}</b></div>`;
-    document.getElementById("wiOut").innerHTML=html;return;
+    document.getElementById("tBeat").innerHTML=html;BEAT_KEY=beatKey();syncStand(team,S.q/S.n);return;
   }
   /* When two or three rivals swing it about equally, the answer is how many of
      them to finish ahead of - "beat two of these three" - not one name, and
@@ -11887,7 +12058,7 @@ function showBeat(team,S){
   for(const b of live)
     html+=`<div class="cmp beat"><span>${b.t.name}<em>beat them in ${P(b.nb,S.n)} of seasons</em></span><b>${P(b.qb,b.nb)}</b><b class="lo">${P(b.ql,b.nl)}</b></div>`;
   html+=`<p class="sub2">Chance of reaching Lane in the seasons ${team.name} finished ahead of that team, and in the seasons it did not. Rivals it almost always beats, or almost never, are left out.</p>`;
-  document.getElementById("wiOut").innerHTML=html;
+  document.getElementById("tBeat").innerHTML=html;BEAT_KEY=beatKey();syncStand(team,S.q/S.n);
 }
 
 /* ---- greedy solver: cheapest improvements that reach the target ---- */
@@ -12849,7 +13020,10 @@ function showTeam(idx){
       :'Did not reach Lane in any of the '+done.toLocaleString()+' simulated seasons, so there is no time to show. ')
     +'The simulated column averages only the seasons this team reached Lane, the same slice the points figure uses'
     +(tm.roster.length>SC?'. Only the first '+SC+' score':'')+'.</div>'
+    +'<button class="gl-go" data-team="'+tm.name+'">'+tm.name+'\u2019s team page \u2192</button>'
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  const go=el.querySelector(".gl-go");
+  if(go)go.onclick=e=>{e.stopPropagation();closeRace();goTeam(go.dataset.team);};
 }
 
 
@@ -13437,9 +13611,12 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
   document.getElementById("go").style.display=/p-sim|p-wi/.test(b.dataset.p)?"":"none";
-  // The controls belong to everything that runs; How is the one page with nothing to set.
-  document.getElementById("ctl").classList.toggle("off",b.dataset.p==="p-doc");
-  if(b.dataset.p==="p-wi")renderWhatIf();
+  // The controls belong to everything that runs. About has nothing to set, and
+  // Races carries its own boys/girls switch because it spans every classification.
+  document.getElementById("ctl").classList.toggle("off",b.dataset.p==="p-doc"||b.dataset.p==="p-races");
+  // the team page is about one school, not the settings: fold them unless the reader chose otherwise
+  if(b.dataset.p==="p-wi"){foldDials();renderWhatIf();autoBeat();}
+  writeHash();
   /* Rows and cards are absolutely positioned off a measured step height, and a
      hidden panel measures zero — so a board built while the reader was on
      another tab has to be re-laid-out the moment it comes back. */
@@ -13475,13 +13652,16 @@ loadSeed();
   setClass(CLS,gender);
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
-  if(h.team)FOCUS=h.team;
+  if(h.team&&!h.page)FOCUS=h.team;
   if(h.mi)setMiles(true);
+  if(h.page&&h.team)OPEN_TEAM=h.team;
 })();
-syncMiNote();
+syncMiNote();renderRaces();
 syncVar();syncViewText();clearOut();renderWhatIf();renderRecord();renderForward();syncHowText();armFigures();
 initFind();
-/* A link that named a team asked a question, so answer it. */
+/* A link to a team page opens it; a link that named a team on the board asked
+   a question, so answer it. */
+if(OPEN_TEAM)goTeam(OPEN_TEAM);
 if(FOCUS)run();
 writeHash();
 </script>

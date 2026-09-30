@@ -385,6 +385,16 @@
       },
       latest, dropped,
       races: races ? races.stats : null,
+      /* Every rated race, for the site's race table: which meet, which field,
+         how many runners informed the rating, how many of them were 6A (the
+         page puts the ratings on the backtest's 6A basis before converting to
+         Lane) and the factor itself. */
+      raceTable: races ? races.races.map(x => {
+        const [mid, g] = x.race.split('|');
+        const inRace = rateable.filter(r => r.mid === mid && r.g === g);
+        return { mid, g, n: x.n, runners: inRace.length,
+                 n6A: inRace.filter(r => r.cls === '6A').length, f: Math.exp(x.effect) };
+      }) : [],
       offBoard: [...offBoardNames].sort(),
       outOfState: [...outOfStateNames].sort(),
     };
@@ -508,6 +518,16 @@
      They arrive protocol-relative and unsized; the map wants https and =s96.
      Merge rather than replace: a school with no team on athletic.net this
      season should keep the crest it already had. */
+  /* The race table: one row per rated race, [meetId, name, date, gender,
+     runners who informed it, of them 6A, factor]. Replaced whole on every
+     refresh, inserted beside DATA_DATE the first time. */
+  function patchRaces(html, rows) {
+    const line = 'const RACES=' + JSON.stringify(rows) + ';';
+    if (/const RACES=\[[\s\S]*?\];/.test(html)) return html.replace(/const RACES=\[[\s\S]*?\];/, () => line);
+    if (!/const DATA_DATE="[\d-]+";/.test(html)) throw new Error('DATA_DATE not found');
+    return html.replace(/(const DATA_DATE="[\d-]+";)/, (m) => m + '\n' + line);
+  }
+
   function patchLogos(html, logos) {
     const m = html.match(/const LOGO=(\{.*?\});/);
     if (!m) throw new Error('LOGO map not found');
@@ -520,7 +540,7 @@
 
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
            cleanName,
-           patchIndex, patchLogos, SEASON_START, MIN_5K, MAX_5K,
+           patchIndex, patchLogos, patchRaces, SEASON_START, MIN_5K, MAX_5K,
            OREGON_DIV, MILES_3, divMetres, wantDiv, resultRow, teamsFromTree, fitRaces, RACE_TAU,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };
 }));

@@ -114,7 +114,32 @@ site quietly lies about how fresh it is.
 
 ## The site
 
-**Three tabs, and one of them has three views.** Odds · What if · How. Inside
+**Four tabs since Sep 30: Odds · Team · Races · About.** It was three - Odds ·
+What if · How - and the coach tools had grown past it: "who do we have to beat"
+and "who can't we lose" sat under the seconds steppers, the Lane table was filed
+under How, and nothing linked a card on the board to its school. The four map
+the site to its readers: the board for everyone, a page per school for coaches,
+a race table for everyone after a weekend, and About for the proof.
+
+- **Team** (`#p-wi`, still, so the What if code is untouched) is one school in
+  the order a coach asks: where it stands (the board's own numbers when the board
+  has been run on this classification and gender, otherwise the qualifying chance
+  the next section measures - never a number from another board), who it has to
+  beat (runs itself on open, briskly, and not again until something feeding it
+  changes: `BEAT_KEY`), who it can't lose (seven paired runs, waits for a tap),
+  then the seconds tool. The dials fold on arrival unless the reader chose.
+- **Every team card's overlay** carries "X's team page", and `#6A/boys/Grant/team`
+  opens it. `goTeam` sets `PENDING_TEAM` before the tab opens, because opening
+  it starts the beat run - selecting afterwards ran the question for whichever
+  school was first alphabetically. A run that finishes after the reader moved on
+  re-runs for the school now selected rather than printing a stale answer.
+- **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it
+  does on About, and Run hides on both. The About styles are scoped
+  `:is(#p-doc,#p-races)` so the race table shares them.
+- At 320px four tabs are 69px each beside nothing; on Odds and Team they share
+  the bar with Run.
+
+**Inside Odds, three views.** Inside
 Odds a segmented switch chooses Teams, Runners or Leagues. That is the shape
 because all three of those *are* odds — they were three sibling tabs for a
 while, each with its own copy of the switchers and its own Run button, and it
