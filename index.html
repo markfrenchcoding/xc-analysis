@@ -109,19 +109,6 @@ header{padding:13px 0 9px;border-bottom:1px solid var(--line);display:flex;align
 .brand:hover .pk-team{transform:translate(2.35px,-1.32px)}
 body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
 @keyframes surge{0%{transform:none}34%{transform:translate(4.4px,-2.5px)}100%{transform:none}}
-/* Idle: every seven seconds a stride runs through the pack, front runner
-   first - each dot lifts a unit and settles, then the mark rests. It animates
-   the circles, not .pk-team, because the group's transform belongs to the
-   hover and the surge; the two compose. Staggered by position along the lean. */
-.pk-team circle{transform-box:fill-box;transform-origin:center;animation:stride 7s var(--ease) infinite}
-.pk-score circle:nth-child(1){animation-delay:1.2s}
-.pk-score circle:nth-child(3){animation-delay:1.27s}
-.pk-score circle:nth-child(2){animation-delay:1.42s}
-.pk-score circle:nth-child(4){animation-delay:1.48s}
-.pk-disp circle:nth-child(1){animation-delay:1.54s}
-.pk-score circle:nth-child(5){animation-delay:1.68s}
-.pk-disp circle:nth-child(2){animation-delay:1.74s}
-@keyframes stride{0%,11%,100%{transform:none}4%{transform:translate(.5px,-1.3px) scale(1.08)}}
 .brand{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
 
@@ -154,7 +141,7 @@ body.gunlap-fire .pk-team{animation:surge .95s var(--ease)}
   .pl-drops,.c-cloud{display:none}
   .pl-wrap.raining .c-water{animation:none}
   .pk-team{transition:none}
-  .pk-team circle,.empty.start .es-dots circle{animation:none}
+  .empty.start .es-dots circle{animation:none}
   .gl-tape{animation:none}
 }
 .gl-kick{margin:13px 17px 0;padding:11px 12px;border-radius:11px;background:var(--bg);
@@ -1184,6 +1171,14 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rday.slow{color:var(--text)}
 .rday.fast{color:var(--accent)}
 .rday.even{color:var(--muted)}
+:is(#p-doc,#p-races) .rec-tbl.races th{padding:0}
+.rsort{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:4px;cursor:pointer;
+  padding:8px 6px;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;border-radius:6px}
+.rsort:hover{color:var(--text)}
+.rsort-hint{margin:14px 0 -4px;font-size:12.5px;color:var(--muted)}
+.rsort:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.rsort.on{color:var(--text)}
+.rsort i{font-style:normal;font-size:8px;color:var(--accent);min-width:8px}
 :is(#p-doc,#p-races) .rec-tbl.races .rlane{font-family:var(--num);font-weight:700;font-size:17px;color:var(--text)}
 
 /* the Team page */
@@ -10329,7 +10324,7 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
 </defs></svg>
 <div class="wrap">
   <header>
-    <span class="brand" id="brand" role="button" tabindex="0" aria-label="Run a single state meet"><svg class="glyph" viewBox="0 0 32 32" aria-hidden="true"><g class="pk-team"><g class="pk-score"><circle cx="27.71" cy="10.57" r="2.79"/><circle cx="17.85" cy="5.58" r="2.79"/><circle cx="26.3" cy="20.55" r="2.79"/><circle cx="16.44" cy="15.56" r="2.79"/><circle cx="6.58" cy="10.57" r="2.79"/></g><g class="pk-disp"><circle cx="15.05" cy="25.54" r="2.49"/><circle cx="5.17" cy="20.55" r="2.49"/></g></g></svg><h1>CHUTE</h1></span>
+    <span class="brand" id="brand" role="button" tabindex="0" aria-label="Run a single state meet"><svg class="glyph" viewBox="0 0 32 32" aria-hidden="true"><g class="pk-team"><g class="pk-orbit"><animateTransform attributeName="transform" type="rotate" dur="9s" repeatCount="indefinite" calcMode="spline" values="0 16.44 15.56;0 16.44 15.56;360 16.44 15.56;360 16.44 15.56" keyTimes="0;0.78;0.94;1" keySplines="0 0 1 1;.55 0 .25 1;0 0 1 1"/><g class="pk-score"><circle cx="27.71" cy="10.57" r="2.79"/><circle cx="17.85" cy="5.58" r="2.79"/><circle cx="26.3" cy="20.55" r="2.79"/><circle cx="16.44" cy="15.56" r="2.79"/><circle cx="6.58" cy="10.57" r="2.79"/></g><g class="pk-disp"><circle cx="15.05" cy="25.54" r="2.49"/><circle cx="5.17" cy="20.55" r="2.49"/></g></g></g></svg><h1>CHUTE</h1></span>
     <div class="hsub"><span id="hcls">Oregon 6A · 2026</span><br><span id="hberth">14 auto berths, 2 at-large</span><br><span class="asof" id="asof"></span></div>
     <button class="themeBtn" id="theme" aria-label="Switch between dark and light"><svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.6a8.4 8.4 0 0 0 0 16.8z" fill="currentColor"/></svg></button>
   </header>
@@ -11895,6 +11890,11 @@ function showWhatIf(meta,team,n,names){
    the ratings are first moved onto it: the 6A-weighted average rating becomes
    one. Without that, small-school meets would shift every conversion a little. */
 let RACE_G="M";
+/* Sorting: tap a heading. Date starts newest first, the race A to Z, and "that
+   day" and the Lane time both start with the slowest race - the two are the same
+   order, so either heading works. Tap again to reverse. */
+let RACE_SORT={k:"date",dir:-1};
+const RACE_SORT_FIRST={date:-1,race:1,day:-1,lane:1};
 const RACE_DEFAULT={M:"17:00",F:"20:00"};
 function parseRun(v){
   const t=String(v||"").trim().replace(/[ .]/g,":");
@@ -11922,13 +11922,17 @@ function renderRaces(){
   if(t===null){out.innerHTML=`<p>Type a time like 17:00 or 1700.</p>`;return;}
   const band=Math.round(t*LANE.twoThirds/100);
   const d=iso=>new Date(iso+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  const key={date:r=>r[2],race:r=>r[1].toLowerCase(),day:r=>r[6],lane:r=>-r[6]}[RACE_SORT.k];
+  rows.sort((a,b)=>{const x=key(a),y=key(b);return (x<y?-1:x>y?1:0)*RACE_SORT.dir||(a[2]<b[2]?1:a[2]>b[2]?-1:0);});
+  const th=(k,label)=>{const on=RACE_SORT.k===k;
+    return `<th aria-sort="${on?(RACE_SORT.dir>0?"ascending":"descending"):"none"}"><button class="rsort${on?" on":""}" data-k="${k}">${label}<i aria-hidden="true">${on?(RACE_SORT.dir>0?"▲":"▼"):""}</i></button></th>`;};
   const body=rows.map(r=>{
     const f=r[6]/shift, day=(f-1)*100;
     const tag=Math.abs(day)<0.5?`<span class="rday even">about average</span>`
       :`<span class="rday ${day>0?"slow":"fast"}">${Math.abs(day).toFixed(1)}% ${day>0?"slow":"fast"}</span>`;
     return `<tr><td>${d(r[2])}</td><td>${r[1]}<em>${r[4]} runners rated it</em></td><td>${tag}</td><td class="rlane">${mmss(t/f*LANE.factor)}</td></tr>`;
   }).join("");
-  out.innerHTML=(rows.length?`<div class="rec-wrap"><table class="rec-tbl races"><thead><tr><th>date</th><th>race</th><th>that day</th><th>${mmss(t)} there is</th></tr></thead><tbody>${body}</tbody></table></div>`
+  out.innerHTML=(rows.length?`<p class="rsort-hint">Tap a heading to sort.</p><div class="rec-wrap"><table class="rec-tbl races"><thead><tr>${th("date","date")}${th("race","race")}${th("day","that day")}${th("lane",mmss(t)+" there is")}</tr></thead><tbody>${body}</tbody></table></div>`
       :`<p>No race matches "${q.replace(/[<>&"]/g,"")}".</p>`)
     +`<p class="rec-note">A time at Lane on a typical day. Checked against ${LANE.seasons.length} past state meets, two in three runners landed within ${LANE.twoThirds}% of it, about ${band} seconds either way at ${mmss(t)}, and nine in ten within ${LANE.nineTenths}%. Part of that is Lane itself: some years it runs a couple of percent fast or slow. A race is rated from how the runners in it ran against their own form, so it cannot tell a hard course from bad weather on the same afternoon, and a race few runners raced twice around is rated closer to average.</p>`;
 }
@@ -11940,6 +11944,13 @@ document.querySelectorAll(".race-ctl button[data-rg]").forEach(b=>b.onclick=()=>
   renderRaces();
 });
 document.getElementById("raceT").addEventListener("input",renderRaces);
+document.getElementById("raceOut").addEventListener("click",e=>{
+  const b=e.target.closest(".rsort");if(!b)return;
+  const k=b.dataset.k;
+  RACE_SORT=RACE_SORT.k===k?{k,dir:-RACE_SORT.dir}:{k,dir:RACE_SORT_FIRST[k]};
+  renderRaces();
+  const nb=document.querySelector('#raceOut .rsort[data-k="'+k+'"]');if(nb)nb.focus({preventScroll:true});
+});
 document.getElementById("raceQ").addEventListener("input",renderRaces);
 
 /* ---- the Team page ----
@@ -13794,6 +13805,10 @@ document.getElementById("go").onclick=()=>{
   addEventListener("resize",()=>movePill(pressed(),true));
   if(document.fonts)document.fonts.ready.then(()=>movePill(pressed(),true));
   movePill(pressed(),true);
+}
+/* The mark's idle turn is SMIL, which CSS reduced-motion rules cannot reach. */
+if(matchMedia("(prefers-reduced-motion: reduce)").matches){
+  const g=document.querySelector(".brand .glyph");if(g&&g.pauseAnimations)g.pauseAnimations();
 }
 addEventListener("resize",()=>{
   if(running)return;

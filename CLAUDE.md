@@ -133,6 +133,8 @@ a race table for everyone after a weekend, and About for the proof.
   it starts the beat run - selecting afterwards ran the question for whichever
   school was first alphabetically. A run that finishes after the reader moved on
   re-runs for the school now selected rather than printing a stale answer.
+- **Races sorts by heading**: date newest first, race A-Z, and "that day" or the
+  Lane time with the slowest race first; a second tap reverses (`RACE_SORT`).
 - **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it
   does on About.
 - **Run is on every tab and the bar never changes shape.** It hid on Races and
@@ -252,10 +254,14 @@ formation is ever redrawn, both need it.
 "— Oregon cross country state odds", which is a description rather than a name
 and read as noise in a row of tabs.
 
-*The seven stride when idle.* Every seven seconds one lift runs through the
-pack, front runner first, and the mark rests between. It animates the circles,
-never `.pk-team`, whose transform belongs to the hover and the surge - the two
-compose. The Odds empty state's five dots drift out of step (`esBob`), odds not
+*The seven turn once when idle.* Every nine seconds the formation makes one
+eased turn about its own centre (16.44, 15.56 - the mean of the seven, which is
+also the middle scorer) and rests. It is SMIL `animateTransform` on an inner
+`.pk-orbit` group, in user units, so it cannot leave the 32-unit square and
+composes with the hover and surge on `.pk-team`. The first version lifted each
+circle with CSS on `transform-box:fill-box` and on the owner's phone threw the
+whole mark left and partly off screen; SMIL has no origin to misread.
+`pauseAnimations()` stops it under reduced motion, which CSS cannot reach. The Odds empty state's five dots drift out of step (`esBob`), odds not
 yet settled. Both stop under `prefers-reduced-motion`.
 
 *The seven surge on tap.* `.pk-team` animates on `body.gunlap-fire`, which is the
