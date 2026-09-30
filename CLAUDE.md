@@ -134,10 +134,13 @@ a race table for everyone after a weekend, and About for the proof.
   school was first alphabetically. A run that finishes after the reader moved on
   re-runs for the school now selected rather than printing a stale answer.
 - **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it
-  does on About, and Run hides on both. The About styles are scoped
+  does on About.
+- **Run is on every tab and the bar never changes shape.** It hid on Races and
+  About at first, and the four tabs jumped to fill its space the moment either
+  was tapped - every label sliding sideways under the finger. From Races or About,
+  Run goes to Odds and runs the board; on Team it runs the what-if. The About styles are scoped
   `:is(#p-doc,#p-races)` so the race table shares them.
-- At 320px four tabs are 69px each beside nothing; on Odds and Team they share
-  the bar with Run.
+- At 375px each tab is about 48px beside Run, in the same place on every tab.
 
 **About fans out.** It is the one tab holding three different things, so a tap
 offers How it works, Track record and Called it as three cards that rise out of

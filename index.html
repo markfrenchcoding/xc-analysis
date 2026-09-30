@@ -13706,7 +13706,10 @@ SCRIM.onclick=()=>fanClose(false);
 function selectTab(b){
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
-  document.getElementById("go").style.display=/p-sim|p-wi/.test(b.dataset.p)?"":"none";
+  /* Run stays on every tab. Hiding it on Races and About made the four tabs
+     jump to fill its space the moment either was tapped - every label sliding
+     sideways under the finger. The bar keeps one shape, and Run keeps one
+     meaning: run the board. */
   // The controls belong to everything that runs. About has nothing to set, and
   // Races carries its own boys/girls switch because it spans every classification.
   document.getElementById("ctl").classList.toggle("off",b.dataset.p==="p-doc"||b.dataset.p==="p-races");
@@ -13726,6 +13729,9 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
 document.getElementById("go").onclick=()=>{
   if(running){skip=true;return;}
   if(document.getElementById("p-wi").classList.contains("on"))return runWhatIf();
+  // from Races or About, Run means the board: go there and run it
+  if(!document.getElementById("p-sim").classList.contains("on"))
+    selectTab(document.querySelector('.tabs button[data-p="p-sim"]'));
   run();
 };
 addEventListener("resize",()=>{
