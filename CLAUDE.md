@@ -4451,6 +4451,23 @@ half the field sits at 100% and those ties break on nothing otherwise, which is
 the same trap that once made `backtest.js` publish the champion record a team
 too high.
 
+**One column per race weekend (Sep 30).** The owner wanted the columns a week
+apart. A week ends on the Saturday and a snapshot belongs to the week its
+`through` date falls in; the latest in a week is shown, a week with none still
+gets an empty column, and the rest are listed under the table as "also
+archived". Nothing is dropped from `SNAPSHOTS` - this is display only.
+
+**Arrows say which way a team moved since the week before**, up always better
+(turned round on Points and Runners, where smaller wins), nothing under a
+point or a place. A **change** column runs from the first week on the current
+model to the latest. **Arrows skip any step into a week where the model
+changed** and that column carries a diamond: Sep 12 to Sep 19 had every team
+falling because the horizon allowance arrived, which is us, not the season.
+`modelOf` reads an entry's `model` field, or infers it for old ones (no
+`weeks` = pre-horizon). `snapshot.js` now writes `model: 'race-rated'`;
+**bump `MODEL` there whenever the board's method changes.** The table opens
+scrolled to the newest week.
+
 **Early entries are narrower, and are not rewritten to match.** `fwdTeam` reads
 both the wide shape and the original `[qual, win]` one, and a column that did not
 exist yet prints as a dash. Widening the archive must never mean going back over

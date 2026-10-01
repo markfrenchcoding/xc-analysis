@@ -187,6 +187,13 @@ for (const cls of classNames) {
 /* ---------- append, never amend ---------- */
 const entry = { taken, through, marks, sigma: +SIGMA.toFixed(2), runs: RUNS, boards };
 if (weeksOut != null) entry.weeks = +weeksOut.toFixed(1);
+/* Which model wrote this. Called it skips its week-on-week arrows across a
+   change of model, because a move there is partly ours rather than the
+   season's. Entries before this field: no `weeks` = before the horizon
+   allowance, `weeks` and no `model` = horizon allowance on raw marks. Bump
+   MODEL whenever the board's method changes. */
+const MODEL = 'race-rated';
+entry.model = MODEL;
 if (forced) entry.forced = forced;
 
 list.push(entry);

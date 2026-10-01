@@ -416,7 +416,7 @@ body.nextseason.miles #wiOut::before{content:"Next season \2014  seniors graduat
 .fwd-tm{font-style:normal;color:var(--dim);font-size:10.5px;margin-left:6px}
 .fsw{margin-bottom:9px}
 .fsw button{font-size:11px;padding:7px 4px}
-.fwd-tbl td:first-child{white-space:nowrap}
+.fwd-tbl td:first-child{white-space:nowrap}.fwd-tbl th .fwd-wk{display:block;font-size:9.5px;opacity:.75;letter-spacing:.04em}.fwd-tbl i.fwd-up,.fwd-tbl i.fwd-dn{font-style:normal;font-size:9px;margin-left:3px;vertical-align:1px}.fwd-up{color:var(--accent)}.fwd-tbl sup.fwd-mod{color:var(--muted);font-size:8px;margin-left:2px}.fwd-dn{color:var(--muted)}.fwd-tbl td.fwd-chg{white-space:nowrap;font-size:12.5px}.fwd-tbl td.fwd-flat{color:var(--dim)}
 .rec-note{font-size:10.5px;color:var(--dim);margin:6px 0 0;line-height:1.45}
 .rec-chart{width:100%;height:auto;display:block;margin:6px 0 2px}
 .rec-chart .ax{stroke:var(--line);stroke-width:.7}
@@ -12702,15 +12702,66 @@ function renderForward(){
   }
 
   const meta=FWD_VIEWS.find(v=>v[0]===FWD_K);
+  /* One column per race weekend, so the columns are a week apart. A week ends on
+     the Saturday, the day the races are run, and a snapshot belongs to the week
+     its results run through. Where a week has more than one snapshot the latest
+     is shown. Nothing is dropped from the archive: the others are listed under
+     the table and every one is in the repository. */
+  const satOf=iso=>{const t=new Date(iso+"T12:00:00");t.setDate(t.getDate()+((6-t.getDay()+7)%7));
+    return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");};
+  const byWeek=new Map();
+  for(const s of rows){const w=satOf(s.through||s.taken);const was=byWeek.get(w);
+    if(!was||(s.through||s.taken)>(was.through||was.taken)||((s.through||s.taken)===(was.through||was.taken)&&s.taken>was.taken))byWeek.set(w,s);}
+  const weeks=[...byWeek.keys()].sort();
+  // a week with no snapshot still gets its column, so the spacing stays true
+  if(weeks.length>1){const all=[];for(let w=weeks[0];w<=weeks[weeks.length-1];){all.push(w);
+    const t=new Date(w+"T12:00:00");t.setDate(t.getDate()+7);
+    w=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
+    weeks.splice(0,weeks.length,...all);}
+  const cols=weeks.map(w=>({w,s:byWeek.get(w)||null}));
+  /* A move across a week where the model itself changed is partly ours, not the
+     season's. Entries written before the horizon allowance carry no "weeks";
+     a later entry can name its model outright. Arrows skip those steps and the
+     change column counts only from the first week on the latest model. */
+  const modelOf=s=>s?(s.model||(s.weeks==null?"pre-horizon":"horizon")):null;
+  cols.forEach((c,i)=>{const p=cols.slice(0,i).reverse().find(x=>x.s);
+    c.newModel=!!(c.s&&p&&modelOf(p.s)!==modelOf(c.s));});
+  const lastModel=modelOf(cols.filter(c=>c.s).pop().s);
+  const base=cols.findIndex(c=>c.s&&modelOf(c.s)===lastModel);
+  const hidden=rows.filter(s=>!cols.some(c=>c.s===s));
   const head='<tr><th>'+(FWD_K==="run"?"runner":"team")+'</th>'
-    +rows.map(s=>'<th>'+d(s.taken)+(s.forced?'<sup title="rewritten: '+s.forced.why+'">\u2020</sup>':'')+'</th>').join("")+'</tr>';
+    +cols.map(({w,s})=>'<th title="'+(s?'Results through '+d(s.through||s.taken)+', written '+d(s.taken):'No snapshot that week')+'">'
+      +'<span class="fwd-wk">thru</span>'+d(w)+(cols.find(c=>c.w===w).newModel?'<sup class="fwd-mod" title="The model changed this week">\u25C6</sup>':'')+(s&&s.forced?'<sup title="rewritten: '+s.forced.why+'">\u2020</sup>':'')+'</th>').join("")
+    +(cols.length>1?'<th title="From the first week on the current model to the latest">change<span class="fwd-wk">since '+d(cols[base].w)+'</span></th>':'')+'</tr>';
+  /* An arrow says which way the team's chances went since the week before.
+     Up is always better: on Points and on the Runners board a smaller number is
+     the better one, so the arrow is turned round there. Moves under a point,
+     or a place on the Runners board, get none. */
+  const lowerBetter=FWD_K==="pts"||FWD_K==="run";
+  const step=FWD_K==="pts"?3:10;
+  const arrow=(prev,v)=>{
+    if(prev==null||v==null)return "";
+    const dlt=lowerBetter?prev-v:v-prev;
+    if(Math.abs(dlt)<step)return "";
+    return dlt>0?'<i class="fwd-up" aria-label="up">\u25B2</i>':'<i class="fwd-dn" aria-label="down">\u25BC</i>';
+  };
+  const fmtD=(dlt)=>FWD_K==="pts"?String(Math.abs(Math.round(dlt))):FWD_K==="run"?(Math.abs(dlt)/10).toFixed(1):(Math.abs(dlt)/10).toFixed(Math.abs(dlt)<100?1:0)+"%";
+  const change=(vals)=>{
+    const got=vals.filter((v,i)=>v!=null&&i>=base);
+    if(cols.length<2)return "";
+    if(got.length<2)return '<td class="fwd-chg">\u2014</td>';
+    const a=got[0],b=got[got.length-1],dlt=lowerBetter?a-b:b-a;
+    if(Math.abs(dlt)<step)return '<td class="fwd-chg fwd-flat">even</td>';
+    return '<td class="fwd-chg '+(dlt>0?"fwd-up":"fwd-dn")+'">'+(dlt>0?"\u25B2 ":"\u25BC ")+fmtD(dlt)+'</td>';
+  };
 
   let body,names,unit;
   if(FWD_K==="run"){
     /* Runners are stored as an ordered list rather than a map, so the name is
        the key and the team rides along for display. Anyone in the top thirty on
        any date gets a row, ordered by the most recent call. */
-    const rowsR=rows.map(s=>{
+    const rowsR=cols.map(({s})=>{
+      if(!s)return {};
       const b=s.boards[key], m={};
       if(Array.isArray(b.r)) for(const r of b.r) m[r[0]]={team:r[1],place:r[2],t21:r[3],win:r[4]};
       return m;
@@ -12728,11 +12779,13 @@ function renderForward(){
       const bad=erR.has(n);
       return '<tr'+(bad?' class="fwd-bad"':'')+'><td>'+n+(bad?'<sup class="fwd-mk" title="Not an Oregon athlete">\u2021</sup>':'')
         +'<em class="fwd-tm">'+(any?any.team:"")+'</em></td>'
-        +rowsR.map(m=>'<td>'+(m[n]?(m[n].place/10).toFixed(1):"\u2014")+'</td>').join("")+'</tr>';
+        +rowsR.map((m,i)=>{const v=m[n]?m[n].place:null,p=i?(rowsR[i-1][n]?rowsR[i-1][n].place:null):null;
+          return '<td>'+(v!=null?(v/10).toFixed(1):"\u2014")+(cols[i].newModel?"":arrow(p,v))+'</td>';}).join("")
+        +change(rowsR.map(m=>m[n]?m[n].place:null))+'</tr>';
     }).join("");
     unit="Lower is better.";
   }else{
-    const last=rows[rows.length-1].boards[key];
+    const last=cols.filter(c=>c.s).pop().s.boards[key];
     const all=s=>Array.isArray(s.boards[key].r)?Object.keys(s.boards[key].t):Object.keys(s.boards[key]);
     names=[...new Set(rows.flatMap(all))]
       .sort((a,b)=>{
@@ -12751,11 +12804,13 @@ function renderForward(){
       const er=erT[n];
       return '<tr'+(er?' class="fwd-bad"':'')+'><td>'+n
         +(er?'<sup class="fwd-mk" title="Carried runners from a same-named school in another state">\u2021</sup>':'')+'</td>'
-        +rows.map(s=>{
-          const v=fwdTeam(s.boards[key],n,FWD_K), hit=er&&er[s.taken];
+        +(()=>{const vals=cols.map(({s})=>s?fwdTeam(s.boards[key],n,FWD_K):null)
+            .map(v=>FWD_K==="pts"&&!v?null:v);
+          return cols.map(({s},i)=>{
+          const v=vals[i], hit=er&&s&&er[s.taken];
           return '<td'+(hit?' class="fwd-x" title="'+hit+' of the top seven were not '+n+'\u2019s"':'')+'>'
-            +(FWD_K==="pts"?(v?v:"\u2014"):pc(v))+'</td>';
-        }).join("")+'</tr>';}).join("");
+            +(FWD_K==="pts"?(v?v:"\u2014"):pc(v))+(cols[i].newModel?"":arrow(i?vals[i-1]:null,v))+'</td>';
+        }).join("")+change(vals);})()+'</tr>';}).join("");
     unit=FWD_K==="pts"?"Lower is better. Only counts the seasons a team actually qualified.":"";
   }
 
@@ -12767,8 +12822,15 @@ function renderForward(){
     +', the first from '+d(first.taken)+' on '+first.marks.toLocaleString()+' marks'
     +(rows.length>1?', the latest from '+d(latest.taken)+' on '+latest.marks.toLocaleString()
       +' marks':'')+'.'+(unit?' '+unit:'')+'</p>'
+    +'<p class="rec-note">One column per race weekend, a week apart, each the call made with results through '
+    +'that Saturday. \u25B2 and \u25BC say which way a team moved since the week before; up is always better. '
+    +'<b>Change</b> runs from the first week on the current model to the latest'
+    +(cols[base].w!==cols[0].w?'. \u25C6 marks a week where the model itself changed, so moves into it get no arrow':'')
+    +'.'+(FWD_K==="run"?' On this board the numbers are places.':'')+'</p>'
     +'<div class="rec-wrap"><table class="rec-tbl fwd-tbl"><thead>'+head+'</thead><tbody>'
     +body+'</tbody></table></div>'
+    +(hidden.length?'<p class="rec-note">Also archived and not shown, because a later call was made the same week: '
+      +hidden.map(s=>d(s.taken)).join(', ')+'.</p>':'')
     /* If the model changed between snapshots, a column can move because WE
        moved rather than because a race happened. Say so rather than letting a
        reader read a step change as news. */
@@ -12794,6 +12856,8 @@ function renderForward(){
     +'we will score these against what happened. Until then they are just the claims, in '
     +'order, with dates on them.</p>';
   wire();
+  // open on the latest week: the newest call is the one a reader came for
+  const fw=box.querySelector('.rec-wrap'); if(fw) fw.scrollLeft=fw.scrollWidth;
 }
 
 function renderRecord(){
