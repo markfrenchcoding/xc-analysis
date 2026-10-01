@@ -4473,7 +4473,7 @@ both the wide shape and the original `[qual, win]` one, and a column that did no
 exist yet prints as a dash. Widening the archive must never mean going back over
 what it already said.
 
-### The out-of-state errata
+### The out-of-state runners, recomputed out
 
 **Every snapshot from Sep 15 to Sep 26 carried other states' runners.** Until
 the Sep 28 fix (`8deedf4`, match on athletic.net team id) results were filed by
@@ -4482,19 +4482,36 @@ had Centennial's 5A girls - seven Boise, Idaho runners - at 81% to win, and
 Century (6A girls, six of seven), Redmond (5A, six of seven from Sep 25),
 Riverside, Rainier, Toledo, Union and others carrying them too.
 
-**The entries were not rewritten.** Rewriting them would break the archive's
-one promise. `ARCHIVE_ERRATA`, right under `SNAPSHOTS`, records for each board
-which teams had how many foreign runners in their top seven on which date, and
-which archived runners were never Oregon athletes. It was computed by taking the
-seed out of each snapshot's own commit and asking which of each team's top
-seven are absent from the id-matched seed. Called it marks those teams and
-runners with a double dagger, strikes the affected dates through, and says in
-plain words what happened, that every rival's odds moved with them, and when it
-was fixed. **Elgin is left out**: it has no athletic.net team, so the id filter
-drops all of its rows and cannot tell us which were foreign.
+**They were recomputed on Sep 30, at the owner's request.** The first answer
+was an errata table (`ARCHIVE_ERRATA`) that marked the affected teams with a
+double dagger and struck dates through. The owner wanted the mistakes gone
+rather than highlighted, so the five entries were re-run, and the errata table
+and its styles were deleted.
 
-`snapshot.js` rewrites only the `SNAPSHOTS` line, so the errata line survives
-every refresh. New entries are clean and need no errata.
+How, so it can be checked or repeated:
+
+- Each entry was re-run with **its own commit's** `snapshot.js`, `model.js` and
+  `pull/seed.js` (Sep 15 `b0a2905`, Sep 17 `67a638e`, Sep 19 `ba79bee`, Sep 25
+  `5e0dc1f`, Sep 26 `636315f`), on its own seed, at 20,000 seasons. The sigma
+  came out identical on all five, which is the check that the same model ran.
+- The affected teams' rows were rebuilt from their Oregon athletic.net team
+  grids, read with dates. **Only meet dates the old seed already held were
+  used**: a date counts if any of that team's seed marks matches a dated mark
+  exactly. So foreign runners leave and the Oregon runners they had pushed past
+  the twelve-deep cap come back, and no meet the database did not yet have gets
+  in. Checked first: every Oregon athlete already in each old seed has exactly
+  the top three marks the dated grid gives up to that cutoff, 0 mismatches.
+- Only the boards whose seed changed were replaced. Unaffected boards kept
+  their published figures; re-running them reproduced those to within a point.
+- Each entry carries `recomputed: {on, boards}`, and Called it prints one
+  footnote saying so. The originals are in the repository history.
+- **Westview was a false positive** in the errata and was left alone. **Elgin**
+  has no athletic.net team and was left alone too.
+
+What moved most: Centennial's 5A girls had been the favourite on every date
+and are now not a team at all (one Oregon runner). Union's 2A/1A girls went from
+87-99% to win (Sep 17-26) to 16-83%, and Century's 6A girls, called as high
+as 49% to reach Lane, go to none on every date.
 
 **The same view printed the wrong field size**: "one of the 12 teams" on 6A
 girls, because it read `FIELD`, which belongs to whatever board Odds is on. It
