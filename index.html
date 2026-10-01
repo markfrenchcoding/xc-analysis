@@ -11959,7 +11959,8 @@ function renderRaces(){
   const q=(document.getElementById("raceQ").value||"").trim().toLowerCase();
   const rows=RACES.filter(r=>r[3]===RACE_G&&(!q||r[1].toLowerCase().includes(q)));
   const lanePct=((LANE.factor-1)*100).toFixed(1);
-  sub.innerHTML=`${RACES.filter(r=>r[3]===RACE_G).length} ${RACE_G==="M"?"boys'":"girls'"} races rated, through ${new Date(DATA_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}. On a typical day Lane runs about ${lanePct}% slower than an average Oregon race.`;
+  const laneSec=t===null?"":`, about ${Math.round(t*(LANE.factor-1))} seconds for a ${mmss(t)} runner`;
+  sub.innerHTML=`${RACES.filter(r=>r[3]===RACE_G).length} ${RACE_G==="M"?"boys'":"girls'"} races rated, through ${new Date(DATA_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}. On a typical day Lane runs about ${lanePct}% slower than an average Oregon race${laneSec}.`;
   if(t===null){out.innerHTML=`<p>Type a time like 17:00 or 1700.</p>`;return;}
   const band=Math.round(t*LANE.twoThirds/100);
   const d=iso=>new Date(iso+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
@@ -11975,9 +11976,9 @@ function renderRaces(){
       :`<span class="rday ${day>0?"slow":"fast"}">${gap(Math.abs(s))} ${day>0?"slow":"fast"}<i>${Math.abs(day).toFixed(1)}%</i></span>`;
     return `<tr><td>${d(r[2])}</td><td>${r[1]}<em>${r[4]} runners rated it</em></td><td>${tag}</td><td class="rlane">${mmss(t/f*LANE.factor)}</td></tr>`;
   }).join("");
-  out.innerHTML=(rows.length?`<p class="rsort-hint">Tap a heading to sort.</p><div class="rec-wrap"><table class="rec-tbl races"><thead><tr>${th("date","date")}${th("race","race")}${th("day","that day")}${th("lane",mmss(t)+" there is")}</tr></thead><tbody>${body}</tbody></table></div>`
+  out.innerHTML=(rows.length?`<p class="rsort-hint">Tap a heading to sort.</p><div class="rec-wrap"><table class="rec-tbl races"><thead><tr>${th("date","date")}${th("race","race")}${th("day","vs avg<br>race")}${th("lane","at Lane")}</tr></thead><tbody>${body}</tbody></table></div>`
       :`<p>No race matches "${q.replace(/[<>&"]/g,"")}".</p>`)
-    +`<p class="rec-note">"That day" is how much slower or faster the race ran than an average Oregon race, in seconds for a ${mmss(t)} runner. The last column is that time at Lane on a typical day. Checked against ${LANE.seasons.length} past state meets, two in three runners landed within ${LANE.twoThirds}% of it, about ${band} seconds either way at ${mmss(t)}, and nine in ten within ${LANE.nineTenths}%. Part of that is Lane itself: some years it runs a couple of percent fast or slow. A race is rated from how the runners in it ran against their own form, so it cannot tell a hard course from bad weather on the same afternoon, and a race few runners raced twice around is rated closer to average.</p>`;
+    +`<p class="rec-note">The middle column compares the race with an average Oregon race, in seconds for a ${mmss(t)} runner. Lane is not in it. The last column takes ${mmss(t)} run at that race and gives the same effort at Lane on a typical day, which is where Lane's ${((LANE.factor-1)*100).toFixed(1)}% comes in. Checked against ${LANE.seasons.length} past state meets, two in three runners landed within ${LANE.twoThirds}% of it, about ${band} seconds either way at ${mmss(t)}, and nine in ten within ${LANE.nineTenths}%. Part of that is Lane itself: some years it runs a couple of percent fast or slow. A race is rated from how the runners in it ran against their own form, so it cannot tell a hard course from bad weather on the same afternoon, and a race few runners raced twice around is rated closer to average.</p>`;
 }
 document.querySelectorAll(".race-ctl button[data-rg]").forEach(b=>b.onclick=()=>{
   const was=RACE_G; RACE_G=b.dataset.rg;

@@ -148,6 +148,10 @@ a race table for everyone after a weekend, and About for the proof.
   reads "12s slow" at 17:00 and "11s slow" at 15:30, with the percentage under it
   (`t*(f-1)`, same basis as the Lane column). A minute or more prints as m:ss.
   "About average" (under 0.5%) keeps its label with the seconds beneath.
+  The line above the table gives Lane's own allowance in seconds at the same
+  time ("about 19 seconds for a 17:00 runner"). Headings are "vs avg race" and
+  "at Lane", and the note says the middle column leaves Lane out: a reader
+  asked whether "30s slow" already included Lane's 1.9%. It does not.
 - **Races sorts by heading**: date newest first, race A-Z, and "that day" or the
   Lane time with the slowest race first; a second tap reverses (`RACE_SORT`).
 - **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it
