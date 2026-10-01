@@ -1167,7 +1167,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 :is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2) em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:2px}
 :is(#p-doc,#p-races) .rec-tbl.races td:first-child{color:var(--muted);white-space:nowrap}
 :is(#p-doc,#p-races) .rec-tbl.races th:nth-child(2),:is(#p-doc,#p-races) .rec-tbl.races td:nth-child(2){text-align:left}
-.rday{font-size:12.5px;white-space:nowrap}.rday i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:1px}
+.race-caveat{display:flex;gap:9px;align-items:flex-start;margin:4px 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:13.5px;line-height:1.45;max-width:60ch}.race-caveat b{flex:none;display:grid;place-items:center;width:18px;height:18px;margin-top:1px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:700 12px/1 var(--num)}.race-caveat em{font-style:italic;color:var(--text)}.rday{font-size:12.5px;white-space:nowrap}.rday i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:1px}
 .rday.slow{color:var(--text)}
 .rday.fast{color:var(--accent)}
 .rday.even{color:var(--muted)}
@@ -10545,6 +10545,7 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
   <section class="panel" id="p-races">
       <h2 class="sec">Every race, at Lane</h2>
       <p class="sub2" id="raceSub"></p>
+      <p class="race-caveat"><b aria-hidden="true">!</b><span>A rating doesn't know <em>why</em> a race was fast or slow. Weather, hills, altitude, the competition and a short or long course all look the same to it. It only sees how the runners in the race did against their own usual form.</span></p>
       <div class="race-ctl">
         <div class="switch" role="group" aria-label="Boys or girls">
           <button data-rg="M" aria-pressed="true">Boys</button>

@@ -152,6 +152,11 @@ a race table for everyone after a weekend, and About for the proof.
   time ("about 19 seconds for a 17:00 runner"). Headings are "vs avg race" and
   "at Lane", and the note says the middle column leaves Lane out: a reader
   asked whether "30s slow" already included Lane's 1.9%. It does not.
+- **Races carries a "!" note under the heading** (`.race-caveat`), at the
+  owner's request: a rating does not know *why* a race was fast or slow -
+  weather, hills, altitude, the competition and a mismeasured course all look
+  the same - only how its runners did against their own form. Worded so it
+  does not claim the rating ignores those things; it measures them together.
 - **Races sorts by heading**: date newest first, race A-Z, and "that day" or the
   Lane time with the slowest race first; a second tap reverses (`RACE_SORT`).
 - **Races** (`#p-races`) spans every classification, so `#ctl` hides there as it
