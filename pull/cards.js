@@ -8,7 +8,7 @@
 // never sees the hash and never runs the page's script, so every link to the
 // site previews as the same generic card. A small static page per team carries
 // that team's own title, description and picture, and sends a person (who does
-// run script) straight on to the board with the card revealed.
+// run script) straight on to that team's page on the site.
 //
 // The numbers come from the latest Called it snapshot when it was taken from
 // this exact database and model, so a card and the archive say the same thing.
@@ -417,7 +417,8 @@ function boardOdds(html, runs) {
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 function page({ name, cls, g, slug, odds, through }) {
   const side = g === 'M' ? 'boys' : 'girls';
-  const hash = '/#' + encodeURIComponent(cls) + '/' + side + '/' + encodeURIComponent(name);
+  // the team's own page, not the board: somebody opening a team's link came for that team
+  const hash = '/#' + encodeURIComponent(cls) + '/' + side + '/' + encodeURIComponent(name) + '/team';
   const title = name + ' ' + side + ' · ' + cls + ' state odds · Chute';
   const desc = odds
     ? pc(odds[2]) + ' to win the ' + cls + ' ' + side + ' title, ' + pc(odds[0]) + ' to reach Lane. From results through ' + shortDate(through) + '.'

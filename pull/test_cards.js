@@ -39,7 +39,7 @@ for (const t of all) {
     const h = (s.match(/location\.replace\("([^"]+)"\)/) || [])[1] || '';
     // the hash the stub sends people to must read back as this school on this board
     const seg = h.replace(/^\/#/, '').split('/').map(decodeURIComponent);
-    if (seg[0] === t.cls && seg[1] === (t.g === 'M' ? 'boys' : 'girls') && seg[2] === t.name
+    if (seg[0] === t.cls && seg[1] === (t.g === 'M' ? 'boys' : 'girls') && seg[2] === t.name && seg[3] === 'team'
         && s.includes('/t/img/' + a + '.png')) hashes++;
     else console.log('  stub wrong: ' + a + ' -> ' + h);
   }

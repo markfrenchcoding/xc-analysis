@@ -3703,10 +3703,10 @@ names a team in the hash (`#6A/boys/Grant`), and a link-preview crawler
 `pull/cards.js` writes, for every school on every board (452 today):
 
 - `t/<slug>.html` - that team's own `og:`/`twitter:` title, description and
-  image, `noindex`, and a `location.replace` to `/#6A/boys/Grant` (meta refresh
+  image, `noindex`, and a `location.replace` to `/#6A/boys/Grant/team` (meta refresh
   inside `<noscript>`, because some crawlers follow a meta refresh and would
-  lose the tags). People run the script and land on the board, which runs and
-  reveals the card.
+  lose the tags). People run the script and land on that school's Team page:
+  somebody opening a team's link came for that team, not the board.
 - `t/img/<slug>.png` - 1200x630: wordmark, board, school name as large as one
   line allows, league, then wins state / reaches Lane / points when there, the
   same three a board card leads with, and the left rail as the chance of
