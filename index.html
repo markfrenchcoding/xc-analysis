@@ -428,6 +428,11 @@ a.tlink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .drow .nm a.tlink{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fsw{margin-bottom:9px}
 .fsw button{font-size:11px;padding:7px 4px}
+.acc-note{margin:-2px 0 12px;font-size:12.5px;color:var(--muted)}
+.acc-link{color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:600}
+/* The first column holds on a narrow screen, so a row keeps its name while the
+   weeks scroll past it. */
+.fwd-tbl th:first-child,.fwd-tbl td:first-child,.rec-tbl.wide th:first-child,.rec-tbl.wide td:first-child{position:sticky;left:0;z-index:1;background:var(--bg);padding-right:10px}
 .fwd-tbl td:first-child{white-space:nowrap}.fwd-tbl th .rsort{padding:6px 0;gap:0;text-align:inherit}.fwd-tbl th .rsort i{min-width:0}.fwd-tbl th .rsort.on i{margin-left:3px}.fwd-tbl th+th .rsort{flex-direction:row}.fwd-tbl th .fwd-wk{display:block;font-size:9.5px;opacity:.75;letter-spacing:.04em}.fwd-tbl i.fwd-up,.fwd-tbl i.fwd-dn{font-style:normal;font-size:9px;margin-left:3px;vertical-align:1px}.fwd-up{color:var(--accent)}.fwd-tbl sup.fwd-mod{color:var(--muted);font-size:8px;margin-left:2px}.fwd-dn{color:var(--muted)}.fwd-tbl td.fwd-chg{white-space:nowrap;font-size:12.5px}.fwd-tbl td.fwd-flat{color:var(--dim)}
 .rec-note{font-size:10.5px;color:var(--dim);margin:6px 0 0;line-height:1.45}
 .rec-chart{width:100%;height:auto;display:block;margin:6px 0 2px}
@@ -11476,6 +11481,7 @@ function buildBoard(tally){
   box.innerHTML=`
     <h2 class="sec">Odds by team</h2>
     <p class="sub2">Points are a team's average score in the seasons it reaches Lane, so a team that rarely gets there can still show a good one. The OSAA chip on each card is that team&rsquo;s place in the OSAAtoday coaches poll, a separate opinion from ours${pollWhen()?" ("+pollWhen()+")":""}. The bars show where it finished across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
+    <p class="acc-note">${CLS==="6A"?"":"No past seasons have been scored on this board yet. The track record covers 6A. "}<a href="#" class="acc-link">How accurate is this?</a></p>
     <div class="legend">
       <span><i style="background:var(--t1)"></i>1st</span>
       <span><i style="background:var(--t2)"></i>2nd</span>
@@ -12991,12 +12997,19 @@ function renderRecord(){
 
   /* Four plain answers, not four statistics. Each tile leads with the thing a
      reader can check and says in words what would count as good. */
+  /* The tiles lead with the row for where the board is today, not September's.
+     A pooled eight-week figure read as "this model is 42% skilful" in October,
+     which is false: at four or five weeks the same seasons score near 75%. */
+  const nowW0=weeksOut();
+  const T0=(R.byHorizon&&R.byHorizon.length&&nowW0!==null)
+    ?R.byHorizon.reduce((a,b)=>Math.abs(b.weeks-nowW0)<Math.abs(a.weeks-nowW0)?b:a)
+    :{weeks:R.weeksOut,found:R.found,ofField:R.ofField,champHit:R.champHit,champOf:R.champOf,skill:R.skill};
   const tiles=[
-    [R.found+" of "+R.ofField,
-     "teams that really made it to Lane were in our top group "+R.weeksOut+" weeks out"],
-    [R.champHit+" of "+R.champOf,
-     "times our "+R.weeksOut+"-week favourite actually won"],
-    [R.skill+"% better",
+    [T0.found+" of "+T0.ofField,
+     "teams that really made it to Lane were in our top group "+T0.weeks+" weeks out"],
+    [T0.champHit+" of "+T0.champOf,
+     "times our "+T0.weeks+"-week favourite actually won"],
+    [T0.skill+"% better",
      "than simply guessing that every team has an average chance"],
     [R.runs.toLocaleString(),
      "seasons played out for each board we scored"],
@@ -14038,6 +14051,19 @@ FAN.addEventListener("keydown",e=>{
   else if(e.key==="Tab"){fanClose(false);}
 });
 SCRIM.onclick=()=>fanClose(false);
+/* "How accurate is this?" on the board opens the Track record directly, so the
+   proof is one tap from the numbers rather than hidden behind About's menu. */
+function openRecord(){
+  fanClose(false);
+  selectTab(ABOUT_BTN);
+  const v=document.querySelector('#p-doc .vsw button[data-view="v-record"]');
+  if(v)v.click();
+}
+document.addEventListener("click",e=>{
+  const a=e.target.closest&&e.target.closest("a.acc-link");
+  if(!a)return;
+  e.preventDefault();openRecord();
+});
 
 /* The pill under the pressed tab slides to the next one, and the new panel
    comes in from the side its tab sits on: to the right of where you were, it

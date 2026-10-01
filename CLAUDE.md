@@ -202,6 +202,16 @@ a race table for everyone after a weekend, and About for the proof.
 - At 375px each tab is 59px wide and 46px tall beside an 87px Run (49px at 320),
   in the same place on every tab.
 
+**The proof is one tap from the board** (Oct 1, after an outside UX review).
+Under the Teams legend, `.acc-note` carries "How accurate is this?", which
+`openRecord()` takes straight to Track record; on every board but 6A it first
+says no past seasons have been scored there yet. The Track record tiles now lead
+with the `RECORD.byHorizon` row nearest today rather than September's, because
+an eight-week 42% read in October as the model's one accuracy. The Called it
+grid and the per-season table hold their first column (`position:sticky`) so a
+row keeps its name when the weeks scroll. When the all-classification backtest
+lands, the non-6A sentence has to change with it.
+
 **About fans out.** It is the one tab holding three different things, so a tap
 offers How it works, Track record and Called it as three cards that rise out of
 the button and settle, bottom first - transform and opacity only, the overshoot
