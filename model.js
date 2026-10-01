@@ -171,6 +171,11 @@ function parseCSV(text){
   return {rows,bad};
 }
 
+function bestRun(marks){
+  const five=marks.filter(m=>!m.mi), pool=five.length?five:marks;
+  return pool.reduce((x,y)=>y.raw<x.raw?y:x);
+}
+
 function buildModel(g,dist){
   const byTeam=new Map();
   for(const r of DATA){
@@ -186,9 +191,14 @@ function buildModel(g,dist){
   for(const t of byTeam.values())
     for(const a of t.values()){
       a.marks.sort((x,y)=>x.v-y.v);
+      /* The season best a reader sees is the fastest time actually run, taken
+         before the slice: the model ranks on rated marks, and the best RATED
+         race is often not the fastest one (16:16 on a 9%-slow course rates
+         ahead of 15:30 on a fast one). A 5,000m best wins over a 3-mile one. */
+      const pr=bestRun(a.marks);
+      a.sbRaw=pr.raw;                   // what they actually ran, for display -
+      a.sbMi=pr.mi;                     // never the converted figure
       a.marks=a.marks.slice(0,3);       // top three of the season
-      a.sbRaw=a.marks[0].raw;           // what they actually ran, for display -
-      a.sbMi=a.marks[0].mi;             // never the converted figure
       a.marks=a.marks.map(m=>m.v);
       if(a.marks.length===1) a.marks=[a.marks[0]*(1+LONE)];
       a.sb=a.marks[0];

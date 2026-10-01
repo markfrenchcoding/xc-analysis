@@ -879,6 +879,14 @@ penalty *on top of* what ships, so a healthy re-run should prefer 0%.
 which is what the Runners board and the what-if roster display. Never show `sb`
 to a reader; it carries the regression.
 
+**`sbRaw` is the fastest time actually run (`bestRun`), and for weeks it was
+not.** It was the raw time of the best *rated* mark, which since race ratings is
+often a different race: Gus Kirby showed 16:16 (Ultimook, rated 9% slow) where
+he ran 15:30 at the Mook. An audit on Sep 30 found **972 of 3,562** athletes
+showing a "best" that was not their best, 639 of them by 20s or more. It is taken
+before the top-three slice, a 5,000m best beats a 3-mile one, and `draftPool` and
+`stateModel` use the same helper. Nothing the model runs on changed.
+
 **A correction worth recording.** The first measurement of this effect compared
 simulated rank against *season-best* rank and reported a seventeen-place gap.
 That baseline is itself biased: a season best is a minimum, and a minimum of two

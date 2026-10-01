@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const INDEX = process.argv[2] || 'C:/Users/markf/xc-analysis/index.html';
+const INDEX = process.argv[2] || path.join(__dirname, 'index.html');
 const OUTDIR = process.argv[3] || __dirname;
 
 const html = fs.readFileSync(INDEX, 'utf8');
@@ -21,7 +21,7 @@ const WANT = [
   'NEXT_SEASON',
   // and these, for the 3-mile setting, which is off unless a caller turns it on
   'MILES_3', 'MI_FACTOR', 'MI_PEN', 'MILES_ON',
-  'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'buildModel', 'scoreMeet',
+  'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'bestRun', 'buildModel', 'scoreMeet',
   'SK_HI', 'SK_MEAN', 'SK_SD',
   'playDistricts', 'playState', 'skew', 'spare', 'gauss', 'pickMark', 'draw', 'shift',
   'oneSeason', 'blankTally', 'runnerTally',
