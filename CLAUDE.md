@@ -4459,7 +4459,9 @@ archived". Nothing is dropped from `SNAPSHOTS` - this is display only.
 
 **Arrows say which way a team moved since the week before**, up always better
 (turned round on Points and Runners, where smaller wins), nothing under a
-point or a place. A **change** column runs from the first week on the current
+point or a place. **The comparison is on the numbers as printed** (`shown`),
+not the stored tenths: 575 against 584 is under a point but prints as 57% and
+58%, and a reader saw two different numbers marked as no change. A **change** column runs from the first week on the current
 model to the latest. **Arrows skip any step into a week where the model
 changed** and that column carries a diamond: Sep 12 to Sep 19 had every team
 falling because the horizon allowance arrived, which is us, not the season.

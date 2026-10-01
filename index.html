@@ -12731,9 +12731,13 @@ function renderForward(){
      or a place on the Runners board, get none. */
   const lowerBetter=FWD_K==="pts"||FWD_K==="run";
   const step=FWD_K==="pts"?3:10;
+  /* Arrows and the change column compare the numbers as printed. Comparing the
+     stored tenths let 57% beside 58% (575 against 584) read as no change. */
+  const pctView=FWD_K!=="pts"&&FWD_K!=="run";
+  const shown=v=>v==null||!pctView?v:v>=995?1000:v<100?Math.round(v):Math.round(v/10)*10;
   const arrow=(prev,v)=>{
     if(prev==null||v==null)return "";
-    const dlt=lowerBetter?prev-v:v-prev;
+    const dlt=lowerBetter?shown(prev)-shown(v):shown(v)-shown(prev);
     if(Math.abs(dlt)<step)return "";
     return dlt>0?'<i class="fwd-up" aria-label="up">\u25B2</i>':'<i class="fwd-dn" aria-label="down">\u25BC</i>';
   };
@@ -12742,7 +12746,7 @@ function renderForward(){
     const got=vals.filter((v,i)=>v!=null&&i>=base);
     if(cols.length<2)return "";
     if(got.length<2)return '<td class="fwd-chg">\u2014</td>';
-    const a=got[0],b=got[got.length-1],dlt=lowerBetter?a-b:b-a;
+    const a=shown(got[0]),b=shown(got[got.length-1]),dlt=lowerBetter?a-b:b-a;
     if(Math.abs(dlt)<step)return '<td class="fwd-chg fwd-flat">even</td>';
     return '<td class="fwd-chg '+(dlt>0?"fwd-up":"fwd-dn")+'">'+(dlt>0?"\u25B2 ":"\u25BC ")+fmtD(dlt)+'</td>';
   };
