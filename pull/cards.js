@@ -199,6 +199,11 @@ const circle = (cx, cy, r, ccw = false, n = 72) => {
   return p;
 };
 const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+const roundRect = (x, y, w, h, r, ccw = false) => {
+  const p = [], arc = (cx, cy, a0) => { for (let i = 0; i <= 12; i++) { const a = a0 + Math.PI / 2 * i / 12; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } };
+  arc(x + w - r, y + r, -Math.PI / 2); arc(x + w - r, y + h - r, 0); arc(x + r, y + h - r, Math.PI / 2); arc(x + r, y + r, Math.PI);
+  return ccw ? p.reverse() : p;
+};
 
 /* ---------------- raster ---------------- */
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -215,10 +220,12 @@ function fill(px, polys, color) {
   let y0 = Infinity, y1 = -Infinity, x0 = Infinity, x1 = -Infinity;
   for (const p of polys) for (let i = 0; i < p.length; i++) {
     const a = p[i], b = p[(i + 1) % p.length];
-    if (a[1] === b[1]) continue;
-    edges.push(a[1] < b[1] ? [a[0], a[1], b[0], b[1], 1] : [b[0], b[1], a[0], a[1], -1]);
+    // the box first: a corner whose only outgoing edge is flat still bounds the shape
+    // (skipping it clipped the left stroke of every W)
     y0 = Math.min(y0, a[1]); y1 = Math.max(y1, a[1]);
     x0 = Math.min(x0, a[0]); x1 = Math.max(x1, a[0]);
+    if (a[1] === b[1]) continue;
+    edges.push(a[1] < b[1] ? [a[0], a[1], b[0], b[1], 1] : [b[0], b[1], a[0], a[1], -1]);
   }
   if (!edges.length) return;
   const ys = Math.max(0, Math.floor(y0)), ye = Math.min(H - 1, Math.ceil(y1));
@@ -314,7 +321,17 @@ const shortDate = iso => {
   const [, mo, d] = iso.split('-').map(Number); return m[mo - 1] + ' ' + d;
 };
 
-function drawCard({ name, cls, g, league, odds, through }) {
+/* Where a team stands on its board by chance of winning, ties broken on reaching
+   Lane. Only worth printing for a team with a real chance: nobody shares #31. */
+function rankOf(board, name) {
+  if (!board || !board[name] || board[name][2] < 10) return null;
+  // out of every team on the board, the same count the board's own cards show
+  const rows = Object.entries(board)
+    .sort((a, b) => (b[1][2] - a[1][2]) || (b[1][0] - a[1][0]));
+  return { r: rows.findIndex(([n]) => n === name) + 1, of: rows.length };
+}
+
+function drawCard({ name, cls, g, league, odds, through, rank, poll }) {
   const px = canvas(C.bg);
   const L = 72;                                  // left edge of the type
   // the rail: chance of reaching Lane, read as a height, the same as a board card
@@ -330,10 +347,14 @@ function drawCard({ name, cls, g, league, odds, through }) {
   }
   fill(px, textPolys(BOLD, 'CHUTE', mx + 72, 88, 40, { track: 1, skew: Math.tan(8 * Math.PI / 180) }), C.text);
 
-  // the board, top right
-  const board = (cls + ' ' + (g === 'M' ? 'BOYS' : 'GIRLS'));
+  // the board, top right, led by where the team stands on it when that is worth saying
+  const board = (rank ? ' OF ' + rank.of + ' TO WIN ' : '') + cls + ' ' + (g === 'M' ? 'BOYS' : 'GIRLS');
   const bw = measure(MED, board, 26, 3);
   fill(px, textPolys(MED, board, W - 64 - bw, 82, 26, { track: 3 }), C.muted);
+  if (rank) {
+    const rs = '#' + rank.r, rw = measure(BOLD, rs, 44, 0);
+    fill(px, textPolys(BOLD, rs, W - 64 - bw - rw, 84, 44), C.accent);
+  }
 
   // the school, as large as it will go on one line
   const title = name.toUpperCase();
@@ -341,7 +362,19 @@ function drawCard({ name, cls, g, league, odds, through }) {
   while (size > 48 && measure(BOLD, title, size, -size * 0.01) > W - L - 64) size -= 2;
   const nameBase = 268;
   fill(px, textPolys(BOLD, title, L - size * 0.03, nameBase, size, { track: -size * 0.01 }), C.text);
-  fill(px, textPolys(MED, league + ' · Oregon cross country', L, nameBase + 50, 28), C.muted);
+  // the coaches' poll, a second opinion beside the model's, outlined like the board's chip
+  let room = W - 64 - L;
+  if (poll) {
+    const ps = poll.label, pw = measure(MED, ps, 22, 2) + 36, ph = 44, py = nameBase + 50 - 31;
+    const px0 = W - 64 - pw;
+    fill(px, [roundRect(px0, py, pw, ph, 10), roundRect(px0 + 2, py + 2, pw - 4, ph - 4, 8, true)], C.line);
+    fill(px, textPolys(MED, ps, px0 + 18, py + 30, 22, { track: 2 }), C.text);
+    room = px0 - 24 - L;
+  }
+  let sub = league + ' · Oregon cross country';
+  if (measure(MED, sub, 28) > room) sub = league;
+  let ss = 28; while (ss > 18 && measure(MED, sub, ss) > room) ss--;
+  fill(px, textPolys(MED, sub, L, nameBase + 50, ss), C.muted);
 
   if (odds) {
     // three numbers, the same three a board card leads with
@@ -415,13 +448,14 @@ function boardOdds(html, runs) {
 
 /* ---------------- the page ---------------- */
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-function page({ name, cls, g, slug, odds, through }) {
+function page({ name, cls, g, slug, odds, through, rank }) {
   const side = g === 'M' ? 'boys' : 'girls';
   // the team's own page, not the board: somebody opening a team's link came for that team
   const hash = '/#' + encodeURIComponent(cls) + '/' + side + '/' + encodeURIComponent(name) + '/team';
   const title = name + ' ' + side + ' · ' + cls + ' state odds · Chute';
   const desc = odds
-    ? pc(odds[2]) + ' to win the ' + cls + ' ' + side + ' title, ' + pc(odds[0]) + ' to reach Lane. From results through ' + shortDate(through) + '.'
+    ? pc(odds[2]) + ' to win the ' + cls + ' ' + side + ' title' + (rank ? ' (#' + rank.r + ' of ' + rank.of + ')' : '')
+      + ', ' + pc(odds[0]) + ' to reach Lane. From results through ' + shortDate(through) + '.'
     : 'Not enough 5,000m runners yet to field a team. From results through ' + shortDate(through) + '.';
   const img = SITE + '/t/img/' + slug + '.png?d=' + through;
   return '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">\n'
@@ -454,6 +488,10 @@ if (require.main === module) {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   const CLASSES = require('./seed.js').parseClasses(html).CLASSES;
   const { through, boards } = boardOdds(html, runs);
+  // the coaches' poll as the site carries it; 0 is "receiving votes"
+  const POLL = (() => { const m = html.match(/\nconst POLL=(\{[^\n]*\});\r?\n/); try { return m ? JSON.parse(m[1]) : {}; } catch (e) { return {}; } })();
+  const kind = (html.match(/const POLL_KIND="([^"]*)"/) || [, ''])[1];
+  const pollName = (kind ? kind.toUpperCase() + ' ' : 'COACHES ') + 'POLL';
   if (!through) { console.error('could not read DATA_DATE'); process.exit(1); }
   fs.mkdirSync(IMG, { recursive: true });
   const seen = new Map(), keep = new Set();
@@ -466,8 +504,11 @@ if (require.main === module) {
       seen.set(slug, name); keep.add(slug);
       if (only && !slug.includes(only)) continue;
       const b = boards[cls + '|' + g], odds = b && b[name] ? b[name] : null;
-      fs.writeFileSync(path.join(IMG, slug + '.png'), drawCard({ name, cls, g, league, odds, through }));
-      fs.writeFileSync(path.join(OUT, slug + '.html'), page({ name, cls, g, slug, odds, through }));
+      const rank = rankOf(b, name);
+      const pr = POLL[cls + '|' + g] && name in POLL[cls + '|' + g] ? POLL[cls + '|' + g][name] : null;
+      const poll = pr == null ? null : { label: pollName + (pr ? ' #' + pr : ' \u00b7 VOTES') };
+      fs.writeFileSync(path.join(IMG, slug + '.png'), drawCard({ name, cls, g, league, odds, through, rank, poll }));
+      fs.writeFileSync(path.join(OUT, slug + '.html'), page({ name, cls, g, slug, odds, through, rank }));
       n++;
     }
   }
@@ -479,4 +520,4 @@ if (require.main === module) {
   console.log(n + ' cards written, results through ' + through);
 }
 
-module.exports = { slugOf, loadFont, drawCard, page };
+module.exports = { slugOf, loadFont, drawCard, page, rankOf };

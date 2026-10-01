@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-const { slugOf, drawCard, page } = require('./cards.js');
+const { slugOf, drawCard, page, rankOf } = require('./cards.js');
 const CLASSES = require('./seed.js').parseClasses(html).CLASSES;
 
 let pass = 0, fail = 0;
@@ -66,5 +66,10 @@ const pg = page({ name: 'A "B" <C>', cls: '6A', g: 'M', slug: 'x', odds: null, t
 ok(!/<C>/.test(pg) && pg.includes('&lt;C&gt;'), 'page escapes the name');
 ok(pg.includes('noindex'), 'pages stay out of search');
 
+// the rank: by chance of winning, ties on reaching Lane, out of every team, and only with a real chance
+const bd = { A: [1000, 1000, 500, 40], B: [1000, 900, 300, 60], C: [990, 800, 300, 70], D: [500, 0, 5, 200], E: [0, 0, 0, 0] };
+ok(JSON.stringify(rankOf(bd, 'A')) === '{"r":1,"of":5}', 'rank 1 of 5');
+ok(rankOf(bd, 'C').r === 3 && rankOf(bd, 'B').r === 2, 'a tie on winning breaks on reaching Lane');
+ok(rankOf(bd, 'D') === null && rankOf(bd, 'E') === null && rankOf(bd, 'Z') === null, 'no rank under 1% to win');
 console.log(pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

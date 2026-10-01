@@ -3711,6 +3711,16 @@ names a team in the hash (`#6A/boys/Grant`), and a link-preview crawler
   line allows, league, then wins state / reaches Lane / points when there, the
   same three a board card leads with, and the left rail as the chance of
   reaching Lane. A team that cannot field five says so instead.
+- Two more things, at the owner's request, both only when they apply. **The rank**
+  top right, "#3 of 45 to win 6A boys": by chance of winning, ties broken on
+  reaching Lane, out of every team on the board, and only from 1% to win up -
+  nobody shares #31 (`rankOf`). **The coaches' poll** as an outlined chip beside
+  the league, "Preseason poll #10" or "· votes" for receiving votes, read from
+  `POLL`/`POLL_KIND` in index.html; an unranked team shows nothing, the same
+  rule as the board. The league line drops " · Oregon cross country", then
+  shrinks, to clear the chip.
+- The fill's bounding box has to take every corner, flat edge or not. Skipping
+  flat edges first clipped the left stroke of every W on every card.
 
 `vercel.json` rewrites `/t/:slug` to `/t/:slug.html`, so the shared address is
 `chutexc.vercel.app/t/6a-boys-grant`. The image URL carries `?d=<DATA_DATE>`
@@ -3719,7 +3729,7 @@ because every platform caches previews hard and the picture changes weekly.
 **The slug rule exists twice** - `slugOf` in `cards.js`, `teamSlug` in
 `index.html` - and `pull/test_cards.js` lifts the page's copy by text and checks
 all 452 agree, are unique, have a page and a 1200x630 PNG, and send people to
-their own school. 918 checks.
+their own school. 921 checks.
 
 **The numbers are the archive's when they can be.** If the newest `SNAPSHOTS`
 entry was taken from this database (`through` and `marks` match) on the current
