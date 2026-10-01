@@ -11429,6 +11429,11 @@ function pollWhen(){
   return kind?(kind+", voted "+when):("voted "+when);
 }
 
+/* A signed gap in seconds. It used to be "+" glued to a number, which printed
+   "+-19.6s" for a runner simulated faster than their best: a runner whose only
+   race was rated slow is one. */
+function sgn(x){const v=Math.round(x*10)/10;return (v>0?"+":v<0?"\u2212":"")+Math.abs(v).toFixed(1)+"s";}
+
 function pollChip(name){
   const p=(typeof POLL!=="undefined"&&POLL[CLS+"|"+gender])||null;
   if(!p||!(name in p))return '<i class="poll-gap"></i>';
@@ -13272,7 +13277,7 @@ function showTeam(idx){
       +'<span class="td-t">'+fmt(r.sbRaw)+'</span>'
       +'<span class="td-t sim">'+(n?fmt(sim):"—")+'</span>'
       // against the 5k the model was handed, or a 3-mile best reads as +40s
-      +'<span class="td-t">'+(n?"+"+(sim-(r.sbMi?r.sbRaw*MI_FACTOR:r.sbRaw)).toFixed(1)+"s":"")+'</span>'
+      +'<span class="td-t">'+(n?sgn(sim-(r.sbMi?r.sbRaw*MI_FACTOR:r.sbRaw)):"")+'</span>'
       +'</div>';
   }).join("");
   const avg=n?row.ptsSum/n:0;
