@@ -142,6 +142,14 @@ a race table for everyone after a weekend, and About for the proof.
   is rebuilt twice a second. A team that cannot field five has no Team page, so
   `teamOk` keeps its name plain on the current board. The team cards are not
   linked: a tap opens the overlay, which already carries the team-page button.
+- **A team with uncounted 3-mile runners says so where its number is** (Oct 1).
+  `miHint` puts a line and a "Count 3-mile races" button in the team panel and
+  on the Team tab when the setting is off and any runner's scaled 3-mile time
+  beats their rated 5k best or they have no 5k. Crater boys sat at 0% to win
+  while first in the coaches' poll, with the reason folded away in the dials.
+- **A shared link below 6A opened under a 6A header** until Oct 1: `syncHead`
+  ran in `loadSeed`, before the hash set the board. Every share card for 5A and
+  below lands on such a link. It runs again after `setClass` now.
 - **Every tab switch goes through `selectTab`.** The school search called its own
   copy of the panel toggle, so the pill stayed on Team while Odds was showing and
   Run kept whatever state the last tab left. It passes `keepScroll` instead, so
@@ -3532,6 +3540,22 @@ Kept here so nobody has to rediscover them.
 - **Per division rather than per meet** could not be tested: the backtest's season
   grid carries a division name only for the championships (14 of 153 meet-genders
   in 2024). It needs the slow meet-by-meet pull.
+- **Rough courses, Sep 30.** Ultimook and Three Course Challenge rate about 9%
+  slow and are right on average, but individual results there scatter twice
+  as widely as at a normal meet (IQR 6-7% against 3-4%), and `MARK_W` leans on
+  each runner's best rated race, so a good day on a rough course goes straight
+  into the odds: Neah-Kah-Nie's three runners held 89% of the 3A boys'
+  individual title between them, Knappa's 85% in 2A/1A. Two fixes were scored
+  on the four seasons' race-rated seeds with paired random draws:
+  **capping** a best mark at N% inside the next-best (2, 3, 4, 6%) was worse at
+  every N, for qualifying and for winning; and **shrinking marks from
+  high-scatter races** toward the runner's median, by (median scatter / race
+  scatter)^2, won the win predictions in about 80% of bootstrap draws and lost
+  the qualifying ones in about 70%. Neither shipped. The sensitive test is
+  `athlete_level.js`, which needs `backtest/raw/` (gitignored, rebuilt by
+  `pull_season.js` from a home connection); run the shrink there before
+  deciding again. A cap throws away real late-season breakthroughs, which is
+  why it lost.
 - **Per classification** could not be tested: every backtest season is 6A.
   Pulling 5A and 4A for the same seasons is about 1,000 requests; the right
   design is one algorithm with each classification's parameters shrunk toward it

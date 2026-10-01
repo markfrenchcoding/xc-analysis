@@ -416,6 +416,11 @@ body.nextseason.miles #wiOut::before{content:"Next season \2014  seniors graduat
 .fwd-tm{font-style:normal;color:var(--dim);font-size:10.5px;margin-left:6px}
 /* a school's name opens its Team page: same colour as the words around it, a
    faint underline so it reads as tappable, the accent under a finger or pointer */
+.mi-hint{margin:12px 0 4px;padding:10px 12px;border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);
+  border-radius:0 8px 8px 0;font-size:13px;line-height:1.45;color:var(--text);text-align:left}
+.mi-hint .mi-on{display:block;margin-top:8px;font:inherit;font-weight:600;color:var(--accent);background:none;
+  border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:999px;padding:6px 12px;cursor:pointer}
+.mi-hint .mi-on:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
 a.tlink{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
   text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);cursor:pointer;border-radius:3px}
 a.tlink:hover{color:var(--accent);text-decoration-color:currentColor}
@@ -12060,7 +12065,8 @@ function syncStand(team,q){
     el.innerHTML=`<div class="stand"><div><b>${Math.round(100*q)}%</b><i>reaches Lane</i></div></div>
       <p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}. Run the board for the chance of winning and the points.</p>`;
   }else el.innerHTML=`<p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}</p>`;
-  el.insertAdjacentHTML("beforeend",'<button class="gl-share">Share '+team.name+'\u2019s odds</button>');
+  el.insertAdjacentHTML("beforeend",miHint(team.name)+'<button class="gl-share">Share '+team.name+'\u2019s odds</button>');
+  wireMiHint(el);
   const sh=el.querySelector(".gl-share");
   sh.onclick=()=>shareTeam(team.name,sh);
 }
@@ -13362,9 +13368,11 @@ function showTeam(idx){
       :'Did not reach Lane in any of the '+done.toLocaleString()+' simulated seasons, so there is no time to show. ')
     +'The simulated column is a time at Lane, which usually runs about '+((LANE_F-1)*100).toFixed(1)+'% slower than an average course, averaged over only the seasons this team reached Lane, the same slice the points figure uses'
     +(tm.roster.length>SC?'. Only the first '+SC+' score':'')+'.</div>'
+    +miHint(tm.name)
     +'<button class="gl-go" data-team="'+tm.name+'">'+tm.name+'\u2019s team page \u2192</button>'
     +'<button class="gl-share" data-team="'+tm.name+'">Share '+tm.name+'\u2019s odds</button>'
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  wireMiHint(el);
   const go=el.querySelector(".gl-go");
   if(go)go.onclick=e=>{e.stopPropagation();closeRace();goTeam(go.dataset.team);};
   const sh=el.querySelector(".gl-share");
@@ -13909,6 +13917,39 @@ function setMiles(on){
    The board on screen, by name, because that is the board it changes; the rest
    of the state as a count, because a list of every school that ever ran 3 miles
    would be longer than the dials. */
+/* A team whose best runners have raced 3 miles reads oddly when the board
+   leaves those races out: Crater boys sat at 0% while first in the coaches'
+   poll, with the reason folded away in the settings. So the team panel and the
+   Team tab say so where the number is. A runner counts when their 3-mile time,
+   scaled the way the setting would scale it, beats their rated 5k best, or they
+   have no 5k at all. */
+function miMissing(team){
+  if(MILES_ON)return [];
+  const by=new Map();
+  for(const r of DATA){
+    if(r.cls!==CLS||r.g!==gender||r.team!==team)continue;
+    if(NEXT_SEASON&&String(r.grade).trim()==="12")continue;
+    const a=by.get(r.name)||{name:r.name,k5:Infinity,mi:Infinity};
+    if(r.dist===MILES_3)a.mi=Math.min(a.mi,r.sb*MI_FACTOR);else if(r.dist===DIST)a.k5=Math.min(a.k5,r.sb/(r.f||1));
+    by.set(r.name,a);
+  }
+  return [...by.values()].filter(a=>a.mi<a.k5);
+}
+function miHint(team){
+  const m=miMissing(team);
+  if(!m.length)return "";
+  const who=m.length===1?m[0].name+" has":m.length+" "+team+" runners have";
+  return '<div class="mi-hint">'+who+' run faster over 3 miles than in any 5k, or only raced 3 miles. '
+    +'The board leaves 3-mile races out unless you count them. '
+    +'<button class="mi-on" type="button">Count 3-mile races</button></div>';
+}
+function wireMiHint(el){
+  const b=el&&el.querySelector(".mi-on");
+  if(b)b.onclick=e=>{e.stopPropagation();closeRace();
+    const on=document.querySelector('.seg button[data-mi="1"]');if(on)on.click();
+    // the Team tab's own answers were for the board without them
+    autoBeat();};
+}
 function syncMiNote(){
   const el=document.getElementById("miNote");
   if(!el)return;
@@ -14090,7 +14131,9 @@ loadSeed();
   const h=readHash();
   if(!h)return;
   CLS=h.cls;gender=h.g;
-  setClass(CLS,gender);
+  // syncHead already ran in loadSeed, on the default board: run it again or
+  // every shared 5A-and-below link opens under a 6A header
+  setClass(CLS,gender);syncHead();
   document.querySelectorAll(".clsw button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===CLS));
   document.querySelectorAll(".switch button[data-g]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.g===gender));
   if(h.team&&!h.page){FOCUS=h.team;PENDING_TEAM=h.team;}
