@@ -72,4 +72,9 @@ echo crawl failed with %CODE% >> "%LOG%"
 
 :done
 echo exit %CODE% >> "%LOG%"
+
+rem One-off, and only until it has worked: the 2022-2025 history every
+rem classification's backtest is built from. About 45 minutes, after the crawl
+rem has finished, so it never competes with it. It commits only backtest\hist.
+if not exist backtest\hist\2025-results.csv.gz call backtest\pull-history.cmd auto
 endlocal

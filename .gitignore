@@ -34,3 +34,6 @@ backtest/data/*-race-0.5.csv
 backtest/data/*-race-1.5.csv
 backtest/data/*-trend*.csv
 backtest/data/*-drace*.csv
+
+# the history pull's log, per machine
+backtest/pull-history.log

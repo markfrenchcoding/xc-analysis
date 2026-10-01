@@ -17,3 +17,6 @@
 # pull/roster/ is safe to list. No site needs it - each page embeds everything
 # - and it sits above every school project's root anyway.
 pull/roster/
+
+# backtest history: no site reads it, and it sits above every school project's root
+backtest/hist/

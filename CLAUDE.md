@@ -4891,6 +4891,40 @@ Not yet pulled: 2023 and earlier. The direction of every finding above is settle
 pinned only to about a point either way. 2023 is worth more held back as a clean
 holdout for whatever drift term gets built than folded in now.
 
+## Backtesting every classification (in progress, Oct 1)
+
+Everything in `backtest/` is 6A because `pull_season.js` needs each season's
+eight championship meet ids typed into `seasons.json`, and nobody has typed the
+other forty leagues'. `backtest/pull_history.js` asks for everything instead:
+GetTree on Oregon, every school's season grid for 2022-2025 (one GET each), then
+the championships found in what came back - November meets named "state", and
+every meet three or more schools ran in the 25 days before them, read division
+by division because only the meet endpoint says which race was varsity. Schools
+seen at a championship but missing from today's tree get pulled too. The 6A ids
+already in `seasons.json` are read whatever the window says, and the log says if
+the window would have missed one.
+
+It writes `backtest/hist/<year>-results.csv.gz`, `<year>-meets.json` and
+`tree.json`, **committed** (about 2MB), so the per-classification builds run
+here where athletic.net cannot be reached. `backtest/hist/` is in
+`.vercelignore`. It resumes from `backtest/raw/hist-<year>.jsonl` and refuses a
+year with no state meet, a state meet that never answered, or more than 2% of
+schools failing.
+
+Mark has no terminal, so it runs two ways: double-click
+`backtest/pull-history.cmd`, or the Monday `refresh.cmd` calls it once at the
+end of its run while `backtest/hist/2025-results.csv.gz` does not exist. About
+45 minutes; it commits only `backtest/hist`. The hook sits below `refresh.cmd`'s
+`git pull` line, so a run that pulls its own new version keeps reading the same
+bytes up to that point.
+
+Still to build once the data lands: class assignment per school-season (the
+state division a school raced in is authoritative; otherwise the district race
+it ran and today's `CLASSES`), per-league automatic berths per season (OSAA
+moves them, and results alone cannot tell three automatic from two plus an
+at-large), scoring depth, and whether the small-school girls' combined races in
+2025 can be scored at all.
+
 ## What the model does not know
 
 Listed in the app's own "How" tab:
