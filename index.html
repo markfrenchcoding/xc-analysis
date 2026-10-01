@@ -11432,6 +11432,12 @@ function pollWhen(){
 /* A signed gap in seconds. It used to be "+" glued to a number, which printed
    "+-19.6s" for a runner simulated faster than their best: a runner whose only
    race was rated slow is one. */
+/* The model races everyone on an average Oregon course, which is fair between
+   runners and is all the odds need. A time shown as "at Lane" has to carry Lane's
+   own slowness on top, the same factor the Races tab's Lane column uses (about
+   1.9%), or it reads twenty seconds fast and a runner whose only race was rated
+   slow appears to beat her best there. */
+const LANE_F=(typeof LANE!=="undefined"&&LANE&&LANE.factor)||1;
 function sgn(x){const v=Math.round(x*10)/10;return (v>0?"+":v<0?"\u2212":"")+Math.abs(v).toFixed(1)+"s";}
 
 function pollChip(name){
@@ -13269,7 +13275,7 @@ function showTeam(idx){
   const n=row?row.ptsN:0;
   const el=overlay();
   const body=tm.roster.map((r,k)=>{
-    const sim=n?rtm[tm.rIdx[k]]/n:0;
+    const sim=n?rtm[tm.rIdx[k]]/n*LANE_F:0;
     return '<div class="td-row'+(k>=SC?" out":"")+'">'
       +'<span class="td-pl">'+(k+1)+'</span>'
       // on its own line: the name column is too narrow on a phone to hold it
@@ -13292,7 +13298,7 @@ function showTeam(idx){
     +(n?'Reached Lane in <b>'+pct(n,done)+'</b> of '+done.toLocaleString()+' seasons, scoring <b>'
         +Math.round(avg)+'</b> points on average when it got there. '
       :'Did not reach Lane in any of the '+done.toLocaleString()+' simulated seasons, so there is no time to show. ')
-    +'The simulated column averages only the seasons this team reached Lane, the same slice the points figure uses'
+    +'The simulated column is a time at Lane, which usually runs about '+((LANE_F-1)*100).toFixed(1)+'% slower than an average course, averaged over only the seasons this team reached Lane, the same slice the points figure uses'
     +(tm.roster.length>SC?'. Only the first '+SC+' score':'')+'.</div>'
     +'<button class="gl-go" data-team="'+tm.name+'">'+tm.name+'\u2019s team page \u2192</button>'
     +'<button class="gl-share" data-team="'+tm.name+'">Share '+tm.name+'\u2019s odds</button>'
@@ -13719,7 +13725,7 @@ function paceLine(model,gi,line,res){
       :'<em><i class="pl-chip" style="background:'+teamHue(s.r.team)+'"></i>'
         +who[s.r.ri].team+'</em>';
     row.innerHTML='<span class="pl-pl">'+s.p+'</span><span class="pl-nm">'+who[s.r.ri].name
-      +' '+tag+'</span><span class="pl-t">'+fmt(s.r.t)+'</span>';
+      +' '+tag+'</span><span class="pl-t">'+fmt(s.r.t*LANE_F)+'</span>';
     feed.appendChild(row);
   };
   const finish=()=>{
@@ -13759,7 +13765,8 @@ function paceLine(model,gi,line,res){
     const e=Math.min((ts-t0)/1000*SPEED,total);
     for(const d of dots) place(d.el,e/d.t);
     rainStep(dt,(ts-t0)/1000);
-    clock.textContent=Math.floor(e/60)+":"+String(Math.floor(e%60)).padStart(2,"0");
+    const el=e*LANE_F;    // the clock reads Lane time, like the feed beneath it
+    clock.textContent=Math.floor(el/60)+":"+String(Math.floor(el%60)).padStart(2,"0");
     if(e<total)nextTick(tick);
   });
 }

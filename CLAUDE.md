@@ -152,6 +152,13 @@ a race table for everyone after a weekend, and About for the proof.
   time ("about 19 seconds for a 17:00 runner"). Headings are "vs avg race" and
   "at Lane", and the note says the middle column leaves Lane out: a reader
   asked whether "30s slow" already included Lane's 1.9%. It does not.
+- **Simulated times are on an average-course scale, so anything labelled Lane
+  multiplies by `LANE_F`** (`LANE.factor`, 1.0186). The team overlay's "at Lane"
+  column, the Dream Team feed and its race clock all do. Before Sep 30 they
+  printed the raw model time, so a runner whose only mark was on a slow day
+  looked faster "at Lane" than she had ever run (Maeve O'Scannlain, Jesuit).
+  The gap column subtracts like for like and prints through `sgn()`, which is
+  what fixed the "+-19.6s" string.
 - **Races carries a "!" note under the heading** (`.race-caveat`), at the
   owner's request: a rating does not know *why* a race was fast or slow -
   weather, hills, altitude, the competition and a mismeasured course all look
