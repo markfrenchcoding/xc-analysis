@@ -3695,6 +3695,53 @@ is on which board: 452 school-boards, matched on name or league.
 final position first, or the scroll lands on whichever team was in that slot
 while the board was still sorting.
 
+## Share cards: a page and a picture per team
+
+**A shared link used to preview as the same card for every team.** The board
+names a team in the hash (`#6A/boys/Grant`), and a link-preview crawler
+(iMessage, Facebook, Slack, X) never sees the hash and never runs script. So
+`pull/cards.js` writes, for every school on every board (452 today):
+
+- `t/<slug>.html` - that team's own `og:`/`twitter:` title, description and
+  image, `noindex`, and a `location.replace` to `/#6A/boys/Grant` (meta refresh
+  inside `<noscript>`, because some crawlers follow a meta refresh and would
+  lose the tags). People run the script and land on the board, which runs and
+  reveals the card.
+- `t/img/<slug>.png` - 1200x630: wordmark, board, school name as large as one
+  line allows, league, then wins state / reaches Lane / points when there, the
+  same three a board card leads with, and the left rail as the chance of
+  reaching Lane. A team that cannot field five says so instead.
+
+`vercel.json` rewrites `/t/:slug` to `/t/:slug.html`, so the shared address is
+`chutexc.vercel.app/t/6a-boys-grant`. The image URL carries `?d=<DATA_DATE>`
+because every platform caches previews hard and the picture changes weekly.
+
+**The slug rule exists twice** - `slugOf` in `cards.js`, `teamSlug` in
+`index.html` - and `pull/test_cards.js` lifts the page's copy by text and checks
+all 452 agree, are unique, have a page and a 1200x630 PNG, and send people to
+their own school. 918 checks.
+
+**The numbers are the archive's when they can be.** If the newest `SNAPSHOTS`
+entry was taken from this database (`through` and `marks` match) on the current
+`MODEL`, the cards use it, so a card and Called it say the same thing. Otherwise
+(a hand run, a model change) it simulates 20,000 seasons a board itself, with the
+sigma worked out the way `snapshot.js` does - **a copy of that logic, so change
+both together.** About a minute.
+
+**Poppins, not the site's faces.** The renderer is dependency-free like
+`make-icon.js`: a small TrueType reader and a scanline filler, 4 sample rows a
+pixel and exact coverage across, rounded to 32 levels so every card fits a
+palette PNG (~25KB, about 11MB for the set). Oswald and Anton live on Google's
+font servers, which an unattended job should not depend on and which this
+sandbox cannot reach; Poppins Bold/Medium are committed in `pull/fonts` with the
+OFL. To match the site exactly, drop static TTFs in and point `BOLD`/`MED` at
+them - a variable font would render at its default weight.
+
+**It runs weekly**: `refresh.cmd` calls it after the snapshot and commits `t/`
+with `index.html`. A school that leaves a board has its files deleted. The site
+offers the link from the team overlay and the Team tab ("Share Grant's odds"):
+the phone's share sheet where there is one, otherwise the link is copied.
+
 ## Worlds
 
 `oneSeason(model, worlds, sigma, times, shock, tmp)` scores N parallel worlds
@@ -4378,6 +4425,7 @@ node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
 node pull/test_roster.js     # 93 checks on the roster builder, no network
 node pull/test_whoswho.js    # 67 checks on the Who's Who parser, no network
 node backtest/test_snapshot.js   # 38 checks that the archive REFUSES, both line endings
+node pull/test_cards.js      # 918 checks that every team has a share card and one slug
 ```
 
 The two `pull` suites are quick and touch no network, so there is no reason not

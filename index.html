@@ -1194,6 +1194,10 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   background:var(--accent);color:var(--on-accent);border:0;font-family:var(--num);font-weight:700;
   font-size:15px;letter-spacing:.02em}
 #p-races{padding-bottom:10px}
+.gl-share{display:block;width:100%;margin:8px 0 2px;padding:11px;border-radius:10px;cursor:pointer;
+  background:transparent;color:var(--accent);border:1px solid var(--accent);font-family:var(--num);
+  font-weight:700;font-size:15px;letter-spacing:.02em}
+#tmStand .gl-share{margin-top:14px}
 
 /* ---------- the About fan ----------
    Three cards rise out of the About button and settle, bottom one first, on
@@ -12029,6 +12033,9 @@ function syncStand(team,q){
     el.innerHTML=`<div class="stand"><div><b>${Math.round(100*q)}%</b><i>reaches Lane</i></div></div>
       <p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}. Run the board for the chance of winning and the points.</p>`;
   }else el.innerHTML=`<p class="sub2">${lg} \u00b7 ${gender==="M"?"Boys":"Girls"} ${CLS}</p>`;
+  el.insertAdjacentHTML("beforeend",'<button class="gl-share">Share '+team.name+'\u2019s odds</button>');
+  const sh=el.querySelector(".gl-share");
+  sh.onclick=()=>shareTeam(team.name,sh);
 }
 function autoBeat(){
   if(running||!document.getElementById("p-wi").classList.contains("on"))return;
@@ -12038,6 +12045,23 @@ function autoBeat(){
 /* Straight to a school's page from anywhere: the overlay on the board, or a
    link that ends in /team. */
 let PENDING_TEAM=null;
+/* Sharing a team. A link to the board names the team in the hash, which link
+   previews never see, so every shared link used to preview as the same card.
+   /t/<slug> is a small page per school that pull/cards.js writes each week,
+   carrying that team's own title and picture, and it sends a reader straight on
+   to this board. The slug must match slugOf in pull/cards.js; test_cards.js
+   checks every school on every board. */
+const teamSlug=(cls,g,name)=>(cls+"-"+(g==="M"?"boys":"girls")+"-"+name).toLowerCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+function shareTeam(name,btn){
+  const url=location.origin+"/t/"+teamSlug(CLS,gender,name);
+  const title=name+" "+(gender==="M"?"boys":"girls")+" \u00b7 "+CLS+" state odds";
+  const say=t=>{if(!btn)return;const o=btn.textContent;btn.textContent=t;setTimeout(()=>{btn.textContent=o;},1800);};
+  if(navigator.share){navigator.share({title,url}).catch(()=>{});return;}
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(url).then(()=>say("Link copied"),()=>prompt("Copy this link",url));
+  else prompt("Copy this link",url);
+}
 function goTeam(name){
   // chosen before the tab opens, so the page's own run is for this school
   PENDING_TEAM=name;
@@ -13266,9 +13290,12 @@ function showTeam(idx){
     +'The simulated column averages only the seasons this team reached Lane, the same slice the points figure uses'
     +(tm.roster.length>SC?'. Only the first '+SC+' score':'')+'.</div>'
     +'<button class="gl-go" data-team="'+tm.name+'">'+tm.name+'\u2019s team page \u2192</button>'
+    +'<button class="gl-share" data-team="'+tm.name+'">Share '+tm.name+'\u2019s odds</button>'
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
   const go=el.querySelector(".gl-go");
   if(go)go.onclick=e=>{e.stopPropagation();closeRace();goTeam(go.dataset.team);};
+  const sh=el.querySelector(".gl-share");
+  if(sh)sh.onclick=e=>{e.stopPropagation();shareTeam(sh.dataset.team,sh);};
 }
 
 

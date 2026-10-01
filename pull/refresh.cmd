@@ -37,8 +37,14 @@ rem archive of identical rows proves nothing it did not already prove.
 node backtest\snapshot.js >> "%LOG%" 2>&1
 if not %ERRORLEVEL%==0 echo snapshot refused or failed - see above >> "%LOG%"
 
-rem Only index.html is ever committed. If anything else is dirty the run leaves
-rem it alone rather than sweeping a half-finished edit into an unattended commit.
+rem A share card and a small page for every school, under t\. It reads the
+rem snapshot just written, so a card and the archive say the same thing.
+node pull\cards.js >> "%LOG%" 2>&1
+if not %ERRORLEVEL%==0 echo share cards failed - see above >> "%LOG%"
+
+rem Only index.html and the share cards in t\ are ever committed. If anything
+rem else is dirty the run leaves it alone rather than sweeping a half-finished
+rem edit into an unattended commit.
 git diff --quiet -- index.html
 if %ERRORLEVEL%==0 (
   echo crawl reported success but index.html is unchanged >> "%LOG%"
@@ -47,7 +53,7 @@ if %ERRORLEVEL%==0 (
 
 rem crawl.js writes the message itself - batch quoting around a nested node -e
 rem is its own small horror, and it already has the figures.
-git add index.html
+git add index.html t
 git commit -F "%~dp0.commit-msg" >> "%LOG%" 2>&1
 git push origin main >> "%LOG%" 2>&1
 echo pushed >> "%LOG%"
