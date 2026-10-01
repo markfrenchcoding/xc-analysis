@@ -10378,10 +10378,10 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
       </div>
     </div>
     <p class="ns-note" id="nsNote" hidden></p>
-    <button class="dsum" id="dsum" aria-expanded="true" aria-controls="dials">
-      <span id="dsumT">Hide settings</span><i></i>
+    <button class="dsum" id="dsum" aria-expanded="false" aria-controls="dials">
+      <span id="dsumT">Settings</span><i></i>
     </button>
-    <div class="dials" id="dials">
+    <div class="dials fold" id="dials">
     <div class="dial">
       <div class="dial-top">
         <span class="dial-lab">Race-day variance</span>
@@ -12654,10 +12654,10 @@ function toast(m){
   t.textContent=m;t.classList.add("show");
   clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2400);
 }
-/* The dials are open until the first run finishes and then fold away, because
-   nobody wants a hundred and fifty pixels of settings above a fifty-row board
-   every time. Touch the header once and that choice sticks for the session. */
-let dialsOpen=true, dialsTouched=false;
+/* The dials start folded to their one-line summary, because nobody wants a
+   hundred and fifty pixels of settings above a fifty-row board. Touch the
+   header once and that choice sticks for the session. */
+let dialsOpen=false, dialsTouched=false;
 function setDials(open){
   dialsOpen=open;
   document.getElementById("dials").classList.toggle("fold",!open);

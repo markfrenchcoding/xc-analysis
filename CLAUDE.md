@@ -224,9 +224,10 @@ onto each panel, which is how What if ended up with a gender switch and no
 classification switch, and how the Runners board ended up with no dials at all.
 The block hides only on How, which is the one page with nothing to set.
 
-**The dials fold.** Open until the first run finishes, then collapsed to a line
-reading `±2.3% · 5,000 seasons`; touch the header once and that choice sticks
-for the session (`dialsTouched`). A hundred and fifty pixels of settings above a
+**The dials fold.** They start collapsed to a line reading
+`±2.3% · 5,000 seasons` (since Oct 1; they used to open until the first run
+finished); touch the header once and that choice sticks for the session
+(`dialsTouched`). A hundred and fifty pixels of settings above a
 fifty-row board every time was the alternative.
 
 **One run fills all three views.** `RUN` holds the model, both tallies and the
