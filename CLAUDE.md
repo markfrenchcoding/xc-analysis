@@ -133,6 +133,15 @@ a race table for everyone after a weekend, and About for the proof.
   it starts the beat run - selecting afterwards ran the question for whichever
   school was first alphabetically. A run that finishes after the reader moved on
   re-runs for the school now selected rather than printing a stale answer.
+- **A school's name opens its Team page wherever it is printed** (Oct 1):
+  Leagues, the Runners board's team line, who-to-beat, Called it (team and
+  runner views) and the Dream Team feed. `tlink(name, cls, g)` writes a real
+  `<a href="#6A/boys/Grant/team">` and one delegated click handler calls
+  `openTeam`, which switches board first when the link is from another one
+  (Called it, the Dream feed) and closes any overlay. Delegated because Leagues
+  is rebuilt twice a second. A team that cannot field five has no Team page, so
+  `teamOk` keeps its name plain on the current board. The team cards are not
+  linked: a tap opens the overlay, which already carries the team-page button.
 - **Every tab switch goes through `selectTab`.** The school search called its own
   copy of the panel toggle, so the pill stayed on Team while Odds was showing and
   Run kept whatever state the last tab left. It passes `keepScroll` instead, so
