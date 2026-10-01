@@ -416,7 +416,7 @@ body.nextseason.miles #wiOut::before{content:"Next season \2014  seniors graduat
 .fwd-tm{font-style:normal;color:var(--dim);font-size:10.5px;margin-left:6px}
 .fsw{margin-bottom:9px}
 .fsw button{font-size:11px;padding:7px 4px}
-.fwd-tbl td:first-child{white-space:nowrap}.fwd-tbl th .fwd-wk{display:block;font-size:9.5px;opacity:.75;letter-spacing:.04em}.fwd-tbl i.fwd-up,.fwd-tbl i.fwd-dn{font-style:normal;font-size:9px;margin-left:3px;vertical-align:1px}.fwd-up{color:var(--accent)}.fwd-tbl sup.fwd-mod{color:var(--muted);font-size:8px;margin-left:2px}.fwd-dn{color:var(--muted)}.fwd-tbl td.fwd-chg{white-space:nowrap;font-size:12.5px}.fwd-tbl td.fwd-flat{color:var(--dim)}
+.fwd-tbl td:first-child{white-space:nowrap}.fwd-tbl th .rsort{padding:6px 0;gap:0;text-align:inherit}.fwd-tbl th .rsort i{min-width:0}.fwd-tbl th .rsort.on i{margin-left:3px}.fwd-tbl th+th .rsort{flex-direction:row}.fwd-tbl th .fwd-wk{display:block;font-size:9.5px;opacity:.75;letter-spacing:.04em}.fwd-tbl i.fwd-up,.fwd-tbl i.fwd-dn{font-style:normal;font-size:9px;margin-left:3px;vertical-align:1px}.fwd-up{color:var(--accent)}.fwd-tbl sup.fwd-mod{color:var(--muted);font-size:8px;margin-left:2px}.fwd-dn{color:var(--muted)}.fwd-tbl td.fwd-chg{white-space:nowrap;font-size:12.5px}.fwd-tbl td.fwd-flat{color:var(--dim)}
 .rec-note{font-size:10.5px;color:var(--dim);margin:6px 0 0;line-height:1.45}
 .rec-chart{width:100%;height:auto;display:block;margin:6px 0 2px}
 .rec-chart .ax{stroke:var(--line);stroke-width:.7}
@@ -12583,6 +12583,7 @@ document.getElementById("dsum").onclick=()=>{dialsTouched=true;setDials(!dialsOp
    boards and each leads with a different figure, so the archive carries all of
    them and this picks between them rather than printing a wall. */
 let FWD_K="qual";
+let FWD_SORT={k:"latest",dir:1}, FWD_KEEP=null; // see renderForward
 /* The Called it view carries its own classification and gender, because #ctl -
    which owns both everywhere else - is hidden on the How tab. Without these the
    archive was permanently stuck on whatever the Odds board happened to be set
@@ -12677,6 +12678,12 @@ function renderForward(){
     +FWD_VIEWS.map(([k,l])=>'<button data-fk="'+k+'" aria-pressed="'+(k===FWD_K)+'">'+l+'</button>').join("")
     +'</div>';
   const wire=()=>{
+    box.querySelectorAll("[data-fs]").forEach(b=>b.onclick=()=>{
+      const k=b.dataset.fs, w=box.querySelector('.rec-wrap');
+      FWD_SORT=FWD_SORT.k===k?{k,dir:-FWD_SORT.dir}:{k,dir:1};
+      FWD_KEEP=w?w.scrollLeft:null; renderForward();
+      const nb=box.querySelector('[data-fs="'+k+'"]');if(nb)nb.focus({preventScroll:true});
+    });
     box.querySelectorAll(".fsw button").forEach(b=>b.onclick=()=>{
       FWD_K=b.dataset.fk; renderForward();
     });
@@ -12721,10 +12728,7 @@ function renderForward(){
   const lastModel=modelOf(cols.filter(c=>c.s).pop().s);
   const base=cols.findIndex(c=>c.s&&modelOf(c.s)===lastModel);
   const hidden=rows.filter(s=>!cols.some(c=>c.s===s));
-  const head='<tr><th>'+(FWD_K==="run"?"runner":"team")+'</th>'
-    +cols.map(({w,s})=>'<th title="'+(s?'Results through '+d(s.through||s.taken)+', written '+d(s.taken):'No snapshot that week')+'">'
-      +'<span class="fwd-wk">thru</span>'+d(w)+(cols.find(c=>c.w===w).newModel?'<sup class="fwd-mod" title="The model changed this week">\u25C6</sup>':'')+(s&&s.forced?'<sup title="rewritten: '+s.forced.why+'">\u2020</sup>':'')+'</th>').join("")
-    +(cols.length>1?'<th title="From the first week on the current model to the latest">change<span class="fwd-wk">since '+d(cols[base].w)+'</span></th>':'')+'</tr>';
+  let head;
   /* An arrow says which way the team's chances went since the week before.
      Up is always better: on Points and on the Runners board a smaller number is
      the better one, so the arrow is turned round there. Moves under a point,
@@ -12751,7 +12755,7 @@ function renderForward(){
     return '<td class="fwd-chg '+(dlt>0?"fwd-up":"fwd-dn")+'">'+(dlt>0?"\u25B2 ":"\u25BC ")+fmtD(dlt)+'</td>';
   };
 
-  let body,names,unit;
+  let body,names,unit,vecs;
   if(FWD_K==="run"){
     /* Runners are stored as an ordered list rather than a map, so the name is
        the key and the team rides along for display. Anyone in the top thirty on
@@ -12770,14 +12774,8 @@ function renderForward(){
         +'individual board when these snapshots were taken. It starts from the next one.</p>';
       wire(); return;
     }
-    body=names.slice(0,30).map(n=>{
-      const any=rowsR.map(m=>m[n]).find(Boolean);
-      return '<tr><td>'+n
-        +'<em class="fwd-tm">'+(any?any.team:"")+'</em></td>'
-        +rowsR.map((m,i)=>{const v=m[n]?m[n].place:null,p=i?(rowsR[i-1][n]?rowsR[i-1][n].place:null):null;
-          return '<td>'+(v!=null?(v/10).toFixed(1):"\u2014")+(cols[i].newModel?"":arrow(p,v))+'</td>';}).join("")
-        +change(rowsR.map(m=>m[n]?m[n].place:null))+'</tr>';
-    }).join("");
+    vecs=names.slice(0,30).map(n=>{const any=rowsR.map(m=>m[n]).find(Boolean);
+      return {n,team:any?any.team:"",vals:rowsR.map(m=>m[n]?m[n].place:null)};});
     unit="Lower is better.";
   }else{
     const last=cols.filter(c=>c.s).pop().s.boards[key];
@@ -12795,17 +12793,46 @@ function renderForward(){
            and published the champion record a team too high. */
         return (y-x)||((fwdTeam(last,b,"win")||0)-(fwdTeam(last,a,"win")||0))||(a<b?-1:1);
       });
-    body=names.slice(0,24).map(n=>{
-      return '<tr><td>'+n+'</td>'
-        +(()=>{const vals=cols.map(({s})=>s?fwdTeam(s.boards[key],n,FWD_K):null)
-            .map(v=>FWD_K==="pts"&&!v?null:v);
-          return cols.map(({s},i)=>{
-          const v=vals[i];
-          return '<td>'
-            +(FWD_K==="pts"?(v?v:"\u2014"):pc(v))+(cols[i].newModel?"":arrow(i?vals[i-1]:null,v))+'</td>';
-        }).join("")+change(vals);})()+'</tr>';}).join("");
+    vecs=names.slice(0,24).map(n=>({n,vals:cols.map(({s})=>s?fwdTeam(s.boards[key],n,FWD_K):null)
+      .map(v=>FWD_K==="pts"&&!v?null:v)}));
     unit=FWD_K==="pts"?"Lower is better. Only counts the seasons a team actually qualified.":"";
   }
+  /* Any heading sorts. The default is the latest week, best first, which is the
+     order the rows were chosen in. A week is keyed by its date so the choice
+     survives switching board or figure; one that is not on this board falls
+     back to the default. Sorting is within the rows shown: the top 24 (30
+     runners) by the latest call. Blanks always sink. */
+  const chgOf=vals=>{const got=vals.filter((v,i)=>v!=null&&i>=base);
+    if(cols.length<2||got.length<2)return null;
+    const a=shown(got[0]),b=shown(got[got.length-1]);return lowerBetter?a-b:b-a;};
+  vecs.forEach((r,i)=>{r.idx=i;r.chg=chgOf(r.vals);});
+  let sk=FWD_SORT.k, sdir=FWD_SORT.dir;
+  const wi=sk.startsWith("w:")?cols.findIndex(c=>c.w===sk.slice(2)):-1;
+  if(sk==="latest"||(sk.startsWith("w:")&&wi<0)||(sk==="chg"&&cols.length<2)){sk="latest";if(FWD_SORT.k!=="latest")sdir=1;}
+  const colOf=sk==="latest"?cols.length-1:wi;
+  const keyOf=r=>sk==="name"?r.n.toLowerCase():sk==="chg"?r.chg:r.vals[colOf];
+  // dir 1 = the column's natural order: A-Z for names, best first for numbers
+  const better=sk==="chg"?-1:lowerBetter?1:-1;
+  if(!(sk==="latest"&&sdir===1))vecs.sort((x,y)=>{const a=keyOf(x),b=keyOf(y);
+    if(a==null&&b==null)return x.idx-y.idx; if(a==null)return 1; if(b==null)return -1;
+    const c=sk==="name"?(a<b?-1:a>b?1:0):(a-b)*better;
+    return c*sdir||x.idx-y.idx;});
+  const activeCol=sk==="name"?-1:sk==="chg"?cols.length:colOf;
+  const asc=sk==="name"?sdir>0:better*sdir>0;
+  const mark=on=>'<i aria-hidden="true">'+(on?(asc?"▲":"▼"):"")+'</i>';
+  const sortTh=(k,on,inner,title)=>'<th'+(title?' title="'+title+'"':'')+' aria-sort="'+(on?(asc?"ascending":"descending"):"none")+'">'
+    +'<button class="rsort'+(on?" on":"")+'" data-fs="'+k+'">'+inner+mark(on)+'</button></th>';
+  head='<tr>'+sortTh("name",sk==="name",FWD_K==="run"?"runner":"team")
+    +cols.map(({w,s,newModel},i)=>sortTh(i===cols.length-1?"latest":"w:"+w,activeCol===i,
+      '<span><span class="fwd-wk">thru</span>'+d(w).replace(" ","\u00A0")+(newModel?'<sup class="fwd-mod" title="The model changed this week">◆</sup>':'')
+        +(s&&s.forced?'<sup title="rewritten: '+s.forced.why+'">†</sup>':'')+'</span>',
+      s?'Results through '+d(s.through||s.taken)+', written '+d(s.taken):'No snapshot that week')).join("")
+    +(cols.length>1?sortTh("chg",sk==="chg",'<span>change<span class="fwd-wk">since '+d(cols[base].w).replace(" ","\u00A0")+'</span></span>',
+      'From the first week on the current model to the latest'):'')+'</tr>';
+  const cell=v=>FWD_K==="run"?(v!=null?(v/10).toFixed(1):"—"):FWD_K==="pts"?(v?v:"—"):pc(v);
+  body=vecs.map(r=>'<tr><td>'+r.n+(FWD_K==="run"?'<em class="fwd-tm">'+r.team+'</em>':'')+'</td>'
+    +r.vals.map((v,i)=>'<td>'+cell(v)+(cols[i].newModel?"":arrow(i?r.vals[i-1]:null,v))+'</td>').join("")
+    +change(r.vals)+'</tr>').join("");
 
   const first=rows[0], latest=rows[rows.length-1];
   const forced=rows.filter(s=>s.forced);
@@ -12819,7 +12846,7 @@ function renderForward(){
     +'that Saturday. \u25B2 and \u25BC say which way a team moved since the week before; up is always better. '
     +'<b>Change</b> runs from the first week on the current model to the latest'
     +(cols[base].w!==cols[0].w?'. \u25C6 marks a week where the model itself changed, so moves into it get no arrow':'')
-    +'.'+(FWD_K==="run"?' On this board the numbers are places.':'')+'</p>'
+    +'.'+(FWD_K==="run"?' On this board the numbers are places.':'')+' Tap a heading to sort.</p>'
     +'<div class="rec-wrap"><table class="rec-tbl fwd-tbl"><thead>'+head+'</thead><tbody>'
     +body+'</tbody></table></div>'
     +(hidden.length?'<p class="rec-note">Also archived and not shown, because a later call was made the same week: '
@@ -12848,7 +12875,8 @@ function renderForward(){
     +'order, with dates on them.</p>';
   wire();
   // open on the latest week: the newest call is the one a reader came for
-  const fw=box.querySelector('.rec-wrap'); if(fw) fw.scrollLeft=fw.scrollWidth;
+  const fw=box.querySelector('.rec-wrap'); if(fw) fw.scrollLeft=FWD_KEEP!=null?FWD_KEEP:fw.scrollWidth;
+  FWD_KEEP=null;
 }
 
 function renderRecord(){

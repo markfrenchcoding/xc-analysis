@@ -4470,6 +4470,14 @@ falling because the horizon allowance arrived, which is us, not the season.
 **bump `MODEL` there whenever the board's method changes.** The table opens
 scrolled to the newest week.
 
+**Every heading sorts** (`FWD_SORT`), the Races pattern: first tap is the
+column's natural order (A-Z, or best first - smaller first on Points and
+Runners), a second reverses, blanks always sink. A week is keyed by its date
+(`w:2026-09-26`), the newest is `latest`, which is the default. It sorts the
+rows shown (top 24 teams, 30 runners, chosen by the latest call) and keeps the
+scroll position (`FWD_KEEP`). The off arrows take no width, or four headers
+grow 44px and the 375 table scrolls the team names out of view.
+
 **Early entries are narrower, and are not rewritten to match.** `fwdTeam` reads
 both the wide shape and the original `[qual, win]` one, and a column that did not
 exist yet prints as a dash. Widening the archive must never mean going back over
