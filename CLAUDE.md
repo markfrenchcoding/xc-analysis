@@ -4474,6 +4474,18 @@ the defaults in the file go stale three times a season: pass the new pair,
 `node pull/poll.js 5100 5101` (boys, girls). `--dry` parses and reports
 without writing.
 
+**The 2026 midseason poll came out Oct 2, not around Oct 8**, so do not plan
+on a fixed date. **And osaa.org now sits behind an interactive Cloudflare
+check**: curl gets a 403 and the browser gets "Verify you are human", which a
+script must not try to pass. So `poll.js` also reads saved copies of the two
+articles: `node pull/poll.js --file boys.html girls.html`. The Oct 2 poll was
+transcribed from the owner's phone screenshots of the two article pages into
+that shape (rank line, then school, then votes) - check a transcription against
+the source before writing it, because a misread rank goes on a card. Four
+aliases were added for it: `Union / Cove`, `Faith Bible / Life Christian`,
+`Trout Lake / Glenwood` and `St. Mary's Acad., Portland`. 107 of 112 entries
+matched; the five that do not are entries the board has no team for.
+
 **A poll that has not been re-published is not stale data, it is the data.** Do
 not invent a refresh to make the page look current - the chip says when it was
 voted, which is the honest way to carry an old opinion.

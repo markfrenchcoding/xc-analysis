@@ -38,7 +38,17 @@ const GIRLS = ids[1] || '5061';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
   + '(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
+/* osaa.org has sat behind an interactive Cloudflare check since early October
+   2026, which a script must not try to get past - curl gets a 403. So the two
+   articles can also be read from saved copies: --file boys.html girls.html.
+   Save them from a browser that a person has let through. */
+const FILES = (() => {
+  const k = process.argv.indexOf('--file');
+  return k < 0 ? null : process.argv.slice(k + 1, k + 3);
+})();
+
 function get(id) {
+  if (FILES) return fs.readFileSync(FILES[id === BOYS ? 0 : 1], 'utf8');
   const url = 'https://www.osaa.org/today/article/' + id + '/view';
   const r = cp.spawnSync('curl', ['-s', '--max-time', '40', '-A', UA, url],
     { encoding: 'utf8', maxBuffer: 1 << 26 });
@@ -105,6 +115,10 @@ const ALIAS = {
   'Heppner / Ionie': 'Heppner',
   "St. Mary's, Medford": "St Mary's",
   'St Marys, Medford': "St Mary's",
+  "St. Mary's Acad., Portland": "St Mary's Academy",
+  'Union / Cove': 'Union',
+  'Faith Bible / Life Christian': 'Faith Bible Christian',
+  'Trout Lake / Glenwood': 'Trout Lake',
 };
 
 function parse(html) {
