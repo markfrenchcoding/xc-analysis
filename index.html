@@ -14709,7 +14709,14 @@ function expSlides(kind,n){
     b.win-a.win||b.top4-a.top4||b.top10-a.top10||b.qual-a.qual||a.avg5-b.avg5).slice(0,n);
   const lg=t=>ABBR[t.league]||t.league;
   const pts=t=>t.ptsN?t.ptsSum/t.ptsN:null;
-  const best=Math.min(...order.map(pts).filter(v=>v!=null));
+  /* Points get their own order, lowest score first, because a list is read as
+     sorted by its number: carried over in win order they ran 92, 135, 159, 154
+     and looked like a mistake. Only teams that reach Lane in at least half the
+     seasons, because the average is taken over the seasons a team gets there,
+     and a team that gets there one year in ten only does so when everything
+     went right - its average flatters it. */
+  const byPts=RUN.tally.filter(t=>t.ptsN&&t.qual/done>=0.5).sort((a,b)=>pts(a)-pts(b)).slice(0,n);
+  const best=byPts.length?pts(byPts[0]):1;
   return [
     {key:"list",cap:"The list",title:"THE TOP "+(n===10?"TEN":"FIFTEEN"),
      sub:"Ranked on "+sims+" simulated seasons, finishing at Lane, "+lane,
@@ -14719,10 +14726,9 @@ function expSlides(kind,n){
      rows:order.map(t=>({name:t.name,team:t.name,big:pct(t.win,done),
        sub:lg(t)+" · "+pct(t.qual,done)+" reach Lane",bar:t.win/done}))},
     {key:"pts",cap:"Points",title:"THE SCORE AT LANE",
-     sub:"Average team score at state, in the seasons each team gets there",unit:"AVG POINTS",
-     rows:order.map(t=>{const p=pts(t);return {name:t.name,team:t.name,
-       big:p==null?"—":String(Math.round(p)),
-       sub:lg(t)+" · there "+pct(t.qual,done)+" of seasons",bar:p==null?0:best/p};})},
+     sub:"Average team score at state, lowest first, for teams there in at least half the seasons",unit:"AVG POINTS",
+     rows:byPts.map(t=>{const p=pts(t);return {name:t.name,team:t.name,big:String(Math.round(p)),
+       sub:lg(t)+" · there "+pct(t.qual,done)+" of seasons",bar:best/p};})},
   ];
 }
 function expFit(ctx,text,font,size,max){
@@ -14786,12 +14792,10 @@ async function expDraw(kind,slide,fmt,crests,k,of){
   ctx.fillText("OREGON CROSS COUNTRY",W-M,74);
   ctx.fillStyle=EXP_C.accent;ctx.fillText("STATE ODDS",W-M,108);ls("0px");
 
-  // title, with where this slide sits in the set
+  // title
   let y=fmt==="story"?250:214;
   ctx.textAlign="left";ctx.fillStyle=EXP_C.accent;ctx.font="600 30px Oswald";ls("4px");
-  ctx.fillText(CLS+" "+(gender==="M"?"BOYS":"GIRLS")+(NEXT_SEASON?" · NEXT SEASON":""),M,y);
-  ctx.textAlign="right";ctx.fillStyle=EXP_C.dim;ctx.fillText((k+1)+" / "+of,W-M,y);ls("0px");
-  ctx.textAlign="left";
+  ctx.fillText(CLS+" "+(gender==="M"?"BOYS":"GIRLS")+(NEXT_SEASON?" · NEXT SEASON":""),M,y);ls("0px");
   y+=fmt==="story"?112:100;
   ctx.fillStyle=EXP_C.text;
   expFit(ctx,slide.title,"$px Anton",fmt==="story"?118:104,W-2*M);
@@ -14969,7 +14973,7 @@ async function expRender(el){
   figs.forEach(f=>{f.querySelector("img").hidden=true;f.querySelector(".exp-wait").hidden=false;});
   await expFonts();
   const specs=expSlides(EXP.kind,EXP_FMT[EXP.fmt].n);
-  const names=[...new Set(specs[0].rows.map(r=>r.team))];
+  const names=[...new Set(specs.flatMap(sp=>sp.rows.map(r=>r.team)))];
   const ims=await Promise.all(names.map(n=>expImg(LOGO[n])));
   const crests=Object.fromEntries(names.map((n,j)=>[n,ims[j]]));
   for(let k=0;k<specs.length;k++){

@@ -330,8 +330,12 @@ the board paints from, in the board's own order, so the two cannot disagree.
 - **Three images you swipe, since the owner asked for a carousel** (`expSlides`):
   Teams is the list, then wins state, then average points at Lane (lower is
   better, so the bar is best/points); Runners is the list, average place,
-  all-state. Every slide keeps the board's order so the set reads as one post,
-  and each carries "1 / 3" by the board name. The swipe is CSS scroll-snap, so
+  all-state. The list and the odds keep the board's order. **The points slide
+  has its own order, lowest first**: carried over in win order it read 92, 135,
+  159, 154 and looked like a mistake, because a list is read as sorted by its
+  number. It takes only teams that reach Lane in at least half the seasons,
+  since the average is over the seasons a team gets there and a rare qualifier's
+  is flattered. No "1 / 3" on the images - the owner took it off. The swipe is CSS scroll-snap, so
   it is the phone's own gesture; the dots, caption and buttons follow it, and an
   arrow or a dot sets the slide directly because a page that is not painting
   sends no scroll events.
