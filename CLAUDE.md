@@ -234,17 +234,26 @@ The switch inside Odds stays, as About's does.
 
 **The mark is the way home.** Tapping CHUTE or the seven (`goHome`) closes any
 overlay and fan, puts Odds and its Teams view in front and scrolls to the top.
-It used to open the Dream Team, which now lives in the Odds fan. On the way home
-the seven swap (`playMark`): the hollow pair shrink to a point and spring back
-filled, the two scorers directly ahead of them (`S[3]`, `S[4]`) open a hole in
-the middle and go hollow, a 0.9s hold, then the same swap back - the sixth and
-seventh passing two of the five. It is JS writing the circles' own `r`, fill and
-stroke in user units, not CSS transforms: that is what the mark's history says
-to do. The "opening" is a stroke as wide as the dot whose radius grows, so the
-hole starts at nothing. Every frame is computed from elapsed time and a timer
-(`markTimer`) resets the circles regardless, so a tab that stops painting cannot
-strand the mark half-swapped. Skipped under reduced motion. The constants are
-`MK_*`, because `MARK_W` is the mark-weights table and was nearly shadowed.
+It used to open the Dream Team, which now lives in the Odds fan.
+
+**And the seven never sit still.** Every 0.9-2.3s, at random, one hollow dot
+shrinks to a point and springs back filled while a random scorer opens a hole in
+its middle and goes hollow (`markSwap`, `markNext`). Always five filled and two
+hollow - five score, two displace - never the same five for long. Tapping the
+mark trades a pair at once (`playMark`). This replaced the nine-second SMIL turn,
+at the owner's request; a first version that only swapped on the way home and
+then swapped back was "not what I wanted".
+
+It is JS writing the circles' own `r`, fill and stroke in user units, not CSS
+transforms: that is what the mark's history says to do. The "opening" is a
+stroke as wide as the dot whose radius grows, so the hole starts at nothing.
+State lives in `MARK.full`, not in which `<g>` a circle sits in - the inline
+styles override `.pk-score`/`.pk-disp`. Every frame is computed from elapsed
+time and a timer snaps the pair to its end state, so a tab that stops painting
+cannot strand a dot half-filled. It idles while `document.hidden` (the desktop
+app's Browser pane reports hidden when it is not in front, which is why a probe
+there sees nothing move) and does not run at all under reduced motion. The
+constants are `MK_*`, because `MARK_W` is the mark-weights table.
 
 **Inside Odds, three views.** Inside
 Odds a segmented switch chooses Teams, Runners or Leagues. That is the shape
@@ -351,15 +360,12 @@ formation is ever redrawn, both need it.
 "— Oregon cross country state odds", which is a description rather than a name
 and read as noise in a row of tabs.
 
-*The seven turn once when idle.* Every nine seconds the formation makes one
-eased turn about its own centre (16.44, 15.56 - the mean of the seven, which is
-also the middle scorer) and rests. It is SMIL `animateTransform` on an inner
-`.pk-orbit` group, in user units, so it cannot leave the 32-unit square and
-composes with the hover and surge on `.pk-team`. The first version lifted each
-circle with CSS on `transform-box:fill-box` and on the owner's phone threw the
-whole mark left and partly off screen; SMIL has no origin to misread.
-`pauseAnimations()` stops it under reduced motion, which CSS cannot reach. The Odds empty state's five dots drift out of step (`esBob`), odds not
-yet settled. Both stop under `prefers-reduced-motion`.
+*The seven used to turn once when idle* - a SMIL `animateTransform` every nine
+seconds. Retired Oct 2 for the trading dots above. The note about why it was SMIL
+still holds for anything that moves the formation: CSS on `transform-box:fill-box`
+once threw the whole mark off the side of the owner's phone. The Odds empty
+state's five dots drift out of step (`esBob`), odds not yet settled, and stop
+under `prefers-reduced-motion`.
 
 *The seven surge on tap.* `.pk-team` animates on `body.gunlap-fire`, which is the
 class the flag's ripple used and the draft still sets. A transform on an SVG
@@ -824,15 +830,34 @@ to 123, and race ratings are what closed that.
 Teams called 90%+ qualified 90% of the time, and the 70-90% group, which used to
 come in at 50% on a call of 81%, now comes in at 76%.
 
-**The About pages open on six weeks out, not eight (Oct 2).** The How tab's
-"we rebuilt four past seasons exactly as they stood N weeks before", the Track
-record's first sentence, its tiles and the champions sentence all read
-`headRow()`, the `RECORD.byHorizon` row at `HEAD_WEEKS = 6`: 127 of 144, 5 of 8
-champions, 74% skill. Before this the sentence said eight weeks while the tiles
-under it followed the row nearest today, which was six - the page contradicted
-itself in two consecutive lines. The horizon table still lights today's row, and
-the season-by-season table stays at eight and four weeks because `perSeason` is
-only published at those two cutoffs.
+**The About pages lead with the checkpoint the board has reached (Oct 2).**
+`headRow()` is the latest of the four tested points (8, 6, 4, 2 weeks before
+Lane) that `weeksOut()` has reached: six weeks now, **four from the first crawl
+with results through Oct 10**, two from Oct 24. The How tab's opening, every
+Track record tile, the checkpoint table's "today" row, the calibration chart,
+the season-by-season table and the winners line all read that one row, so the
+page can no longer quote eight weeks in one sentence and six in the next, which
+it did.
+
+**The Track record speaks plainly now.** Asked for by the owner: "better than
+guessing" was vague because nobody guesses - they read a list. So every figure
+sits beside **a ranking of season bests** (fastest five-average goes), which is
+what readers actually look at: 127 qualifiers to 115 at six weeks, 5 champions
+to 3. The Brier decimals and the dial percentages are gone from the main text;
+the spread is told as seconds on a 17:00 runner, and the raw scores sit in a
+closed "For anyone checking the maths" drawer. It still names the method, never
+the site. It also says outright that at six weeks season bests run through
+OSAA's rules catch exactly as many qualifiers as the board (127 each): the edge
+over a list on *who* qualifies is the rules, and the board's own contribution is
+how sure to be.
+
+`publish.js` writes what that needs: per checkpoint, `picks` carry each season's
+found/field/champion, `bands` the calibration groups, and `vsRanking` carries
+`rankChamp` and `rankPicks` (the ranking's fastest five, and whether it won).
+Republished Oct 2 at 20,000/12,000: 108/127/128/129 qualifiers, champions
+3/5/6/4 - the four-week count flickers between 5 and 6, as recorded - and the
+ranking 112/115/119/120 with 3/3/5/4 champions. At eight weeks the plain ranking
+finds more qualifiers than the board, 112 to 108, and the page says so.
 
 **The headline is scored the way the board runs, and it used not to be.** It was
 scored at the bare race-day dial, which in September is a spread the board never

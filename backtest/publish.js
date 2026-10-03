@@ -77,19 +77,30 @@ const byHorizon = horizon.map((h, ci) => {
   for (const year of YEARS) for (const g of ['M', 'F']) {
     const r = L.odds(year, g, L.cutoffs(year)[ci] + VARIANT, h.best, HSEASONS);
     field += r.order.length;
-    found += r.teams.filter(t => t.modelled).slice(0, r.order.length).filter(t => t.actual).length;
+    const f1 = r.teams.filter(t => t.modelled).slice(0, r.order.length).filter(t => t.actual).length;
+    found += f1;
     const fav = r.teams.reduce((x, y) => (y.win > x.win ? y : x));
     if (fav.name === r.order[0]) champ++;
     n++;
-    // each season's favourite at this distance, so the season table can show it
-    picks.push({ year: +year, g, fav: fav.name, hit: fav.name === r.order[0] });
+    // each season at this distance, so the season table can follow the page's
+    // headline checkpoint rather than being stuck on eight and four weeks
+    picks.push({ year: +year, g, fav: fav.name, hit: fav.name === r.order[0],
+                 found: f1, field: r.order.length, champ: r.order[0] });
     for (const t of r.teams) ps.push([t.p, t.actual]);
   }
   const b = L.brier(ps), base = ps.reduce((s, p) => s + p[1], 0) / ps.length;
   const bref = L.brier(ps.map(p => [base, p[1]]));
   console.log('    ' + h.weeks + 'w out: found ' + found + '/' + field + ', ' + champ + ' of ' + n + ' champions');
+  // "when we say 70%" at this distance, not only at eight weeks
+  const hb = [[0, .1], [.1, .3], [.3, .5], [.5, .7], [.7, .9], [.9, 1.01]].map(([lo, hi]) => {
+    const gp = ps.filter(p => p[0] >= lo && p[0] < hi);
+    if (!gp.length) return null;
+    return { lo: Math.round(100 * lo), hi: Math.round(Math.min(100 * hi, 100)), n: gp.length,
+      said: Math.round(100 * gp.reduce((s2, p) => s2 + p[0], 0) / gp.length),
+      was: Math.round(100 * gp.reduce((s2, p) => s2 + p[1], 0) / gp.length) };
+  }).filter(Boolean);
   return { weeks: h.weeks, sigma: h.best, found, ofField: field, champHit: champ, champOf: n,
-           skill: Math.round(100 * (1 - b / bref)), picks };
+           skill: Math.round(100 * (1 - b / bref)), picks, bands: hb };
 });
 
 /* A ranking is not a forecast. State is two from every league plus the at-large
@@ -105,7 +116,7 @@ const byHorizon = horizon.map((h, ci) => {
    that stayed home and the worst-ranked that went. Named by method, not by
    site: athletic.net does apply OSAA's rules, after the league championships. */
 const vsRanking = horizon.map((h, ci) => {
-  let ranking = 0, rules = 0, field = 0; const home = [], went = [];
+  let ranking = 0, rules = 0, field = 0, rankChamp = 0; const home = [], went = [], rankPicks = [];
   for (const year of YEARS) for (const g of ['M', 'F']) {
     const cut = L.cutoffs(year)[ci], truth = L.truthFor(year);
     const csv = fs.readFileSync(path.join(__dirname, 'data', year + '-seed-' + cut + '.csv'), 'utf8');
@@ -118,6 +129,10 @@ const vsRanking = horizon.map((h, ci) => {
     const real = new Set(truth.state[g].map(x => x.team)), N = real.size;
     field += N;
     ranking += ranked.slice(0, N).filter(t => real.has(t.name)).length;
+    // the ranking's favourite is simply its fastest five
+    const champName = truth.state[g][0].team, top1 = ranked[0] && ranked[0].name;
+    if (top1 === champName) rankChamp++;
+    rankPicks.push({ year: +year, g, fav: top1, hit: top1 === champName });
     ranked.forEach((t, i) => {
       const x = { year: +year, g, team: t.name.replace(/ \(OR\)$/, ''), league: t.league, rank: i + 1 };
       if (i < N && !real.has(t.name)) home.push(x);
@@ -130,6 +145,7 @@ const vsRanking = horizon.map((h, ci) => {
   console.log('    ' + h.weeks + 'w out: a ranking finds ' + ranking + ', season bests with the rules '
     + rules + ', the board ' + byHorizon[ci].found + ' of ' + field);
   return { weeks: h.weeks, ranking, rules, chute: byHorizon[ci].found, ofField: field,
+           rankChamp, chuteChamp: byHorizon[ci].champHit, rankPicks,
            stayedHome: home.slice(0, 3), went: went.slice(0, 3), missed: home.length };
 });
 
