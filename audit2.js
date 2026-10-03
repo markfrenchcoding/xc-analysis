@@ -218,6 +218,31 @@ console.log('\nsimulation invariants');
   ok('top4 never exceeds top10', t.list.every(x => x.top4 <= x.top10));
 }
 
+console.log('\nAt-large committee: head to head');
+{
+  // four candidates, fastest first on time
+  const pool = () => [{ idx: 0, avg5: 960 }, { idx: 1, avg5: 965 }, { idx: 2, avg5: 990 }, { idx: 3, avg5: 1000 }];
+  const n = 4, H = new Float64Array(n * n).fill(NaN);
+  let p = pool(); M.rankByCommittee(p, { n, H });
+  eq('with no meetings the committee ranks on time', p.map(c => c.idx).join(''), '0123');
+  // 1 beat 0 head to head
+  H[1 * n + 0] = 1; H[0 * n + 1] = 0;
+  p = pool(); M.rankByCommittee(p, { n, H });
+  eq('a head-to-head win puts the slower team ahead', p.map(c => c.idx).join(''), '1023');
+  // the matrix: two meetings split, the later one counts more
+  const teams = [{ name: 'A', idx: 0 }, { name: 'B', idx: 1 }];
+  global.H2H = { '6A|M': { t: ['A', 'B'], m: [[0, 1, '09-01', 20, 35, 1, 'x'], [0, 1, '10-15', 35, 20, 0, 'y']] } };
+  let h = null;
+  try { h = M.h2hMatrix(teams, '6A|M'); } catch (e) { console.log('  ' + e.message); }
+  ok('the matrix reads H2H when the page has it', !!h);
+  if (h) {
+    ok('a split pair leans to the later winner', h.H[1 * 2 + 0] > 0.5 && h.H[0 * 2 + 1] < 0.5, 'B over A = ' + h.H[2]);
+    ok('and the two directions add to one', Math.abs(h.H[1] + h.H[2] - 1) < 1e-9);
+  }
+  delete global.H2H;
+  ok('no H2H, no matrix - the backtest ranks on time as it always did', M.h2hMatrix(teams, '6A|M') === null);
+}
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 if (latent.length) {
   console.log('\nlatent issues (not reachable through the app today):');

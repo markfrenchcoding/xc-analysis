@@ -243,7 +243,7 @@ async function meetRows(meetId) {
     await sleep(GAP_POST);
     if (stopping) break;
     for (const r of await divRows(meetId, d.IDMeetDiv, md.jwtMeet)) {
-      const row = Seed.resultRow(r, date, Seed.divMetres(d.DivName), meetId);
+      const row = Seed.resultRow(r, date, Seed.divMetres(d.DivName), meetId, d.IDMeetDiv);
       if (row) out.push(row);
     }
   }
@@ -352,6 +352,7 @@ function finish(html, board) {
   const date = b.latest || new Date().toISOString().slice(0, 10);
   let out = Seed.patchIndex(html, b.csv, date);
   out = Seed.patchLogos(out, S.logos);
+  out = Seed.patchH2H(out, b.h2h);
 
   const was = (html.match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
     .trim().split('\n').length - 1;

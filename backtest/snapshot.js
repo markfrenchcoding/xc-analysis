@@ -79,6 +79,14 @@ const SIGMA = Math.sqrt(M.CAL.sd * M.CAL.sd + drift * drift);
 const parsed = M.parseCSV(seed);
 M.setDATA(parsed.rows);
 const marks = parsed.rows.length;
+/* The board picks its at-large teams on this season's head to head, and the
+   archive has to freeze what the board says, so it reads the same table.
+   model.js deliberately does not carry it - the backtest has no H2H and ranks
+   on time - so it goes on the global h2hMatrix looks for. */
+{
+  const m = html.match(/const H2H=(\{.*?\});/);
+  if (m) global.H2H = JSON.parse(m[1]);
+}
 
 /* Today, not the data date. The two differ on purpose: `taken` is when the
    claim was made and `through` is what it was made from, and a reader checking

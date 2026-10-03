@@ -148,7 +148,7 @@ function toSeconds(m){
   return (+x[1])*60+s+(x[3]?+("0."+x[3]):0);
 }
 
-function fmt(s){const m=Math.floor(s/60);return m+":"+(s-m*60).toFixed(1).padStart(4,"0");}
+function fmt(s){const t=Math.round(s*10)/10,m=Math.floor(t/60);return m+":"+(t-m*60).toFixed(1).padStart(4,"0");}
 
 function parseCSV(text){
   const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
@@ -220,7 +220,7 @@ function buildModel(g,dist){
   }
   const byLeague={};
   for(const lg of LG) byLeague[lg]=teams.filter(t=>t.league===lg&&!t.short);
-  return {teams,runners,byLeague,unassigned};
+  return {teams,runners,byLeague,unassigned,h2h:NEXT_SEASON?null:h2hMatrix(teams,CLS+"|"+g)};
 }
 
 function scoreMeet(list,times,SC,PL){
@@ -255,6 +255,40 @@ const SK_MEAN=0.7978845608*(SK_HI-SK_LO)/2;
 
 const SK_SD=Math.sqrt((SK_HI*SK_HI+SK_LO*SK_LO)/2-SK_MEAN*SK_MEAN);
 
+const H2H_TAU=28;
+
+function h2hDay(md){const [m,d]=md.split("-").map(Number);return (m-8)*31+d;}
+
+function h2hMatrix(teams,key){
+  const B=typeof H2H!=="undefined"&&H2H[key];
+  if(!B||!B.m||!B.m.length)return null;
+  const n=teams.length, at=new Map(teams.map(t=>[t.name,t.idx]));
+  const W=new Float64Array(n*n), R=new Float64Array(n*n);
+  let any=false;
+  for(const [a,b,day,,,res] of B.m){
+    const i=at.get(B.t[a]), j=at.get(B.t[b]);
+    if(i==null||j==null)continue;
+    const w=Math.exp(h2hDay(day)/H2H_TAU);
+    W[i*n+j]+=w;R[i*n+j]+=w*res;W[j*n+i]+=w;R[j*n+i]+=w*(1-res);
+    any=true;
+  }
+  if(!any)return null;
+  const H=new Float64Array(n*n).fill(NaN);
+  for(let k=0;k<n*n;k++)if(W[k]>0)H[k]=R[k]/W[k];
+  return {n,H,W};
+}
+
+function rankByCommittee(pool,h2h){
+  const {n,H}=h2h, m=pool.length;
+  for(const c of pool)c.pts=0;
+  for(let i=0;i<m;i++)for(let j=i+1;j<m;j++){
+    const a=pool[i],b=pool[j], h=H[a.idx*n+b.idx];
+    const p=h===h?h:1/(1+Math.exp((a.avg5-b.avg5)/10));
+    a.pts+=p;b.pts+=1-p;
+  }
+  pool.sort((a,b)=>b.pts-a.pts||a.avg5-b.avg5);
+}
+
 function playDistricts(model,byIdx,times,indOut){
   const {byLeague}=model;
   const autos=[],pool=[],perLeague=[];
@@ -271,7 +305,8 @@ function playDistricts(model,byIdx,times,indOut){
       else if(p<A+2) pool.push({idx:r[p].idx,third:p===A,lg,avg5:r[p].sumN/SC});
     }
   }
-  pool.sort((a,b)=>a.avg5-b.avg5);
+  if(model.h2h) rankByCommittee(pool,model.h2h);
+  else pool.sort((a,b)=>a.avg5-b.avg5);
   const slots=Math.min(AT_LARGE+(autoTotal()-autos.length),pool.length);
   const taken3=new Set(),wilds=[];
   for(const c of pool){
@@ -416,6 +451,7 @@ module.exports = {
   get SC(){return SC;}, get PL(){return PL;},
   CAL, MARK_W, TEAM_SHARE, SIG_T, SIG_I,
   parseCSV, toSeconds, fmt, buildModel, scoreMeet, playDistricts, playState,
+  h2hMatrix, rankByCommittee,
   gauss, skew, pickMark, draw, shift, oneSeason, blankTally, runnerTally,
   get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},

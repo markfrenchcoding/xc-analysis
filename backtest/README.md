@@ -184,3 +184,31 @@ to 9 points — the model is not worse on the older seasons. What differs is how
 much had been raced and recorded by the September cutoff: 14 meets in 2022,
 33 by the same point in 2025. Quote the figures per cutoff, not pooled, or the
 number describes neither regime.
+
+## How the at-large committee picks
+
+```
+node backtest/atlarge_h2h.js            # --detail prints every pool
+```
+
+OSAA's 2025 seeding criteria say the committee weighs district order, district
+score against the automatic teams, last year's state results, and head-to-head
+"with more consideration given to meets later in the season". This scores rules
+for that choice against the real at-large picks, 2022-2025: the real pool is each
+district's 3rd and 4th, the real picks are the state field minus each district's
+top two, and every rule respects 3rd-before-4th. Every season had 4 berths.
+
+| rule | picks named, of 32 |
+|---|---|
+| random | about 11 |
+| district score margin vs 2nd | 13 |
+| scoring-five average (the old simulator) | 26 |
+| Borda on head-to-head where met, time otherwise | 27-28 |
+
+Head-to-head here is the NFHS dual of the two teams' runners in a shared race,
+weighted `exp(-days/tau)`. The grid rows carry no division, so "same race" is
+inferred from places restarting. +2 of 32 is noise on this much data (sign test
+across boards, p ~ 0.6); the site uses the head-to-head rule because it is the
+committee's own criterion and does at least as well, not because it was shown
+to be better. The simulator's own backtest still ranks on time: `model.js` does
+not carry `H2H`.

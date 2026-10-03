@@ -43,8 +43,8 @@ slow the race was that day, which the model divides by (see **Race ratings**).
 - `gender` is `M`/`F`; `dist` is always `5000`
 - one row per athlete per mark; duplicates are the point, not a mistake
 - a `class` column selects the board: 6A, 5A, 4A, 3A or 2A/1A
-- 8,893 rows currently across all five classifications: 3,617 athlete-boards,
-  225 schools, up to twelve deep a team. Pulled through Sep 26, 2026 by the refresh
+- 9,590 rows currently across all five classifications: 3,623 athlete-boards,
+  225 schools, up to twelve deep a team. Pulled through Oct 2, 2026 by the refresh
 - the flag's draft reads `DATA` across every classification at once, so a name
   that only appears on one board is still draftable onto any other
 
@@ -222,6 +222,30 @@ while its left edge clears 12px, and slides right otherwise - aligned blindly it
 hung 52px off the glass at 375. The switch inside About stays for readers who
 land there from a link.
 
+**Odds fans out too, since Oct 2.** Teams, Runners, Leagues and the Dream Team,
+four cards out of the Odds button, the same component as About's: one scrim,
+one key handler, only one fan open at a time (`FANS`, `FAN_OPEN`, `fanFor`).
+Odds is the leftmost tab, so its fan is **left**-aligned (`.fan-l`) and grows
+from its own bottom-left corner, clamped 12px inside the glass at both ends. The
+closing stagger reads `--n` off the fan (2 for About, 3 for Odds) - it was a
+hardcoded `2 - --i`, which would have given the fourth card a negative delay.
+Picking a view from the fan switches the tab only if Odds is not already on.
+The switch inside Odds stays, as About's does.
+
+**The mark is the way home.** Tapping CHUTE or the seven (`goHome`) closes any
+overlay and fan, puts Odds and its Teams view in front and scrolls to the top.
+It used to open the Dream Team, which now lives in the Odds fan. On the way home
+the seven swap (`playMark`): the hollow pair shrink to a point and spring back
+filled, the two scorers directly ahead of them (`S[3]`, `S[4]`) open a hole in
+the middle and go hollow, a 0.9s hold, then the same swap back - the sixth and
+seventh passing two of the five. It is JS writing the circles' own `r`, fill and
+stroke in user units, not CSS transforms: that is what the mark's history says
+to do. The "opening" is a stroke as wide as the dot whose radius grows, so the
+hole starts at nothing. Every frame is computed from elapsed time and a timer
+(`markTimer`) resets the circles regardless, so a tab that stops painting cannot
+strand the mark half-swapped. Skipped under reduced motion. The constants are
+`MK_*`, because `MARK_W` is the mark-weights table and was nearly shadowed.
+
 **Inside Odds, three views.** Inside
 Odds a segmented switch chooses Teams, Runners or Leagues. That is the shape
 because all three of those *are* odds — they were three sibling tabs for a
@@ -272,6 +296,19 @@ leagues" on every board, including the five-league and four-league ones.
 `FIELD`, and must be called anywhere `setClass` is.
 
 Three things on the board beyond the odds themselves.
+
+**1-5 average and spread.** A quiet line under each card's name: the mean of
+the scoring five's season bests and the gap from first to fifth (`packOf`,
+`packLine`), on the overlay and the Team page too. Times as run (`sbRaw`), never
+the rated or regressed figures; "1-4" on the boards that score four. If a 3-mile
+mark is among the five the line shows dashes, because averaging it with 5ks
+would mean showing a converted time. Every card carries the line so the measured
+step stays uniform; on desktop `.tc-big` spans four rows now, not three.
+
+**`fmt` had the carry bug too.** The page's own formatter floored the minutes
+and then rounded the seconds, so 959.96s printed "15:60.0" - the third copy of
+the fault recorded under **Rebuilding the database**. It rounds to the tenth
+first now.
 
 **Average points.** Each card carries the team's mean score at Lane underneath
 its chance of winning, averaged only over the seasons it actually qualified —
@@ -531,8 +568,8 @@ orderings could disagree at the boundary, so an eighth-fastest athlete with two
 marks could outrank a seventh with one and never get the chance. A deeper cap
 removes that quietly as well.
 
-**The flag: your Oregon Dream Team.** Tapping the checkered flag opens a
-draft. Pick any seven athletes in the state — any school, any classification —
+**The flag: your Oregon Dream Team.** The fourth card in the Odds fan opens a
+draft (it was the mark, and before that a checkered flag). Pick any seven athletes in the state — any school, any classification —
 and they race **the sixteen fastest schools in Oregon**, 6A through 1A, once in
 front of you as a pace line and then two thousand more times for the odds.
 
@@ -986,7 +1023,7 @@ worse than no job, because the failure arrives as a quietly wrong board rather
 than as an error.
 
 ```
-node pull/test_seed.js        # 61 checks, no network
+node pull/test_seed.js        # 120 checks, no network
 node pull/test_crawl.js       # 8 checks on the write guards
 ```
 
@@ -1133,7 +1170,17 @@ it catches a meet whose results went up late on the Sunday, and it runs whether
 or not anybody remembers. Do not read the Monday choice as "results are not
 up before then".
 
-Current coverage: 8,893 marks, 3,617 athlete-boards, 225 schools, from 102 meets.
+Current coverage: 9,590 marks, 3,623 athlete-boards, 225 schools, from 118 meets
+(Oct 2 crawl, 53,576 results read, none unanswered). It also writes `H2H`:
+2,045 A-race meetings across the ten boards, 471 of them 6A boys - 70KB raw,
+14KB gzipped. Counting every division first gave 3,399, and 1,254 for 6A boys:
+JV fives were most of it.
+
+**The "nothing changed" guard compares `H2H` too.** The second crawl of Oct 2
+found the seed byte-identical and exited 3 without writing, so the corrected
+head-to-head rule never reached the page. The state file survives an exit 3, so
+the table was rebuilt from it offline; the guard now treats a moved `H2H` as a
+change.
 That is 671 rows more than the hand-built pull it replaced, which is the crawl
 starting from the full Oregon team list rather than from team ids resolved out of
 meets already pulled - it finds meets the old chicken-and-egg approach could not
@@ -2472,6 +2519,11 @@ the largest Annabelle Webster at 31:38.06 to 29:27.66; eight athletes got a
 first 5,000m. Nothing else moved: four-year completion held at 45% and 50%, the
 school record and the top three held.
 
+**Oct 2, 2026: athletic.net re-keyed an athlete.** Aaron Lakeman (class of
+2023, 68 results) moved from id 27032743 to 33135063 with every result intact,
+so `test_page` reported 13 values GONE and 25 NEW. Nothing was lost. When GONE
+appears, look the name up in the new athletes CSV before suspecting the pull.
+
 **An athlete can be on the page with no mark on any ruler.** Daniel Zumwalt ran
 that meet's 3,000m, which is cross country and therefore not the `tf3000`
 ruler, and nothing is ever converted between distances. He is on the roster, in
@@ -3599,8 +3651,8 @@ penalty for racing more often. The table exists precisely so that cannot happen.
 Anybody reading only this section would have described the model wrongly, and
 somebody did.
 
-Live as of the Sep 26 pull: **3,068 of 3,617** athlete-boards carry two or three
-marks, **85%**, up from 53% a fortnight earlier and 348 of 1,172 before the
+Live as of the Oct 2 pull: **3,245 of 3,623** athlete-boards carry two or three
+marks, **90%** (85% on Sep 26), up from 53% in mid-September and 348 of 1,172 before the
 automated pull. That is the ordinary case now rather than the exception.
 
 What the weights still cannot do is judge a second mark fairly, because a slower
@@ -3642,9 +3694,49 @@ ratio itself never enters the model; only the spread does.
 scoring, ties break on the sixth runner, a team without a sixth loses any tie.
 Teams that cannot field five are removed before places are assigned.
 
-**Qualification** (`playDistricts`). Top two per league auto-qualify. Third-place
-teams enter the at-large pool ranked by scoring-five average; a fourth-place
-team is only eligible once its own league's third is taken. Two at-large spots.
+**Qualification** (`playDistricts`). Top two per league auto-qualify. Third- and
+fourth-place teams enter the at-large pool, ranked by the committee rule below;
+a fourth-place team is only eligible once its own league's third is taken. Two
+at-large spots.
+
+**Head to head decides the at-large order, because OSAA says it does.** The
+2025 seeding criteria (`osaa.org/docs/planbooks/XCSeedingCriteria.pdf`) list
+what the committee weighs: district order, district score against the automatic
+teams, last year's state results for district strength, and "head-to-head
+competition with more consideration given to meets later in the season".
+`rankByCommittee` does a Borda count over the pool: for each pair, the real
+head-to-head record this season where they met, otherwise the simulated
+district-day five-average through a logistic ten seconds wide. Meetings are
+weighted `e^(day/28)`, so a race four weeks later counts e times as much.
+
+Measured before it shipped (`backtest/atlarge_h2h.js`, real pools 2022-2025,
+32 picks): scoring-five average **26 of 32**, this rule **28 of 32** (27-28
+across tau), random about 11. District score margin, the committee's second
+criterion, is a poor predictor alone (13) and makes head-to-head worse when
+blended in. +2 of 32 is not distinguishable from noise - a sign test across
+boards is p ~ 0.6 - so it ships as the committee's own stated rule, which
+does at least as well, not as a measured improvement. Only 44% of
+cross-district pool pairs meet in a race before districts, so most pairs still
+fall back to time.
+
+`H2H` is a constant beside `RACES`, written by the crawl (`Seed.headToHead`,
+`patchH2H`): per board, the teams and every meeting as `[a, b, "MM-DD", scoreA,
+scoreB, result, meetId]`. **A meeting is the same meet AND the same division** -
+varsity and JV share a meet id - which is why `resultRow` now carries `div`;
+rows without one are skipped, not guessed. **And only each team's A race
+counts**: the division where its own five ran fastest at that meet. The first
+version paired every division, and Grant and Franklin girls "met" twice at Nike
+Portland on one afternoon - varsity and their JV fives. Caught on the overlay,
+not by a test; `test_seed` now has both fives in a JV race and a star in an
+individual elite race, and asserts one meeting. The score is the dual those two
+would have had in that race (`dualScore`: their runners only, seven a side,
+sixth breaks a tie), not the meet's own team scores. `buildModel` folds it into
+an n-by-n matrix (`h2hMatrix`, NaN where they never met); Next season gets none.
+`model.js` lifts both functions but not `H2H`, so **the backtest still ranks on
+time** and the published Track record is untouched by this.
+
+The same table is shown: every team overlay and Team page carries "Head to head
+this season", rival by rival, latest first (`h2hFor`, `h2hBlock`).
 
 **The at-large count is a season's rule, not a constant.** OSAA sets it each
 year and it has moved: 2024 and 2025 both ran 14 automatic + **4** at-large
@@ -3691,6 +3783,11 @@ touched a constant:
 | Sep 19 | 7.01 | 3.39% | 4.10% |
 | Sep 24 | 6.30 | 1.84% | 2.95% |
 | Sep 26 | 6.00 | 1.23% | 2.61% |
+| Oct 2 | 5.14 | 1.47% | 2.17% |
+
+The Oct 2 row sits on the 1.6% race-day spread that came in with race
+ratings; the rows above it were taken at 2.3%, so the drop in the total is
+partly the dial and not only the calendar.
 
 If a refresh ever leaves the total unchanged, the horizon is not being read -
 check `DATA_DATE` and `STATE_DATE` before believing the board.
@@ -4488,8 +4585,8 @@ it moved. Anything added below that point must stay below it.
 
 ```
 node extract_model.js        # regenerate model.js after any signature change
-node audit2.js               # 104 checks, 1 deliberate failure
-node pull/test_seed.js       # 104 checks on the seed builder, no network
+node audit2.js               # 114 checks, 1 deliberate failure
+node pull/test_seed.js       # 120 checks on the seed builder, no network
 node pull/test_crawl.js      # 8 checks on the scheduled crawl's write guards
 node pull/test_roster.js     # 93 checks on the roster builder, no network
 node pull/test_whoswho.js    # 67 checks on the Who's Who parser, no network
@@ -4948,8 +5045,9 @@ Listed in the app's own "How" tab:
   dividing it out makes forecasts worse. Treat the number as an upper bound on
   the course effect, not a measurement of it.
 - No seasonal progression, injury, or roster change between now and November.
-- The at-large ranking is a stand-in for a committee that also weighs league
-  strength and head-to-head.
+- The at-large ranking uses this season's head-to-head and district-day times.
+  The committee also weighs last year's state results for district strength,
+  and it discusses before it votes; neither is modelled.
 - A league with only two scoring teams shows both at 100% — arithmetic, not
   prediction. This no longer bites on the 5,000m board: the meet-results pull
   filled Three Rivers out from two scoring teams to six, and the 5,000m board

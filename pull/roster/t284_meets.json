@@ -5,9 +5,9 @@
   "to": 2026,
   "horizon": 1983,
   "solid": 2004,
-  "pulled": "2026-09-27",
+  "pulled": "2026-10-03",
   "sports": {
-    "xc": 8974,
+    "xc": 9017,
     "tfo": 9823
   },
   "depth": "page",
@@ -973,6 +973,10 @@
     "xc|258447": {
       "date": "2025-11-08",
       "name": "OSAA State XC Championships"
+    },
+    "xc|268653": {
+      "date": "2026-10-01",
+      "name": "Grant Robison Invitational"
     },
     "xc|269957": {
       "date": "2026-09-26",

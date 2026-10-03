@@ -23,6 +23,8 @@ const WANT = [
   'MILES_3', 'MI_FACTOR', 'MI_PEN', 'MILES_ON',
   'splitCSVLine', 'toSeconds', 'fmt', 'parseCSV', 'bestRun', 'buildModel', 'scoreMeet',
   'SK_HI', 'SK_MEAN', 'SK_SD',
+  // the at-large committee; H2H itself stays behind, so the headless copy ranks on time
+  'H2H_TAU', 'h2hDay', 'h2hMatrix', 'rankByCommittee',
   'playDistricts', 'playState', 'skew', 'spare', 'gauss', 'pickMark', 'draw', 'shift',
   'oneSeason', 'blankTally', 'runnerTally',
 ];
@@ -82,6 +84,7 @@ parts.push(`module.exports = {
   get SC(){return SC;}, get PL(){return PL;},
   CAL, MARK_W, TEAM_SHARE, SIG_T, SIG_I,
   parseCSV, toSeconds, fmt, buildModel, scoreMeet, playDistricts, playState,
+  h2hMatrix, rankByCommittee,
   gauss, skew, pickMark, draw, shift, oneSeason, blankTally, runnerTally,
   get IND(){return IND;}, setInd(n){ IND=n; },
   get DATA(){return DATA;},

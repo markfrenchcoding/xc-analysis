@@ -325,5 +325,43 @@ ok(!(999 in ft.ids), 'an out-of-state school has no Oregon id');
   ok(/,1\.0000$/.test(lone.csv.split('\n')[1]), 'an unrateable mark keeps a factor of 1');
 }
 
+/* ---------- head to head ---------- */
+{
+  const d = S.dualScore([1, 2, 3, 4, 5, 6, 7], [8, 9, 10, 11, 12, 13, 14]);
+  eq(d.a + '-' + d.b, '15-50', 'a perfect dual is 15-50, the sixth and seventh displacing');
+  eq(d.res, 1, 'and the lower score wins');
+  // 1+4+6+8+9 = 28 against 2+3+5+7+11 = 28, the sixths at 10 and 12
+  const t = S.dualScore([1, 4, 6, 8, 9, 10], [2, 3, 5, 7, 11, 12]);
+  eq(t.a + '-' + t.b, '28-28', 'a tied dual');
+  eq(t.res, 1, 'goes to the better sixth runner');
+  eq(S.dualScore([2, 3, 5, 7, 11], [1, 4, 6, 8, 9, 10]).res, 0, 'a team with no sixth loses a tie');
+
+  const row = (name, school, sec, div, mid) => ({ g: 'M', name, school, grade: '11', dist: 5000,
+    seconds: sec, date: '2026-09-20', mid: mid || '900', div: div == null ? '1' : div, aid: 0 });
+  const rows = [];
+  for (let k = 0; k < 6; k++) rows.push(row('Jes ' + k, 'Jesuit', 960 + k * 10));
+  for (let k = 0; k < 5; k++) rows.push(row('Cen ' + k, 'Central Catholic', 965 + k * 10));
+  // both teams' second fives in the JV race of the same meet: not a meeting
+  for (let k = 0; k < 5; k++) rows.push(row('Cen JV ' + k, 'Central Catholic', 1100 + k, '2'));
+  for (let k = 0; k < 5; k++) rows.push(row('Jes JV ' + k, 'Jesuit', 1105 + k, '2'));
+  // and Jesuit's fastest runner in an individual elite race does not drag the team's meeting there
+  rows.push(row('Jes Star', 'Jesuit', 900, '3'));
+  // and a race with no division at all is not guessed at
+  for (let k = 0; k < 5; k++) rows.push(row('Jes ' + k, 'Jesuit', 990 + k, '', '901'));
+  for (let k = 0; k < 5; k++) rows.push(row('Cen ' + k, 'Central Catholic', 980 + k, '', '901'));
+  const h = S.buildSeed(rows, board).h2h;
+  const B = h['6A|M'];
+  ok(B && B.m.length === 1, 'one meeting: the race each team sent its best to, not the JV race as well — ' + JSON.stringify(h));
+  if (B && B.m.length) {
+    const [a, b, day, sa, sb, res, mid] = B.m[0];
+    eq(B.t[a] + ' v ' + B.t[b], 'Central Catholic v Jesuit', 'named in board spelling');
+    eq(day + ' ' + mid, '09-20 900', 'dated and tied to its meet');
+    eq(sa + '-' + sb + ' ' + res, '30-25 0', 'Jesuit win it 25-30 on the dual');
+  }
+  ok(/const H2H=\{"x":1\};/.test(S.patchH2H('const DATA_DATE="2026-09-26";', { x: 1 })), 'patchH2H inserts beside DATA_DATE');
+  ok((S.patchH2H(S.patchH2H('const DATA_DATE="2026-09-26";', { x: 1 }), { y: 2 }).match(/const H2H=/g) || []).length === 1,
+     'and replaces rather than adds on the next run');
+}
+
 console.log(pass + ' passed' + (fail ? ', ' + fail + ' FAILED' : ''));
 process.exit(fail ? 1 : 0);

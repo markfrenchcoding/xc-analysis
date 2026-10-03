@@ -80,7 +80,7 @@
   /* One athletic.net result -> one row for buildSeed, or null to skip it.
      SortValue is already seconds, which saves parsing Result, but it is also
      where the 999999 scratch sentinel lives - buildSeed's bounds catch that. */
-  function resultRow(r, date, dist, meetId) {
+  function resultRow(r, date, dist, meetId, divId) {
     if (!r || r.Exhibition) return null;     // unattached, not on anyone's roster
     return {
       g: r.Gender,
@@ -99,6 +99,9 @@
          an identity) and the meet the mark came from */
       aid: +r.AthleteID || 0,
       mid: meetId ? String(meetId) : '',
+      /* which race at the meet: varsity and JV share a meet id, and head-to-head
+         is only a meeting if the two teams were on the same start line */
+      div: divId ? String(divId) : '',
       date: date || '',
     };
   }
@@ -299,7 +302,7 @@
       keep.push({ g: r.g, name: cleanName(r.name), dist,
                   sec, date: r.date || '', grade: String(r.grade || '').replace(/\D/g, ''),
                   team: b.name, cls: b.cls, aid: r.aid || 0, mid: r.mid || '',
-                  race: +r.race || 1 });
+                  div: r.div || '', race: +r.race || 1 });
     }
 
     /* Rate every 5,000m race from every Oregon result read, not only the marks
@@ -397,7 +400,91 @@
       }) : [],
       offBoard: [...offBoardNames].sort(),
       outOfState: [...outOfStateNames].sort(),
+      h2h: headToHead(keep),
     };
+  }
+
+  /* ---------- head to head ----------
+     OSAA's at-large committee weighs "head-to-head competition with more
+     consideration given to meets later in the season" (the 2025 seeding
+     criteria), so the page needs to know who has met whom. A meeting is two
+     teams from one board on the same start line - same meet AND same division,
+     because varsity and JV share a meet id - each with five finishers there.
+     It is scored as the NFHS dual those two would have had: their runners
+     alone, seven a side, five score, sixth breaks a tie, a team with no sixth
+     loses one.
+
+     Out: { "6A|M": { t: [team names], m: [[a, b, "MM-DD", scoreA, scoreB, res, meetId]] } }
+     with res 1 when a won, 0 when b won, 0.5 for a tie nothing could break.
+     Rows without a division are skipped rather than guessed at. */
+  function dualScore(A, B) {
+    const line = A.map(t => [t, 0]).concat(B.map(t => [t, 1])).sort((x, y) => x[0] - y[0]);
+    const sum = [0, 0], cnt = [0, 0], sixth = [0, 0];
+    line.forEach(([, s], i) => {
+      cnt[s]++;
+      if (cnt[s] <= 5) sum[s] += i + 1;
+      else if (cnt[s] === 6) sixth[s] = i + 1;
+    });
+    let res = sum[0] < sum[1] ? 1 : sum[0] > sum[1] ? 0 : 0.5;
+    if (res === 0.5) {
+      if (sixth[0] && (!sixth[1] || sixth[0] < sixth[1])) res = 1;
+      else if (sixth[1] && (!sixth[0] || sixth[1] < sixth[0])) res = 0;
+    }
+    return { a: sum[0], b: sum[1], res };
+  }
+  function headToHead(keep) {
+    /* A team's race at a meet is the division where its own five ran fastest,
+       among the divisions where it fielded five. A big invitational runs
+       varsity, JV and open races, and two programmes deep enough to field five
+       in each would otherwise "meet" three times in one afternoon - their JV
+       squads counted as head to head. Only the race both teams sent their best
+       five to is a meeting. (Not the division of the fastest runner: a star in
+       an individual elite race would take the team's meeting with them.) */
+    const byDiv = new Map();
+    for (const r of keep) {
+      if (r.dist !== 5000 || !r.mid || !r.div) continue;
+      const k = r.mid + '|' + r.cls + '|' + r.g + '|' + r.team;
+      if (!byDiv.has(k)) byDiv.set(k, new Map());
+      const d = byDiv.get(k);
+      if (!d.has(r.div)) d.set(r.div, []);
+      d.get(r.div).push(r.sec);
+    }
+    const top = new Map();
+    for (const [k, d] of byDiv) {
+      let best = null, bestSum = Infinity;
+      for (const [div, t] of d) {
+        if (t.length < 5) continue;
+        const sum = t.sort((x, y) => x - y).slice(0, 5).reduce((a, b) => a + b, 0);
+        if (sum < bestSum) { bestSum = sum; best = div; }
+      }
+      top.set(k, best);
+    }
+    const races = new Map();
+    for (const r of keep) {
+      if (r.dist !== 5000 || !r.mid || !r.div) continue;
+      if (top.get(r.mid + '|' + r.cls + '|' + r.g + '|' + r.team) !== r.div) continue;
+      const k = r.mid + '|' + r.div + '|' + r.cls + '|' + r.g;
+      if (!races.has(k)) races.set(k, { mid: r.mid, date: r.date, board: r.cls + '|' + r.g, teams: new Map() });
+      const rc = races.get(k), tm = rc.teams.get(r.team) || new Map();
+      // one time per athlete per race: a division read twice is not two runs
+      if (!tm.has(r.name) || r.sec < tm.get(r.name)) tm.set(r.name, r.sec);
+      rc.teams.set(r.team, tm);
+    }
+    const out = {};
+    for (const rc of [...races.values()].sort((x, y) => (x.date < y.date ? -1 : 1))) {
+      const five = [...rc.teams].filter(([, m]) => m.size >= 5)
+        .map(([name, m]) => [name, [...m.values()].sort((x, y) => x - y).slice(0, 7)])
+        .sort((x, y) => (x[0] < y[0] ? -1 : 1));
+      if (five.length < 2) continue;
+      const B = out[rc.board] || (out[rc.board] = { t: [], m: [], ix: new Map() });
+      const id = n => { if (!B.ix.has(n)) { B.ix.set(n, B.t.length); B.t.push(n); } return B.ix.get(n); };
+      for (let i = 0; i < five.length; i++) for (let j = i + 1; j < five.length; j++) {
+        const d = dualScore(five[i][1], five[j][1]);
+        B.m.push([id(five[i][0]), id(five[j][0]), (rc.date || '').slice(5), d.a, d.b, d.res, rc.mid]);
+      }
+    }
+    for (const b of Object.values(out)) delete b.ix;
+    return out;
   }
 
   /* ---------- race ratings ----------
@@ -528,6 +615,15 @@
     return html.replace(/(const DATA_DATE="[\d-]+";)/, (m) => m + '\n' + line);
   }
 
+  /* The head-to-head table, replaced whole on every refresh, inserted beside
+     DATA_DATE the first time - the same treatment as the race table. */
+  function patchH2H(html, h2h) {
+    const line = 'const H2H=' + JSON.stringify(h2h || {}) + ';';
+    if (/const H2H=\{.*?\};/.test(html)) return html.replace(/const H2H=\{.*?\};/, () => line);
+    if (!/const DATA_DATE="[\d-]+";/.test(html)) throw new Error('DATA_DATE not found');
+    return html.replace(/(const DATA_DATE="[\d-]+";)/, (m) => m + '\n' + line);
+  }
+
   function patchLogos(html, logos) {
     const m = html.match(/const LOGO=(\{.*?\});/);
     if (!m) throw new Error('LOGO map not found');
@@ -540,7 +636,7 @@
 
   return { ALIAS, canonical, lookup, key, strip, parseClasses, toSeconds, fmt, buildSeed,
            cleanName,
-           patchIndex, patchLogos, patchRaces, SEASON_START, MIN_5K, MAX_5K,
+           patchIndex, patchLogos, patchRaces, patchH2H, dualScore, headToHead, SEASON_START, MIN_5K, MAX_5K,
            OREGON_DIV, MILES_3, divMetres, wantDiv, resultRow, teamsFromTree, fitRaces, RACE_TAU,
            MARKS_PER_ATHLETE, ATHLETES_PER_TEAM };
 }));

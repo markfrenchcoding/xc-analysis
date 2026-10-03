@@ -145,7 +145,7 @@ function meetRows(meetId, counters) {
     }
     if (!rows.length) counters.empty++;
     for (const r of rows) {
-      const row = Seed.resultRow(r, date, dist, meetId);
+      const row = Seed.resultRow(r, date, dist, meetId, d.IDMeetDiv);
       if (row) out.push(row);
     }
   }
@@ -270,8 +270,12 @@ function main() {
      was. */
   const wasSeed = (fs.readFileSync(IDX, 'utf8').match(/<script id="seed"[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
     .trim().replace(/\r\n/g, '\n');
-  // a page with no race table yet is a change even when the seed is not
+  // a page with no race table yet is a change even when the seed is not, and so
+  // is a head-to-head table that has moved - its rule can change while the seed
+  // stays byte for byte the same
+  const wasH2H = (fs.readFileSync(IDX, 'utf8').match(/const H2H=(\{.*?\});/) || [, ''])[1];
   if (b.csv.trim() === wasSeed && /const RACES=/.test(html)
+      && wasH2H === JSON.stringify(b.h2h || {})
       && date === (html.match(/const DATA_DATE="([\d-]+)"/) || [, ''])[1]) {
     log('\n  nothing changed'); process.exitCode = 3; return;
   }
@@ -291,6 +295,7 @@ function main() {
     .map(r => [r.mid, Seed.cleanName((info[r.mid] || {}).name || ''), (info[r.mid] || {}).date || '',
                r.g, r.n, r.n6A, +r.f.toFixed(4)])
     .sort((a, c) => (a[2] < c[2] ? 1 : a[2] > c[2] ? -1 : 0) || (a[1] < c[1] ? -1 : 1)));
+  out = Seed.patchH2H(out, b.h2h);
   fs.writeFileSync(IDX, out);
 
   /* The commit message is written here rather than assembled in the .cmd.
