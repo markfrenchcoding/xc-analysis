@@ -1219,6 +1219,24 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .rsort i{font-style:normal;font-size:8px;color:var(--accent);min-width:8px}
 :is(#p-doc,#p-races) .rec-tbl.races .rlane{font-family:var(--num);font-weight:700;font-size:17px;color:var(--text)}
 
+
+/* share an image of the board */
+.exp-row{margin:10px 0 2px}
+.exp-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 11px;border-radius:999px;cursor:pointer;
+  background:transparent;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 55%,var(--line));
+  font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.exp-btn:hover,.exp-btn:focus-visible{background:color-mix(in srgb,var(--accent) 10%,transparent);outline:none;border-color:var(--accent)}
+.exp-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.exp-sw{margin-top:11px}
+.exp-prev{margin:12px 17px 0;display:grid;place-items:center;min-height:220px;background:#0D0D0F;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.exp-wait{color:var(--muted);font-size:13px}
+.exp-img{display:block;width:100%;height:auto}
+.exp-img.story{width:auto;max-width:100%;max-height:62vh}
+.exp-card .gl-go{width:calc(100% - 34px);margin:14px 17px 2px}
+.exp-save{display:block;width:calc(100% - 34px);margin:8px 17px 2px;text-align:center;text-decoration:none;box-sizing:border-box}
+.exp-save[aria-disabled]{opacity:.45;pointer-events:none}
+
 /* the Team page */
 #p-wi .wisel{margin:6px 0 4px}
 .tm-part{margin-top:34px;padding-top:6px;border-top:1px solid var(--line)}
@@ -12160,6 +12178,7 @@ function buildBoard(tally,model){
     <h2 class="sec">Odds by team</h2>
     <p class="sub2">Points are a team's average score in the seasons it reaches Lane, so a team that rarely gets there can still show a good one. The OSAA chip on each card is that team&rsquo;s place in the OSAAtoday coaches poll, a separate opinion from ours${pollWhen()?" ("+pollWhen()+")":""}. The bars show where it finished across ${nSims.toLocaleString()} simulated ${nSims===1?"season":"seasons"}.</p>
     <p class="acc-note">${CLS==="6A"?"":"No past seasons have been scored on this board yet. The track record covers 6A. "}<a href="#" class="acc-link">How accurate is this?</a></p>
+    <p class="exp-row"><button class="exp-btn" data-exp="teams"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="9" cy="9.5" r="1.8"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg>Share image</button></p>
     <div class="legend">
       <span><i style="background:var(--t1)"></i>1st</span>
       <span><i style="background:var(--t2)"></i>2nd</span>
@@ -13146,7 +13165,8 @@ function spin(s,lock){
 
 function buildRunBoard(pool){
   const out=document.getElementById("runOut");
-  out.innerHTML='<div class="rhead"><span></span><span>athlete</span><span>wins</span>'
+  out.innerHTML='<p class="exp-row"><button class="exp-btn" data-exp="runners"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="9" cy="9.5" r="1.8"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg>Share image</button></p>'
+    +'<div class="rhead"><span></span><span>athlete</span><span>wins</span>'
     +'<span>all-state</span><span>avg place</span><span>gets there</span></div>'
     +'<div id="rboard"></div>'
     +'<p class="sub2" id="runFoot" style="margin-top:9px"></p>';
@@ -14586,6 +14606,269 @@ function ghostOdds(model,gi,sigma){
   }
   slice();
 }
+
+/* ---------- a picture of the board, to post ----------
+   The Teams or Runners board as one image, sized for a feed (4:5, 1080x1350,
+   top ten) or a story (9:16, 1080x1920, top fifteen). Drawn on a canvas from
+   the same RUN the board paints from, so the image and the board cannot
+   disagree. Always the dark design: it is the brand, whichever theme the
+   reader has on.
+
+   The settings ride along at the foot in fine print - board, season, results
+   date, seasons run, the spread and the 3-mile setting - so a screenshot that
+   travels without the site still says what it was a picture of. Subtle on
+   purpose: a reader sees the teams; anybody checking can read the stamp.
+
+   Crests come from googleusercontent, which answers with
+   Access-Control-Allow-Origin: *, so crossOrigin="anonymous" keeps the canvas
+   exportable. A crest that fails falls back to initials rather than tainting
+   the canvas or holding the picture up. The CSP has data: for images and no
+   blob:, so the preview is a data URL; sharing hands the OS a File made with
+   toBlob, which needs no fetch and so no connect-src. */
+const EXP={fmt:"post",kind:"teams",url:"",blob:null};
+const EXP_FMT={post:{w:1080,h:1350,n:10},story:{w:1080,h:1920,n:15}};
+const EXP_C={bg:"#0D0D0F",surface:"#17171A",raised:"#212126",line:"#2E2E35",text:"#F3F3F4",
+  muted:"#A2A2AB",dim:"#6C6C77",accent:"#E8A33D"};
+// the seven, from the mark's own coordinates (the skew is already in them)
+const EXP_DOTS=[[27.71,10.57,1],[17.85,5.58,1],[26.3,20.55,1],[16.44,15.56,1],[6.58,10.57,1],
+  [15.05,25.54,0],[5.17,20.55,0]];
+// the four plate finishes, repeated from the <defs> by hand like the SVG ones
+const EXP_PLATE=[["#B6CEFF","#4A74D8"],["#FFFFFF","#B2B9C3"],["#F8D2AB","#C08344"],["#3C4047","#101215"]];
+
+function expImg(url){
+  return new Promise(res=>{
+    if(!url)return res(null);
+    const i=new Image();let done=false;
+    const fin=v=>{if(!done){done=true;res(v);}};
+    i.crossOrigin="anonymous";i.referrerPolicy="no-referrer";
+    i.onload=()=>fin(i);i.onerror=()=>fin(null);
+    setTimeout(()=>fin(null),5000);
+    i.src=url;
+  });
+}
+function expStamp(){
+  const d=new Date(DATA_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  const dr=driftPct();
+  return [CLS+" "+(gender==="M"?"BOYS":"GIRLS"),
+    NEXT_SEASON?"NEXT SEASON":"THIS SEASON",
+    "RESULTS THROUGH "+d.toUpperCase(),
+    RUN.done.toLocaleString()+" SEASONS",
+    "±"+sigmaPct.toFixed(1)+"% RACE DAY"+(dr>0.05?" +"+dr.toFixed(1)+"% DRIFT":""),
+    MILES_ON?"3-MILE MARKS IN":"5,000M MARKS ONLY"];
+}
+function expRows(kind,n){
+  const done=RUN.done;
+  if(kind==="runners"){
+    const mean=r=>r.n?r.placeSum/r.n:1e9;
+    return RUN.pool.filter(r=>r.n).sort((a,b)=>mean(a)-mean(b)).slice(0,n).map(r=>({
+      name:r.name,team:r.team,big:mean(r).toFixed(1),bigLab:"AVG PLACE",
+      sub:r.team+" · wins "+pct(r.win,done)+" · all-state "+pct(r.top21,done),
+      bar:r.top21/done}));
+  }
+  const order=[...RUN.tally].sort((a,b)=>
+    b.win-a.win||b.top4-a.top4||b.top10-a.top10||b.qual-a.qual||a.avg5-b.avg5);
+  return order.slice(0,n).map(t=>({
+    name:t.name,team:t.name,big:pct(t.win,done),bigLab:"WINS STATE",
+    sub:(ABBR[t.league]||t.league)+" · "+pct(t.qual,done)+" reach Lane",
+    bar:t.win/done}));
+}
+function expFit(ctx,text,font,size,max){
+  let s=size;
+  ctx.font=font.replace("$",s);
+  while(s>14&&ctx.measureText(text).width>max){s-=1;ctx.font=font.replace("$",s);}
+  return s;
+}
+function expDots(ctx,x,y,size,alpha){
+  const k=size/32;
+  ctx.save();ctx.globalAlpha=alpha;
+  for(const [cx,cy,f] of EXP_DOTS){
+    ctx.beginPath();
+    if(f){ctx.arc(x+cx*k,y+cy*k,2.79*k,0,7);ctx.fillStyle=EXP_C.accent;ctx.fill();}
+    else{ctx.arc(x+cx*k,y+cy*k,2.49*k,0,7);ctx.strokeStyle=EXP_C.accent;ctx.lineWidth=2.35*k;ctx.stroke();}
+  }
+  ctx.restore();
+}
+function expTrophy(ctx,i,x,y,w){
+  const s=w/106, p=new Path2D(OR_PATH);
+  ctx.save();ctx.translate(x+3*s,y+3*s);ctx.scale(s,s);
+  const g=ctx.createLinearGradient(0,0,0,74);
+  g.addColorStop(0,EXP_PLATE[i][0]);g.addColorStop(1,EXP_PLATE[i][1]);
+  const wd=ctx.createLinearGradient(0,0,0,74);
+  wd.addColorStop(0,"#8A5C33");wd.addColorStop(1,"#4E3018");
+  ctx.lineWidth=4.4;ctx.lineJoin="round";ctx.strokeStyle=wd;ctx.stroke(p);
+  ctx.fillStyle=g;ctx.fill(p);
+  ctx.fillStyle=i===3?"#B0B6BE":"#0D0D0F";
+  ctx.font="34px Anton";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText("#"+(i+1),50,38);
+  ctx.restore();
+}
+async function expDraw(kind,fmt){
+  const F=EXP_FMT[fmt], W=F.w, H=F.h, M=64;
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;
+  const ctx=cv.getContext("2d");
+  if(document.fonts&&document.fonts.load){
+    try{await Promise.all(["40px Anton","700 40px Oswald","600 40px Oswald","700 40px Rajdhani",
+      "600 40px Rajdhani","400 40px Barlow","500 40px Barlow"].map(f=>document.fonts.load(f)));}catch(e){}
+  }
+  const rows=expRows(kind,F.n);
+  const crests=await Promise.all(rows.map(r=>expImg(LOGO[r.team])));
+  const ls=v=>{if("letterSpacing" in ctx)ctx.letterSpacing=v;};
+
+  // ground: near-black, a warm glow off the top right, the seven huge and faint
+  ctx.fillStyle=EXP_C.bg;ctx.fillRect(0,0,W,H);
+  let g=ctx.createRadialGradient(W*0.92,-H*0.02,0,W*0.92,-H*0.02,W*0.95);
+  g.addColorStop(0,"rgba(232,163,61,.22)");g.addColorStop(1,"rgba(232,163,61,0)");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  g=ctx.createRadialGradient(0,H,0,0,H,W*0.8);
+  g.addColorStop(0,"rgba(232,163,61,.07)");g.addColorStop(1,"rgba(232,163,61,0)");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  expDots(ctx,W-430,H-560,760,0.035);
+
+  // masthead: the mark and the wordmark, with the board named on the right
+  expDots(ctx,M,52,64,1);
+  ctx.save();ctx.translate(M+80,108);ctx.transform(1,0,-Math.tan(8*Math.PI/180),1,0,0);
+  ctx.fillStyle=EXP_C.text;ctx.font="60px Anton";ctx.textBaseline="alphabetic";ctx.textAlign="left";
+  ctx.fillText("CHUTE",0,0);ctx.restore();
+  ctx.textAlign="right";ctx.fillStyle=EXP_C.muted;ctx.font="600 24px Oswald";ls("3px");
+  ctx.fillText("OREGON CROSS COUNTRY",W-M,74);
+  ctx.fillStyle=EXP_C.accent;ctx.fillText("STATE ODDS",W-M,108);ls("0px");
+
+  // title
+  let y=fmt==="story"?250:214;
+  ctx.textAlign="left";ctx.fillStyle=EXP_C.accent;ctx.font="600 30px Oswald";ls("4px");
+  ctx.fillText(CLS+" "+(gender==="M"?"BOYS":"GIRLS")+(NEXT_SEASON?" · NEXT SEASON":""),M,y);ls("0px");
+  y+=fmt==="story"?112:100;
+  ctx.fillStyle=EXP_C.text;
+  expFit(ctx,kind==="runners"?"FRONT OF THE RACE":"WHO WINS STATE?","$px Anton",fmt==="story"?118:104,W-2*M);
+  ctx.fillText(kind==="runners"?"FRONT OF THE RACE":"WHO WINS STATE?",M,y);
+  y+=48;
+  ctx.fillStyle=EXP_C.muted;ctx.font="400 28px Barlow";
+  const lane=new Date(STATE_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  ctx.fillText(kind==="runners"
+    ?"Average finish at Lane, "+lane+", from "+RUN.done.toLocaleString()+" simulated seasons"
+    :"Chance of the title at Lane, "+lane+", from "+RUN.done.toLocaleString()+" simulated seasons",M,y);
+  y+=34;
+  ctx.fillStyle=EXP_C.accent;ctx.fillRect(M,y,96,6);
+
+  // rows
+  const top=y+(fmt==="story"?62:44), foot=H-(fmt==="story"?210:178);
+  const rh=(foot-top)/rows.length, maxBar=Math.max(...rows.map(r=>r.bar),1e-9);
+  rows.forEach((r,i)=>{
+    const ry=top+i*rh, cy=ry+rh/2;
+    // the bar: how much of the top row's value this row holds
+    const bx=M+168, bw=(W-M-bx)*Math.max(0.015,r.bar/maxBar);
+    const bg2=ctx.createLinearGradient(bx,0,bx+bw,0);
+    bg2.addColorStop(0,"rgba(232,163,61,"+(i===0?.26:.14)+")");bg2.addColorStop(1,"rgba(232,163,61,.02)");
+    ctx.fillStyle=bg2;
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(bx,ry+rh*0.12,bw,rh*0.76,10):ctx.rect(bx,ry+rh*0.12,bw,rh*0.76);ctx.fill();
+    if(i)ctx.fillStyle=EXP_C.line,ctx.fillRect(M,ry,W-2*M,1);
+    // rank: the plaque for the four OSAA trophies, a number below that
+    if(i<4&&kind==="teams")expTrophy(ctx,i,M-4,cy-rh*0.36,Math.min(92,rh*1.02));
+    else{
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillStyle=i<3?EXP_C.accent:EXP_C.muted;ctx.font="700 "+Math.round(rh*0.46)+"px Rajdhani";
+      ctx.fillText(String(i+1),M+40,cy+2);
+    }
+    // crest
+    const cr=Math.min(28,rh*0.36), cx=M+124;
+    ctx.save();ctx.beginPath();ctx.arc(cx,cy,cr,0,7);ctx.closePath();
+    ctx.fillStyle=EXP_C.raised;ctx.fill();ctx.clip();
+    if(crests[i]){
+      const im=crests[i], k=Math.max(2*cr/im.width,2*cr/im.height);
+      ctx.drawImage(im,cx-im.width*k/2,cy-im.height*k/2,im.width*k,im.height*k);
+    }else{
+      ctx.fillStyle=EXP_C.muted;ctx.font="600 "+Math.round(cr*0.8)+"px Oswald";
+      ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(initials(r.team),cx,cy+1);
+    }
+    ctx.restore();
+    // name and the line under it
+    const nx=M+168, right=W-M-170;
+    ctx.textAlign="left";ctx.textBaseline="alphabetic";ctx.fillStyle=EXP_C.text;
+    expFit(ctx,r.name.toUpperCase(),"700 $px Oswald",Math.round(rh*0.4),right-nx);
+    ctx.fillText(r.name.toUpperCase(),nx,cy+2);
+    ctx.fillStyle=EXP_C.muted;expFit(ctx,r.sub,"500 $px Barlow",Math.round(rh*0.27),right-nx);
+    ctx.fillText(r.sub,nx,cy+rh*0.33);
+    // the figure
+    ctx.textAlign="right";ctx.fillStyle=i===0?EXP_C.accent:EXP_C.text;
+    ctx.font="700 "+Math.round(rh*0.56)+"px Rajdhani";ctx.fillText(r.big,W-M,cy+rh*0.12);
+    // the unit once, on the first row: ten repeats of it is noise
+    if(!i){ctx.fillStyle=EXP_C.dim;ctx.font="600 "+Math.round(Math.max(14,rh*0.19))+"px Oswald";ls("2px");
+      ctx.fillText(r.bigLab,W-M,cy+rh*0.36);ls("0px");}
+  });
+
+  // foot: the address, and the settings in fine print
+  ctx.fillStyle=EXP_C.line;ctx.fillRect(M,foot+18,W-2*M,1);
+  ctx.textAlign="left";ctx.textBaseline="alphabetic";
+  ctx.fillStyle=EXP_C.accent;ctx.font="600 30px Oswald";ls("1px");
+  ctx.fillText("chutexc.vercel.app",M,foot+70);ls("0px");
+  ctx.textAlign="right";ctx.fillStyle=EXP_C.dim;ctx.font="400 22px Barlow";
+  ctx.fillText("Results from athletic.net",W-M,foot+68);
+  ctx.textAlign="left";ctx.font="600 19px Rajdhani";ls("2.5px");ctx.fillStyle=EXP_C.dim;
+  const parts=expStamp(), lines=[""];
+  for(const p of parts){
+    const t=lines[lines.length-1]?lines[lines.length-1]+"  ·  "+p:p;
+    if(ctx.measureText(t).width>W-2*M)lines.push(p);else lines[lines.length-1]=t;
+  }
+  lines.forEach((l,k)=>ctx.fillText(l,M,foot+116+k*30));ls("0px");
+  return cv;
+}
+
+async function exportBoard(kind){
+  if(running){toast("Let the run finish first");return;}
+  if(!RUN||!RUN.done){toast("Press Run first");return;}
+  EXP.kind=kind==="runners"?"runners":"teams";
+  const el=overlay();
+  const canShare=!!(navigator.canShare&&navigator.share&&typeof File!=="undefined");
+  el.innerHTML='<div class="gl-card gl-wide exp-card" role="dialog" aria-label="Share this board as an image">'
+    +'<div class="gl-tape"></div>'
+    +'<div class="gl-hd"><h3>Share this board</h3>'
+    +'<p>The '+(EXP.kind==="runners"?"Runners":"Teams")+' board as an image, settings in the fine print.</p>'
+    +'<div class="switch exp-sw" role="group" aria-label="Size">'
+    +'<button data-f="post" aria-pressed="'+(EXP.fmt==="post")+'">Post 4:5</button>'
+    +'<button data-f="story" aria-pressed="'+(EXP.fmt==="story")+'">Story 9:16</button></div></div>'
+    +'<div class="exp-prev"><div class="exp-wait">Drawing…</div><img alt="" hidden></div>'
+    +(canShare?'<button class="gl-go" id="expShare" disabled>Share</button>':'')
+    +'<a class="gl-share exp-save" id="expSave" download="chute.png" aria-disabled="true">Save image</a>'
+    +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  el.querySelectorAll(".exp-sw button").forEach(b=>b.onclick=()=>{
+    if(b.dataset.f===EXP.fmt)return;
+    EXP.fmt=b.dataset.f;
+    el.querySelectorAll(".exp-sw button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    expRender(el);
+  });
+  const sh=document.getElementById("expShare");
+  if(sh)sh.onclick=async()=>{
+    if(!EXP.blob)return;
+    const f=new File([EXP.blob],expName(),{type:"image/png"});
+    if(navigator.canShare({files:[f]})){
+      try{await navigator.share({files:[f],title:"Chute",text:"chutexc.vercel.app"});}catch(e){}
+    }else toast("This browser cannot share images. Use Save image.");
+  };
+  expRender(el);
+}
+function expName(){
+  return ("chute-"+CLS+"-"+(gender==="M"?"boys":"girls")+"-"+EXP.kind+"-"+DATA_DATE+"-"+EXP.fmt)
+    .toLowerCase().replace(/[^a-z0-9-]+/g,"-")+".png";
+}
+async function expRender(el){
+  const img=el.querySelector(".exp-prev img"), wait=el.querySelector(".exp-wait"),
+        save=document.getElementById("expSave"), sh=document.getElementById("expShare");
+  const ticket=(EXP.ticket=(EXP.ticket||0)+1);
+  img.hidden=true;wait.hidden=false;if(sh)sh.disabled=true;save.setAttribute("aria-disabled","true");
+  const cv=await expDraw(EXP.kind,EXP.fmt);
+  if(ticket!==EXP.ticket||!document.body.contains(img))return;   // switched size mid-draw
+  EXP.url=cv.toDataURL("image/png");
+  EXP.blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+  img.src=EXP.url;img.hidden=false;wait.hidden=true;
+  img.className="exp-img "+EXP.fmt;
+  save.href=EXP.url;save.download=expName();save.removeAttribute("aria-disabled");
+  if(sh)sh.disabled=false;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest(".exp-btn");
+  if(!b)return;
+  e.preventDefault();exportBoard(b.dataset.exp);
+});
 
 function closeRace(){
   drCancel();

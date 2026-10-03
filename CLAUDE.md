@@ -306,6 +306,31 @@ leagues" on every board, including the five-league and four-league ones.
 
 Three things on the board beyond the odds themselves.
 
+**Share image (Oct 2).** A button on the Teams and Runners boards draws the
+board as a PNG on a canvas (`exportBoard`, `expDraw`): a **Post** at 1080x1350
+with the top ten or a **Story** at 1080x1920 with the top fifteen, previewed in
+the overlay with Share (the OS share sheet, via `navigator.share` with a File,
+only where the browser can share files) and Save image. It reads the same `RUN`
+the board paints from, in the board's own order, so the two cannot disagree.
+
+- **Always the dark design** (`EXP_C` repeats the dark tokens): it is the brand,
+  whatever theme the reader has on. The plates repeat the trophy `<defs>` stops
+  by hand (`EXP_PLATE`) - a third copy, so change all three together. The seven
+  are drawn from the mark's own coordinates (`EXP_DOTS`), skew baked in.
+- **The settings are a fine-print stamp at the foot** (`expStamp`): board,
+  this/next season, results-through date, seasons run, race-day spread plus
+  drift, and whether 3-mile marks were in. The owner asked for the settings to
+  be included subtly; a screenshot travels without the site.
+- **Crests are drawn cross-origin.** googleusercontent answers
+  `Access-Control-Allow-Origin: *`, so `crossOrigin="anonymous"` keeps the canvas
+  exportable; a crest that fails or takes over five seconds falls back to
+  initials instead of tainting the canvas. **The CSP has `data:` and no `blob:`
+  for images**, so the preview and Save use a data URL, and Share hands the OS a
+  File from `toBlob` (no fetch, so no `connect-src` either).
+- The figure's unit ("WINS STATE", "AVG PLACE") prints on the first row only;
+  ten repeats of it was noise. Trophies only on the Teams image - a runner did
+  not win a plaque.
+
 **1-5 average and spread.** A quiet line under each card's name: the mean of
 the scoring five's season bests and the gap from first to fifth (`packOf`,
 `packLine`), on the overlay and the Team page too. Times as run (`sbRaw`), never
