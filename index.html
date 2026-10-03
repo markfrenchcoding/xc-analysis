@@ -14708,15 +14708,12 @@ function expSlides(kind,n){
   const order=[...RUN.tally].sort((a,b)=>
     b.win-a.win||b.top4-a.top4||b.top10-a.top10||b.qual-a.qual||a.avg5-b.avg5).slice(0,n);
   const lg=t=>ABBR[t.league]||t.league;
-  const pts=t=>t.ptsN?t.ptsSum/t.ptsN:null;
-  /* Points get their own order, lowest score first, because a list is read as
-     sorted by its number: carried over in win order they ran 92, 135, 159, 154
-     and looked like a mistake. Only teams that reach Lane in at least half the
-     seasons, because the average is taken over the seasons a team gets there,
-     and a team that gets there one year in ten only does so when everything
-     went right - its average flatters it. */
-  const byPts=RUN.tally.filter(t=>t.ptsN&&t.qual/done>=0.5).sort((a,b)=>pts(a)-pts(b)).slice(0,n);
-  const best=byPts.length?pts(byPts[0]):1;
+  /* The pack, which is what a coach quotes about a team: the scoring five's
+     average and the gap from first to fifth, off the times actually run
+     (packOf). In the board's order like the first two slides, so the three
+     read as one set. A 3-mile mark among the five gets a dash, because
+     averaging it with 5ks would mean showing a converted time. */
+  const pack=t=>packOf(RUN.model.teams[t.idx]);
   return [
     {key:"list",cap:"The list",title:"THE TOP "+(n===10?"TEN":"FIFTEEN"),
      sub:"Ranked on "+sims+" simulated seasons, finishing at Lane, "+lane,
@@ -14725,10 +14722,11 @@ function expSlides(kind,n){
      sub:"Chance of the title at Lane, "+lane+", from "+sims+" seasons",unit:"WINS STATE",
      rows:order.map(t=>({name:t.name,team:t.name,big:pct(t.win,done),
        sub:lg(t)+" · "+pct(t.qual,done)+" reach Lane",bar:t.win/done}))},
-    {key:"pts",cap:"Points",title:"THE SCORE AT LANE",
-     sub:"Average team score at state, lowest first, for teams there in at least half the seasons",unit:"AVG POINTS",
-     rows:byPts.map(t=>{const p=pts(t);return {name:t.name,team:t.name,big:String(Math.round(p)),
-       sub:lg(t)+" · there "+pct(t.qual,done)+" of seasons",bar:best/p};})},
+    {key:"pack",cap:"Average and spread",title:"THE SCORING "+(SC===4?"FOUR":"FIVE"),
+     sub:"Each team’s 1–"+SC+" average and spread, from season bests as run",unit:"1–"+SC+" AVG",
+     rows:order.map(t=>{const p=pack(t), ok=p&&!p.mi;return {name:t.name,team:t.name,
+       big:ok?fmt(p.avg):"—",
+       sub:lg(t)+" · 1–"+SC+" spread "+(ok?fmtGap(p.spread):"—")};})},
   ];
 }
 function expFit(ctx,text,font,size,max){
@@ -14881,7 +14879,7 @@ async function exportBoard(kind){
   if(!RUN||!RUN.done){toast("Press Run first");return;}
   EXP.kind=kind==="runners"?"runners":"teams";EXP.at=0;
   const el=overlay();
-  const caps=EXP.kind==="runners"?["The list","Average place","All-state"]:["The list","State odds","Points"];
+  const caps=EXP.kind==="runners"?["The list","Average place","All-state"]:["The list","State odds","Average and spread"];
   el.innerHTML='<div class="gl-card gl-wide exp-card" role="dialog" aria-label="Share this board as images">'
     +'<div class="gl-tape"></div>'
     +'<div class="gl-hd"><h3>Share this board</h3>'
