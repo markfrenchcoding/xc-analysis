@@ -11093,7 +11093,7 @@ M,Ethan Emch,20:32.50,11,Regis,4828,2A/1A,1.0000
       <h3>Checked against seasons we already know</h3>
       <p>Anyone can publish numbers. The question is whether they hold up, so we checked.</p>
       <p>We rebuilt <span id="howSeasons">four past seasons</span> exactly as they stood
-        <span id="howCut">eight weeks</span> before their own state meet, with nothing after
+        <span id="howCut">six weeks</span> before their own state meet, with nothing after
         that date and no hindsight, then ran each season forward and compared it to what
         actually happened at Lane in November.</p>
       <p>It is easy to sort teams. It is hard to be right about <em>how sure</em> you are, and that is the part worth checking. The whole scorecard is on the <b>Track record</b> tab above, written straight out of the harness: what we got right, what we got wrong, and where the odds are still too confident. A model that has never been scored is only an opinion.</p>
@@ -11630,13 +11630,23 @@ function syncHowText(){
       :("the "+y.join(" and ")+" season"+(y.length>1?"s":""));
   }
   const c=document.getElementById("howCut");
-  if(c)c.textContent=RECORD.weeksOut+" weeks";
+  if(c)c.textContent=headRow().weeks+" weeks";
   syncHowStats();
 }
 /* The four figures under the first diagram. They were typed in once and sat at
    2,221 athletes and 2,974 results for a month while the database grew past
    three and a half thousand and nine thousand. Counted off DATA now, which is
    what the board itself runs on. */
+/* The headline horizon. The pages open on six weeks out: far enough ahead to be
+   a forecast, near enough that the season has mostly happened, and the point
+   most of the season is read from. Eight weeks was the headline once and made
+   the opening claim the weakest one on the page. The horizon table below still
+   lights whichever row is nearest today. */
+const HEAD_WEEKS=6;
+function headRow(){
+  const R=RECORD, h=R.byHorizon&&R.byHorizon.find(x=>x.weeks===HEAD_WEEKS);
+  return h||{weeks:R.weeksOut,found:R.found,ofField:R.ofField,champHit:R.champHit,champOf:R.champOf,skill:R.skill};
+}
 function syncHowStats(){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v.toLocaleString();};
   set("hsAth",new Set(DATA.map(r=>r.cls+"|"+r.g+"|"+r.team+"|"+r.name)).size);
@@ -13663,13 +13673,10 @@ function renderRecord(){
 
   /* Four plain answers, not four statistics. Each tile leads with the thing a
      reader can check and says in words what would count as good. */
-  /* The tiles lead with the row for where the board is today, not September's.
-     A pooled eight-week figure read as "this model is 42% skilful" in October,
-     which is false: at four or five weeks the same seasons score near 75%. */
-  const nowW0=weeksOut();
-  const T0=(R.byHorizon&&R.byHorizon.length&&nowW0!==null)
-    ?R.byHorizon.reduce((a,b)=>Math.abs(b.weeks-nowW0)<Math.abs(a.weeks-nowW0)?b:a)
-    :{weeks:R.weeksOut,found:R.found,ofField:R.ofField,champHit:R.champHit,champOf:R.champOf,skill:R.skill};
+  /* The tiles lead with the headline horizon, the same one the opening sentence
+     names. They used to follow the row nearest today, which put the sentence
+     above them on eight weeks and the tiles on six. */
+  const T0=headRow();
   const tiles=[
     [T0.found+" of "+T0.ofField,
      "teams that really made it to Lane were in our top group "+T0.weeks+" weeks out"],
@@ -13797,7 +13804,7 @@ function renderRecord(){
 
   box.innerHTML=
     '<h3>We tested this against seasons we already know the answer to</h3>'
-    +'<p>We rebuilt the '+yr+' seasons as they looked '+R.weeksOut+' weeks before each '
+    +'<p>We rebuilt the '+yr+' seasons as they looked '+T0.weeks+' weeks before each '
     +'state meet. Nothing after that date went in. Then we played each season out '
     +R.runs.toLocaleString()+' times and checked the result against what really happened at '
     +'Lane. That is <b>'+R.teamSeasons+' teams</b> judged, '+R.qualified+' of which made it.</p>'
@@ -13844,10 +13851,11 @@ function renderRecord(){
       +'shows how much less: '+thin.marks.toLocaleString()+' race results by the '+thin.year
       +' cutoff against '+full.marks.toLocaleString()+' by '+full.year+'. Today\u2019s board '
       +'runs on more results than any season in this table, so read these as a floor.</p>':'')
-    +'<p>Picking the <b>winner</b> is much harder, and we will not dress it up. From '
-    +R.cutoff+', the team we called the favourite went on to win <b>'+R.champHit+' of '
-    +R.champOf+'</b>. Eight weeks out, nobody knows who wins.'
-    +(nearPick?' By '+near.weeks+' weeks out, where the board is now, the favourite won <b>'
+    +'<p>Picking the <b>winner</b> is much harder, and we will not dress it up. '
+    +T0.weeks+' weeks out, the team we called the favourite went on to win <b>'+T0.champHit+' of '
+    +T0.champOf+'</b>. From '+R.cutoff+', '+R.weeksOut+' weeks out, it was <b>'+R.champHit+' of '
+    +R.champOf+'</b>: that early, nobody knows who wins.'
+    +(nearPick&&near.weeks!==T0.weeks?' By '+near.weeks+' weeks out, where the board is now, the favourite won <b>'
       +near.champHit+' of '+near.champOf+'</b>.':'')+'</p>'
 
     +'<h3>Early-season numbers are wider than they look</h3>'

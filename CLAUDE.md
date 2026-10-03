@@ -824,6 +824,16 @@ to 123, and race ratings are what closed that.
 Teams called 90%+ qualified 90% of the time, and the 70-90% group, which used to
 come in at 50% on a call of 81%, now comes in at 76%.
 
+**The About pages open on six weeks out, not eight (Oct 2).** The How tab's
+"we rebuilt four past seasons exactly as they stood N weeks before", the Track
+record's first sentence, its tiles and the champions sentence all read
+`headRow()`, the `RECORD.byHorizon` row at `HEAD_WEEKS = 6`: 127 of 144, 5 of 8
+champions, 74% skill. Before this the sentence said eight weeks while the tiles
+under it followed the row nearest today, which was six - the page contradicted
+itself in two consecutive lines. The horizon table still lights today's row, and
+the season-by-season table stays at eight and four weeks because `perSeason` is
+only published at those two cutoffs.
+
 **The headline is scored the way the board runs, and it used not to be.** It was
 scored at the bare race-day dial, which in September is a spread the board never
 uses. When the dial was corrected from 2.3 to 1.6 the headline fell from 35% to
