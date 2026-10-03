@@ -1228,13 +1228,32 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
 .exp-btn:hover,.exp-btn:focus-visible{background:color-mix(in srgb,var(--accent) 10%,transparent);outline:none;border-color:var(--accent)}
 .exp-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
 .exp-sw{margin-top:11px}
-.exp-prev{margin:12px 17px 0;display:grid;place-items:center;min-height:220px;background:#0D0D0F;
-  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+/* three images in a row that snap one at a time: the browser's own swipe */
+.exp-stage{position:relative;margin:12px 17px 0}
+.exp-car{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;
+  scrollbar-width:none;border-radius:12px;outline:none}
+.exp-car::-webkit-scrollbar{display:none}
+.exp-car:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.exp-slide{flex:0 0 100%;margin:0;scroll-snap-align:center;scroll-snap-stop:always;display:grid;place-items:center;
+  min-height:240px;background:#0D0D0F;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-sizing:border-box}
 .exp-wait{color:var(--muted);font-size:13px}
 .exp-img{display:block;width:100%;height:auto}
-.exp-img.story{width:auto;max-width:100%;max-height:62vh}
-.exp-card .gl-go{width:calc(100% - 34px);margin:14px 17px 2px}
-.exp-save{display:block;width:calc(100% - 34px);margin:8px 17px 2px;text-align:center;text-decoration:none;box-sizing:border-box}
+.exp-img.story{width:auto;max-width:100%;max-height:58vh}
+.exp-nav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 80%,transparent);color:var(--text);
+  font-size:22px;line-height:1;cursor:pointer;display:none}
+.exp-nav.prev{left:6px}.exp-nav.next{right:6px}
+.exp-nav:disabled{opacity:0;pointer-events:none}
+@media (hover:hover){.exp-nav{display:grid;place-items:center}}
+.exp-dots{display:flex;justify-content:center;gap:8px;margin:11px 0 0}
+.exp-dots button{width:8px;height:8px;padding:0;border-radius:50%;border:0;background:var(--line);cursor:pointer;
+  transition:background .2s,transform .2s}
+.exp-dots button.on{background:var(--accent);transform:scale(1.25)}
+.exp-cap{margin:7px 17px 0;text-align:center;font-size:12.5px;color:var(--muted)}
+.exp-card .gl-go,.exp-card .gl-share{width:calc(100% - 34px);margin-left:17px;margin-right:17px;box-sizing:border-box}
+.exp-card .gl-go{margin-top:12px}
+.exp-hint{margin:8px 17px 0;text-align:center;font-size:12px;color:var(--muted)}
+.exp-save{display:block;text-align:center;text-decoration:none}
 .exp-save[aria-disabled]{opacity:.45;pointer-events:none}
 
 /* the Team page */
@@ -14607,25 +14626,31 @@ function ghostOdds(model,gi,sigma){
   slice();
 }
 
-/* ---------- a picture of the board, to post ----------
-   The Teams or Runners board as one image, sized for a feed (4:5, 1080x1350,
+/* ---------- pictures of the board, to post ----------
+   The Teams or Runners board as a set of three images you swipe through, the
+   way a carousel post reads: the list, then the odds, then the points (for
+   runners: the list, average place, all-state). Every slide keeps the board's
+   own order so the three read as one story. Sized for a feed (4:5, 1080x1350,
    top ten) or a story (9:16, 1080x1920, top fifteen). Drawn on a canvas from
-   the same RUN the board paints from, so the image and the board cannot
+   the same RUN the board paints from, so the images and the board cannot
    disagree. Always the dark design: it is the brand, whichever theme the
    reader has on.
 
    The settings ride along at the foot in fine print - board, season, results
    date, seasons run, the spread and the 3-mile setting - so a screenshot that
-   travels without the site still says what it was a picture of. Subtle on
-   purpose: a reader sees the teams; anybody checking can read the stamp.
+   travels without the site still says what it was a picture of.
 
    Crests come from googleusercontent, which answers with
    Access-Control-Allow-Origin: *, so crossOrigin="anonymous" keeps the canvas
    exportable. A crest that fails falls back to initials rather than tainting
-   the canvas or holding the picture up. The CSP has data: for images and no
-   blob:, so the preview is a data URL; sharing hands the OS a File made with
-   toBlob, which needs no fetch and so no connect-src. */
-const EXP={fmt:"post",kind:"teams",url:"",blob:null};
+   the canvas. The CSP has data: for images and no blob:, so previews are data
+   URLs; sharing hands the OS Files made with toBlob, which needs no fetch.
+
+   Saving: a download link does nothing on an iPhone - the owner pressed it and
+   nothing happened. Wherever the browser can share files, the share sheet IS
+   the save button (it carries Save Image), so phones get Share and Share all 3;
+   anything that cannot share files gets download links. */
+const EXP={fmt:"post",kind:"teams",slides:[],at:0,ticket:0};
 const EXP_FMT={post:{w:1080,h:1350,n:10},story:{w:1080,h:1920,n:15}};
 const EXP_C={bg:"#0D0D0F",surface:"#17171A",raised:"#212126",line:"#2E2E35",text:"#F3F3F4",
   muted:"#A2A2AB",dim:"#6C6C77",accent:"#E8A33D"};
@@ -14656,21 +14681,49 @@ function expStamp(){
     "±"+sigmaPct.toFixed(1)+"% RACE DAY"+(dr>0.05?" +"+dr.toFixed(1)+"% DRIFT":""),
     MILES_ON?"3-MILE MARKS IN":"5,000M MARKS ONLY"];
 }
-function expRows(kind,n){
-  const done=RUN.done;
+/* The three slides for a board: a title, a line under it, and for each row the
+   figure, its unit, the line under the name and how long its bar is. A slide
+   with no figure is the plain list. */
+function expSlides(kind,n){
+  const done=RUN.done, sims=done.toLocaleString();
+  const lane=new Date(STATE_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
   if(kind==="runners"){
     const mean=r=>r.n?r.placeSum/r.n:1e9;
-    return RUN.pool.filter(r=>r.n).sort((a,b)=>mean(a)-mean(b)).slice(0,n).map(r=>({
-      name:r.name,team:r.team,big:mean(r).toFixed(1),bigLab:"AVG PLACE",
-      sub:r.team+" · wins "+pct(r.win,done)+" · all-state "+pct(r.top21,done),
-      bar:r.top21/done}));
+    const list=RUN.pool.filter(r=>r.n).sort((a,b)=>mean(a)-mean(b)).slice(0,n);
+    const base=r=>({name:r.name,team:r.team});
+    return [
+      {key:"list",cap:"The front of the race",title:"FRONT OF THE RACE",
+       sub:"The runners most likely to lead at Lane, "+lane,
+       rows:list.map(r=>({...base(r),sub:r.team+" · season best "+fmt(r.sb)}))},
+      {key:"place",cap:"Average place",title:"WHERE THEY FINISH",
+       sub:"Average finish at Lane over "+sims+" simulated seasons",unit:"AVG PLACE",
+       rows:list.map(r=>({...base(r),big:mean(r).toFixed(1),sub:r.team+" · wins "+pct(r.win,done),
+         bar:1/mean(r)}))},
+      {key:"allstate",cap:"All-state chance",title:"ALL-STATE ODDS",
+       sub:"Chance of a top-21 finish at Lane, from "+sims+" seasons",unit:"ALL-STATE",
+       rows:list.map(r=>({...base(r),big:pct(r.top21,done),sub:r.team+" · gets there "+pct(r.n,done),
+         bar:r.top21/done}))},
+    ];
   }
   const order=[...RUN.tally].sort((a,b)=>
-    b.win-a.win||b.top4-a.top4||b.top10-a.top10||b.qual-a.qual||a.avg5-b.avg5);
-  return order.slice(0,n).map(t=>({
-    name:t.name,team:t.name,big:pct(t.win,done),bigLab:"WINS STATE",
-    sub:(ABBR[t.league]||t.league)+" · "+pct(t.qual,done)+" reach Lane",
-    bar:t.win/done}));
+    b.win-a.win||b.top4-a.top4||b.top10-a.top10||b.qual-a.qual||a.avg5-b.avg5).slice(0,n);
+  const lg=t=>ABBR[t.league]||t.league;
+  const pts=t=>t.ptsN?t.ptsSum/t.ptsN:null;
+  const best=Math.min(...order.map(pts).filter(v=>v!=null));
+  return [
+    {key:"list",cap:"The list",title:"THE TOP "+(n===10?"TEN":"FIFTEEN"),
+     sub:"Ranked on "+sims+" simulated seasons, finishing at Lane, "+lane,
+     rows:order.map(t=>({name:t.name,team:t.name,sub:lg(t)}))},
+    {key:"win",cap:"State odds",title:"WHO WINS STATE?",
+     sub:"Chance of the title at Lane, "+lane+", from "+sims+" seasons",unit:"WINS STATE",
+     rows:order.map(t=>({name:t.name,team:t.name,big:pct(t.win,done),
+       sub:lg(t)+" · "+pct(t.qual,done)+" reach Lane",bar:t.win/done}))},
+    {key:"pts",cap:"Points",title:"THE SCORE AT LANE",
+     sub:"Average team score at state, in the seasons each team gets there",unit:"AVG POINTS",
+     rows:order.map(t=>{const p=pts(t);return {name:t.name,team:t.name,
+       big:p==null?"—":String(Math.round(p)),
+       sub:lg(t)+" · there "+pct(t.qual,done)+" of seasons",bar:p==null?0:best/p};})},
+  ];
 }
 function expFit(ctx,text,font,size,max){
   let s=size;
@@ -14702,16 +14755,16 @@ function expTrophy(ctx,i,x,y,w){
   ctx.fillText("#"+(i+1),50,38);
   ctx.restore();
 }
-async function expDraw(kind,fmt){
+async function expFonts(){
+  if(!document.fonts||!document.fonts.load)return;
+  try{await Promise.all(["40px Anton","700 40px Oswald","600 40px Oswald","700 40px Rajdhani",
+    "600 40px Rajdhani","400 40px Barlow","500 40px Barlow"].map(f=>document.fonts.load(f)));}catch(e){}
+}
+async function expDraw(kind,slide,fmt,crests,k,of){
   const F=EXP_FMT[fmt], W=F.w, H=F.h, M=64;
   const cv=document.createElement("canvas");cv.width=W;cv.height=H;
   const ctx=cv.getContext("2d");
-  if(document.fonts&&document.fonts.load){
-    try{await Promise.all(["40px Anton","700 40px Oswald","600 40px Oswald","700 40px Rajdhani",
-      "600 40px Rajdhani","400 40px Barlow","500 40px Barlow"].map(f=>document.fonts.load(f)));}catch(e){}
-  }
-  const rows=expRows(kind,F.n);
-  const crests=await Promise.all(rows.map(r=>expImg(LOGO[r.team])));
+  const rows=slide.rows, isList=!slide.unit;
   const ls=v=>{if("letterSpacing" in ctx)ctx.letterSpacing=v;};
 
   // ground: near-black, a warm glow off the top right, the seven huge and faint
@@ -14733,35 +14786,36 @@ async function expDraw(kind,fmt){
   ctx.fillText("OREGON CROSS COUNTRY",W-M,74);
   ctx.fillStyle=EXP_C.accent;ctx.fillText("STATE ODDS",W-M,108);ls("0px");
 
-  // title
+  // title, with where this slide sits in the set
   let y=fmt==="story"?250:214;
   ctx.textAlign="left";ctx.fillStyle=EXP_C.accent;ctx.font="600 30px Oswald";ls("4px");
-  ctx.fillText(CLS+" "+(gender==="M"?"BOYS":"GIRLS")+(NEXT_SEASON?" · NEXT SEASON":""),M,y);ls("0px");
+  ctx.fillText(CLS+" "+(gender==="M"?"BOYS":"GIRLS")+(NEXT_SEASON?" · NEXT SEASON":""),M,y);
+  ctx.textAlign="right";ctx.fillStyle=EXP_C.dim;ctx.fillText((k+1)+" / "+of,W-M,y);ls("0px");
+  ctx.textAlign="left";
   y+=fmt==="story"?112:100;
   ctx.fillStyle=EXP_C.text;
-  expFit(ctx,kind==="runners"?"FRONT OF THE RACE":"WHO WINS STATE?","$px Anton",fmt==="story"?118:104,W-2*M);
-  ctx.fillText(kind==="runners"?"FRONT OF THE RACE":"WHO WINS STATE?",M,y);
+  expFit(ctx,slide.title,"$px Anton",fmt==="story"?118:104,W-2*M);
+  ctx.fillText(slide.title,M,y);
   y+=48;
-  ctx.fillStyle=EXP_C.muted;ctx.font="400 28px Barlow";
-  const lane=new Date(STATE_DATE+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
-  ctx.fillText(kind==="runners"
-    ?"Average finish at Lane, "+lane+", from "+RUN.done.toLocaleString()+" simulated seasons"
-    :"Chance of the title at Lane, "+lane+", from "+RUN.done.toLocaleString()+" simulated seasons",M,y);
+  ctx.fillStyle=EXP_C.muted;expFit(ctx,slide.sub,"400 $px Barlow",28,W-2*M);
+  ctx.fillText(slide.sub,M,y);
   y+=34;
   ctx.fillStyle=EXP_C.accent;ctx.fillRect(M,y,96,6);
 
   // rows
   const top=y+(fmt==="story"?62:44), foot=H-(fmt==="story"?210:178);
-  const rh=(foot-top)/rows.length, maxBar=Math.max(...rows.map(r=>r.bar),1e-9);
+  const rh=(foot-top)/rows.length, maxBar=Math.max(...rows.map(r=>r.bar||0),1e-9);
   rows.forEach((r,i)=>{
     const ry=top+i*rh, cy=ry+rh/2;
     // the bar: how much of the top row's value this row holds
-    const bx=M+168, bw=(W-M-bx)*Math.max(0.015,r.bar/maxBar);
-    const bg2=ctx.createLinearGradient(bx,0,bx+bw,0);
-    bg2.addColorStop(0,"rgba(232,163,61,"+(i===0?.26:.14)+")");bg2.addColorStop(1,"rgba(232,163,61,.02)");
-    ctx.fillStyle=bg2;
-    ctx.beginPath();ctx.roundRect?ctx.roundRect(bx,ry+rh*0.12,bw,rh*0.76,10):ctx.rect(bx,ry+rh*0.12,bw,rh*0.76);ctx.fill();
-    if(i)ctx.fillStyle=EXP_C.line,ctx.fillRect(M,ry,W-2*M,1);
+    if(!isList&&r.bar>0){
+      const bx=M+168, bw=(W-M-bx)*Math.max(0.015,r.bar/maxBar);
+      const bg2=ctx.createLinearGradient(bx,0,bx+bw,0);
+      bg2.addColorStop(0,"rgba(232,163,61,"+(i===0?.26:.14)+")");bg2.addColorStop(1,"rgba(232,163,61,.02)");
+      ctx.fillStyle=bg2;
+      ctx.beginPath();ctx.roundRect?ctx.roundRect(bx,ry+rh*0.12,bw,rh*0.76,10):ctx.rect(bx,ry+rh*0.12,bw,rh*0.76);ctx.fill();
+    }
+    if(i){ctx.fillStyle=EXP_C.line;ctx.fillRect(M,ry,W-2*M,1);}
     // rank: the plaque for the four OSAA trophies, a number below that
     if(i<4&&kind==="teams")expTrophy(ctx,i,M-4,cy-rh*0.36,Math.min(92,rh*1.02));
     else{
@@ -14770,30 +14824,30 @@ async function expDraw(kind,fmt){
       ctx.fillText(String(i+1),M+40,cy+2);
     }
     // crest
-    const cr=Math.min(28,rh*0.36), cx=M+124;
+    const cr=Math.min(28,rh*0.36), cx=M+124, im=crests[r.team];
     ctx.save();ctx.beginPath();ctx.arc(cx,cy,cr,0,7);ctx.closePath();
     ctx.fillStyle=EXP_C.raised;ctx.fill();ctx.clip();
-    if(crests[i]){
-      const im=crests[i], k=Math.max(2*cr/im.width,2*cr/im.height);
-      ctx.drawImage(im,cx-im.width*k/2,cy-im.height*k/2,im.width*k,im.height*k);
+    if(im){
+      const s=Math.max(2*cr/im.width,2*cr/im.height);
+      ctx.drawImage(im,cx-im.width*s/2,cy-im.height*s/2,im.width*s,im.height*s);
     }else{
       ctx.fillStyle=EXP_C.muted;ctx.font="600 "+Math.round(cr*0.8)+"px Oswald";
       ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(initials(r.team),cx,cy+1);
     }
     ctx.restore();
-    // name and the line under it
-    const nx=M+168, right=W-M-170;
+    // name and the line under it; the plain list gives the name the whole row
+    const nx=M+168, right=isList?W-M:W-M-170;
     ctx.textAlign="left";ctx.textBaseline="alphabetic";ctx.fillStyle=EXP_C.text;
-    expFit(ctx,r.name.toUpperCase(),"700 $px Oswald",Math.round(rh*0.4),right-nx);
+    expFit(ctx,r.name.toUpperCase(),"700 $px Oswald",Math.round(rh*(isList?0.44:0.4)),right-nx);
     ctx.fillText(r.name.toUpperCase(),nx,cy+2);
     ctx.fillStyle=EXP_C.muted;expFit(ctx,r.sub,"500 $px Barlow",Math.round(rh*0.27),right-nx);
     ctx.fillText(r.sub,nx,cy+rh*0.33);
-    // the figure
+    if(isList)return;
+    // the figure, and its unit once on the first row: ten repeats of it is noise
     ctx.textAlign="right";ctx.fillStyle=i===0?EXP_C.accent:EXP_C.text;
     ctx.font="700 "+Math.round(rh*0.56)+"px Rajdhani";ctx.fillText(r.big,W-M,cy+rh*0.12);
-    // the unit once, on the first row: ten repeats of it is noise
     if(!i){ctx.fillStyle=EXP_C.dim;ctx.font="600 "+Math.round(Math.max(14,rh*0.19))+"px Oswald";ls("2px");
-      ctx.fillText(r.bigLab,W-M,cy+rh*0.36);ls("0px");}
+      ctx.fillText(slide.unit,W-M,cy+rh*0.36);ls("0px");}
   });
 
   // foot: the address, and the settings in fine print
@@ -14804,65 +14858,132 @@ async function expDraw(kind,fmt){
   ctx.textAlign="right";ctx.fillStyle=EXP_C.dim;ctx.font="400 22px Barlow";
   ctx.fillText("Results from athletic.net",W-M,foot+68);
   ctx.textAlign="left";ctx.font="600 19px Rajdhani";ls("2.5px");ctx.fillStyle=EXP_C.dim;
-  const parts=expStamp(), lines=[""];
-  for(const p of parts){
+  const lines=[""];
+  for(const p of expStamp()){
     const t=lines[lines.length-1]?lines[lines.length-1]+"  ·  "+p:p;
     if(ctx.measureText(t).width>W-2*M)lines.push(p);else lines[lines.length-1]=t;
   }
-  lines.forEach((l,k)=>ctx.fillText(l,M,foot+116+k*30));ls("0px");
+  lines.forEach((l,j)=>ctx.fillText(l,M,foot+116+j*30));ls("0px");
   return cv;
 }
 
+// can this browser hand the OS image files? asked once, with a dummy file
+const EXP_SHARE=(()=>{
+  try{return !!(navigator.canShare&&navigator.share&&typeof File!=="undefined"
+    &&navigator.canShare({files:[new File([""],"x.png",{type:"image/png"})]}));}catch(e){return false;}
+})();
 async function exportBoard(kind){
   if(running){toast("Let the run finish first");return;}
   if(!RUN||!RUN.done){toast("Press Run first");return;}
-  EXP.kind=kind==="runners"?"runners":"teams";
+  EXP.kind=kind==="runners"?"runners":"teams";EXP.at=0;
   const el=overlay();
-  const canShare=!!(navigator.canShare&&navigator.share&&typeof File!=="undefined");
-  el.innerHTML='<div class="gl-card gl-wide exp-card" role="dialog" aria-label="Share this board as an image">'
+  const caps=EXP.kind==="runners"?["The list","Average place","All-state"]:["The list","State odds","Points"];
+  el.innerHTML='<div class="gl-card gl-wide exp-card" role="dialog" aria-label="Share this board as images">'
     +'<div class="gl-tape"></div>'
     +'<div class="gl-hd"><h3>Share this board</h3>'
-    +'<p>The '+(EXP.kind==="runners"?"Runners":"Teams")+' board as an image, settings in the fine print.</p>'
+    +'<p>Three images, swipe through them. Settings are in the fine print.</p>'
     +'<div class="switch exp-sw" role="group" aria-label="Size">'
     +'<button data-f="post" aria-pressed="'+(EXP.fmt==="post")+'">Post 4:5</button>'
     +'<button data-f="story" aria-pressed="'+(EXP.fmt==="story")+'">Story 9:16</button></div></div>'
-    +'<div class="exp-prev"><div class="exp-wait">Drawing…</div><img alt="" hidden></div>'
-    +(canShare?'<button class="gl-go" id="expShare" disabled>Share</button>':'')
-    +'<a class="gl-share exp-save" id="expSave" download="chute.png" aria-disabled="true">Save image</a>'
+    +'<div class="exp-stage">'
+    +'<div class="exp-car" tabindex="0" aria-label="Images, swipe or use the arrow keys">'
+    +caps.map((c,k)=>'<figure class="exp-slide" aria-label="'+(k+1)+' of 3: '+c+'">'
+      +'<div class="exp-wait">Drawing…</div><img alt="'+c+'" hidden></figure>').join("")
+    +'</div>'
+    +'<button class="exp-nav prev" aria-label="Previous image">‹</button>'
+    +'<button class="exp-nav next" aria-label="Next image">›</button></div>'
+    +'<div class="exp-dots">'+caps.map((c,k)=>'<button aria-label="'+c+'" data-k="'+k+'"'
+      +(k?'':' class="on"')+'></button>').join("")+'</div>'
+    +'<p class="exp-cap" id="expCap">1 of 3 · '+caps[0]+'</p>'
+    +(EXP_SHARE
+      ?'<button class="gl-go" id="expOne" disabled>Share this image</button>'
+        +'<button class="gl-share" id="expAll" disabled>Share all 3</button>'
+        +'<p class="exp-hint">To keep it, pick <b>Save Image</b> in the share sheet.</p>'
+      :'<a class="gl-go exp-save" id="expOne" aria-disabled="true">Save this image</a>'
+        +'<button class="gl-share" id="expAll" disabled>Save all 3</button>')
     +'<p class="gl-esc">tap outside or press Esc to close</p></div>';
+  const car=el.querySelector(".exp-car");
+  /* The swipe is the browser's own scroll-snap; this only keeps the dots, the
+     caption and the buttons on the slide in view. An arrow or a dot sets the
+     slide itself rather than waiting for the scroll to report back - a page
+     that is not painting delivers no scroll events at all. */
+  const go=k=>{k=Math.max(0,Math.min(2,k));car.scrollTo({left:k*car.clientWidth,behavior:"smooth"});show(k);};
+  const sync=()=>show(Math.round(car.scrollLeft/Math.max(1,car.clientWidth)));
+  const show=k=>{
+    EXP.at=k;
+    el.querySelectorAll(".exp-dots button").forEach((b,j)=>b.classList.toggle("on",j===k));
+    document.getElementById("expCap").textContent=(k+1)+" of 3 · "+caps[k];
+    el.querySelector(".exp-nav.prev").disabled=k===0;el.querySelector(".exp-nav.next").disabled=k===2;
+    expButtons();
+  };
+  car.addEventListener("scroll",()=>{clearTimeout(car._t);car._t=setTimeout(sync,60);});
+  car.addEventListener("scrollend",sync);
+  car.addEventListener("keydown",e=>{
+    if(e.key==="ArrowRight"){e.preventDefault();go(EXP.at+1);}
+    else if(e.key==="ArrowLeft"){e.preventDefault();go(EXP.at-1);}
+  });
+  el.querySelector(".exp-nav.prev").onclick=()=>go(EXP.at-1);
+  el.querySelector(".exp-nav.next").onclick=()=>go(EXP.at+1);
+  el.querySelectorAll(".exp-dots button").forEach(b=>b.onclick=()=>go(+b.dataset.k));
+  sync();
   el.querySelectorAll(".exp-sw button").forEach(b=>b.onclick=()=>{
     if(b.dataset.f===EXP.fmt)return;
     EXP.fmt=b.dataset.f;
     el.querySelectorAll(".exp-sw button").forEach(x=>x.setAttribute("aria-pressed",x===b));
     expRender(el);
   });
-  const sh=document.getElementById("expShare");
-  if(sh)sh.onclick=async()=>{
-    if(!EXP.blob)return;
-    const f=new File([EXP.blob],expName(),{type:"image/png"});
-    if(navigator.canShare({files:[f]})){
-      try{await navigator.share({files:[f],title:"Chute",text:"chutexc.vercel.app"});}catch(e){}
-    }else toast("This browser cannot share images. Use Save image.");
-  };
+  const file=s=>new File([s.blob],s.name,{type:"image/png"});
+  const one=document.getElementById("expOne"), all=document.getElementById("expAll");
+  if(EXP_SHARE){
+    one.onclick=async()=>{const s=EXP.slides[EXP.at];if(!s)return;
+      try{await navigator.share({files:[file(s)]});}catch(e){}};
+    all.onclick=async()=>{if(EXP.slides.length<3)return;
+      const fs=EXP.slides.map(file);
+      if(navigator.canShare({files:fs})){try{await navigator.share({files:fs});}catch(e){}}
+      else toast("This phone shares one image at a time");};
+  }else{
+    all.onclick=()=>{EXP.slides.forEach((s,j)=>setTimeout(()=>{
+      const a=document.createElement("a");a.href=s.url;a.download=s.name;
+      document.body.appendChild(a);a.click();a.remove();},j*400));};
+  }
   expRender(el);
 }
-function expName(){
-  return ("chute-"+CLS+"-"+(gender==="M"?"boys":"girls")+"-"+EXP.kind+"-"+DATA_DATE+"-"+EXP.fmt)
+function expButtons(){
+  const one=document.getElementById("expOne"), all=document.getElementById("expAll");
+  if(!one)return;
+  const s=EXP.slides[EXP.at], ready=EXP.slides.length===3&&EXP.slides.every(Boolean);
+  if(one.tagName==="A"){
+    if(s){one.href=s.url;one.download=s.name;one.removeAttribute("aria-disabled");}
+    else one.setAttribute("aria-disabled","true");
+  }else one.disabled=!s;
+  all.disabled=!ready;
+}
+function expName(key){
+  return ("chute-"+CLS+"-"+(gender==="M"?"boys":"girls")+"-"+EXP.kind+"-"+key+"-"+DATA_DATE+"-"+EXP.fmt)
     .toLowerCase().replace(/[^a-z0-9-]+/g,"-")+".png";
 }
 async function expRender(el){
-  const img=el.querySelector(".exp-prev img"), wait=el.querySelector(".exp-wait"),
-        save=document.getElementById("expSave"), sh=document.getElementById("expShare");
-  const ticket=(EXP.ticket=(EXP.ticket||0)+1);
-  img.hidden=true;wait.hidden=false;if(sh)sh.disabled=true;save.setAttribute("aria-disabled","true");
-  const cv=await expDraw(EXP.kind,EXP.fmt);
-  if(ticket!==EXP.ticket||!document.body.contains(img))return;   // switched size mid-draw
-  EXP.url=cv.toDataURL("image/png");
-  EXP.blob=await new Promise(r=>cv.toBlob(r,"image/png"));
-  img.src=EXP.url;img.hidden=false;wait.hidden=true;
-  img.className="exp-img "+EXP.fmt;
-  save.href=EXP.url;save.download=expName();save.removeAttribute("aria-disabled");
-  if(sh)sh.disabled=false;
+  const ticket=++EXP.ticket;
+  const figs=[...el.querySelectorAll(".exp-slide")];
+  EXP.slides=[];expButtons();
+  figs.forEach(f=>{f.querySelector("img").hidden=true;f.querySelector(".exp-wait").hidden=false;});
+  await expFonts();
+  const specs=expSlides(EXP.kind,EXP_FMT[EXP.fmt].n);
+  const names=[...new Set(specs[0].rows.map(r=>r.team))];
+  const ims=await Promise.all(names.map(n=>expImg(LOGO[n])));
+  const crests=Object.fromEntries(names.map((n,j)=>[n,ims[j]]));
+  for(let k=0;k<specs.length;k++){
+    const cv=await expDraw(EXP.kind,specs[k],EXP.fmt,crests,k,specs.length);
+    if(ticket!==EXP.ticket||!document.body.contains(figs[k]))return;   // size switched mid-draw
+    const url=cv.toDataURL("image/png");
+    const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+    if(ticket!==EXP.ticket)return;
+    EXP.slides[k]={url,blob,name:expName(specs[k].key)};
+    const img=figs[k].querySelector("img");
+    img.src=url;img.className="exp-img "+EXP.fmt;img.hidden=false;
+    figs[k].querySelector(".exp-wait").hidden=true;
+    expButtons();
+  }
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest&&e.target.closest(".exp-btn");

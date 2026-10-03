@@ -327,6 +327,20 @@ the board paints from, in the board's own order, so the two cannot disagree.
   initials instead of tainting the canvas. **The CSP has `data:` and no `blob:`
   for images**, so the preview and Save use a data URL, and Share hands the OS a
   File from `toBlob` (no fetch, so no `connect-src` either).
+- **Three images you swipe, since the owner asked for a carousel** (`expSlides`):
+  Teams is the list, then wins state, then average points at Lane (lower is
+  better, so the bar is best/points); Runners is the list, average place,
+  all-state. Every slide keeps the board's order so the set reads as one post,
+  and each carries "1 / 3" by the board name. The swipe is CSS scroll-snap, so
+  it is the phone's own gesture; the dots, caption and buttons follow it, and an
+  arrow or a dot sets the slide directly because a page that is not painting
+  sends no scroll events.
+- **Save did nothing on an iPhone**, reported by the owner: Safari ignores a
+  download link there. Wherever `canShare` accepts files (`EXP_SHARE`), the
+  buttons are "Share this image" and "Share all 3" with a line saying Save Image
+  is in the share sheet; elsewhere they are download links. `navigator.share` is
+  called straight from the tap with Files already built, because Safari drops a
+  share that waits on anything first.
 - The figure's unit ("WINS STATE", "AVG PLACE") prints on the first row only;
   ten repeats of it was noise. Trophies only on the Teams image - a runner did
   not win a plaque.
